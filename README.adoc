@@ -1,0 +1,8 @@
+= 개발을 통한 자기수양
+정상혁의 개발 블로그
+
+== 사용 기술
+* http://jbake.org/[Jbake]
+* Gradle
+* 템플릿 : https://github.com/manikmagar/jbake-future-imperfect-template
+

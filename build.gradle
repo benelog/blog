@@ -1,0 +1,49 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'org.ajoberstar:gradle-git-publish:0.3.2'  
+    }
+}
+
+plugins {
+    id 'org.jbake.site' version '1.0.0'
+}
+
+buildDir = 'output'
+
+Properties jbakeProps = new Properties()
+FileInputStream stream = new FileInputStream('src/jbake.properties');
+jbakeProps.load(new InputStreamReader(stream, 'UTF-8'));
+
+jbake {
+    srcDirName  = 'src'
+    destDirName = ''
+    configuration = jbakeProps
+}
+
+apply plugin: 'war'
+webAppDirName = buildDir
+apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty.plugin'
+
+gretty {
+    // See http://akhikhl.github.io/gretty-doc/Gretty-configuration.html
+    contextPath = '/'
+}
+
+apply plugin: 'org.ajoberstar.git-publish'
+
+
+gitPublish {
+    repoUri = 'git@github.com:benelog/blog.git'
+    branch = 'gh-pages'
+
+    contents {
+        from(file('output')) {
+        into '.'
+    }
+}
+
+
