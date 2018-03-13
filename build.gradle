@@ -4,12 +4,13 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.ajoberstar:gradle-git-publish:0.3.2'  
+        classpath 'org.ajoberstar:gradle-git-publish:0.3.2'
+        classpath 'com.orientechnologies:orientdb-graphdb:2.2.30'
     }
 }
 
 plugins {
-    id 'org.jbake.site' version '1.0.0'
+    id 'org.jbake.site' version '1.1.1'
 }
 
 buildDir = 'output'
@@ -19,7 +20,7 @@ FileInputStream stream = new FileInputStream('src/jbake.properties');
 jbakeProps.load(new InputStreamReader(stream, 'UTF-8'));
 
 jbake {
-    version = '2.5.1'
+    version = '2.6.0'
     srcDirName  = 'src'
     destDirName = ''
     configuration = jbakeProps
