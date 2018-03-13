@@ -32,6 +32,13 @@
     <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">-->
     <link rel="shortcut icon" href="<#if (content.rootpath)??>${content.rootpath}<#else></#if>img/favicon/favicon.png">
   </head>
+  <script>
+  var url = window.location.href;
+  var lastChar = url.substr(-1);
+  if (lastChar != '/') {
+      window.location.href = url + '/'; 
+  }
+  </script>
   <body>
      <!-- Wrapper -->
         <div id="wrapper">
