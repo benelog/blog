@@ -1,0 +1,94 @@
+= Android App과 TDD - 임유진 (Kakao), GDG Korea Android 컨퍼런스 중에서
+정상혁
+2013-04-17
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: Android,Robolectric,Test,행사후기
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+지난 2013/04/13일, 종로 페럼타회에서 열렸던 '구글 개발자와 함께하는 GDG Korea Android 컨퍼런스 '에서 공유된 내용입니다
+
+== 발표 자료
+* 발표 자료 : http://goo.gl/1WyAz
+* 예제코드 : https://github.com/eugenelgm/AndroidForTest
+
+== 요약
+
+제가 핵심으로 기억하는 내용은 아래와 같습니다.
+
+* 앱이 기능이 점점 추가되고 복잡해져 가면서 코드가 점점 누더기가 되어갔다. 수정에 대한 부작용을 파악하기기 어려워져 갔다. 그래서 테스트의 필요성이 느껴졌다.
+* Android의 기본 Test Framework는 너무 느려서 포기했다. 한번 실행에 30~40초가 걸렸다.
+* Robolectric도 검토했으나, 없는 기능이 많고 라이브러리 충돌 때문에 포기했다.
+** 테스트가 실패할 때 Robolectric의 버그인지 앱의 버그인지 확인하기 어려워서 디버깅에 시간이 걸렸다.
+** 암호화 관련 라이브러리에서 충돌이 일어남
+* 결국 UI쪽의 테스트보다는 UI를 벗어난 layer에서 핵심로직을 테스트하는데 집중했다.
+* 테스트 기법
+** android.util.Log를 호출하는 부분은 별도의 Wrapping 클래스로 작성. 테스트 프로젝트에서는 같은 패키지에 같은 클래스 이름으로 System.out으로 로그를 출력하는 클래스를 작성. class loader의 순서를 조정해서 테스트 코드에서는 테스트용 Logger클래스를 호출.
+*** 실환경용 Log 랩퍼 클래스 : https://github.com/eugenelgm/AndroidForTest/blob/master/src/com/example/test/util/Logger.java[Logger.java
+]
+*** 테스트용 Log 클래스  : https://github.com/eugenelgm/AndroidForTest/blob/master/tests/src/com/example/test/util/Logger.java[Logger.java]
+** Background Thread에 대한 테스트도 래핑 클래스를 이용. 테스트 환경에서는 테스트 코드와 같은 쓰레드에서 동기적으로 실행되도록 Runnable.run을 호출하는 래퍼클래스를 호출함.
+*** 실환경용 쓰레드 실행 클래스 : https://github.com/eugenelgm/AndroidForTest/blob/master/src/com/example/test/util/DatabaseJobQueue.java[DatabaseJobQueue.java]
+*** 테스트용 Log 클래스  : https://github.com/eugenelgm/AndroidForTest/blob/master/tests/src/com/example/test/util/DatabaseJobQueue.java[DatabaseJobQueue.java]
+** 같은 interface를 구현한 테스트용 Mock객체를 작성하고, 주입은 별도의 setter 메소드를 사용.
+** API에 대한 테스트는 정적파일을 통해서 함. 후임자가 API의 명세를 예시로 금방 확인할 수 있는 장점도 생김
+** Context에 대한 참조 등 Android에 대한 의존성을 제거하기 어려운 부분은 PowerMock + Mockito로 해결
+*** PowerMock + Mockto로 Context.getString(int)의 동작을 가로채는 예제 : https://github.com/eugenelgm/AndroidForTest/blob/master/tests/test/com/example/test/MainActivityTest.java[MainActivityTest.java]
+* 테스트할 수 있는 Layer를 구분하다 보니 설계 개선을 이끔
+* TDD에 대한 오해
+** 꼭 Dalvik에서 테스트해야 의미가 있다.
+** TDD로 모든 에러를 잡을 수 있다.
+** 개발 후에 만들어도 된다.
+
+== 질문
+
+좀 더 자세히 알고 싶은 점이 있어서 발표가 끝난 후에 아래 2가지를 질문했습니다.
+
+=== 1. Robolectric의 라이브러리 충돌의 구체적인 사례
+앞에서 정리한 암호화 라이브러리와의 충돌사례를 알려주셨고, Robolectric의 버그 때문에 디버깅이 어려웠다는 이야기도 구체적으로 해주셨습니다.
+
+=== 2. Depenency Injection 프레임워크를 고려
+검토는 했지만 쓰지는 않았고, 발표한 내용은 사례일 뿐이기 때문에 각자 생각하는 좋은 방법이 있으면 계속 시도해봤으면 좋겠다고 말씀해주셨습니다.
+
+== 의견
+추가로 제 의견을 덧붙이면, Roblectric에 빈틈이 많다는 단점은 저도 공감은 가지만 꼭 UI를 테스트하지 않더라도 Robolectric을 부분적으로 유용하게 쓸 수는 있다고 생각합니다. 예를 들면 android.util.Log 클래스를 쓰는 코드도 Robolectric을 쓰면 별도의 랩퍼 클래스가 없어도 편하게 테스트할 수 있습니다. ShadowLog라는 클래스를 사용하면  Console이나 특정 파일등 로그를 쓰는 위치도 좀 더 편하게 조정할 수 있습니다.
+
+[source,java]
+----
+ShadowLog.stream = System.out;
+Robolectric.bindShadowClass(ShadowLog.class);
+----
+
+그리고 멀티쓰레드에 대한 테스트를 할 때도 Robolectric의 RobolectricBackgroundExecutorService를 쓰면 편할 때가 있습니다. 이 클래스도 다른 쓰레드를 생성하지 않고 호출한 쪽과 같은 쓰레드에서 Runnable 클래스를 실행해 줍니다.
+
+
+Android-annotations를 쓰면 @Background가 붙은 메소드는 BackgroundExecutor라는 클래스를 통해서 실행되는데, 이 클래스에 있는 executor라는 멤버변수를 교체하면 쓰레드의 생성 정책을 조절 할 수 있습니다. 따라서 테스트를 할 때는 아래와 같이 테스트용 Executor를 넣으면 자연스럽게 같은 쓰레드에서 동기적으로 Runnable 클래스를 실행할 수 있습니다.
+
+[source,java]
+----
+
+BackgroundExecutor.setExecutor(new RobolectricBackgroundExecutorService());
+----
+참고로 구조적으로 Thread의 Executor를 바꿔치기 하기 힘든 경우에는 https://code.google.com/p/awaitility/[Awaitility]라는 라이브러리도를 사용해볼만도 합니다.
+
+
+그리고 SDK버전에 따라서 다르게 돌아가는 코드가 있다면 Robolectric에서 아래와 같이 조작을 할 수 있습니다. (물론 PowerMock을 써도 같은 일을 할 수 있기는 합니다.)
+
+[source,java]
+----
+Robolectric.Reflection.setFinalStaticField(Build.VERSION.class, "SDK_INT", Build.VERSION_CODES.JELLY_BEAN);
+----
+
+암튼 Robolectric에 빈틈이 많기에 큰 기대를 하지 말고 UI 레이어의 테스트에는 많은 욕심을 부리지 말자고 생각하지만 그래도 몇가지 매력적인 기능이 있어서 Robolectric을 아예 외면을 할 수는 없었습니다.
+
+Mockito + Powermock의 조합은 강력하지만, 구조를 고치기 어려운 레가시 코드에만 한정해서 썼으면 한다는 의견입니다. 가능하다면 Powermock이 없어도 테스트할 수 있도록 구조를 개선하는 것이 더 클래스의 역할이 명확해지고, 앞으로 기능을 추가하거나 읽기에도 좋은 코드가 되기 때문입니다. 그렇게 구조개선을 하는데는 DI 프레임워크가 많은 도움이 되기도 합니다.  DI 프레임워크를 쓰면 Context에 대한 직접 의존이나 안드로이드 기본 프레임워크의 final 메소드의 동작을 가로채야할 일이 적어져서  훨씬 테스트하기 편해집니다.
+
+Helloworld에 올라온  http://helloworld.naver.com/helloworld/342818[Android에서 @Inject, @Test] 에서 이에 대해 자세히 적었습니다.
+
+== 소감
+개인적으로 많은 고민을 했던 주제였고, 발표자께서 내리신 결론이 저와 거의 비슷했기에 무척 반가웠습니다. 저도 Android의 기본 테스트 클래스를 쓰면서 느꼈던 좌절감에 결국 JVM에서 테스트를 해야 TDD로서 의미가 있다고 느꼈습니다. UI에 대한 테스트보다는 안드로이드와 독립적인 Layer를 테스트하는 것이 ROI가 높고, 좋은 설계를 이끈다는 점도 공감이 갔습니다. 로그호출 부분이나 멀티쓰레드에 대한 테스트 등 제가 했던 고민도 보편적인 문제였다는 것도 확인했습니다. API의 호출결과를 정적 파일로 저장해두고 테스트 코드에서 파싱부터 검증하는 기법은 저도 Server to Server API클라이언트 모듈 테스트 때 많이 썼던 방법이였습니다
+
+제가 편향된 생각을 가졌을지 늘 걱정이 되었는데, 같은 의견을 가지신 분이 구체적인 사례까지 공유해주셔서 많은 도움이 되었습니다.  앞으로  다른 분께도 안드로이드에서 TDD를 자신있게 권장해드릴 용기를 얻었습니다.

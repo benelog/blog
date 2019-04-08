@@ -1,0 +1,62 @@
+= 매쉬업(Mashup) 도구들
+정상혁
+2008-04-23
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: 매쉬업,mashup,mashup도구
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+== Yahoo Pipe
+* http://pipes.yahoo.com/pipes/
+* 설명 : http://en.wikipedia.org/wiki/Yahoo_Pipes , http://radar.oreilly.com/archives/2007/02/pipes-and-filters-for-the-inte.html[Pipes and Filters for the Internet]
+* 예제
+** http://pipes.yahoo.com/pipes/pipe.info?_id=vvW1cD212xGMiR9aqu5lkA[ New York Times thru Flickr]
+* 사용법
+** http://usefulvideo.blogspot.com/2007/02/yahoo-pipes-tutorials.html[Yahoo! Pipes tutorials] http://www.jumpcut.com/fullscreen?id=C086AA92568811DCAB02000423CF381C&amp;amp;type=movie[How to Translate a Feed Using Pipes]
+** http://www.jumpcut.com/fullscreen?id=594F555C568011DC9D24000423CEF5B0&amp;amp;type=movie[Learn How to Build a Pipe in Just a Few Minutes]
+** http://alexeysmirnov.name/blog/?page_id=198[Alexey's Yahoo Pipes tutorial]
+
+== MS Popfly
+
+* http://www.popfly.com/
+* 설명 : http://en.wikipedia.org/wiki/Popfly
+* Silverlight 기술에 기반
+* 시연동영상 : http://www.youtube.com/watch?v=hkTdJAYb--M[Three Minut Mashup - Microsoft Popfly]
+
+
+
+== IBM lotus mashup
+
+* http://www.ibm.com/lotus/mashups
+* 2008년 중반에 공개 예정
+
+
+
+== Google Mashup Editor
+
+* http://www.googlemashups.com/
+* 설명 : http://en.wikipedia.org/wiki/Google_Mashup_Editor
+
+
+
+== Intel Mash maker
+
+* http://mashmaker.intel.com/web/
+* 웹브라우저에 확장된 기능을 제공하는 형식
+* 시연동영상 : http://blip.tv/file/get/Intel_SW-IntelMashMakerOverviewVideo814.wmv
+
+
+
+== 관련링크
+
+http://uzys.tistory.com/97[mashup 도구]
+
+
+
+
+
+
+

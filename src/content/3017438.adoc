@@ -1,0 +1,16 @@
+= Android에서 @Inject, @Test
+정상혁
+2013-04-17
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: Android,Test,DependencyInjection
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+제가 지난달에 썼던 글이 네이버의 기술블로그인 http://helloworld.naver.com/[http://helloworld.naver.com]에 공개되었습니다.
+
+http://helloworld.naver.com/helloworld/342818[Android에서 @Inject, @Test]
+
+Android에서 DI + Test 스타일로 개발을 하는데 겪는 어려움과 이를 극복하는데 도움을 주는 Android annotations와 Robolectric 등의 오픈소스 프레임워크를 비교하고 소개했습니다.

@@ -1,0 +1,25 @@
+= Spring batch 국내 자료링크, 그리고 KSUG 연재
+정상혁
+2008-08-04
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: Spring,Spring-Batch,뉴스
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+(수정이력: 2008.01.19 - 스프링배치 관련 링크들은 http://www.ksug.org/94로 옮기고, 최근 자료를 포함시켰습니다.)
+
+7월31일에 Spring Batch 1.1.1이 나왔군요. 버그수정 외에 특별한  기능의 update 사안은 없기는 합니다만, 진도가 빠른 느낌입니다. ( http://www.springframework.org/node/722 )
+
+Spring batch에 대한 국내 자료도 점점 많이 생겨나고 있습니다.  http://www.ksug.org/[KSUG](한국 스프링사용자모임)에서 만난 분들 중 Spring batch에 관심을 가지고 계신 분들이 몇 분 계셔서, 새로운 자료들도 속속 올라올 것 같군요. 그런 분들과 정보를 주고 받을 수 있으니, 포럼(http://forum.ksug.org) 개설 등 최근 http://www.ksug.org/[KSUG]의 변화에 따른 수혜를 제가 많이 받고 있다고 느껴집니다.
+
+
+스프링배치 국내 자료 모음 - http://www.ksug.org/94[http://www.ksug.org/94]
+
+그리고 제가 마이크로소프트웨어지에 연재하고 있는 글도 시일이 좀 지난 기사에 한해서 담당기자분의 허락을 얻어 http://www.ksug.org/[KSUG]의 블로그에 올리고 있습니다.
+
+이미 잡지에 나왔던 내용이지만, 인쇄되어 나올 원고를 쓸 때와는 달리 링크와 인용을 더 편하게 할 수 있기에 웹사이트에 올릴 수 있는 기회가 온 것을 반가워하고 있습니다. 연재용 원고를 쓸 때는 참조자료의 URL이 들어가면 긴 주소를 독자들이 직접 쳐서 웹사이트에 들어가 볼까 하는 의구심도 들고, 주소가 차지하는 지면 공간도 많고 해서 사소한 것까지 웹사이트 주소를 쓰기가 망설여 지더군요. 웹에 올릴 때는 API문서 등 사소한  링크도 다 넣을 수 있어서 속이 후련했습니다. 그리고 티스토리에서 제공되는 '미주'를 다는 기능도 정말 마음에 듭니다. 개인블로그도 이글루스에서 이사가고 싶은 마음이 생길 정도입니다;
+
+위의 연재 내용을 포함한 스프링에 대한 모든 질문과 토론은 http://forum.ksug.org/[http://forum.ksug.org]을 통해서 하시면 됩니다~!

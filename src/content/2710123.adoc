@@ -1,0 +1,47 @@
+= SpringOne2GX 2010 (4) Spring Roo 관련 발표들
+정상혁
+2010-11-11
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: Spring,Spring-One,행사후기
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+작년 SpringOne에서도 Spring Roo에 대한 발표가 있었고, Google IO 등 다른 컨퍼런스에서도 꾸준히 Spring Roo는 홍보되었지만, 이번 SpringOne에서는 부쩍 그 비중이 높게 느껴졌습니다.
+
+키노트가 있었던 주행사장에는 Spring Roo, Spring, SpringSource, Groovy, Grails의 5개의 로고가 조명으로 비추어져 있었습니다. Groovy-Grais의 관계처럼 Spring-SpringRoo의 관계를 연상시켜서, Spring의 대표 기술로  홍보하려는 전략으로 보였습니다.
+
+
+image:http://lh3.ggpht.com/_oJrmz3UkGJk/TMi7gUjZNII/AAAAAAAAC0A/hSU3s8E2XCk/s640/PA220055.JPG[_oJrmz3UkGJk/TMi7gUjZNII/AAAAAAAAC0A/hSU3s8E2XCk/s640/PA220055.JPG,title="_oJrmz3UkGJk/TMi7gUjZNII/AAAAAAAAC0A/hSU3s8E2XCk/s640/PA220055.JPG",width=640,height=480]
+
+image:http://lh6.ggpht.com/_oJrmz3UkGJk/TMi7hDFNR_I/AAAAAAAAC0A/mWjWPk7bMPE/s912/PA220058.JPG[_oJrmz3UkGJk/TMi7hDFNR_I/AAAAAAAAC0A/mWjWPk7bMPE/s912/PA220058.JPG,title="_oJrmz3UkGJk/TMi7hDFNR_I/AAAAAAAAC0A/mWjWPk7bMPE/s912/PA220058.JPG",width=465,height=348]
+
+그리고 행사 기념품으로 나온 배찌에서도, Spring,SpringSource, Goorvy, Grails, Tomcat 등과 함께 Spring Roo의 로고가 박힌 것이 포함되었습니다. Security나 Batch같이 이미 현장에서 더 많이 쓰이고 있는 하위 프로젝트들도 있는데, Roo만 특별대우 한다는 느낌까지 들 정도였습니다.  다른 프레임웍 기술만과는 차별된 Spring만의 강점을 강조하기 위해서 Spring Roo가 전면에 나왔다고 생각됩니다.  스프링에서 지원하는 기술이 많아질 수록, API들을 전파하는 것도 쉽지 않을 것인데, Spring Roo를 통해서 사용할 수 있는 방법을 제공하면 코드가 자동생성 되므로 사용법이 더 간편해 보인다는 장점이 있을 것입니다. 그리고 Roo가 그렇게 새로운 API 전파 창구의 역할을 수행한다면 Roo를 직접 사용하지 않는 사람도 Roo가 생성해주는 코드를 샘플로 활용할 수도 있을 것입니다. Spring 3.0.4에 포함된 <mvc:default-servlet-handler/>가 Roo에 바로 반영된 것이나, Neo4j의 Roo addon등이 그 예입니다.
+
+
+컨퍼런스가 끝나고 몇일 뒤에 바로 Spring Roo 1.1.0 버전이 발표되었는데,  이번 컨퍼런스에서 1.1.0에 포함된 기능을 소개하는 발표가 많았습니다.
+
+* http://blog.springsource.com/2010/10/27/spring-roo-1-1-0-is-released/
+
+OSGi, GWT, GAE-J 지원,  검색서버인 Apache Solr  지원, Database reverse engineering 등 많은 발전을 보여줍니다. 아래 포스트에 있는 지난 1년간의 Roo의 commit 내력을 시각화한 그림에서도 그런 변화가 표현되었습니다.
+
+* http://stsmedia.net/spring-roo-1-1-ga-released/
+
+벤알렉스 아저씨가 열심히 개발을 하는 모습이 보이는군요.  이번 컨퍼런스에  벤알렉스는 참석하지 않았고, 벤알렉스가 진행하기로 한 발표의 일부는 로드존슨이 직접 진행했습니다. 아파서 못 왔다고는 말했는데, 1.1 출시를 얼마 안 앞두고 마무리 작업 때문에 못 온 것이 아닌가 하는 생각도 들었습니다.
+
+저는 Roo 관련 세션 중에 Add-On 개발 관련 세션에 들어갔었습니다.
+아래 URL에 있는 toString addon을 샘플소스로 보라고 했는데,  toString을 Addon도 크게 쉬워보이지는 않았습니다.
+
+http://git.springsource.org/roo/roo/trees/master/addon-tostring/src/main/java/org/springframework/roo/addon/tostring
+
+가장  흥미로운 이야기는 Roo에서 앞으로 iBatis, Spring jdbc 같은  JPA 이외의 Persistence 기술도 지원하겠다는 것이였습니다.
+
+그리고 Maven 멀티 프로젝트를 언제 지원할 수 있으냐는 질문이 세션 중에 나왔는데, 명확한 일정을 확답을 하지 못한 것으로 봐서는 가까운 시일 내에 가능해지지는 않을 것 같습니다.
+
+Roo 관련 발표 자료들은 아래에 공개되어 있습니다.
+
+* http://www.slideshare.net/schmidtstefan/new-persistence-features-in-spring-roo-11[New Persistence Features in Spring Roo 1.1]
+* http://www.slideshare.net/schmidtstefan/next-generation-spring-mvc-with-spring-roo[Next Generation Spring MVC with Spring Roo]
+* http://www.slideshare.net/schmidtstefan/spring-one2010addondev[Spring Roo Add-On Development & Distribution]

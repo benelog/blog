@@ -1,0 +1,189 @@
+= 확장된 나선형 배열 출력 문제(Spiral Array)
+정상혁
+2007-09-19
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: 코딩연습,spiral-array
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+지난 2월에 회사 워크샵에서 풀었던 나선형 배열 문제에 대한 글을 올린 적이 있었지요. ( http://blog.benelog.net/901106 )
+
+알고보니 xper.org에도 이 문제가 올라와 있더군요 (http://xper.org/wiki/seminar/SpiralArray). 거기에 가면 다른 분들의 풀이도 많이 볼 수 있습니다.  저는 이 문제를 실컷 가지고 논 후에 더 이상 손 댈 것이 없다고 느껴질때 다른 분들의 풀이를 꼼꼼히 볼 생각입니다.
+
+우연찮게 이에 대한 확장된 문제를 다른 블로그에서 보게 되었습니다. (http://blog.naver.com/itioma?Redirect=Log&logNo=40040118386 ). 그 포스트에서 본 문제에는 아래의 조건들이 더 추가되어 있었습니다.
+
+* 작성된 코드에서 한 글자만 수정해서 '숫자는 1씩 늘어난다'를 '숫자는 2씩 늘어난다'로 바꾸시오.
+* 코드에서 한 문장만 수정해서 시작점 좌표(x,y)를 마음대로 바꿀 수 있도록 만드시오
+* 코드에서 한 문장만 수정해서 시작할 때의 진행방향을 (위/아래/왼쪽/오른쪽 중에서 ) 바꿀 수 있도록 만드시오
+* 배열의 크기를 마음대로 정할 수 있도록 만드시오.
+* 코드에서 한 문장만 수정해서 '시계방향으로 90도'를 '반시계 반향으로 90'도로 바꾸시오
+* 코드에서 swich 문이나 else 문을 이용한 3단계 이상의  조건분기가 있다면 모두 제거하시오.
+* 코드에서 한 글자만 수정해서 '한칸씩 진행하며'를 두칸씩 건너뛰며'로 바꾸시오.
+* 1~7에서 수정되었던 문장/값/변수들이모두 하나의 함수 또는 블럭안에 존재하도록 고치시오.
+
+그리고   숫자는 1에서 시작하고 , 채워지지 않은 부분이 있다면 0으로 표시된다는 점이 제가 처음에 풀었던 문제와 다르네요.
+
+확장된 조건을 다 수용할 수 있는  만족시키는 코드를 다시 한번 만들어보았습니다.
+
+== 소스코드
+[source,java]
+----
+public class MatrixMain {
+    public static void main(String[] args) {
+       System.out.println("0.원래의 matrix");
+       ExtMatrix mp = new ExtMatrix(6,6);
+       mp.print();
+
+       System.out.println("1.숫자가 2씩 늘어나게");
+       mp.setIncrement(2);
+       mp.print();
+
+       System.out.println("2.시작점을 1,1로");
+       mp.setStartPoint(1, 1);
+       mp.print();
+
+       System.out.println("3.시작방향을 아래부터");
+       mp.setStartDirection(ExtMatrix.DOWN);
+       mp.print();
+
+       System.out.println("4.배열크기 바꾸는건 생성할때 파라미터 바꾸면 됨.");
+       System.out.println();
+       System.out.println("5.반시계 반향으로 회전");
+       mp.setReverseClockWiseTurn();
+       mp.print();
+
+       System.out.println("6.그런 조건 분기 없음.");
+       System.out.println();
+
+       System.out.println("7.한칸씩이 아닌 두칸씩 건너뛰며.");
+       mp.setMoveStep(2);
+       mp.print();
+    }
+}
+
+public class ExtMatrix {
+    public static final int RIGHT = 0;
+    public static final int DOWN = 1;
+    public static final int LEFT = 2;
+    public static final int UP  = 3;
+
+    private static final int INIT_VALUE = 0;
+    private static final int CLOCK_WISE_TURN = 1;
+    private static final int REVERSE_CLOCK_WISE_TURN = -1;
+
+    private int m = 0;
+    private int n = 0;
+    private int startX = 0;
+    private int startY = 0;
+    private int[][] matrix;
+    private int startDirection = RIGHT;
+    private int increment = 1;
+    private int moveStep = 1;
+
+    private int turnDirection = CLOCK_WISE_TURN;
+
+
+    public ExtMatrix(int m, int n){
+        this.m = m;
+        this.n = n;
+        matrix = new int[m][n];
+    }
+
+    public void setIncrement(int increment){
+        this.increment = increment;
+    }
+
+    public void setStartPoint(int startX, int startY){
+        this.startX = startX;
+        this.startY = startY;
+    }
+
+    public void setClockWiseTurn(){
+        turnDirection = CLOCK_WISE_TURN;
+
+    }
+
+    public void setReverseClockWiseTurn(){
+        turnDirection = REVERSE_CLOCK_WISE_TURN;
+    }
+
+    public void setMoveStep(int moveStep){
+        this.moveStep = moveStep;
+    }
+
+    public void setStartDirection(int startDirection){
+        this.startDirection = startDirection;
+    }
+
+    public void print(){
+        locateNumbers();
+        for (int i=0;i< m ;i++){
+            for (int j=0;j<n;j++) System.out.print(matrix[i][j] + "\t");
+            System.out.println();
+       }
+       System.out.println();
+    }
+
+    private void locateNumbers() \{
+       init();
+       int[] startPosition = new int[]\{startX,startY};
+       matrix[startX][startY]= 1;
+       int direction = startDirection;
+       while(move(startPosition ,direction)) direction= getNextDirection(direction);
+    }
+
+    private void init(){
+        for (int i=0;i< m ;i++){
+            for (int j=0;j<n;j++) matrix[i][j] = INIT_VALUE;
+        }
+    }
+
+    private boolean move(int[] position, int direction){
+        int nowNumber = matrix[position[0]][position[1]];
+        boolean moved = false;
+        int[] nextPosition =getNextPosition(position,direction);
+        while(isMovable(nextPosition[0],nextPosition[1])){
+            moved = true;
+            nowNumber+= increment;
+            position[0] = nextPosition[0];
+            position[1] = nextPosition[1];
+            matrix[position[0]][position[1]]= nowNumber;
+            nextPosition = getNextPosition(position,direction);
+        }
+        return moved;
+    }
+
+    private int[] getNextPosition(int[] position,int direction){
+        int x = position[0];
+        int y = position[1];
+        if (direction == RIGHT) y+= moveStep;
+        else if (direction == DOWN) x+= moveStep;
+        else if (direction == LEFT) y-= moveStep;
+        else if (direction == UP)  x-= moveStep;
+        return new int[]\{x,y};
+    }
+
+    private int getNextDirection(int direction){
+        direction+= turnDirection;
+        if (direction<0) direction+=4;
+        direction = direction %4;
+        return direction;
+    }
+
+    private boolean isMovable(int x, int y){
+        if (x>=m) return false;
+        if (y>=n) return false;
+        if (x<0) return false;
+        if (y<0) return false;
+        if (matrix[x][y]!= INIT_VALUE) return false;
+        return true;
+    }
+}
+----
+
+
+방향을 int로 나타내는 것이 처음에는 좋은 아이디어 라고 생각했는데  `mp.setStartDirection(ExtMatrix.DOWN);` 부분을 보니 타입안전열거형이나 enum을 도입해야지 좀더 코드가 이뻐질 것 같네요.
+

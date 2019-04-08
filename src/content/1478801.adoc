@@ -1,0 +1,65 @@
+= Sybase 날짜형(datetime)의 문자열 변환시 style number
+정상혁
+2007-09-17
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: Sybase,날짜
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+sybase에서 select convert(varchar,getdate(),112)로 찍어보면 오늘 날짜가 20070831 형식으로 나오죠. 이런 형식들이 정리된 자료를 한 번 만들어 보았습니다.
+
+제가 쓰는 sybase 버전은 12.5.3입니다. (select @@version)으로 확인할 수 있죠)
+
+`select convert(varchar,날짜데이터, *_convertType_*)`` 형식으로 쓰고 _*convertType *_ 위치에 숫자가  들어갈 때 옆에 적힌 형식대로 나온다고 보시면 됩니다. 예시로 옆에 찍힌 날짜는 2007년 8월27일입니다.
+
+== Style number
+* 0 = Aug 27 2007  5:28PM
+* 1 = 08/27/07
+* 2 = 07.08.27
+* 3 = 27/08/07
+* 4 = 27.08.07
+* 5 = 27-08-07
+* 6 = 27 Aug 07
+* 7 = Aug 27, 07
+* 8 = 17:23:35
+* 9 = Aug 27 2007  5:28:08:563PM
+* 10 = 08-27-07
+* 11 = 07/08/27
+* 12 = 070827
+* 13 = 07/27/08
+* 14 = 08/07/27
+* 15 = 27/07/08
+* 16 = Aug 23 2007 17:28:08
+* 18 = 15:17:08
+* 19 = 5:11:39:086PM
+* 20 = 17:12:30:633
+* 21 = 07/08/27
+* 22 = 07/08/27
+* 100 = Aug 27 2007  5:28PM
+* 101 = 08/27/2007
+* 102 = 2007.08.07
+* 103 = 27/08/2007
+* 104 = 27.08.2007
+* 105 = 27-08-2007
+* 106 = 27 Aug 2007
+* 107 = Aug 27, 2007
+* 108 = 17:28:08
+* 109 = Aug 27 2007 5:28:08:563PM
+* 110 = 08-27-2007
+* 111 = 2007/08/27
+* 112 = 20070827
+* 113 = 2007/27/08
+* 114 = 08/2007/27
+* 115 = 27/2007/08
+* 116 = Aug 23 2007 17:28:08
+
+== 응용
+* `select convert(char,GETDATE(),112)` : 오늘날짜를 YYYYMMDD로
+* `select convert(char(8), DATEADD(DD,-1,getdate()) ,112)` : 현재 날짜 하루전을 yymmdd형식으로 출력
+* `select convert(char(8), DATEADD(DD,-1,'20070827') ,112)` : 2007년 8월 27일 전날을 출력. string -> datetime은 convert라는 함수를 사용하지 않고 내부적(implicit)으로 자동으로 변경됩니다
+* `select str_replace( convert(varchar,getdate(),20),':',null)` : 현재 분일초,밀리세컨드까지: 152515853
+* `select convert(varchar,GETDATE(),112) || str_replace( convert(varchar,getdate(),20),':',null)` : 현재 연월일시분초밀리세컨드를 다 붙여서
+

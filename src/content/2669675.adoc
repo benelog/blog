@@ -1,0 +1,27 @@
+= 로또 번호 생성기 파이썬으로 만들어보기
+정상혁
+2010-08-28
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: 코딩연습,Lotto,Python
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+오래 전에 블로그에 Java를 이용한 로또 번호 생성기(http://blog.benelog.net/1646013 )코드를 올린 적이 있었습니다.
+
+갑자기 생각이 나서, 이번에는 Python으로 코딩해봤습니다.
+
+== 문제
+* 1부터 45까지의 숫자 중에 6개를 뽑는다.6개의 값이 다 달라야 한다.
+* 출력시 작은 숫자부터 순서대로 출력
+
+== 풀이
+[source,python]
+----
+import random
+balls = range(1,46)
+random.shuffle(balls)
+print sorted(balls[0:6])
+----

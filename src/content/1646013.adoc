@@ -1,0 +1,37 @@
+= shuffle을 이용한 로또생성기
+정상혁
+2007-12-14
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: 코딩연습, Lotto
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+바로 아래 포스팅에서 간단한 로또생성기 코드를 만들어봤었죠. (http://blog.benelog.net/1642193).
+
+같은 문제에 대한 dak99님의 풀이(http://dak99.egloos.com/3529054)를 보고 다시 다른 버전을 만들어봤어요.
+
+shuffle을 이용해도 http://java.sun.com/j2se/1.5.0/docs/api/java/util/Collections.html[Collections]의 메소드들을 불러서 쓰니 코드가 별로 안 복잡해 지는군요.
+
+[source,java]
+----
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public class LottoMachine \{
+    public static void main(String[] args) \{
+        List<Integer> numberCards = new ArrayList<Integer>();
+        for(int i=1;i<=45;i++) numberCards.add(i);
+        Collections.shuffle(numberCards);
+        List<Integer> picked = numberCards.subList(0,5);
+        Collections.sort(picked);
+        System.out.println(picked);
+    }
+}
+----
+
+n이 클수록 속도차이가 클겁니다.
+

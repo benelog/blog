@@ -1,0 +1,200 @@
+= 시간대 DB에서 우리나라 시간의 오류
+정상혁
+2014-11-03
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: timezone,시간대,날짜
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+변경이력
+
+* 2015/02/13
+** tzdata2014j에 반영 사실 갱신
+** 북한의 시간대에 대한 진행 상황 설명
+
+2014년 2월, 회사의 기술블로그인 http://helloworld.naver.com에 http://helloworld.naver.com/helloworld/64560[Java의 날짜와 시간 API]이라는 글을 기고한 적이 있습니다. 그 글을 쓰던 도중에 우리나라의 타임존 데이터에 대한 몇가지 의문을 가지게 되었지만 완벽히 해결하지는 못했었습니다.
+
+얼마 전에 이 문제를 좀 더 깊이 파악을 해보았고, 원천 데이터인 IANA Timezone 데이터베이스에 패치를 전달해서 반영되었습니다. 조사과정에서 1920년대부터 1999년까지의 과거 뉴스를 조회하는 네이버의 뉴스라이브러리 서비스 ( http://newslibrary.naver.com/) 가 큰 도움이 되었습니다.
+
+이 오류는 tzdata2014j에 반영되고, 이를 참조하는 Java, Android, FreeBSD에서도 2014년 11월경에 반영되었습니다.
+
+* http://permalink.gmane.org/gmane.comp.time.tz/9111[tzdata2014j의 릴리즈노트]
+* https://bugs.openjdk.java.net/browse/JDK-8064560[JDK-8064560] : Open JDK의 반영. TZUpdater 1.4.10가 오류가 수정된 이 데이터를 참조하고, JDK 8u40, JDK
+7u80, JDK 7u75등 여러 버전에 백포트 패치
+* https://android.googlesource.com/platform/bionic.git/+/b11d8e057c86c3926128af9d07180d9328e144c6[Android에 반영 Commit]
+* http://lists.freebsd.org/pipermail/svn-src-stable-10/2014-November/003831.html[FreeBSD에 반영 Commit]
+
+플랫폼별로 반영시점은 다르겠지만, 다른 OS에서 이를 반영할 것으로 예상합니다.
+
+현시점에서는 드물것 같지만, 혹시 우리나라의 1912 ~ 1980년대의 섬머타임과 시간대 변경에 영향받은 프로그램을 만드셨던 분이 있다면 참고로 알아둘만 합니다.
+
+== 섬머타임의 오류 발견
+처음 발견한 오류는 1988년의 섬머타임이 시작된 시간이였습니다. 아래 자료에 따르면 이 해의 섬머타임은 5월 8일 새벽 2시부터 시작되었습니다.
+
+* '한국 표준시', 위키백과, http://ko.wikipedia.org/wiki/한국_표준시
+* http://newslibrary.naver.com/viewer/index.nhn?articleId=1988050700099215012&editNo=1&printCount=1&publishDate=1988-05-07&officeId=00009&pageNo=15&printNo=6822&publishType=00020['내일부터 서머타임... 새벽2시를 3시로'], 매일경제, 1988. 5. 7.
+
+그러나 Java프로그램으로는 1988년 5월 7일 23시의 1시간 후가 5월8일 1시인것으로 나와서 00시를 기점으로 섬머타임이 적용되어 있습니다. 아래 테스트는 아직 오류수정이 정식 릴리즈되지 않은 지금 시점에서는 통과합니다.
+
+[source,java]
+----
+@Test
+public void shouldGetAfterOneHour() {
+    TimeZone seoul = TimeZone.getTimeZone("Asia/Seoul");
+    Calendar calendar = Calendar.getInstance(seoul);
+    calendar.set(1988, Calendar.MAY , 7, 23, 0);
+    String pattern = "yyyy.MM.dd HH:mm";
+    String theTime = toString(calendar, pattern, seoul);
+    assertThat(theTime).isEqualTo("1988.05.07 23:00");
+    calendar.add(Calendar.HOUR_OF_DAY, 1);
+    String after1Hour = toString(calendar, pattern, seoul);
+    assertThat(after1Hour).isEqualTo("1988.05.08 01:00");}
+----
+
+(자세한 설명은 http://helloworld.naver.com/helloworld/645609[Java의 날짜와 시간 API],전체 소스는 https://github.com/benelog/java-date-time/blob/master/jdk7-date-time/src/test/java/com/nbp/weblab/date/OldJdkDateTest.java[OldJdkDateTest.java)] 참조)
+
+
+시간대 변경에 대한 정보는 윈도우즈, 안드로이드, OSX, 리눅스, Java, 오라클 등 거의 모든 플랫폼에서 Internet Assigned Numbers Authority (IANA)라는 조직에서 관리하는 시간대 데이터베이스를 원천으로 참조합니다. 처음에는 이 타임존 데이터베이스의 오류일지 아니면 다른 이유가 있을지 확신을 하지 못했습니다.
+
+
+== 오류의 역사
+
+Helloworld에 글이 나간 후에 이응준님께서 알려주셔서 우리나라의 섬머타임을 기록한 사람이 누구인지 알게 되었습니다. Github에 올라간 https://github.com/eggert/tz의 커밋로그를 바탕으로 이를 자세히 분석해봤습니다.
+
+
+우리나라의 섬머타임에 대한 기록은 'Arthur David Olson'의 https://github.com/eggert/tz/commit/79373b10463c3b59a1b2af49491dc308efbad09d[1988년 1월 3일의 커밋]에 아래와 같이 처음으로 등장합니다.
+
+
+[source]
+----
+# Republic of Korea. According to someone at the Korean Times in San Francisco,# Daylight Savings Time was not observed until 1987. He did not know# at what time of day DST starts or ends.# Rule NAME FROM TO TYPE IN ON AT SAVE LETTER/SRule ROK 1987 max - May Sun<=14 2:00 1:00 DRule ROK 1987 max - Oct Sun<=14 3:00 0 S
+----
+
+주석을 봐서는 섬머타임의 시작시기도 정확히 몰랐던 사람의 증언을 참고로 한 듯합니다. 그리고 1987년 이전에는 우리나라에 섬머타임이 없었다는 이야기도 사실과 다릅니다.
+
+위의 코드로는 1987년부터 섬머타임이 계속되고 있다고 정의되었습니다. 1987,1988년에 우리나라에서 섬머타임이 실행되었으니 commit시점에서는 적어도 이 년도에 대해서는 맞는 데이터였습니다.
+
+그러나 1988년 이후로도 우리나라에서는 섬머타임이 계속되어 있는것처럼 한동안 유지가 됩니다. 1993년에 이르러서야 이 데이터는 정정됩니다.
+
+https://github.com/eggert/tz/commit/61315cadc3d0e8b4ef559539502a606cf58fc0f7[1993년 11월23일의 커밋]으로 다음의 날짜가 다시 반영됩니다.
+
+[source]
+----
+Rule ROK 1960 only - May 15 0:00 1:00 DRule ROK 1960 only - Sep 13 0:00 0 SRule ROK 1987 1988 - May Sun<=14 0:00 1:00 DRule ROK 1987 1988 - Oct Sun<=14 0:00 0 S
+----
+
+이 commit은 아래 2가지 오류를 담고 있습니다.
+
+* 1987~1988년도의 섬머타임은 시작시간 2시부터인데 0시부터로 표기되었습니다.
+* 새로 추가한 1960년의 섬머타임은 실제로는 5월1일부터 9월18일까지였습니다. 위키페디아와 옛날신문의 자료가 일치합니다.
+* http://newslibrary.naver.com/viewer/index.nhn?articleId=1960050100209103019&editNo=2&printCount=1&publishDate=1960-05-01&officeId=00020&pageNo=3&printNo=11713&publishType=00010[썸머타임 1일부터], 동아일보, 1960.05.01
+* http://newslibrary.naver.com/viewer/index.nhn?articleId=1960091800209103010&editNo=2&printCount=1&publishDate=1960-09-18&officeId=00020&pageNo=3&printNo=11853&publishType=00010[없어지는 섬머타임], 동아일보, 1960.09.18
+
+이외에도 이 Commit은 우리나라 시간대 변경에 대한 많은 오류를 포함하고 있습니다. 섬머타임 외의 오류는 나중에 다시 살펴보도록 하겠습니다.
+
+주석으로 볼때 위의 https://github.com/eggert/tz/commit/61315cadc3d0e8b4ef559539502a606cf58fc0f7[1993년 11월23일의 커밋]은 http://en.wikipedia.org/wiki/Thomas_G._Shanks[Thomas G. Shanks]의 The International Atlas의 제3판에 있는 내용을 반영한것을 보입니다. 주석에도 아래와 같이 미국이외의 타임존 정보는 별다른 명시가 없다면 이 책을 참고로 했다고 나옵니다.
+
+[source]
+----
+# A good source for time zone historical data outside the U.S. is# Thomas G. Shanks, The International Atlas (3rd edition),# San Diego: ACS Publications, Inc. (1991).# Except where otherwise noted, it is the source for the data below.
+----
+
+지금 이 책은 http://www.amazon.com/International-Atlas-6th-Thomas-Shanks/dp/0935127887/[6판]까지 나와있고, 이후의 commit에서도 5판,6판을 따라서 수정한 내용이 보입니다.
+
+그 이후 https://github.com/eggert/tz/commit/da23b4d3897fd8a9e302ca0e85b25ce921f95ec7[2012년 7월 18일의 커밋]이 한번더 섬머타임 데이터를 수정했습니다. 1987년, 1988년의 표현규칙을 바꾼것으로 근본적인 오류가 수정되지는 않았습니다.
+
+[source]
+----
+Rule ROK 1987 1988 - May Sun>=8    0:00 1:00 DRule ROK 1987 1988 - Oct Sun>=8    0:00 0 S
+----
+
+1960년 이전의 데이터까지 포함한다면, IANA 데이터베이스에서 우리나라의 섬머타임이 제대로 반영된 적은 한번도 없었던 것입니다.
+
+
+== 패치 전달와 반영
+조사결과 섬머타임의 오류를 확신하고, 이를 수정하는 패치파일을 직접 만들어서 시간대데이터를 관리하는 IANA에 메일(tz@iana.org )로 보냈습니다. 여러 옛날 신문들을 많이 찾아본결과 http://ko.wikipedia.org/wiki/한국_표준시[위키페이디아의 '한국표준시'페이지]의 정보가 신뢰할만하다고 판단했습니다.
+
+* 1948.06.01. 00:00 ~ 1948.09.13. 00:00
+* 1949.04.03. 00:00 ~ 1949.09.11. 00:00
+* 1950.04.01. 00:00 ~ 1950.09.10. 00:00
+* 1951.05.06. 00:00 ~ 1951.09.09. 00:00
+* 1955.05.05. 00:00 ~ 1955.09.09. 00:00
+* 1956.05.20. 00:00 ~ 1956.09.30. 00:00
+* 1957.05.05. 00:00 ~ 1957.09.22. 00:00
+* 1958.05.04. 00:00 ~ 1958.09.21. 00:00
+* 1959.05.03. 00:00 ~ 1959.09.20. 00:00
+* 1960.05.01. 00:00 ~ 1960.09.18. 00:00
+* 1987.05.10. 02:00 ~ 1987.10.11. 03:00
+* 1988.05.08. 02:00 ~ 1988.10.09. 03:00
+
+예를 들면 1948년의 정보는 http://newslibrary.naver.com/viewer/index.nhn?articleId=1948060100209202008&editNo=1&printCount=1&publishDate=1948-06-01&officeId=00020&pageNo=2&printNo=7607&publishType=00020[1948년 6월1일자 동아일보 기사]에서 확인할수 있습니다.
+
+
+패치절차는 시간대데이터베이스의 소스에 있는 https://github.com/eggert/tz/blob/master/CONTRIBUTING[CONTRIBUTING]파일에 잘 설명되어 있습니다. 정식절차와는 별도로 github에도 올려봤습니다. ( https://github.com/eggert/tz/pull/9 )
+
+얼마 후 제가 보낸 패치를 포함하는 https://github.com/eggert/tz/commit/929c14a3d8ce505a9b8fb7099bee3a03ccf7e8e4[2014년 10월30일의 Commit]이 올라왔습니다. 'Unreleased, experimental changes'라는 문구가 포함되었지만, 이를 뒤집는 증거가 발견되지 않는한 정식릴리즈에 포함될 것으로 예상합니다.
+
+IANA쪽에서 이 수정을 받아준 Paul Eggert은 제가 섬머타임 변경의 근거로 보낸 http://ko.wikipedia.org/wiki/한국_표준시[위키페이디아의 '한국표준시'페이지]를 보고 우리나라의 시간대 변경시점에 대한 오류도 추가로 수정을 했습니다.
+
+== 시간대 변경시점의 오류
+처음에 보낸 패치에는 포함되지 못했지만 섬머타임 외에도 우리나라 시간대 변경에 대한 의문도 있었습니다. "yyyy.MM.dd HH:mm (Z)"을 포멧으로 해서, 1954년, 1961년, 1968년의 특정시간과 그 때와 UTC와의 차이를 출력해보면, 아래와 같이 나옵니다. (소스는 https://github.com/benelog/java-date-time/blob/master/jdk7-date-time/src/main/java/com/nbp/weblab/date/TimeZoneChangePoint.java[TimeZoneChangePoint.java] 참조 )
+
+[source]
+----
+1954.03.20 22:59 (+0900)1954.03.20 23:00 (+0800)1961.08.09 23:59 (+0800)1961.08.10 00:30 (+0830)1968.09.30 23:59 (+0830)1968.10.01 00:30 (+0900)
+----
+
+이 소스의 결과는 https://github.com/eggert/tz/commit/61315cadc3d0e8b4ef559539502a606cf58fc0f7[1993년 11월23일의 수정] 때 반영된 타임존DB의 정보에 의지합니다. 위의 결과라면 우리나라의 시간대 변경시점은 아래와 같습니다.
+
+* 1954년 : UTC+0900 -> UTC+0800
+* 1961년 : UTC+0800 -> UTC+0830
+* 1968년 : UTC+0830 -> UTC+090
+
+그러나 과거 신문에서 확인한 역사적 사실은 아래와 같습니다. 위키페디아의 내용과도 일치합니다.
+
+* 1954년 : UTC+0900 -> UTC+0830
+** http://newslibrary.naver.com/viewer/index.nhn?articleId=1954032100209203002&editNo=1&printCount=1&publishDate=1954-03-21&officeId=00020&pageNo=3&printNo=9522&publishType=00020['오늘은 춘분 시간도 광복'], 동아일보, 1954.03.21
+** http://newslibrary.naver.com/viewer/index.nhn?articleId=1954032100329203006&editNo=1&printCount=1&publishDate=1954-03-21&officeId=00032&pageNo=3&printNo=2462&publishType=00020['입일일은 춘분, 표준시간광복의 날']. 경향신문, 1954.03.21
+* 1961년 : UTC+0830 -> UTC+0900
+** http://newslibrary.naver.com/viewer/index.nhn?articleId=1961080900329203009&editNo=2&printCount=1&publishDate=1961-08-09&officeId=00032&pageNo=3&printNo=4796&publishType=00020['구일밤 통금 싸이렌 불면 시계 바늘을 12시반으로], 경향신문, 1961.8.09
+** http://newslibrary.naver.com/viewer/index.nhn?articleId=1961081000209204005&editNo=2&printCount=1&publishDate=1961-08-10&officeId=00020&pageNo=4&printNo=12179&publishType=00020['새 표준자오선이란?'], 동아일보, 1961.08.10
+
+즉 현재의 시간대데이터로는 1961~1968년사이는 아예 우리나라의 시간대가 잘못 계산되어 나온다는 것입니다.
+
+이 부분은 섬머타임이 반영되는 것을 보고 조금 더 조사를 한 후에 추가 패치를 하려고 생각했었습니다. 기존 데이터가 그렇게까지 다 틀렸다는 것이 믿기가 어려웠고, 우리나라의 시간대 정보에 대한 거의 모든것을 한번에 고치기가 조심스러웠기 때문입니다. 그런데 Paul Eggert가 먼저 적극적으로 반영해주었습니다.
+
+Paul Eggert는 이와 더불어 http://ko.wikipedia.org/wiki/한국_표준시[위키페이디아의 '한국표준시'페이지]에 따르면 1912년에 UTC+0900로 변경이 있었는데, 1910년에도 같은 변경이 있었던것으로 기록된 부분이 혼동된다며 이를 명확히 확인해주었다면 좋겠다고 했습니다. 위키페디아에서 1910년도 변경의 근거로 든 '여적 표준시 변경, 경향신문, 2000-08-14.'라는 자료는 현재 인터넷으로 찾을 수 없어서 대신 여러 기록을 확인해보았습니다. 많은 자료가 1912년에 변경되었다는것으로 일치했고, 1910년도의 변경기록은 누군가가 한일합방 연도와 혼동한것이 아닐까하는 의견을 답장으로 보냈습니다.
+
+
+== 북한의 타임존 데이터
+또하나 의문이였던 점은 https://github.com/eggert/tz/commit/61315cadc3d0e8b4ef559539502a606cf58fc0f7[1993년 11월23일의 커밋]으로 북한의 시간대가 1961년에 UTC+0900으로 변경되었다는 내용입니다. 그때 남한 쪽에서 시간대 변경이 있었는데, 당시 신문을 다 찾아봐도 남북한이 동시에 추진을 했다는 내용은 없었습니다.
+
+Paul Eggert도 이를 이상하게 여겨 일단은 북한쪽은 1940년대 이후로 변화가 없는것으로 가정했다고 합니다.
+
+____
+While we're in the neighborhood, it's completely implausible that Pyongyang faithfully mimicked Seoul time during and after the Korean war (which is what Shanks says), so let's remove that obviously-bogus guess.
+____
+
+
+저도 답장으로 북한쪽의 변경에 대한 의미있는 기록을 찾지 못했고, Paul Eggert의 가정에 동의한다는 내용을 보냈습니다.
+
+tzdata2014j버전대로라면 1954년과 1961년 사이 서울과 평양사이에는 30분의 시차가 존재합니다. 이 것이 역사적 사실과 부합하는지 알아내려고 계속 알아보고 있는 중입니다. 현재 한국표준과학연구원과 통일부, 국정원에 문의를 했지만, 의미있는 답변은 받지 못했습니다. 특히 친절히 전화까지 해주신 통일부 직원분께 감사드립니다.
+
+1954년과 1961년 사이에 남파/북파 간첩활동을 한 분이 있다면, 그 사실을 정확히 알고 있을 것 같기도 합니다. 그런데 과거 간첩사건을 조사해보니 생각보다 간첩들의 나이가 많아서 지금까지 생존한 분이 계실 가능성은 별로 없어보입니다.
+
+== 마치며
+재미있게도 위의 오류를 신고한지 얼마뒤인 2014년 11월 1일에 'https://github.com/eggert/tz/commit/bee436b03e28bd5ea984534fcc5e4f3a4d18b47a[Be less enthusiastic about Shanks and clarify UT vs UTC.] '라는 제목으로 commit이 올라왔습니다. 우리나라 시간대에 대한 잘못된 정보의 출처였던 Shanks의 저서에 많은 오류가 있음을 지적하는 주석이 들어갔습니다. 아시아, 아프리카, 오스트랄라시아, 유럽 등 지역별 정보를 기록하는 모든 파일에 'A good source for time zone historical data outside the U.S. is..'라는 내용이 삭제되고, 'unfortunately this book contains many errors and cites no sources.'라는 문장이 추가되었습니다.
+
+저의 신고가 영향을 준것인지는 알 수 없지만, 이 주석을 기점으로 기존의 데이터를 조금 더 의심하는 계기가 될 것으로 기대합니다.
+
+비록 오래전 과거데이터라서 지금 시점의 영향성은 적지만, 믿음직한 표준데이터라고 생각했던 IANA Timezone DB에 이렇게 오류가 많았다는 점, 특히 우리나라 관련한 데이터에는 제대로 된 것이 거의 없었다는 사실은 놀랍습니다. 우리나라의 과거 자료와는 별도로, 국제화관련 개발을 하는 사람이라면 내 컴퓨터/내 담당서버에 들어와있는 타임존데이터베이스가 언제 시점인지, 업데이트는 잘 되어 있는지도 잘 확인해봐야겠습니다.
+
+지금까지의 내용과 관련된 메일스레드는 아래와 같습니다.
+
+* 2014년 10월 30일 00:07:24 (UTC) From 정상혁, To tz@iana.org : 최초 패치를 보낸 메일 http://mm.icann.org/pipermail/tz/2014-October/021830.html
+* 2014년 10월 30일 06:53:09 (UTC) From Paul Eggert, To 정상혁 : 답장과 1910년 시간대 변경에 대한 문의 http://mm.icann.org/pipermail/tz/2014-October/021831.html
+* 2014년 10월 30일 09:18:57 (UTC) From 정상혁, To Paul Eggert : 1910년의 시간대 변경과 북한시간대에 대한 의견 : http://mm.icann.org/pipermail/tz/2014-October/021833.html
+

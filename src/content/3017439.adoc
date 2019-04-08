@@ -1,0 +1,115 @@
+= 10 things you need to know about Android and Google Play - Tony Chan (Google), GDG Korea Android 컨퍼런
+정상혁
+2013-04-17
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: Android,행사후기
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+지난 2013/04/13일, 종로 페럼타회에서 열렸던 '구글 개발자와 함께하는 GDG Korea Android 컨퍼런스 '에서 공유된 내용입니다.
+
+참석해서 메모했던 내용을 정리합니다.
+
+구글 Play와 API, 권장 UI스타일, 정책 등 다양한 주제를 이야기한 발표였습니다.  UX설계를 할 때 많은 고민이 필요하겠다고 느꼈습니다.
+
+== 1. Think Global
+
+* 한 지역만 염두에 둔다면 기회를 놓히고 있는것이다. 구글 Play 수익의 67%가 미국외에서 나오고 있다.
+* Localization을 고려해라. 구글 Play의 그래픽스와 비디오도 이제 로컬라이즈되었다.
+
+웹애플리케이션은 국제화에 대한 고려를 하는 비율이 높지 않습니다. 앱개발은 반대로 국제화를 고려하지 않는 것이 더 합당한 이유가 있어야하는 듯합니다. 기준이 차이가 생겼다고 느껴집니다.
+
+== 2. Pure Android
+* 다른 플랫폼의 UI형태를 모망하지 마라. 각각의 플랫폼은 고유한 스타일이 있다.
+* 플랫폼 특화된 아이콘을 밖에서 쓰지 말라.
+* 바닥에 붙은 탭바를 쓰지 마라. (아이폰 스타일)
+* 별도의 라벨이 붙은 백버튼, 'right point caret'(>) 버튼을 쓰지 마라. 백버튼을 플랫폼에서 제공하는 것을 쓰도록 유도해야 한다.
+* UI에 대한 지침을 지키지 않으면 사용자가 안 좋은 Rating을 할 것이다.
+* 이전의 안드로이드 버전에 지원하던 스타일의 레가시 버튼을 쓰지 마라.
+* Action bar를 써라. 곧 support 라이브리리를 통해 하위 버전에서도 ActionBar를 쓸 수 있게 될 것이다. 지금도 오픈소스로 http://actionbarsherlock.com/[Actionbar-sherlock]이 있지만, 기본 SDK에서 이제 지원된다.
+* 가장 최신의 SDK에 targeting하라. 최신의 SDK에서만 돌아가야한다는 의미는 아니다. 하위버전에서도 돌아가도록 만들면서도 상위버전에서는 최신의 UI 요소들을 활용해야 한다.
+
+개별 앱의 UI는 같은 플랫폼 내에서의 일관성을 해치지 않아야한다는 지침을 강조했습니다. 같은 사용자가 2개의 다른 플랫폼을 오가면서 같은 앱을 사용하는 경우보다는, 하나의 플랫폼에서 여러 앱을 사용하므로 플랫폼 내에서의 일관성이 중요한 것은 당연한듯합니다.
+
+기획자나 디자이너 입장에서는 하나의 앱을 출시하면 여러 플랫폼이 동일한 UI로 나오기를 바랄 수도 있을 듯한데, 이러한 지침을 초기부터 염두에 두고 엔지니어가 피드백을 줄 수 있어야겠습니다. http://developer.android.com/design/index.html[안드로이드 디자인가이드]도 정독해봐야겠구나 싶었습니다.
+
+그리고 http://actionbarsherlock.com/[Actionbar-sherlock]에서 해주던 ActionBar의 하위 호환성 지원이 support 라이브러리에 들어간다는 소식도 반가웠습니다. Fragment가 support 라이브러리에서 지원되는 것을 생각하면 자연스러운 개선이기도 합니다.
+
+== 3. Design for all form-factors
+* Fragment를 써라
+* 타블릿과 폰을 위해서 별도의 프로젝트를 프로젝트를 만드는것은 바람직하지 않다. Fragment를 이용해서 타블릿에서는 하나의 Activity에 여러개의 Fragment가, 폰에서는 Activity당 하나의 Fragment를 보여주는 식으로 구성하면 얼마든지 하나의 프로젝트로 구성할 수 있다.
+* UI요소의 크기는 기기의 해상도에 독립적이도록 DP를 쓰고, 텍스트에는 SP를 써라.
+* 적어도 3개의 레이아웃을 고려해라. 폰, 7인치 타블릿, 10인치 타블릿. DP는 해상도 문제만 해결할 뿐, 다른 사이즈에 대한 문제는 별도로 고려해야 한다.
+* 지원하려는 화면 밀도(Density), 해당도에 맞는 Asset, 이미지을 각각 준비해라. Aliasing은 보기에도 좋기않고 CPU를 많이 사용해서 배터리 사용시간을 짧아지게 한다.
+
+DP에 대해서는 아래 그림 1장이 직관적인 이해에 많은 도움이 되었습니다.
+[.image-wrap]#image:http://cfile8.uf.tistory.com/image/11355F45516932300FB576[11355F45516932300FB576]#
+
+(이미지 출처 : http://www.kmshack.kr/317#.UWy9VIpdUbj )
+
+웹에서는 '방탄형 웹'이나 '반응형 웹디자인'에 대한 많은 노하우가 공유되고 있는데, 안드로이드에서도 점점 더 섬세한 노하우들이 공유될 것 같습니다.
+
+== 4. Correct back button behaviors
+* 앱의 메인 화면에서 사용자는 홈스크린으로 바로 돌아갈 수 있어야 한다. 종료 할때 다이얼로그로 종료할지 물어보는 방식으로 Back에 대한 이벤트를 강제적으로 막지마라.
+
+많은 앱이 이렇게 되어 있지 않기에 다소 의외의 가이드라고 느껴졌습니다. 이것도 일관성을 생각하면 의미 있는 지침입니다.
+
+== 5. Proper notification
+
+* 핵심 기능에 대해서 통지해라. 광고에 Notification을 쓰지 마라.
+
+== 6. App quality improvement
+* http://bit.ly/google-play-core-checklist 참고
+* http://bit.ly/google-play-tablet-checklist 참고
+
+한글 번역도 http://googledevkr.blogspot.kr/2013/01/app-quality-guidelines.html 에서 보실 수 있습니다.
+
+(이 포스트를 쓰고 난 후에 권순선님께서 알려주셨습니다.)
+
+== 7. Permission
+
+* 핵심기능에 필요한 최소한의 권한만 부여하도록 해라.
+* 민감한 권한을 너무 많이 가지고 있으면 당신에게 해가 된다. 앱의 다운로드 숫자나 주목 받을 기회가 줄어들 것이다.
+
+== 8. Google play service
+
+* 구글에서 제공하는 서비스 API를 나열하면서 소개.
+* Maps API 2, Google+, Google Authorization, Google Play services APK 등
+
+위 내용은 http://developer.android.com/google/play-services/index.html에 자세히 나와 있습니다.
+
+== 9. New platform API
+
+* 새로 추가된 API를 간단히 나열.
+** Lock screen widget
+** Seconary display
+** Day dreams (interactive screensaver mode)
+** Natvie RTL(right-to-left) support
+** Tablet sharing
+* 최근 업데이트된 API 소개
+** GCM
+** Analystic SDK
+** In-app Billing V3 (V2는 더이상 쓰지마라)
+** Youtube android player
+
+자세한 내용은 http://developer.android.com/about/versions/jelly-bean.html에 있습니다.
+
+발표된지는 한참된 기능이지만, 이렇게 모아서 보니 앱개발자가 화면을 다양하게 활용할 수 있는 여지가 더 늘어나고 있다고 느껴졌습니다. 이에 따라 새로운 사업모델도 나올 수 있었는데, 이런 아이디어들이 기획부서에서만 나오기를 기다리는 것보다 개발자들도 적극 제안을 해 보면 어떨까하는 생각이 들었습니다. 개발자들은 새로운 API가 추가되는것을 늘 관심있게 보고 있기 때문에 자연스럽게 아이디어가 나올만도 합니다. Lock screen widget을 이용한 광고 제품이 나왔듯이, 앞으로도 그런 기회가 많이 남아 있을 것이라고 기대가 됩니다.
+
+== 10. Publishing on google play
+* Google play는 풍부하게 미디어를 활용한다.
+** 특징을 멋지고 깔끔한 이미지로
+** 스크린샷
+** 짧은 유튜브 동영상
+** 로컬라이케이션
+* 대표적인 정책 위반 사례들.
+** 3rd party 지불
+** 다운로드를 위해 3rd party 사이트로의 연결
+** 스팸 키워드
+** 별점에 인센티브 부과
+* 정책에 대한 자세한 내용은 http://bit.ly/google-play-policy-edu 참조
+
+정책에 따라 구현이 달라져야 할 부분을 미리 파악하고 있으려면 꾸준한 관심을 가져야겠습니다.

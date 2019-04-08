@@ -1,0 +1,101 @@
+= CSS 선택자 정리
+정상혁
+2007-09-06
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: CSS
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+== 여러개의 element 선택
+
+[source,css]
+----
+h1, h2 \{ }
+---
+
+== class 선택자
+[source,css]
+----
+p.greentea \{ } /* class가 greentea인 <p/> 선택 */
+
+.greentea\{ } /* class가 greentea인 모든 태그 */
+----
+
+
+== id 선택자
+[source,css]
+----
+#footer \{ } /* id가 footer인 모든 태그 */
+
+p#footer\{}
+----
+
+
+== 자식(Child) element 선택
+[source,css]
+----
+
+div h2\{ color:red} /* <div/> 하위에 있는<h2/> 선택  */
+
+.detail p \{}   /* class가 "detail"로 지정되어 있는 하위의 <p/> 선택 */
+----
+
+
+== 상태에 따른 선택자
+[source,css]
+----
+
+a:visited\{}
+
+a:link \{}
+----
+
+상태는 active, hover, link, visited, first-child 등
+
+
+== 의사(Psdudo) element 선택자
+
+[source,css]
+----
+
+p:first-letter \{}
+
+p:first-line \{}
+----
+
+
+== 속성(Attribute) 선택자
+[source,css]
+----
+
+img[width] \{border:black thin solid;} /* width 속성을 가진 모든 이미지 선택 */
+
+img[height="300"] \{border:red thin solid; } /* 값이 300인 height 속성을 가진 모든 이미지 선택 */
+
+image[alt~="flowers"]  \{border:red thin solid; }  /* "flowers"라는 단어를 포함하는 alt 속성을 가진 모든 이미지 */
+----
+
+
+== 형제(Sibling) element 선택자
+
+[source,css]
+----
+
+h1+p \{}  /* <h1> 다음에 오는 <p> 선택 */
+----
+
+
+== 선택자 결합
+[source,css]
+----
+div#greentea > blockquote \{}  /* <blockquote/>의 부모가 되어야하는 "greentea" id를 가진 <div/> 자손 선택자 */
+
+div#greentea > blockquote p \{} /* <blockquote/>의 자손이자 "greentea" id를 가진 <div/>의 자손인 <p/> 선택 */
+
+div#greentea > blockquote p:first-line /* 그 <p/>의 첫 줄 */
+----
+
+추가: 주로 Head first HTML/CSS에 있는 내용을 정리했습니다.

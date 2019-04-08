@@ -1,0 +1,50 @@
+= Effective Java 2nd Edition
+정상혁
+2008-05-30
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: effective-Java,Java
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+Amazon에서 예약주문 단계에서 판매상태로 바뀌었습니다.
+
+http://www.amazon.com/Effective-Java-2nd-Joshua-Bloch/dp/0321356683/ref=pd_bbs_sr_1?ie=UTF8&s=books&qid=1212115691&sr=8-1[http://www.amazon.com/Effective-Java-2nd-Joshua-Bloch/dp/0321356683/ref=pd_bbs_sr_1?ie=UTF8&s=books&qid=1212115691&sr=8-1]
+
+회사에서 Yes24에서 책을 주문할 수 있는 쿠폰을 주기 때문에 저는 공짜로 보기 위해서 거기서 주문할 수 있을 때까지 기다리고 있는 중입니다.
+
+Joshua Bloch과의 인터뷰를 보니 역시 Generics등 Java5 이후의 주제들에 대해서 내용이 보강되었다고 하네요. 정확히는 21개의 항목과 83페이지가 늘어났다고 합니다. 기대가 되는군요.
+
+http://www.infoq.com/articles/bloch-effective-java-2e[Book Excerpt and Interview: Effective Java, Second Edition]
+
+더불어 121페이지의 예제코드의 실수도 언급되어 있길래 옮겨봅니다.
+
+[source,java]
+.지금 인쇄판에 들어간 코드
+----
+static Object reduce(List list, Function f, Object initVal) {
+    Object[] snapshot = list.toArray(); // Locks list internally
+    Object result = initVal;
+    for (Object o : list) // 오류 부분
+        result = f.apply(result, o);
+    return result;
+}
+----
+
+[source,java]
+.수정된 내용
+----
+static Object reduce(List list, Function f, Object initVal) {
+    Object[] snapshot = list.toArray(); // Locks list internally
+    Object result = initVal;
+    for (Object o : snapshot) // 수정된 부분 (list 대신 snapshot을 참조)
+        result = f.apply(result, o);
+    return result;
+}
+----
+
+Joshua Bloch의 말에 따르면 다음에 찍는 인쇄판에서는 수정을 하겠지만 현재 시중에 나가는 판에는 이 오류가 포함이 되어 있다고 합니다.
+
+

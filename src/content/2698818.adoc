@@ -1,0 +1,71 @@
+= SpringOne2GX 2010 (1) 키노트
+정상혁
+2010-10-20
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: Spring,Spring-One,행사후기
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+2010년 10월 19일부터 22일까지 시카고에서 열리는 SpringOne2GX 2010 행사에 참석하고 있는 중입니다. 정리가 완벽하게 되지 않아도 중간중간 듣고 본 것들을 올리도록 하겠습니다.
+
+== 수정이력
+. (최초작성) 키노트의 내용을 발표 때 사용한 슬라이드 자료를 보면서 정리를 하려고 마음을 먹고 있었습니다. 그래서 특별히 메모도 하지 않고 있었는데, 키노트가 끝난 다음에서야 발표 자료가 아직 올라오지 않았다는 것을 알았습니다. 그래서 대략적으로 기억나는 것들을 같이 간 분들에게 물어보고 보완하면서 트위터에 올라온 글들 ( http://twitter.com/#!/search/s2gx )을 보고 회상한 내용으로  일단 정리합니다.
+
+== 키노트의 제목은?
+로드존슨은 첫장에 키노트의 제목을 표시하지 않고 '여기에 제목이 들어간다'는 슬라이드 템플릿에 있을법만 문구를 그대로 보여줍니다. 나름대로 웃음을 주려고 했던 의도도 있었지만, 지난 12개월동안 스프링 세계에 어떤 일이 일어났는지를 키노트에서 정리해야 하는데, 이번에는 그것이 쉽지 않았음을 이야기 합니다. 발표가 한참 지나서야 제목이라고 할만한 내용들을 이야기하는데, 간단히 정리하면 '스프링의 성공요인이였던 Portability, Productivity, Innovation을  다음 10년에도 새로운 영역에서 이어서 가고, 개발자들이 더욱 핵심 비지니스 가치의 전달에 전념할 수 있도록 돕는다'라고 말할 수 있었습니다.
+
+== 그동안 스프링 세계에 있었던 일들..
+키노트 발표는 이번 컨퍼런스의 주요 후원자인 Accenture, Google, Saleforce.com에 대한 스폰서들에 대한 감사의 이야기로 시작되었습니다. 이번 컨퍼런스를 통해 비니지스 어플리케이션을 전통적인 데이터 센터에서 클라우드 환경으로 올리겠다는 비전을 강조할 것이라고 미리 예상을 했었고,  인터넷 업계, 시스템통합, SaaS 업계의 최강자들인 이들 세 업체가 그런 비전을 공유하고 후원업체로 전면에 나와 있다는 생각이 들었습니다.
+
+이어서 얼마전에 발표되었던 vFabric cloud platform의 그림을 보여줍니다.
+
+* 참조 : http://blog.springsource.com/2010/08/31/cloud-platform/
+
+이 아키텍처에서 모니터링은 Hyperic, 메시징큐는 RabbitMQ, 캐슁을 위한 데이터그리드는 Gemfire가 들어가는데, 작년부터 스프링소스가 인수합병을 통해서 확보한 솔류션들입니다.
+
+이어서 이런 솔류션들이 현재 얼마나 중요한 시스템에서 쓰이고 있는지 레퍼런스를 알려줍니다. Gemfire는 NASA나 펜타곤에서, RabbitMQ는 인도의 수많은 인구들의 주민등록 정보를 관리하는 곳에 들어가 있다고 합니다.
+
+그리고 다른 스프링 포트폴리오 프로젝트의 대표적인 발전도 정리해줍니다.
+
+* Spring 3.1 : Cache abstraction, 환경에 특화된 bean 설정
+* Spring Integration 2.0 : Spring Tools Suite를 통한 plugin지원, 더 많은 Adaptor 지원
+* Spring Web flow 3.0 : Java flow Definition 지원 (https://jira.springsource.org/browse/SWF-295 이 이슈를 말한 것으로 짐작됩니다.)
+* Grails : Spring Tools Suite에 추가된 Grails 지원 기능을 Demo로 보여주었습니다. 프로젝트 생성,  Entity 생성, Grails command 입력등을 Eclipse 안에서 편하게 할 수 있고, Grails View에서 Grails에 구조에 맞는 디렉토리 구성을 더 편하게 볼 수 있었습니다.
+
+개인적으로 Cache abstraction에 가장 관심이 가는데, 이 주제를 다룰 내일 유겐할러의 발표를 기대해 봅니다.
+
+== 스프링의 지난 10년과 그 다음
+로드존슨은 스프링 프레임웍이 이제 새로운 10년대를 맞이하고 있음을 강조합니다. 로드존슨이 직접 밝힌 스프링에서 가장 오래된 클래스는 http://www.jarvana.com/jarvana/view/org/springframework/spring-web/2.5.6.SEC02/spring-web-2.5.6.SEC02-sources.jar%21/org/springframework/web/context/support/RequestHandledEvent.java?format=ok[RequstHandlerEvent.java]로 2001년 1월 17일 처음 만들어졌습니다. (스프링의 오래된 클래스들에 대해서는 토비님이 쓰신 http://toby.epril.com/?p=171[스프링코드의 역사] 글에서도 재밌는 정보들을 찾을 수 있습니다.) 로드 존슨의 큰 아들의 다음 생일이 10번째 생일인데, 걔가 스프링보다는 나이가 어리다고 합니다.
+
+그렇게 10년을 지나오면서 스프링을 성공으로 이끌었던 핵심가치들은 Portability, Productivity, Innovation의 3가지 단어로 설명했습니다.
+
+Jetty, Tomcat을 포함한 많은 Application Server들에서 Spring 애플리케이션이 돌아갈 수 있었떤 Portability는 이제 다음 목표를 이제 Google App Engine, VMForce와 같은 클라우스 서버 영역으로까지 나아가고 있습니다.  그리고 Grails, Spring Roo, Spring Tools Suite를 이용한 생산성 향상도 계속되고 있습니다. Spring Roo에서는 GWT 지원, Database reverese-engineering 기능이 포함된 다는 것을 홍보했습니다. 바이트코드 삽입(Instrumentation)을 통한 Application Monitoring 도구인 Spring Insight를 운영환경에서 사용할 수 있도록 성능저하가 없는 버전을 준비하고 있다고 합니다.
+
+스프링이 나아가는 새로운 영역들 중에 Social media 결합, NoSQL 저장소 지원, 모바일 환경의 다양한 Client 지원 기능등이 특히나 신선한 소식이였습니다.
+
+== 새로운 영역들
+
+=== NoSql
+로드존슨은 NoSQL을 Not only SQL이라고 풀어줬습니다. 전통적인 데이터 저장소였던 RDB도 나름대로의 영역을 지키겠지만, 이제는 RDB만으로는 해결할 수 없는 문제들이 많아 생겼다는 것입니다. 그렇다고 RDB를 배제하는 것이 아니라는 것을 Not  only SQL이라는 말로 강조했다고 느껴졌습니다.
+
+이미 GORM에서는 Redis를 지원하는 Addon을 넣었다는 소식을 이미 들은 적이 있습니다.
+
+*  http://www.springsource.org/node/2839[Grails adds GORM for Redis] 참조
+
+이날은 neo4j(http://neo4j.org/)를 이용한 GraphDB 지원에 대한 코드를 보여줬습니다.  Graph DB는 친구사이 관계 같은 것이 저장되는 social media같은 서비스에 적합한 구조인데, 스프링과 neo4j의 결합은 원래 neo4j의 API를 쓰지 않고 annotation으로 필드 간의 관계를 설정하는 것이였습니다. 이것도 내부적으로는 Aspect J를 이용해서 동작한다고 했습니다. Graph DB를 위한 annotation은 JPA annotation과 같이 쓰여서 Domain object에서 관계형 DB와 Graph DB에 연결되는 정보를 동시에 볼 수 있었습니다.  로드존슨은 이를 polyglot persistence, cross persistence라고 표현했습니다. 다수의 저장소를 활용할 때 Java Object가 그 연결정보의 구심점이 되는 모습이 간단한 코드에서 잘 보여졌습니다. Spring roo에서도 Neo4j를 위한 Addon이 들어갔다고 합니다.
+
+ Spring-data 프로젝트(http://git.springsource.org/spring-data)에서는 Graph DB이외에도 key-value, document, column 저장소들을 위한 하위 프로젝트가 진행되고 있었습니다.
+
+=== Social Media와 다양한 client의 시대
+
+로드존슨은 근래의 기술환경이 Mobile 환경의 다양한 Client와 브라우저에 대처해야 한다는 것을 상기시킵니다. 그리고 Twitter와 Facebook과 같이 Social Media와 연결된 개발도 중요한 이슈입니다. 스프링에서도 이에 대비하고 있는데, Spring-mobile(http://git.springsource.org/spring-mobile)과 Spring-social(http://git.springsource.org/spring-mobile%29%EA%B3%BC%20Spring-social%28http://git.springsource.org/spring-social[]http://git.springsource.org/spring-social[http://git.springsource.org/spring-social] ) 프로젝트가 이와 관련되어 있습니다. 그리고 GreenHouse(http://git.springsource.org/greenhouse)  프로젝트가 이들을 활용한 실제 예제가 되는 프로젝트입니다. GreenHouse는 https://greenhouse.springsource.org/ URL로 들어가볼 수 있고, Spring 개발자들의 social network 기능을 할 수 있어 보였습니다. iPhone와 Android client가 있는데, iPhone client는 시뮬레이터를 통해서 데모를 보여줬습니다.
+
+=== Missing link - Code to Cloud
+로드존슨은 지금까지 스프링이 많은 영역들을 지원해왔지만, 그 중에 빠진 연결점(Missing Link)가 있었고, 그 부분은 소스관리, 이슈관리, Contious Integration, 배포에 관한 영역이였다고 합니다. 개발자들의 각각의 도구를 설치한다고 많은 시간을 소모하고 있는데, 이제 그 영역도 Code to Cloud라는 통합솔류션을 제공한다고 합니다. 이 솔류션은 Git + Hudson + Bugzilra + Mylyn + STS을 엮은 것이였습니다. Tasktop이라는 업체와 제휴를 통해 이를 제공했고, 시연도 직접 Tasktop의 CEO가 나와서 했습니다.
+
+* 관련기사 : http://www.marketwire.com/press-release/VMware-Brings-the-Cloud-to-Developers-With-Code2Cloud-Application-Lifecycle-Tools-NYSE-VMW-1337583.htm
+*  소개와 데모 동영상: http://tasktop.com/connectors/c2c.php[http://tasktop.com/connectors/c2c.php]
+*  Spring2gx 2010에서의 시연 동영상 (http://plixi.com/p/51699717[http://plixi.com/p/51699717] )

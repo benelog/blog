@@ -1,0 +1,119 @@
+= 문제로 풀어보는 알고리즘 0.3 생각해보기 풀이
+정상혁
+2012-08-31
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: 코딩연습
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+출판사 인사이트 블로그에 아래와 같은 퀴즈가 올라왔네요
+( 원문: http://www.insightbook.co.kr/post/3814 )
+
+== 문제
+____
+배열 arr[]과 위치 s, t가 있을 때,arr[s], arr[s+1], … , arr[t-1]을 오른쪽으로 한 칸씩 이동하고,arr[t]는 arr[s]로 복사하는 것을 ’1만큼 오른쪽으로 회전시켰다’고 한다.
+
+예를 들어 길이가 8인 배열에서 s=2, t=6이면 다음 그림처럼 바뀐다.
+
+http://www.insightbook.co.kr/wp-content/uploads/2012/08/%EA%B7%B8%EB%A6%BC-0-1.jpg[image:http://www.insightbook.co.kr/wp-content/uploads/2012/08/%EA%B7%B8%EB%A6%BC-0-1.jpg[image,title="그림 0-1",width=404,height=194]]
+
+길이가 n인 배열의 위치는 0, 1, 2, … , n-1이다.
+
+문제 :k를 인자로 받아서 k만큼 오른쪽으로 회전시키는 함수를 작성하라.단, 1만큼 오른쪽으로 이동시키는 과정을 k번 반복해서는 안 된다.
+
+조건 1 : 작성하는 언어에는 제한이 없습니다.
+조건 2 : 답안으로 작성하신 글 제목에는 ‘문제로 풀어보는 알고리즘 0.3 생각해보기 풀이’라는 문장이 들어가야 합니다. (저희 블로그에도 트랙백을 걸어주세요.)
+
+(주의: 이 코딩 인터뷰는 인사이트 입사와는 무관합니다. ㅡㅁㅡ /)
+____
+
+== 풀이
+
+밀린 일이 많아서 정신적인 여유가 없지만,  경품에 눈이 어두워서 급하게 풀어봤습니다
+
+우선 테스트부터 먼저 작성하고
+
+
+[source,java]
+----
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+import org.junit.Test;
+
+public class ArrayHandlerTest {
+    ArrayHandler handler = new ArrayHandler();
+
+    @Test
+    public void testShift1() {
+        int[] array = {1,2,3,4,5};
+        handler.shift(array,0,3,1);
+        assertThat(array, is(new int[]{4,1,2,3,5}));
+    }
+
+    @Test
+    public void testShift2() {
+        int[] array = {1,2,3,4,5};
+        handler.shift(array,1,3,1);
+        assertThat(array, is(new int[]{1,4,2,3,5}));
+    }
+
+    @Test
+    public void testShift3() {
+        int[] array = {1,2,3,4,5};
+        handler.shift(array,1,2,1);
+        assertThat(array, is(new int[]{1,3,2,4,5}));
+    }
+....
+
+----
+
+
+그리고 이를 통과시키는 실행코드입니다.
+
+
+
+[source,java]
+----
+import java.util.Arrays;public class ArrayHandler {
+    public void shift(int[] array, int s, int t, int k) {
+        if (s > t) return;
+        if (t >= array.length) return;
+
+        int[] rangeToShift = Arrays.copyOfRange(array, s, t + 1);
+        int rangeLength = t-s + 1; for(int i=0; i< rangeLength; i++) {
+            int offset = (i+k) % rangeLength;
+            array[s + offset] = rangeToShift[i];
+        }
+    }
+}
+----
+
+
+대용량 배열일 때 메모리를 더 적게 쓰는 방법들도 고민해볼만도 하지만, 우선은 쉽게 문제를 푸는데 집중했습니다.
+t,s, k 같은 한글자 변수명은 별로 좋아하지 않지만, 문제에 있는 변수명이라서 그대로 살렸습니다.
+
+전체 소스는 Github에 올렸습니다.
+
+* 테스트 코드 : https://github.com/benelog/quiz/blob/master/src/test/java/net/benelog/quiz/insight/ArrayHandlerTest.java[ArrayHandlerTest.java]
+* 문제 풀이 코드 : https://github.com/benelog/quiz/blob/master/src/main/java/net/benelog/quiz/insight/ArrayHandler.java[ArrayHandler.java]
+
+참고로 java.util.Collections.roate()메소드를 쓰면 위 문제는 아래 두 줄로 풀 수 있기도 합니다.
+
+
+[source,java
+----
+List<Integer> range = list.subList(s, t+1);
+Collections.rotate(range, k);
+----
+
+그런데 이렇게 하는게 이 문제의 의도는 아닐듯해서 참고구현 정도로 남겨 두었습니다. 처음 풀이에서도 Arrays.copyOfRange 메소드를 쓰기는 했지만 이 부분은 특별한 알고리즘에 없는 단순한 배열복사라서 활용했습니다.
+
+* Collections.rotate를 이용한 풀이 코드 : https://github.com/benelog/quiz/blob/master/src/main/java/net/benelog/quiz/insight/ListHandler.java[ListHandler.java]
+
+
+
+
+

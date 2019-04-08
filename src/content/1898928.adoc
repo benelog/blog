@@ -1,0 +1,83 @@
+= JDBC에서 Connection, Statement,ResultSet의 close
+정상혁
+2008-05-21
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: Java,exception,JDBC
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+이미 많이 알려진 내용이지만, 아직도 문제를 많이 일으키는 주제입니다. 그래서 보다 이 주제를 검색엔진에서 쉽게 찾을 수 있었으면 하는 마음에서 이 글을 정리해봤습니다.
+
+[source,java]
+----
+  Connection conn = null;
+  PreparedStatement pstmt = null;
+  ResultSet rs = null; // <---- !!!
+  try{
+     conn = ...<getConnection()>...;
+     pstmt = conn.prepareStatement("select .....");
+     rs = pstmt.executeQuery(); // <----- !!!
+     while(rs.next()){
+       ......
+     }
+  }  catch(Exception e){
+     ....
+  }  finally {
+     if ( rs != null ) try{rs.close();}catch(Exception e){}
+     if ( pstmt != null ) try{pstmt.close();}catch(Exception e){}
+     if ( conn != null ) try{conn.close();}catch(Exception e){}
+
+ }
+----
+
+이것이 JDBC API 사용시에 권장되는 코딩방식입니다. 코드는 참조자료에 있는 이원영님의 글에서 인용했습니다.
+
+JDBC 스펙을 찾아보면 Statement가 닫힐 때 ResultSet은 닫히고, Connection이 닫히면 Statement도 닫힌다고 되어 있습니다. 하지만 Staement close 시에 Exception이 발생한다면 이것이 따로 Exception을 catch되지 않고서는 뒤에 Connection을 닫는 코드가 실행되지 않습니다. 그리고 Connection pool에서 얻어온 Connection객체는 connection.close()로 처리하는 것이 pool로의 반환을 의미하는 것이지 실제로 connetion을 close하는 것이 아니기 때문에 Statement까지 닫아준다고 장담할 수 없습니다. ResultSet의 경우도 WAS에도 제공하는 Statement cache 기능 때문에 명시적으로 close해주는 것이 확실한 자원해제를 보장할 수 있습니다.
+
+DBMS에서 "maximum open cursor exceed !" 나 "Limit on number of statements exceeded " 에러를 내고 있다면 위와 같이 코딩했는지 한번 확인해보시기 바랍니다.
+
+각 벤더별 드라이버의 구현이나 WAS의 Connection Pool의 구현등에 따라서 저 정도까지 안 해도 문제가 안 생길 수도 있습니다. 그리고 독립적으로 돌아가는 배치프로그램이나 커넥션풀을 쓰지 않는 경우에는 보다 덜 엄격해도 될 때도 있습니다.  그래도 어떠한 경우에도 안심하고 있을만한 코드는 위와 같은 구조입니다.
+
+javaservice.net에서 이원영님이 처음에 이 문제에 대한 글을 쓰신것이 2000년 9월입니다. 그래서  많은 분들이 알고 계시지만 그래도 정말 반복적으로 만나게 되는 문제입니다.  저의 경험이 편향된지도 모르겠지만, 지금까지 제가 만났던 JDBC AP를 그대로 쓰는 개발팀은 세 팀이였었는데, 모두 이렇게 코딩하지 않을 경우 문제가 생길 가능성이 있다는 것을 모르고 있었습니다. 결국 그 중 한 팀은 시스템 전체를 몇 일동안 매시간마다 재부팅시키게 만들게 했었습니다.
+
+미국의 모 대형항공사의 예약시스템을 3시간동안 멈춘 코드도 위와 같은 방식을 따르지 않았었습니다. finally절이 다음과 같았다고 합니다.
+
+
+[source,java]
+----
+} finally{
+    if (stmt!=null) stmt.close();
+    if (conn!=null) conn.close();
+}
+----
+
+그 예약 시스템은 이중화된 DB로 구성되어 있었고, 그 DB들은 가상IP주소로 어플리케이션과 연결되어 있었습니다.  정기 점검을 위해 DB중 하나를 수동  fail-over 시키는 순간 내려간 DB의 JDBC연결에서 나온 statement객체의 close문장은 Exception을 일으켰습니다. 이 문장은 별도로 catch 되지 않았기 때문에 그 다음의 conn.close()는 실행되지 않았습니다. 결국 이 때문에 반환되지 않은 Connection 자원들로 인해 리소스 풀은 곧 바닥이 났습니다. 그 후에 새로 Connection을 얻고자 하는 다른 프로그램들은 블록되어서 전체 시스템을 멈추었습니다.
+
+아마도 JDBC API를 쓰는 곳에는 언제나 생길 수 있는 문제일 것입니다. 좋은 API는 문서를 안 보고 자연스럽게 써도 사용하기 쉽고 문제를 안 일으키는 것일텐데, JDBC는 제대로 사용하기가 오히려 더 어려운 API입니다. 위의 항공사 사건 같이 전 세계에서 JDBC로 인해 야기된 장애,생산성 저하를 다 따져본다면, 가히 이 API가 인류에게 끼친 해악이 엄청나다는 생각까지도 듭니다.  요즘은 Framework 기반 개발로 JDBC를 직접 안 쓰는 것이 이런 점에서는 다행입니다.
+
+JDBC API에서 대표적으로 지적받는 문제점은 Checked Exception을 남발했다는 것입니다. catch 절에서 아무 것도 하지 않는 것은 바람직하지 않은 코딩이지만 JDBC API에서는 정말 할 것이 없습니다. 그래서 이런 문제점을 알고서 그 후에 나온 JDBC를 활용한 API들, Spring의 http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/jdbc/core/JdbcTemplate.html[JdbcTemplet], http://www.hibernate.org/[Hibernate]의  http://www.hibernate.org/hib_docs/v3/api/org/hibernate/Query.html[Query] 인터페이스,  http://en.wikipedia.org/wiki/Java_Persistence_API[JPA]의 http://java.sun.com/javaee/5/docs/api/javax/persistence/Query.html[Query] 인터페이스, http://java.sun.com/jdo/[JDO]의 http://db.apache.org/jdo/api21/apidocs/javax/jdo/Query.html[Query] 인터페이스에서는 Checked Exception인 SqlException을 볼 수 없게 설계되어 있습니다.
+
+그리고 Java6 이전의 JDBC에서는 접속에러, 쿼리에러, 제약조건 에러 등 다양한 원인으로 생기는 Exception을 SqlException 1개로 다 때우는 문제도 있었습니다. Spring에서는 이것을 더 섬세하게 구분한  Exception들을 정의를 하고 있습니다. http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/dao/DataAccessException.html[DataAccessException]의 하위 클래스를 보면 http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/dao/CleanupFailureDataAccessException.html[CleanupFailureDataAccessException], http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/dao/DataIntegrityViolationException.html[DataIntegrityViolationException], http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/dao/DataRetrievalFailureException.html[DataRetrievalFailureException] 등이 보입니다. Java6에 포함된 JDBC 4.0에서는  http://docs.oracle.com/javase/7/docs/api/java/sql/SQLNonTransientException.html[SQLNonTransientException], http://docs.oracle.com/javase/7/docs/api/java/sql/SQLRecoverableException.html[SQLRecoverableException], http://docs.oracle.com/javase/7/docs/api/java/sql/SQLTransientException.html[SQLTransientException] 등의 하위 클래스가 생겼고, ,Spring에서는 이런 클래스도 잘 인식해서 적절한 DataAccessException의 하위 클래스로 변환해줍니다.
+
+http://blog.benelog.net/1901121[Java의 Checked Exception 처리 문제에 관한 글]은 따로 정리했습니다.
+
+== 참고자료
+=== 미국 항공사 장애 사건 관련
+* http://www.yes24.com/Goods/FTGoodsView.aspx?goodsNo=2753365&CategoryNumber=001001003016002003[Release It 릴리스 잇 : 성공적인 출시를 위한 소프트웨어 설계와 배치]  (마이클 나이가드 저/신승환,정태중 역, 위키북스)
+** 2장 사례연구 : 항공사를 정지시킨 예외(Exception) 사건
+
+=== JDBC 관련
+Javaservice.net에 이원영님이 올린 글
+
+* (죽은 링크) http://www.javaservice.net/~java/bbs/read.cgi?m=devtip&b=servlet&c=r_p&n=968185187&k=JDBC&d=tb[서블렛 + JDBC 연동시 코딩 고려사항 -제1탄-]
+* (죽은 링크) http://www.javaservice.net/~java/bbs/read.cgi?m=devtip&b=servlet&c=r_p&n=968522077[서블렛 + JDBC 연동시 코딩 고려사항 -제2탄-]
+
+현 시점에서 찾을수 있는 해당 글의 복사본
+
+* https://winmargo.tistory.com/46?category=428145
+* http://www.zdnet.co.kr/view/?no=00000010048177[서블렛 + JDBC 연동시 코딩 고려사항 4]
+* http://www.zdnet.co.kr/view/?no=00000010048223[서블렛 + JDBC 연동시 코딩 고려사항 6]
+

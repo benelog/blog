@@ -1,0 +1,106 @@
+= 초간단한 FTP server, One-FTPServer
+정상혁
+2012-05-17
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: FTP,자작도구,Test
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+== 배경
+
+서버 작업을 하다보면, PC에 있는 파일을 서버에 올리거나, 서버에 있는 로그파일을 PC로 받고 싶을 때가 있습니다.그런 용도로 저는 다운로드를 할 때는 Winstone을, 업로드를 할 때는 간단한 웹애플리케이션으로 만든 https://github.com/benelog/uploader/[Uploader] 를 사용합니다.
+
+제 블로그의 아래 포스트를 통해서 그 방법을 설명했었습니다.
+
+* http://blog.benelog.net/2875999[Winstone, 경량 Servlet container]
+* http://blog.benelog.net/2864739[간단하게 서버에 파일을 올리기...]
+
+또는 파이썬이 설치되어 있다면 'python -m SimpleHTTPServer'를 실행하면 간단한 웹서버를 띄울 수도 있습니다.
+
+그런데, 여러 개의 파일을 올리거나 받을 때는 아무래도 FTP가 더 편하기도 합니다.그럴 때는 저는 http://mina.apache.org/ftpserver/[Apache FtpServer]를 사용합니다.Apache FtpServer가 설정이 간단한 편이지만, 기본 패키지를 wget으로 다운로드 받고, 압축을 풀고, 설정 파일을 편집하는 과정을 여러 번 하다보면 좀 번거롭기도 합니다.
+
+그래서 Apache FtpServe의 모듈을 이용한 간단한 프로그램을 직접 만들어서 Github에 올려 보았습니다.'https://github.com/benelog/one-ftpserver[One-FTPServer]'라고 이름을 붙여봤습니다.
+
+== https://gist.github.com/2711965#%EC%82%AC%EC%9A%A9%EB%B2%95[]사용법
+
+간단하게 아래와 같이 다운로드를 받고
+
+[source]
+----
+wget benelog.net/one-ftpserver.jar
+----
+
+Jar파일을 직접 실행하면 끝입니다.
+
+[source]
+----
+java -jar one-ftpserver.jar
+[source]
+----
+
+아무런 옵션이 없으면 익명 사용자(anonymous) 로그인을 통해 2121번 포트로, FTP서버가 실행 중인 디렉토리를 홈디렉토리로 접속할 수 있습니다.
+
+포트, 아이디, 비밀번호 등을 명령행에서 바로 지정할 수 있습니다.
+
+[source]
+----
+java -jar one-ftpserver.jar port=10021 id=benelog password=1234
+----
+
+그외 passive port, SSL적용여부 등 총 6가지 설정변수를 지원합니다.
+
+[source]
+----
+java -jar one-ftpserver.jar port=10021 passivePorts=10125-10199 ssl=true id=benelog password=1234 home=/home/benelog/programs
+----
+
+자세한 파라미터의 설명은 https://github.com/benelog/one-ftpserver에 나와 있습니다. 혹시나 외국사람들도 쓸 일이 생길가봐 잘 되지 않은 어색한 영어로 적는다고 힘들었습니다;
+
+다양한 FTP클라언트를 쓸 수 있지만,저는 wget이나 curl을 즐겨 사용합니다. 만약 benelog.net이라는 서버에 10021포트로 id가 benelog, 비밀번호 1234로 서버를 띄었다면, 아래와 같이 접근합니다.
+
+* wget
+** download : wget ftp://benelog:1234@benelog.net:10021/[filename]
+* curl
+** upload : curl -T [filename] ftp://benelog.net:10021 -u benelog:1234
+** download : curl ftp://benelog.net:10021/[filename] -u benelog:1234
+
+== 재미있었던 코드
+
+=== 사용자 인증 정책 구현 클래스
+Apache FtpServer는 UserManager라는 인터페이스로 사용자 인증 정책을 구현하도록 설계되어 있습니다. 기본 구현클래스로 Property파일이나 데이터베이스에서 사용자 정보를 읽어오는 클래스가 제공됩니다.
+
+이 프로그램에서는 UserManager를 구현한 클래스에서 단순히 사용자 한명의 아이디, 비밀번호 값만을 가지고 인증을 하는 SingleUserManager라는 클래스를 만들었습니다.
+
+* https://github.com/benelog/one-ftpserver/blob/master/src/main/java/net/benelog/oneftpserver/user/SingleUserManager.java[net.benelog.oneftpserver.user.SingleUserManager]
+
+혹시나 다른 인증정책이 필요한 FTP서버를 만들게되더라도, 이 클래스만 간단하게 구현해주면 됩니다.
+
+=== Apache Commons Net의 FTPClient모듈을 이용한 통합 테스트
+특별히 어렵지 않는 프로그램이지만 여러 조합의 옵션이 다 의도대로 동작하는지 확인하는데에는 반복적인 테스트가 필요할 것 같습니다.그래서 http://commons.apache.org/net/[Apache Commons Net]에서 제공하는 FTP클라언트 모듈로 통합 테스트를 만들었습니다.
+
+* https://github.com/benelog/one-ftpserver/blob/master/src/test/java/net/benelog/oneftpserver/CommanderFtpSslTest.java[net.benelog.oneftpserver.CommanderFtpSslTest]
+
+아래와 같이 Console의 명령행에서 넘어가는 것과 똑같은 옵션을 넣어서 서버를 실행시킨 후, FTPClient로 접속했습니다.
+
+[source,java]
+----
+@Test
+public void loginFail() throws Exception {
+  startServer(new String[]{"port=3131","ssl=true","id=benelog","password=1234", "home=" + home});
+  client.connect("127.0.0.1", 3131);    // login
+  boolean authorized = client.login("benelog", "13234");
+  assertFalse(authorized);
+}
+----
+
+이 통합테스트 덕분에 처음에 만들 때 디버깅 시간도 줄였고, 나중에 발견된 버그도, 버그를 드러내는 통합테스트를 먼저 추가해서 실패한 테스트를 만든 후에 그 것을 통과시키도록 수정해서 해결했습니다.
+
+FTPClient모듈의 사용법도 덤으로 익혔습니다. http://commons.apache.org/net/[Apache Commons Net]에서는 FTP와 FTPS클라이언트가 동일한 인터페이스가 제공되어서 ssl옵션을 테스트 할 때 편리했습니다.
+
+* http://commons.apache.org/net/api-3.1/org/apache/commons/net/ftp/FTPClient.html[org.apache.commons.net.ftp.FTPClient]
+* http://commons.apache.org/net/api-3.1/org/apache/commons/net/ftp/FTPSClient.html[org.apache.commons.net.ftp.FTPSClient]
+
+

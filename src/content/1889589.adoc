@@ -1,0 +1,66 @@
+= Batch job에서의 바람직한 트랜잭션 처리 방식
+정상혁
+2008-05-15
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: batch,Spring-Batch,Spring
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+일반적인 온라인 어플리케이션에서는 사용자가 보내는 event 한번에 하나의 트랜잭션을 묶어서 처리합니다. 하지만 배치처리에서는 하나의 처리가 하나의 트랜잭션으로 관리되는 것은 때로는 문제가 될 여지가 있습니다.
+
+몇 만 건 이상의 행과 같이 대용량 데이터를 다루는 경우에는 roll back segment 같은 공간의 부족현상이 생길 위험이 있습니다. 그리고 상대적으로 긴 처리 시간동안 DB에 lock을 걸리게 해서 전체 시스템에 병목을 만들지도 모릅니다. 사용자가 많은 웹어플리케이션이 동시에 접근하는 DB에서 배치처리를 돌릴 때는 이를 더 염두에 두어야 할 것입니다.
+
+또, 데이터가 건마다 독립성을 가지고 있는 경우라면 한 두건의 처리실패 때문에 앞에 성공한 건들도 다 Roll back이 되어버린다면 더 많은 건의 데이터가 의도하지 않은 상태로 오래 유지됩니다. 배치처리의 에러가 발생 즉시 해결되지 않을 수도 있기 때문에 때문에 업무 규칙상으로 가능한 경우라면 부분적으로 성공한 건이라도 DB에 반영되는 것이 좋습니다. 그렇지 않을 경우에 재시도시에 다시 모든 데이터를 처리해야 하니 그 처리시간이 더 길어지게 됩니다.
+
+그렇다고 해서 데이터 매 건마다 따로 트랜잭션 처리를 하는 것도 성능상 좋지 못합니다. 트랜잭션을 시작하고 끝낼 때 드는 비용도 감안해야 되기 때문입니다.
+
+따라서 일정한 행 단위를 묶어서 처리를 하는 것이 배치처리에서는 더 바람직한 방식입니다.
+
+WebSphere XD Compute Grid에서는 check-point algorithm을 time-based와 record-based 두 가지 방식으로 제공해서 이런 문제에 대한 해결책을 제시하고 있습니다.
+Spring batch에서는 SimpleStepFactoryBean 클래스에서 commitInterval이라는 속성으로 주기적인 commit을 설정할 수 있습니다. 데이터 특성이나 업무규칙에 따라서 적절한 값을 트랜잭션 단위로 묶이는 건수를 지정할 수 있는 것입니다.
+
+
+== 참고자료 1
+http://www.devx.com/Java/Article/20791/1763/page/1[High-volume Transaction Processing in J2EE] :
+
+세번째 페이지의 Job Partitioning and Chunking 단락에서 아래와 같이 설명하고 있습니다.
+
+____
+Running your job as one long-lived transaction isn't a good idea. Long-lived transactions are more fragile than short-lived transactions. They are more susceptible to errors and DBMS locking problems because the locks are held longer. Smaller chunks are more reliable and less likely to exceed your connection and session timeouts.
+____
+
+
+== 참고자료2
+http://www.speakeasy.org/~jwilton/oracle/dedicated-rbs.html[Misconception: Big batch jobs should use a ‘dedicated’ rollback segment] :
+
+Oracle의 경우를 설명한 글입니다. DBA들이 보통 긴 transaction을 유지하는 batch job에 전용 role back segment를 할당하는데 실제로는 이것이 별도움이 못 된다고 말합니다. 결국 다른 session들이 사용할 수 있는 roll back segment를 사용하는 것은 똑같기 때문에 ORA-01555 에러를 유발할 수 있다고 합니다. 결국 보다 작은 transaction 단위를 가지고 가는 것이 근본적인 해결책입니다.
+
+그리고 실패시 재시도를 위해서 지난 번 처리한 영역까지 표시하거나 앞에 성공한 건들을 다 지워줘야 하는 경우 때문에  큰 transaction을 가지고 가는 문제가 .생기는데, 재시도를 위한 기능을 트랜잭션에서 제공받기 전에 응용프로그램에서 적절한 로직으로 처리하는 것이 필요하다고 나와 있습니다.
+____
+The problem that needs to be addressed in cases such as these is the design of the batch processes that require such a huge transaction.  Transactions in Oracle should normally be kept fairly short.  While it is undesirable to commit for every row processed (which will cause excessive redolog buffer flushing and high waits on “log file sync”), it makes sense to have batch processes commit for every few hundred rows processed.
+____
+
+____
+Often the greatest barrier to changing batch jobs to commit continuously is failure tolerance.  If a batch job that commits continuously fails part way through, then there must be a way to restart that batch job where it left off, or clean up from the first attempt so that the job can be started over.  Whereas before this restart capability was provided by rolling back the large transaction, the proposed rollback-friendly model requires that the appropriate application logic be built into the batch processing software.
+____
+
+____
+If you allow your semi-frequently committing batch jobs to randomly select rollback segments like all the rest of the transactions in your system, you will be less likely to overwrite recently committed changes, since the burden of the batch transactions is spread around, rather than concentrated in a single rollback segment
+____
+
+== 참고자료3
+http://www.ibm.com/developerworks/websphere/library/techarticles/0606_antani/0606_antani.html[Solving Business Problems with WebSphere Extended Deployment] :
+
+WebSphere XD에서 제공하고 있는 check-point algorithm에 대한 설명을 볼 수 있습니다.
+
+== 참고자료4
+
+http://static.springframework.org/spring-batch/spring-batch-docs/reference/html/execution.html#d0e3602[Spring batch documentation - 4.4.1.2. Configuring a CommitInterval] :
+
+Spring batch에서 주기적인 commit을 설정하는 방법입니다.
+
+
+

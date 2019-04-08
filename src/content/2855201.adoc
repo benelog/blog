@@ -1,0 +1,113 @@
+= Btrace로 DBCP의 connection정보를 모니터링 하기
+정상혁
+2011-09-28
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: Btrace,JDBC,Monitoring
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+Connection pool을 library로 DBCP를 많이 사용하고 있습니다. DataSouce가 선언되어 있는 설정 파일을 보면 min, max Connection 숫자는 쉽게 알 있지만, 현재 Active 한 것이 몇개 인지등은 실행시간에 쉽게 알아보기가 쉽지가 않죠. 그래서 JMX로 현재 Active한 Connection 수 등을 노출하는, DBCP를 한번 감싼 DataSource를 사용하기도 합니다.
+
+Btrace를 이용하면 비교적 간단하게 DBCP의 속성들을 값들을 확인할 수 있습니다. 이미 실행되고 있는 JVM에도 붙일 수 있으니 설정을 바꾸고 WAS를 재시작하지 않아도 됩니다.
+
+아래와 같이 간단한 소스로도 가능합니다.
+
+[source,java]
+----
+import static com.sun.btrace.BTraceUtils.*;
+import java.lang.reflect.Field;
+import com.sun.btrace.BTraceUtils.Sys;
+import com.sun.btrace.annotations.BTrace;
+import com.sun.btrace.annotations.OnMethod;
+import com.sun.btrace.annotations.Self;
+
+@BTrace
+public class DbcpMonitorSimple {
+
+  private static final String DS_CLASS = "org.apache.commons.dbcp.BasicDataSource";
+
+  @OnMethod(clazz = DS_CLASS, method = "getConnection")
+  public static void onGetConnection(@Self Object basicDataSource) {
+    Field urlField = field(DS_CLASS, "url");
+    Object url = get(urlField, basicDataSource);
+    print("=====DBCP BasicDataSource info (");
+    print(url);
+    println(" ) ==========");
+    printFields(basicDataSource);
+    Field poolField = field(DS_CLASS, "connectionPool");
+
+    Object pool = get(poolField, basicDataSource);
+    println("=====connectionPool (GenericObjectPool) info====");
+    printFields(pool);
+    println("==========");
+    Sys.exit(0);
+  }
+}
+----
+
+DataSource.getConnection 요청이 있을 때 해당 객체를 얻어와서 속성값들을 찍어줍니다.
+
+그리고 필요한 필드만 찍는다던지, 보기좋게 정렬한다던지 하는 작업은 필요에 따라 하면 되겠죠.
+
+jps로 모니터링하고자 하는 JVM의 pid를 확인하고,
+`btrace [pid] DbcpSimpleMonitor.java` 로 실행하면 아래와 같이 속성값들을 쭉 찍어줍니다.
+
+[source]
+----
+>btrace 4288 DbcpMonitor.java
+
+
+=====DBCP BasicDataSource info (jdbc:hsqldb:file:store;shutdown=true ) ========
+
+{defaultAutoCommit=true, defaultReadOnly=null, defaultTransactionIsolation=-1, d
+
+efaultCatalog=null, driverClassName=org.hsqldb.jdbcDriver, driverClassLoader=nul
+
+l, maxActive=8, maxIdle=8, minIdle=0, initialSize=0, maxWait=-1, poolPreparedSta
+
+tements=false, maxOpenPreparedStatements=-1, testOnBorrow=false, testOnReturn=fa
+
+lse, timeBetweenEvictionRunsMillis=-1, numTestsPerEvictionRun=3, minEvictableIdl
+
+eTimeMillis=1800000, testWhileIdle=false, password=, url=jdbc:hsqldb:file:store;
+
+shutdown=true, username=sa, validationQuery=null, validationQueryTimeout=-1, con
+
+nectionInitSqls=null, accessToUnderlyingConnectionAllowed=false, restartNeeded=t
+
+rue, connectionPool=org.apache.commons.pool.impl.GenericObjectPool@1f31079, conn
+
+ectionProperties={user=sa, password=}, dataSource=org.apache.commons.dbcp.Poolin
+
+gDataSource@be8958, logWriter=java.io.PrintWriter@12b1ff9, abandonedConfig=null,
+
+ closed=false, }
+
+===== number of Active : 0
+
+==========
+
+----
+
+FIeld 객체를 얻어올 때 field(String,String)을 쓰면 static 필드초기화나 @OnMethod 메소드가 붙지 않은 메소드에서는 객체가 얻어지지 않는  에러가 있었습니다.
+
+인터넷을 찾아보니 아래와 같이 비슷한 현상을 겪은 사람이 있었습니다.
+
+http://kenai.com/projects/btrace/forums/forum/topics/1366-Drilling-into-a-method-argument-s-properties[http://kenai.com/projects/btrace/forums/forum/topics/1366-Drilling-into-a-method-argument-s-properties]
+
+결국 `@OnMethod` 가 붙지 않는 메소드에서 호출을 할 때는 `field(classof(obj), "fieldName")` 과 같이 피해가는 방법을 썼습니다. 되도록 메소드에서 매번 호출할 필요가 없는 부분은 static 초기화를 시킬 수 있었으면 하는데, static 초기화로는 하는 것도 잘 되지 않았습니다. 직접 field(BasicDataSource.class, "fieldName)으로 를 참조하기는 것도 잘 안 되었고, field(String,String)으로는 참조가 안 되었습니다.
+이것만 아니면 좀 더 최적된 호출을 할 수 있었을 것 같습니다.
+
+첨부한 파일들은 아래와 같은 다소 다른 방식이나 출력형식으로 택했습니다.
+
+* https://gist.github.com/1246239#file_dbcp_monitor_simple.java[DbcpMonitorSimple.java] : BasicDataSource.getConnection이 한번 호출될 때 BasicDataSource의 모든 정보와 BasicDataSource.connetionPool의 정보를 출력
+* https://gist.github.com/1246239#file_dbcp_monitor.java[DbcpMonitor.java] :  이벤트 방식은 1과 같고, BasicDataSource의 모든 필드와 BasicDataSource.connetionPool에서 _numActive 값만을 보여줌
+* https://gist.github.com/1246239#file_dbcp_active_connection_monitor.java[DbcpActiveConnectionMonitor.java] : 여러 개의 Datasource의 Active connection 갯수를 구할 때 사용. getConnection에서 URL별로 active connection 갯수를 저장해 두었다가, Btrace에서 이벤트를 날리면 출력을 해주고 종료
+
+첨부한 스크립트 중 1,2번은 getConnection이 한번 호출되고 나면 스크립트를 종료하는 구조라서 큰 부하는 없겠지만, 증가 추이 등의 통계 정보를 쌓는기능 등이 필요하다면 Field poolField = field(DS_CLASS, "connectionPool"); 같은 부분도 중복호출되지 않게 하는 처리가 필요합니다.
+
+소스는 gist에 올렸습니다. ( https://gist.github.com/1246239 )
+

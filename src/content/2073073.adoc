@@ -1,0 +1,98 @@
+= Cubrid에서 commit시에 Statement가 닫히는 현상
+정상혁
+2008-09-25
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: Cubrid,JDBC
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+다음의  코드는 1000건을 insert하면서 100건마다 한번씩 commit을 하는 기능을 수행합니다. 대용량 데이터를 입력 할 때 이렇게 주기적으로 commit을 해주는 것은 일반적인 처리방식입니다. Cubrid DB에서는 이와 같은 코드를 실행시키면 'Attempt to access a closed PreparedStatement.'라는 에러 메시지를 받게 될 수도 있습니다.
+
+[source,java]
+----
+package test;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.util.Properties;
+
+public class JDBCTest {
+
+  public static void main(String[] args) {
+    String query = "INSERT into common_cd(cd_type, cd, cd_name) values(?, ?, ?);";
+    Properties cubrid = new Properties();
+    cubrid.put("url","jdbc:cubrid:127.0.0.1:43003:test:::");
+    cubrid.put("driver","cubrid.jdbc.driver.CUBRIDDriver");
+    cubrid.put("user","test");
+    cubrid.put("password","test");
+
+    insertAndCommit(cubrid, query);
+ }
+
+  private static void insertAndCommit(Properties prop,String query) {
+    Connection con =  null;
+    PreparedStatement psmt  = null;
+    try{
+     Class.forName (prop.getProperty("driver"));
+     con = DriverManager.getConnection(prop.getProperty("url"),prop);
+     con.setAutoCommit(false);
+     psmt = con.prepareStatement(query);
+     for(int i=1;i<=1000;i++)\{
+       psmt.setString(1, "00");
+       psmt.setString(2, String.valueOf(i));
+       psmt.setString(3, "code:"+i);
+       psmt.execute();
+       System.out.println(i+"th row set");
+       if(i%100==0) {
+         con.commit();
+         System.out.println("commit-------------------------------------");
+       }
+     }
+    } catch (Exception ex){
+      ex.printStackTrace();
+    } finally{
+     try{ psmt.close();} catch(Exception e){}
+     try{ con.close();} catch(Exception e){}
+    }
+ }
+}
+----
+
+
+commit 을 했을 뿐인데, Statement가 닫혀버리는 형상이 발생한 것이죠. 원인을 찾기 위해 Cubrid JDBC드라이버의 클래스 파일들을 역컴파일 해서 봤더니, 아래와 같은 completeAllStatements()라는 메소드가 commit 메소드 안에서 호출이 되는 것이였습니다.
+
+[source,java]
+----
+private void completeAllStatements() throws SQLException {
+    for (int i = 0; i < statements.size(); i++) {
+        UniSQLStatement unisqlstatement = (UniSQLStatement) statements.get(i);
+        if (unisqlstatement instanceof UniSQLPreparedStatement) {
+            statements.remove(i);
+            if (u_con.brokerInfoStatementPooling())   unisqlstatement.complete();
+            else   unisqlstatement.close();
+        } else{
+        unisqlstatement.complete();
+        }
+    }
+}
+----
+
+Connection의 close시에 Statement가 close되는 것은  JDBC명세에 나와있지만 commit시에 close될 수 있다는 것은 의외였습니다. 혹시나 싶어서 MySql, Oracle, Hsql의 JDBC구현들을 다 살펴보았지만, 비슷한 동작을 할 가능성이 있는 코드들은 찾을 수가 없었습니다. Cubrid만의 독특한 점이죠.
+
+이 문제를 해결하는 방법은 DB 서버에 있는 설정파일인 Cubrid_broker.conf 파일에서 STATEMENT_POOLING속성을 ON으로 표시해주는 것이라고 합니다.
+
+이 속성은 서버에서 Statement Pooling을 하겠다는 의미가 아니고, Connection을 받아서 쓰는 Client 쪽에서 Connection Pooling을 하고 있으니 Commit시에 Statement를 끊지 말라고 알려주는 것이라고 합니다. 위에 있는 completeAllStatements메소드 안의  u_con.brokerInfoStatementPooling()코드가 그것을 검사하는 것 같습니다. 사실 앞의 코드의 commit을 여러번 하는 예는 Statement pooling도 아니고 한 번 만들어진 Statement를 계속 쓰는 것 뿐인데, 이것을 Statement pooling을 쓰는 것으로 인식시켜야 한다니 논리적으로 이상하기는 합니다.
+
+그리고, Cubrid에 접근하는 Client는 CAS(Common Application Server)라는 것을 거치게 되어 있는데, 이 CAS보다 요청하는 Client의 갯수가 많을 때에는 항상 에러를 내는 것이 아니고, 이미 연결되어 있는 다른 Connection이 Transaction 중이 아니라면 그 Connection의 Statement자원을 해제시켜 버리고 가져와서 쓸 수 도 있다고 합니다. 이것을 막는 설정이 KEEP_CONNECTION이라는 속성입니다. CUBRID Manager Client프로그램에서 바꿀 수 있습니다.
+
+image:img/cubrid-keep-config.jpg[Cubrid설정.JPG,title="Cubrid설정.JPG"]
+
+또, Cubrid는 하나의 Connection에서 동시에 두개의 Prepare를 오픈 할 수 없는 구조라고 하네요. (참고자료:http://cubrid.com/bbs/view.php?id=faq&no=318&category=3[] http://cubrid.com/bbs/view.php?id=faq&no=318&category=3)
+
+이런 특징들을 보면, Cubrid는 Client의 명시적인 요청이 없이도 자원을 최대한 빨리 해제시켜 버리는 것이 사상이 아닌가 하는 생각도 듭니다. 어쩌면  제대로 자원 해제를 못하는 JDBC 코드가 많았던 시절에 그로 인해 생기는 문제들을 대응하면서 생긴 구조일 것 같다는 추측도 해봅니다.(참고: http://blog.benelog.net/1898928[JDBC에서 Connection, Statement,ResultSet의 close] ) 그러나 대부분 프레임웍 기반의 개발을 하고 필요할 때 자원을 close시켜주는 코드들이 정착되고 있는 지금 시점에서는 큰 의미가 없는 특징이고, 오히려 다른 DB나 JDBC명세에 없는 동작으로 인한 혼란만 불러 일으킨다고 생각됩니다.
+
+그래서 결론은 Cubrid에서 개발자의 의도보다 Statement를 먼저 해제시킬 수 있는 기능을 안 쓰려면 STATEMENT_POOLING과 KEEP_CONNECTION속성을 ON으로 하면 된다는 것입니다.

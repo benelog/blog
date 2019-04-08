@@ -1,0 +1,53 @@
+= Kent Beck과의 인터뷰 중에서..
+정상혁
+2011-06-21
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: Test
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+2010년 9월에 Kent Beck과의 인터뷰가 SE-Radio 사이트에 올라왔었습니다.
+
+http://www.se-radio.net/2010/09/episode-167-the-history-of-junit-and-the-future-of-testing-with-kent-beck/
+
+이 인터뷰 중에 아래 내용이 가장 인상 깊었고, 몇달이 지나서도 기억에 남아있습니다.
+
+19분 경에 나오는 내용입니다.
+
+== 받아쓴 내용
+
+.Martin(사회자):
+____
+Do you think you've convinced most of people you talk to?
+____
+
+.Kent Beck :
+____
+I don't try to convince people any more.I think I spent probably 10 years really trying to convince people TDD, pair programming, you should do this, you should do that and I don't do that any more.
+
+I am always working to improve my own practice, I am eager to share what I learn and I try and listen and understand what other people learned and their experiences as well. So I don't like ... I don't really keep score by how many people do TDD.
+
+If the practice of software development is improving overall, then I think that's a great thing, If I have some small influence on that, then I think that's a great thing too.
+____
+
+
+== 번역
+
+.마틴(사회자)
+____
+그동안 이야기한 사람들을 대부분 설득했다고 생각합니까?
+____
+
+
+.켄트벡 :
+____
+저는 더 이상 사람들을 설득하려 하지 않습니다. 저는 거의 10년동안 사람들에게 TDD를 꼭해라, 짝프로그래밍을 꼭 해라고 설득하려고 애써왔지만, 더 이상 그렇게 하지 않습니다.
+
+전 항상 제가 수행하는 방식을 개선하려고 일하고, 제가 시도하고 배운 것을 공유하려고 노력합니다.  다른 사람이 배운 것과 경험도 듣고 이해하려 하구요. 그래서 전 얼마나 많은 사람들이 TDD를 하는지를 가지고 점수를 매기지는 않습니다.
+
+소프트웨어를 개발하는 방식이 전반적으로 나아진다면 전 그걸 대단한 일이라고 생각하고, 만약 제가 거기에 약간의 영향이라도 끼친다면 역시나 대단한 일이라고 생각합니다.
+____
+

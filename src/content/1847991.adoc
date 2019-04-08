@@ -1,0 +1,22 @@
+= Effective Java에 대한 서평에 재미있는 댓글
+정상혁
+2008-04-17
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: Java,Effective-java
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+Effective Java의 Second Edition이 나올 때가 되지 않았나 싶어서 아마존에 가봤더니 아직이군요. 5월28일로 발매가 예정되어 있습니다. (http://www.amazon.com/Effective-Java-Second-2nd/dp/0321356683/ref=pd_bbs_sr_1?ie=UTF8&s=books&qid=1208402810&sr=8-1)
+
+대신 Effective Java의 서평 중에서 재밌는 내용을 발견했습니다.
+
+http://www.amazon.com/review/R296QBPY6ZC2LB/ref=cm_cr_pr_cmt?_encoding=UTF8&ASIN=0201310058#wasThisHelpful
+
+____
+Spend a couple years writing Java code. Then come back, re-read the book, and revisit your review. You will change your mind, or career.
+____
+
+처음에 서평쓴 사람이 컴퓨터 과학전공 졸업자로서 35%의 내용정도만 유익했거나 재미있었다고 하니 밑에 답글로 '2년 정도 Java코드를 작성해보고 다시 책을 읽고 다시 서평을 쓴 것을 찾아봐라. 너는 생각을 바꾸게 되거나 진로를 바꾸게 될 것이다.' 라고 적었군요. ^^;

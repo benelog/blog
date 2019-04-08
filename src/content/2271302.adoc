@@ -1,0 +1,187 @@
+= Oracle을 사용해 입출력하는 Map-Reduce
+정상혁
+2009-03-25
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: Hadoop,Oracle
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+Hadoop의 Map-Reduce처리에서는 DB를 바로 연결해서 처리할 수 있는  http://hadoop.apache.org/core/docs/current/api/org/apache/hadoop/mapred/lib/db/DBInputFormat.html[DBInputFormat], http://hadoop.apache.org/core/docs/current/api/org/apache/hadoop/mapred/lib/db/DBOutputFormat.html[DBOutputFormat]의 클래스가 제공되고 있습니다.
+
+그러나 이 클래스들은 이름이 'DB'가 붙어있는 것이 무색하게 Oracle과 연결해서 사용해보면 에러가 납니다. http://hadoop.apache.org/core/docs/current/api/org/apache/hadoop/mapred/lib/db/DBInputFormat.html[DBInputFormat]에서는 웹에서의 페이지 처리 쿼리처럼 데이터를 잘라서 가지고 오기 위해 원래 쿼리에다 LIMIT와 OFFSET 키워드를 붙이는데, 이 것은 Oracle에서는 지원되지 않습니다. 그리고 http://hadoop.apache.org/core/docs/current/api/org/apache/hadoop/mapred/lib/db/DBOutputFormat.html[DBOutputFormat]에서는 insert문의 맨 뒤에 세미콜론(;)을 붙여버리는데, 이것 역시 Oracle의 JDBC를 사용할 때는 에러를 냅니다.
+
+따라서, 결국 이 클래스들을 Oracle에서 쓸 수 있도록 상속해서 구현을 해 줄수 밖에 없었습니다. 얼핏 생각하면 쿼리만 바꾸어주면 되는 것이니 메소드 하나만 오버라이딩 해주면 될 것으로 예상했으나, 원래 클래스들의 구조가 그 정도로 단순하지 않았습니다.Inner클래스가 많아서 여러 클래스와 메서드들을 다 overriding해 줄 수 밖에 없었습니다. 더군다나, 새로 상속한 클래스의 내부에서 꼭 호출해야 하는 DBConfiguration클래스의 생성자가 public이 아닌 package private(아무것도 선언안한 디폴트 접근자)인 탓에, 패키지를 원래의 http://hadoop.apache.org/core/docs/current/api/org/apache/hadoop/mapred/lib/db/DBInputFormat.html[DBInputFormat], http://hadoop.apache.org/core/docs/current/api/org/apache/hadoop/mapred/lib/db/DBOutputFormat.html[DBOutputFormat]와 같은 패키지로 맞추어야 하는 불편함도 있었습니다. protected로 선언된 메소드들이 많은 것보면 분명히 상속해서 덮어쓰라고 만들어놓은 클래스 같은데, 막상 그렇게 활용하기에는 간편하지 않았던 것이죠.
+
+그리고 또 구조적으로 아쉬운 점은 두 클래스가 같은 DBConfiguration을 보게 있어서 Map에서 입력자료를 얻어오는 DB와 Reduce에서 쓰는 DB가 다를 때는 다시 별도의 클래스를 만들어주어야 한다는 것입니다.
+
+Spring Batch에서도 http://static.springsource.org/spring-batch/apidocs/org/springframework/batch/item/database/JdbcPagingItemReader.html[JdbcPagingItemReader]라는 약간 유사한 클래스가 있습니다. http://hadoop.apache.org/core/docs/current/api/org/apache/hadoop/mapred/lib/db/DBInputFormat.html[DBInputFormat]이 하나의 쿼리에서 가지고 올 데이터를 동시에 여러번 쿼리해서 나누어 가지고 오는 반면에 http://static.springsource.org/spring-batch/apidocs/org/springframework/batch/item/database/JdbcPagingItemReader.html[JdbcPagingItemReader]에서는 부분씩 가지고 오더라도 순차적으로 쿼리를 하는 차이점이 있기는 합니다. 그래도, 페이지 처리 쿼리처럼, 데이터를 나누어서 가지고 오는 쿼리를 제공한다는 점에서는 유사합니다. http://static.springsource.org/spring-batch/apidocs/org/springframework/batch/item/database/JdbcPagingItemReader.html[JdbcPagingItemReader]에서는 내부적으로 http://static.springsource.org/spring-batch/apidocs/org/springframework/batch/item/database/PagingQueryProvider.html[PagingQueryProvider] 라는 인터페이스를 사용하게 되어 있고, 이 인터페이스는 각 DB종류별로 OraclePagingQueryProvider, HsqlPagingQueryProvider, MySqlPagingQueryProvider, SqlServerPagingQueryProvider, SybasePagingQueryProvider 등의 구현클래스를 가지고 있습니다.
+Hadoop의 http://hadoop.apache.org/core/docs/current/api/org/apache/hadoop/mapred/lib/db/DBInputFormat.html[DBInputFormat]도 이런 구조였다면 이를 응용하려는 개발자가 훨씬 쉽게 클래스 확장방법을  이해했을 것입니다.
+
+아뭏든 지금까지 현재 공개된 API만으로는 Hadoop의 DB연결 지원 클래스들은 빈약해 보이고, API도 좋은 설계요건을 갖추었다고 느껴지지는 않습니다. 아무래도 포털 등에서 대용량 데이터를 처리하는 곳에 쓰이다보니 DB와 함께 연결되는 쓰임새가 그리 많지는 않았나봅니다. 더군다나 Oracle에서는 한번도 안 돌려본 클래스가 버젓이 DB...로 시작되는 이름으로 들어간 것 보면 Oracle이 쓰이는 동네와 Hadoop이 사는 곳은 아주 멀리 떨어져 있었던 것 같습니다. 그러나, 앞으로  엔터프라이즈 환경에서도 Hadoop이 쓰이려면 DB와의 integration은 반드시 거쳐야할 다리인 것 같습니다. http://www.jaso.co.kr/283[Enterprise 시장에서의 mapreduce] 링크를 보아도 이미 그런 시도들이 시작된 것을 알 수 있습니다.
+
+한편, Hadoop의 http://hadoop.apache.org/core/docs/current/api/org/apache/hadoop/mapred/FileInputFormat.html[FileInputFormat]가 Spring batch의 http://static.springsource.org/spring-batch/apidocs/org/springframework/batch/item/file/FlatFileItemReader.html[FlatFileItemReader]와 유사한 것 등이나 Spring batch도 2.0에서 아직 분산, 동시처리 등을 지원하기 시작했다는 점은 두 프레임웍의 겹치는 지점이 늘어날 수도 있다는 생각도 듭니다. 뭐 아직 Spring batch의 분산지원은 걸음마 단계이기는 합니다만, DB에서 HDFS에 들어가는 파일을 쓸 때 Spring batch의 API를 활용하는 것 깉은 활용법은 시도해 볼만하다고 생각됩니다.
+
+
+== 소스
+[source,java]
+.OracleInputFormat
+----
+package org.apache.hadoop.mapred.lib.db;
+
+import java.io.IOException;
+import java.sql.SQLException;
+
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.mapred.InputSplit;
+import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapred.RecordReader;
+import org.apache.hadoop.mapred.Reporter;
+
+public class OracleInputFormat<T extends DBWritable> extends DBInputFormat<T>{
+
+    private DBConfiguration dbConf = null;
+    private DBInputSplit split;
+
+    @Override
+    public RecordReader<LongWritable,T> getRecordReader(InputSplit split, JobConf job,
+            Reporter reporter) throws IOException {
+        dbConf = new DBConfiguration(job);
+        this.split = (DBInputSplit)split;
+
+        @SuppressWarnings("unchecked")
+        Class inputClass = dbConf.getInputClass();
+        try {
+            @SuppressWarnings("unchecked")
+            RecordReader<LongWritable,T> reader = new OracleRecordReader((DBInputSplit) split, inputClass, job);
+            return reader;
+        } catch (SQLException ex) {
+            throw new IOException(ex.getMessage());
+        }
+    }
+
+    public static void setInput(JobConf job, Class<? extends DBWritable> inputClass,
+              String inputQuery, String inputCountQuery) {
+        DBInputFormat.setInput(job, inputClass, inputQuery, inputCountQuery);
+        job.setInputFormat(OracleInputFormat.class);
+     }
+
+    protected class OracleRecordReader extends DBRecordReader{
+        protected OracleRecordReader(DBInputSplit split, Class<T> inputClass,
+                JobConf conf) throws SQLException {
+            super(split, inputClass, conf);
+        }
+
+        @Override
+        protected String getSelectQuery() {
+            long length = 0;
+            long start = 0;
+            try{
+                length = split.getLength();
+                start = split.getStart();
+            } catch(IOException e){
+                throw new IllegalArgumentException
+                        ("cannot read length or start variable from DBInputSplit",e);
+            }
+            StringBuilder query = new StringBuilder();
+            query.append(" SELECT * \r\n");
+            query.append(" FROM (SELECT m.* , ROWNUM rno ");
+            query.append("       FROM ( ");
+            query.append(              dbConf.getInputQuery());
+            query.append("             )  m");
+            query.append("       WHERE ROWNUM <= " + start + " + " + length + ")");
+            query.append(" WHERE RNO > " + start);
+            System.out.println(query.toString());
+            return query.toString();
+        }
+    }
+}
+----
+
+[source,java]
+.OracleOutputFormat
+----
+package org.apache.hadoop.mapred.lib.db;
+import org.apache.hadoop.mapred.JobConf;
+
+public class OracleOutputFormat<K  extends DBWritable, V> extends DBOutputFormat<DBWritable, V>{
+    @Override
+    protected String constructQuery(String table, String[] fieldNames) {
+            if(fieldNames == null) {
+              throw new IllegalArgumentException("Field names may not be null");
+            }
+            StringBuilder query = new StringBuilder();
+            query.append("INSERT INTO ").append(table);
+
+            if (fieldNames.length > 0 && fieldNames[0] != null) {
+              query.append(" (");
+              for (int i = 0; i < fieldNames.length; i++) {
+                query.append(fieldNames[i]);
+                if (i != fieldNames.length - 1) {
+                  query.append(",");
+                }
+              }
+              query.append(")");
+            }
+            query.append(" VALUES (");
+
+            for (int i = 0; i < fieldNames.length; i++) {
+              query.append("?");
+              if(i != fieldNames.length - 1) {
+                query.append(",");
+              }
+            }
+            query.append(")");
+            return query.toString();
+          }
+    public static void setOutput(JobConf job, String tableName, String... fieldNames) {
+        DBOutputFormat.setOutput(job, tableName, fieldNames);
+        job.setOutputFormat(OracleOutputFormat.class);
+    }
+}
+----
+
+
+[source,java]
+.Job 구성 예
+----
+public class SampleJob {
+
+    public static void main(String args[]) throws IOException, URISyntaxException{
+        JobConf conf = new JobConf(SampleJob.class);
+        initClasspath(conf);
+        conf.setJobName("sampleJob");
+        DBConfiguration.configureDB(conf, "oracle.jdbc.driver.OracleDriver",
+                "jdbc:oracle:thin:@localhost:1525:TEST",
+                "myuser", "mypassword");
+        OracleInputFormat.setInput(conf, Query.class,
+                "SELECT query, category, user_id FROM query_log ",
+                "SELECT COUNT(*) FROM query_log");
+        conf.setOutputKeyClass(Query.class);
+        conf.setOutputValueClass(IntWritable.class);
+        conf.setMapperClass(SampleMapper.class);
+        conf.setReducerClass(SampleReducer.class);
+        conf.setCombinerClass(SampleReducer.class);
+        OracleOutputFormat.setOutput(conf, "category", "user_id","cnt");
+
+        JobClient.runJob(conf);
+    }
+
+    private static void initClasspath(JobConf conf) throws URISyntaxException,
+            IOException {
+        DistributedCache.addCacheFile(new URI("lib/ojdbc5-11.1.0.6.jar"), conf);
+        DistributedCache.addFileToClassPath(new Path("lib/ojdbc5-11.1.0.6.jar"), conf);
+    }
+}
+----
+
+== hadoop의 DBInputFormat 참고자료
+* http://developer.yahoo.net/blogs/hadoop/DBInputFormat.ppt
+* http://www.cloudera.com/blog/wp-content/uploads/DBInputFormat.pdf
+* http://www.cloudera.com/blog/2009/03/06/database-access-with-hadoop/
+* http://www.cloudera.com/blog/tag/dbinputformat/
+
+
+

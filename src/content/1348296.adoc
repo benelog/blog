@@ -1,0 +1,33 @@
+= AOP 관련 용어 정리
+정상혁
+2007-07-19
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: AOP
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+부서원들과 같이 하는 세미나를 위해서 정리했었던 자료 중의 일부입니다. 대충 알고 있었던 것도 막상 누가 물어보면 한마디로 설명하는 것은 어렵다고 종종 느낍니다.  세미나 발표 준비를 하면서 모르면서 알고 있었다고 착각했던 부분을 많이 발견할 수 있어서 좋았습니다.
+
+약간 엉뚱한 이야기지만, 포스트를 작성하는 동안 '그림1'을 다시 보면서 최근 읽고 있는 http://www.amazon.com/World-Flat-Updated-Expanded-Twenty-first/dp/0374292795/ref=pd_bbs_sr_1/105-2068841-6541209?ie=UTF8&s=books&qid=1184811573&sr=8-1['The world is flat]'이라는 책의 내용이 생각났습니다. 그 책의 처음에는 기업의 아웃소싱에 대한 사례가 많이 나옵니다.  기업의 핵심 업무가 아니고 밖에서 할 수있는 업무들은 보다 싼 비용으로 처리할 수 있는 해외의 조직으로 넘기는 사례가 늘어나고 있다는 것이죠. 각 업무단의 코드에는 핵심로직만 남기고 공통적인 처리는 따로 정의해 둔 것을 weaving해서 쓴다는 내용과 왠지 비슷하게 보이더군요.  (그런데 책을 아직 1장 밖에 못 읽었어요)
+
+== AOP 용어
+
+* http://en.wikipedia.org/wiki/Aspect-oriented_programming[AOP] :보안, 예외등과 같이 프로그램에 처리해야 하는 다양한 관점을 분리(http://en.wikipedia.org/wiki/Separation_of_concerns[Separation of concerns])시키고 각각의 관점별로 구현을 한 후 이를 조합하여 완성된 프로그램을 만들고자 하는 개념. (참고자료1)
+* 횡단관점(http://en.wikipedia.org/wiki/Cross-cutting_concern[crosscutting concerns]) : 분리된 모듈로 작성하기 힘든 시스템 전반적으로 산재된 기능(예로 보안, 로그, 인증)
+* 핵심관점(main concern) : 해당시스템의 핵심가치와 목적이 드러난 관심영역 (primary concern, http://en.wikipedia.org/wiki/Core_concern[core concern])
+* 조인포인트(http://en.wikipedia.org/wiki/Join_point[join point]) : 횡단 관심모듈의 기능이 삽입되어 호출될 수 있는 실행가능한 특정위치
+* 포인트컷(http://en.wikipedia.org/wiki/Pointcut[point cut]) : 조인포인트의 집합. 어떤 클래스의 어느 조인포인트를 사용할 것인지 결정하는 선택 기능. Code와 advice를 연결해주는 설정정보.
+* 어드바이스(http://en.wikipedia.org/wiki/Advice_in_aspect-oriented_programming[advice]) : 각  조인포인트에서 행하는 행위, 삽입될 수 있는 코드. cross-cutting concern을 구현한 코드.
+* 조합(weaving) : 핵심관점코드와 어드바이스를 조합해 애플리케이션으로 완성하는 과정
+* 기술적 용어로서의 asepct : Advice와 point-cut을 함께 지칭하는 단어
+
+== 참고자료
+* 마이크로소프트웨어 2005/11 테크니컬 컬럼 - 객체지향을 넘어 관점지향으로 AOP (이일민)   (http://www.zdnet.co.kr/builder/dev/java/0,39031622,39147106,00.htm )
+* 마이크로소프트웨어 2006/09 S/W로 여는 세상 - 관점지향의 개념잡기 -상황중심의 프로그래밍 (임백준) (http://www.zdnet.co.kr/builder/dev/etc/0,39031619,39154322-1,00.htm)
+* 3번 자료에 대한 반론 - http://toby.epril.com/?p=229 (이일민님의 블로그)
+* 마이크로소프트웨어 2007/03 Cover Story- OOP한계 극복패러다임 AOP (이일민,김백기,박재성, 류대원)
+* 한빛네트워크에 올라온 AOP소개 기사 : http://network.hanb.co.kr/view.php?bi_id=968
+* 위키페디아

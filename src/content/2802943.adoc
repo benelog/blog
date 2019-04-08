@@ -1,0 +1,245 @@
+= Quartz 설정을 읽어서 CronExpression 테스트
+정상혁
+2011-05-23
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: test,Spring-Test,Cron
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+Cron expression은 실수하기가 쉽고, 오류가 뒤늦게서야 발견됩니다. 매일 5시 20분, 40분,60분에 실행될 일정을 지정하고자 했는데 "* 0/20 5 * * * ?"로 써야 할 표현식을  "* 0,20 5 * * * ?"으로 써놓고는 실운영 서버에 배포해서 하루가 지난 다음에 실행결과를 보고서야 실수를 발견한 경험을 해보신 분들이 많으실 것입니다.
+
+Cron expression도 테스트 코드를 짜서 검증을 해본다면 치명적인 실수를 막을 기회가 더 많아집니다.
+
+아래 예제는  ApplicationContext에 설정되어 있는 Quartz의 CronTrigger의 일정을 테스트하는 코드입니다.
+
+== ApplicationContext의 스케쥴링 설정 파일
+
+[source,xml]
+----
+<bean id="schedulerFactoryBean" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+     <property name="triggers" ref="triggers"/>
+</bean>
+<util:list id="triggers">
+     <bean p:jobName="baseballJob" p:cronE-pression="0 * * * * ?" parent="jobTrigger"/>
+     <bean p:jobName="baseballExportJob" p:cronE-pression="30 5-7 * * * ?" parent="jobTrigger"/>
+</util:list>
+
+----
+
+위의 설정 예제에서는 반복되는 설정을 간편하게 해주는 FactoryBean을 썼습니다. parent="jobTrigger"라고 지정된 부분이 FactoryBean 클래스와 연결되는 bean id를 지정한 속성입니다.
+여기에 쓰인 FactoryBean은 이"jobName"과 "cronExpression" 속성을 받아서 org.quartz.CronTrigger 타입의 bean을 생성해주는 역할을 합니다. 
+
+[source,java]
+.JobTriggerFactoryBean
+----
+package edu.batch.support.launch;
+ 
+import java.util.HashMap;
+import java.util.Map;
+ 
+import org.quartz.Trigger;
+import org.springframework.batch.core.configuration.JobLocator;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.sample.quartz.JobLauncherDetails;
+import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.scheduling.quartz.CronTriggerBean;
+import org.springframework.scheduling.quartz.JobDetailBean;
+import org.springframework.util.Assert;
+ 
+/**
+ * @author sanghyuk.jung
+ */
+public class JobTriggerFactoryBean implements FactoryBean<Trigger>, InitializingBean {
+    private JobLocator jobLocator;
+    private JobLauncher jobLauncher;
+    private String jobName;
+    private String cronExpression;
+    private String triggerName;
+ 
+    /**
+     * @return
+     * @throws Exception
+     * @see org.springframework.beans.factory.FactoryBean#getObject()
+     */
+    public Trigger getObject() throws Exception {
+        CronTriggerBean trigger = new CronTriggerBean();
+        trigger.setCronExpression(cronExpression);
+        JobDetailBean jobDetail = createJobDetail();
+        trigger.setJobDetail(jobDetail);
+        if(triggerName == null ){
+        trigger.setName(jobName+"Trigger");
+        } else {
+            trigger.setName(triggerName);
+        }
+        trigger.afterPropertiesSet();
+        return trigger;
+    }
+ 
+    private JobDetailBean createJobDetail() {
+        JobDetailBean jobDetail = new JobDetailBean();
+        jobDetail.setName(jobName);
+        Map<String, Object> jobData = new HashMap<String, Object>();
+        jobData.put("jobName", jobName);
+        jobData.put("jobLocator", jobLocator);
+        jobData.put("jobLauncher", jobLauncher);
+        jobDetail.setJobDataAsMap(jobData);
+        jobDetail.setJobClass(JobLauncherDetails.class);
+        jobDetail.afterPropertiesSet();
+        return jobDetail;
+    }
+ 
+    /**
+     * @return
+     * @see org.springframework.beans.factory.FactoryBean#getObjectType()
+     */
+    public Class<Trigger> getObjectType() {
+        return Trigger.class;
+    }
+ 
+    /**
+     * @return
+     * @see org.springframework.beans.factory.FactoryBean#isSingleton()
+     */
+    public boolean isSingleton() {
+        return false;
+    }
+ 
+    public void setJobLocator(JobLocator jobLocator) {
+        this.jobLocator = jobLocator;
+    }
+ 
+    public void setJobLauncher(JobLauncher jobLauncher) {
+        this.jobLauncher = jobLauncher;
+    }
+ 
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
+    }
+ 
+    public void setCronExpression(String cronExpression) {
+        this.cronExpression = cronExpression;
+    }
+ 
+    /**
+     * @throws Exception
+     * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+     */
+    public void afterPropertiesSet() throws Exception {
+        Assert.notNull(jobName, "jobName must be provided");
+        Assert.notNull(jobLocator, "jobLocator name must be provided");
+        Assert.notNull(jobLauncher, "jobLauncher name must be provided");
+    }
+ 
+    public void setTriggerName(String triggerName) {
+        this.triggerName = triggerName;
+         
+    }
+}
+----
+
+== 테스트 코드
+triggers라는 bean 이름으로 List<CronTrigger> type의 객체를 가지고 와서, List안에서 지정된 trigger의 이름을 탐색한다음에 그 안에서 그 trigger의 cron e-pression을 검사했습니다.  테스트 코드를 간결하게 유지하기 위해서 Cron e-pression을 검사하는 코드는  QuartzCronExpressionTestUtils라는 클래스로 분리해서 static import로 처리했습니다.
+QuartzCronExpressionTestUtils.findTriggerByName 메소드는 List<CronTrigger> 타입의 객체가 담고 있는 여러개의 CronTrigger에서 지정된 이름의 CronTrigger를 반환해줍니다.
+
+[source,java]
+----
+package edu.batch.baseball.schedule;
+
+import static edu.batch.support.launch.QuartzCronE-pressionTestUtils.*;
+
+import java.text.ParseException;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.quartz.CronTrigger;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration( { "classpath:/launch-context.xml" })
+public class BaseballQuartzScheduleTest {
+
+    private static final String DATE_PATTERN = "yyyy/MM/dd hh:mm:ss";
+
+    @Resource(name = "triggers")
+    List<CronTrigger> triggers;
+
+    @Test
+    public void testbaseballJobTriggerSchedule() throws ParseException {
+        CronTrigger trigger = findTriggerByName(triggers, "baseballJobTrigger");
+        String initialTime = "2010/09/01 09:00:00";
+        List<String> expectedTimeList = Arrays.asList(
+                "2010/09/01 09:01:00",
+                "2010/09/01 09:02:00",
+                "2010/09/01 09:03:00",
+                "2010/09/01 09:04:00");
+        assertSchedule(trigger, initialTime, expectedTimeList, DATE_PATTERN);
+    }
+
+    @Test
+    public void testbaseballExportJobTriggerSchedule() throws ParseException {
+        CronTrigger trigger = findTriggerByName(triggers, "baseballExportJobTrigger");
+        String initialTime = "2010/09/01 09:00:00";
+        List<String> expectedTimeList = Arrays.asList(
+                "2010/09/01 09:05:30",
+                "2010/09/01 09:06:30",
+                "2010/09/01 09:07:30",
+                "2010/09/01 10:05:30",
+                "2010/09/01 10:06:30",
+                "2010/09/01 10:07:30");
+        assertSchedule(trigger, initialTime, expectedTimeList, DATE_PATTERN);
+    }
+}
+----
+
+[source,java]
+.QuartzCronExpressionTestUtils
+----
+package edu.batch.support.launch;
+
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+ 
+import java.text.ParseException;
+import java.util.Date;
+import java.util.List;
+ 
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang.time.DateUtils;
+import org.quartz.CronTrigger;
+ 
+public class QuartzCronExpressionTestUtils {
+     
+    public static void assertSchedule(CronTrigger trigger, String initialTime,
+            List<String> expectedTimeList, String datePattern) throws ParseException {
+            Date previousStartTime = DateUtils.parseDate(initialTime,   new String[]{datePattern});
+             
+            for(String expectedTime : expectedTimeList){
+                trigger.setStartTime(previousStartTime);
+                Date nextExecutionTime =  trigger.getFireTimeAfter(previousStartTime);
+                String actualTime = DateFormatUtils.format(nextExecutionTime, datePattern);
+                assertThat("executed on expected time", actualTime, is(expectedTime));
+                previousStartTime = nextExecutionTime;
+            }       
+        }
+ 
+    public static CronTrigger findTriggerByName(List<CronTrigger> triggers, String triggerName) {
+        for (CronTrigger trigger : triggers) {
+            if (triggerName.equals(trigger.getName())) {
+                return trigger;
+            }
+        }
+        throw new IllegalArgumentException("cannot find trigger : "
+                + triggerName);
+    }
+}
+----
+

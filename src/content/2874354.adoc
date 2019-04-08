@@ -1,0 +1,97 @@
+= Java Stack dump 다운로드를 편하게
+정상혁
+2011-11-20
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: Java, 자작도구
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+실행 중인 Java 프로세스의 Stack dump를 뜨는 작업은 간단합니다.  Jstack 이나 kill -3 뒤에 process id를 지정하기만 하면 됩니다. Stack dump를 서버에 있는 stack dump파일을 PC로 옮길때면 Secure CRT나 putty에서 console에 찍히는 내용을 파일로 저장하는 기능을 주로 쓰고 있습니다.
+
+언젠가 테스트를 한다고 자주 Stack dump를 뜨다보니 이런 작업마저도 번거롭게 느껴졌습니다. 그리고  파일이름에 timestamp가 들어가 있으면 나중에 찾아보기가 편한데, 그런 파일명 지정도 수동으로 하려니까 귀찮았습니다. 그래서 간단한 프로그램을 만들어 봤었습니다.
+
+보통은 서버에서 vi로 덤프를 보는 때가 많아서 저도 잘 쓰지는 않는데, 그래도 코딩하면서는 재밌었던 기억이 나네요.
+
+== 다운로드
+`wget file.benelog.net/dumper.jar` 혹은 웹브라우저로 benelog.net/dumper.jar 접근해서 저장
+
+== 실행
+* Windows : `java -cp "dumper.jar;%JAVA_HOME%/lib/tools.jar" Start [port number]`
+* Linux : `java -cp "dumper.jar:$JAVA_HOME/lib/tools.jar" Start [port number]`
+
+Console 창에는 아래 메시지가 찍힙니다.
+
+
+[source]
+----
+Usage:
+
+ (Windows)
+
+   Prompt>java -cp "dumper.jar;%JAVA_HOME%/lib/tools.jar" Start [port]
+
+ (Linux)
+
+   Prompt>java -cp dumper.jar:$JAVA_HOME/lib/tools.jar Start [port]
+
+-----------------------------
+
+The port is selected by ramdom.
+
+Web address: http://192.168.0.11:17456
+
+2011-11-20 04:04:32.901:INFO::jetty-7.x.y-SNAPSHOT
+
+2011-11-20 04:04:33.248:INFO::started o.e.j.s.ServletContextHandler\{/,null}
+
+2011-11-20 04:04:34.526:INFO::Started SelectChannelConnector@0.0.0.0:17456
+----
+
+파라미터로 port번호를 넘겨서 원하는 포트로 웹페이지를 띄울 수가 있는데, 지정된 포트가 없다면 10000번에서 20000번 사이의 포트를 임의로 찍어서 띄어줍니다. 위에 "Web address" 라고 적힌 칸 옆의 주소가 접근할 수 있는 URL입니다.
+
+
+== 사용법
+Console창에서 알려주는 주소를 웹브라우저 입력하면 아래처럼 jps의 정보를 보여주는 화면이 뜹니다.
+
+image:img/my-program/dumper-jps.jpg[title="JPS"]
+
+
+pid를 찍으면 지정한 JVM의 jstack dump를 바로 다운로드할 수 있습니다.
+
+파일명은 \{pid}_\{연도}-\{일월}-\{시분초}.log의 형식으로 했습니다.
+
+혹시 덤프파일을 생성하는데 아래 에러 메시지가 뜬다면, 장비에 여러개의 JVM이 설치되어 있으면서 덤프를 뜨려는 JVM 프로세스와 tools.jar를 classpath로 지정한 경로의 JVM이 다르지 않는지 확인해보셔야 합니다.
+
+
+[source]
+----
+java.lang.UnsatisfiedLinkError: no attach in java.library.path
+com.sun.tools.attach.AttachNotSupportedException: no providers installed
+        at com.sun.tools.attach.VirtualMachine.attach(VirtualMachine.java:190)
+----
+
+
+== 구현방식
+Jps나 Jstack과 유사하게 sun.jvmstat.monitor 패키지의 클래스를 이용한 프로그램입니다.
+
+http://www.java2s.com/Open-Source/Java-Document/6.0-JDK-Modules-sun/jvmstat/sun.jvmstat.monitor.htm
+
+참고로 jdk의 tools.jar는 따로 배포하면 license에 어긋난다고 알고 있어서 묶어서 패키징하지 않고 classpath로 지정하도록 했습니다.
+
+전체 소스는 github에 올렸습니다.
+
+https://github.com/benelog/dumper
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,87 @@
+= 최상위권 n등의 점수 구하기
+정상혁
+2012-02-29
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: 코딩연습
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+http://blog.benelog.net/2173103[Effective & Agile Java Generics] 글에 이은, Generics 활용 사례입니다.
+
+배치 프로그램을 짜다가 수십만개의 점수 중에 상위 0.1%, 0.01%에 해당하는 값이 무엇인지 구해야하는 일이 생겼습니다. 기존의 프로그램은 Linux shell로 되어 있었는데, Linux의 sort를 이용해서 전체 정렬을 한 후에 찾고자하는 등수가 있는 줄을 찾아가는 방식이였습니다. 전체 건수에 비해서 구하고자 하는 등수가 상위 0.1%, 0.01% 등 아주 작은 비율임에도 불구하고, 전체 Sort를 하는 것은 비효율적이라는 생각이 들었습니다.
+
+그래서 이 프로그램의 일부를 Java로 바꾸는 작업을 하다가 이 순위를 구하는 부분도 필요한만큼만 정렬을 하도록 바꾸고 싶었습니다.  저는 OS를 우분투를 쓰기 떄문에 상관없지만, Java로 만든 프로그램에서 중간에 Shell을 호출하는 부분이 남아있으면 다른 개발자들은 Local PC에서는 확인할 수 없는 부분이 생겨서 불편해질까봐 걱정되었던 이유도 있었습니다.
+
+등수를 구하는 대상 데이터형은 Integer와 Float이였지만, Integer를 위한 클래스 따로 만들고 Float를 위한 것을 따로 만들기 싫어서 java.lang.Comparable를 구현한 클래스명을 다 사용할 수 있게 했습니다. 이정도 유연성을 두는게 추가 개발은 거의 없이 그냥 Generics 선언을 잘하면 되는 일이였으므로 그다지 과도한 확장은 아니였다고 생각했습니다. 덕분에 String형의 문자열도 비교할 수 있습니다.
+
+즉, 문제를 다시 정리하면 아래와 같습니다.
+
+. 데이터는 점수값만이 1차원으로 나열된다. (예: 1,5,3,10 .... )
+. java.lang.Comparable형의 클래스를 모두 계산 대상으로 받을수 있고, 명시적인 캐스팅이 필요없게 사용할 수 있어야한다.
+. 전체 데이터 중에 지정한 등수를 구한다. 전체 데이터는 파일에 있고, 수십만건이라서 메모리에 모두 올릴 수 없으나, 지정한 등수까지는 메모리에 올릴 수 있을 정도로 최상위권의 값이 지정된다. 즉 예를 들면 80만건중 100등의 점수가 몇점인지를 구하는 상황이다
+
+
+Integer, Float, String형을 대상으로 작성한 테스트 코드는 아래와 같습니다.
+
+
+[source,java]
+----
+public void get3rdRankOf5() {
+    //given
+    List<Integer> rawData = asList(400,400,100,500,200);
+    int rankToFind = 3;
+
+    //when
+    RankFinder<Integer> rankFinder = new RankFinder<Integer>(rankToFind);
+    addAll(rawData, rankFinder);
+    Integer rankedValue = rankFinder.getRankedValue();
+
+    //then
+    assertThat(rankedValue, is(400));
+    assertThat(rankFinder.getTopValues(), is(asList(400,400,500)));
+}
+
+@Test
+public void get2ndRankOf5WithFloat() {
+    //given
+    List<Float> rawData = asList(10.9F, 10.2F, 10.3F, 10.4F, 10.5F);
+    int rankToFind = 2;
+
+    //when
+    RankFinder<Float> rankFinder = new RankFinder<Float>(rankToFind);
+    addAll(rawData, rankFinder);
+    Float rankedValue = rankFinder.getRankedValue();
+
+    //then
+    assertThat(rankedValue, is(10.5F));
+    assertThat(rankFinder.getTopValues(), is(asList(10.5F,10.9F)));
+}
+
+@Test
+public void get4thOfWord() {
+    //given
+    List<String> rawData = asList("e","fc","a","b","k");
+    int rankToFind = 2;
+
+    //when
+    RankFinder<String> rankFinder = new RankFinder<String>(rankToFind);
+    addAll(rawData, rankFinder);
+    String rankedValue = rankFinder.getRankedValue();
+
+    //then
+    assertThat(rankedValue, is("fc"));
+}
+
+private <T> void addAll(List<T> rawData, RankFinder<? super T> rankFinder) {
+    for (T num : rawData) {
+        rankFinder.addTargetValue(num);
+    }
+}
+----
+
+이를 통과시키는 실행 코드와 테스트 코드 전체는 https://gist.github.com/1938477[GIST]에 올렸습니다.
+
+더 효율적으로 개선할 여지가 많은 방식이지만, 1시간이 걸리는 전체 배치 중 1초 미만의 구간이였기에 속도향상이 큰 의미가 없어서 더 이상 리팩토링을 진행하지는 않았습니다.  알려진 selection alorithm을 참고하면 이 상황에서도 더 좋은 방식이 있을 듯합니다.

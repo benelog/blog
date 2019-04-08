@@ -1,0 +1,25 @@
+= Java에서 여러줄에 걸친 문자열 선언을 편하게 하는 @Multiline
+정상혁
+2013-01-29
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: Java,String,Multiline,자작도구
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+Andrian Walker라는 영국 개발자가 만든 라이브러리를 제가 수정해서 Github에 올렸습니다.
+
+이 프로젝트에 대한 자세한 설명은 아래에 있습니다.
+
+* https://github.com/benelog/multiline/wiki/Java%EC%97%90%EC%84%9C-%EC%97%AC%EB%9F%AC%EC%A4%84%EC%97%90-%EA%B1%B8%EC%B9%9C-%EB%AC%B8%EC%9E%90%EC%97%B4-%EC%84%A0%EC%96%B8%EC%9D%84-%ED%8E%B8%ED%95%98%EA%B2%8C-%ED%95%98%EB%8A%94-%40Multiline[Java에서 여러줄에 걸친 문자열 선언을 편하게 하는 @Multiline]
+
+(github wiki에 적고 블로그에 붙여넣기를 하니 코드 블럭이 깨지는 등 편집이 쉽지가 않네요. 그래서 링크로 대신 합니다.)
+
+위 글의 핵심 내용은 아래와 같습니다.
+
+* Java에는 여러 줄에 걸친 문자열을 선언하는 문법이 없어서 긴 문자열을 편집하는 작업이 불편합니다.
+* 이를 보완하는 방법을 찾던 중 Adrian Walker라는 개발자가 만든 Multiline-string 이라는 라이브러리를 발견했고, Eclipse에서도 쓸 수 있도록 코드를 수정해서 원저자의 허락을 받고 Github에 올렸습니다. (https://github.com/benelog/multiline)
+* 이 과정 중에 Annotation Processing과 ECJ(Eclipse compiler for Java)에 대해서 알게 된 것들을 정리했습니다.
+* 이 라이브러리와 비슷한 기능을 Lombok에 추가하거나, 안드로이드에서 annotation Processing을 활용할만한 방안을 더 연구해볼만 합니다

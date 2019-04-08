@@ -1,0 +1,30 @@
+= 로그인별 process 숫자를 집계하는 sybase 쿼리
+정상혁
+2007-07-10
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: Sybase
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+sa 계정으로 로그인해서,
+
+[source,sql]
+----
+select
+    p.hostname,
+    p.ipaddr,
+    p.cnt,
+    (select l.name from syslogins l where l.suid = p.suid) name
+from
+    (select s.hostname, s.ipaddr, s.suid,
+        count(*) cnt from sysprocesses s
+group by s.hostname, s.ipaddr ,s.suid ) p
+----
+
+현재 어느 로그인 아이디에서 많이 프로세스가 붙어있는지 볼 때 쓰면 됩니다.
+내장 함수 중에 비슷한게 있는지 모르겠네요.
+
+간단한 내용이지만 필요하신 분들이 검색엔진을 타고 오셔서 찾아가시길 바라는 의도에서 올립니다.

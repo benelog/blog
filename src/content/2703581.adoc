@@ -1,0 +1,147 @@
+= SpringOne2GX 2010 (3) Spring and Java EE 6,Synergy or Competition?
+정상혁
+2010-10-29
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: Spring,Spring-One,행사후기
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+== 논쟁에 응하다
+2010년 10월 4일, http://www.theserverside.com/[http://www.theserverside.com] 에는 이제 프레임웍의 시대는 가고, Spring에서 Java EE6로 옮겨야 한다는 주장을 담은 글이 올라왔고, 뜨거운 논쟁거리가 되었습니다.
+
+* http://www.theserverside.com/news/thread.tss?track=NL-461&ad=790558&thread_id=61023&asrc=EM_NLN_12619056&uid=2873925[Moving from Spring to Java EE 6: The Age of Frameworks is Over]
+
+ 과거 Java EE 스펙의 부족함 때문에 Spring이 떠올랐지만, 이제 Java EE 6에서는 그런 것들을 다 극복을 했으니 Java EE6로 갈아타자는 내용이였습니다.
+
+ 이 글의 댓글에서부터 많은 반론이 올라왔고, 별도의 포스트로 쓰여진 아래와 같은 글들도 있었습니다.
+
+* http://raibledesigns.com/rd/entry/re_moving_from_spring_to
+* http://jandiandme.blogspot.com/2010/10/spring-vs-java-ee-and-why-i-dont-care.html?utm_source=feedburner&utm_medium=twitter&utm_campaign=Feed%3A+jandiandme2+%28J+and+I+and+Me%29&utm_content=Twitter[Spring vs. Java EE and Why I Don't Care]
+
+ 반론들에 포함된 공통적인 내용들은 아래와 같습니다.
+
+* 크게 볼 때, Spring과 Java EE6 는 비슷한 프로그래밍 모델을 가진 부분이 많다.Annotation을  @Stateless을 쓸지, @Component 쓸지는 프로젝트의 성공여부를 결정지을 만큼 중요한 차이는 아니다.
+* 그러나 Spring이 Tomcat, Jetty를 비롯한 더 많은 WAS에서 실행될 수 있다.
+* Batch, Integration, Spring Roo 같은  Java EE 스펙이 미치지 못하는 영역을  스프링에서는 제공하고 있다.
+
+
+JavaEE 진영과 스프링 쪽의 갈등은 이미 뿌리가 깊습니다.  스프링의 시초가 된 코드가 있는 "Expert One-on-OneJ2EE Design and Development"책에는 EJB의 단점들이 날카롭게 지적되어 있고, 로드존슨과 유겐할러가 써서최초로 스프링을 언급한 책은 이름부터가 "Expert One-on-One J2EE Development withoutEJB"였습니다. "with Spring"도 아닌 "without EJB"인 것이죠. EJB를 적용했을 때의 실패경험 때문인지로드존슨은 EJB에 맺힌 것이 많아 보이고, 그런 것들이 앞의 저서들을 저술한 동기를 더 강하게 하지 않았을까하는 생각도듭니다.  그래도 J2EE 시절만 해도 표준 스펙은 OS나 DB서버와 같이, low level의 기술을 제공하는 컨테이너로인식이 되었는데, Java EE5 이후  실사용자 레벨의 컴퍼넌트 모델을 제공하기 시작하면서 JavaEE와 Spring은경쟁관계로 인식이 됩니다. 사실 스펙을 정의하는 JavaEE와 구현기술인 Spring을 동등하게 비교할 수도 없고,Spring에서도 JavaEE스펙을 지원하는 부분이 있습니다. 하지만 JavaEE스펙을 더 지지하는 진영에서는 Spring을사유기술일 뿐이고 JavaEE에 근거한 기술은 표준이라는 것을 계속 강조하면서 스프링을 공격하고 있습니다.  로드존슨은 이전에올린 http://blog.springsource.com/2009/04/14/enterprise-java-and-the-american-motors-gremlin/#comment-164086[블로그 포스트의 댓글]에서 오픈소스 기술인 Spring을 사유(proprietary)라고 표현한 것에 대해서는 그것은 의심스러운 용어일 뿐이라고 말한적도 있습니다.  (In any case, "proprietary" is a questionable term when we'retalking about open source. )
+
+마침 SpringOne2GX 컨퍼런스 직전에  또다시 이런 논쟁이 일어난 것이 흥미로웠고, 저는 로드존슨이 키노트에서 바로 이에 대한 반론을 하지 않을까 하는 기대도 했었습니다. 그런데 로드 존슨은 핵심가치 같은 큰 그림에서의 스프링이 추구하는 바를 이야기했고, 이 논쟁에 대한 직접적인이야기는 하지 않았습니다.
+
+바로 셋째날에 한 이 발표 "Spring and Java EE 6,Synergyor Competition?"에서 유겐할러가 그에 대한 구체적인 대답을 했습니다.  유겐할러는 최근 이런 논쟁들을 보고서 발표제목을 바꾸었다고 했고  이미 발표 몇시간 전  팀블로그에 아래와 같은 글을 올려서 이날 발표에서 말할 내용을 먼저 공개하기도했습니다. 저는 컨퍼런스가 끝난 후에야 이 글이 올라온 것을 보았는데, 발표에서 가장 뒷부분에 강조한 핵심내용이 정리되어있었습니다.
+
+* http://blog.springsource.com/2010/10/19/spring-3-on-a-java-ee-6-server/
+
+뒤에서 언급되겠지만, 간단히 정리하면  JavaEE6 환경에서도 스프링을 사용하면  플랫폼에서 제공되는 기술들을 일관된 프로그래밍과 설정 모델로 조화시키고, 더 많은 기술과 환경을 조합할 수 있으면서, Java EE7보다 더 빨리 발전하는 기능들을사용할 수 있는 것이라는 주장이였습니다.
+
+사실 유겐할러는 이 날 발표와 비슷한 주제의 발표를 Java EE6 스펙의 확정 전에도 여러 번 한적이 있었습니다. 작년에 한 발표도 아래 링크에서 동영상으로 올라와 있습니다.
+
+* http://www.infoq.com/presentations/Spring-and-Java-EE-6-Jurgen-Holler
+
+확정된 스펙을 가지고 이야기 한 것이 작년에 한 위의 발표와 달랐던 점이였습니다. 발표 중에 유겐할러는 Spring 쪽에서도오랫동안 EE 6 스펙의 확정을 기다렸다고 했고 EE6 확정 직후에 발표된 Spring 3.0에서도 EE6의 스펙을 많이지원하고 있음을 강조했습니다.  발표 제목 중에  포함된 "Synergy or Competition"중,  "Synergy"를주장하고 싶었던 것이죠.
+
+== 스프링의 역할
+
+이 것은 이번 컨퍼런스 내내 키노트와 여러 세션에서 반복되어 언급된 말이였는데, 이 발표에서도 스프링을 사용하면 Java EE와 동등한 기능을쓰면서도 어플리케이션을 어느 서버에서도 배포될 수 있다는 것을 강조했습니다.  대상 플랫폼의 런타임에 적용되어서, 서비스추상화를 통해 공통적인 Programming model과 설정으로 개발을 할 수 있고,  전통적인  어플리케이션 서버 역할의 대안을 제공한다고 했습니다. Java EE 5의 스펙 중에서도 @PostConstruct, @PreDestoy ,@PersistenceContext, @PersistenceUnit , @Resource, @EJB, @TransationAttribute 등의 많은 Annotation을 지원하는데, 원하는 Semantics에 따라서 조합하고조화시켜(Mix & Match) 사용하라고 권장했습니다.
+
+== Java EE6 스펙 리뷰와 스프링의 지원
+
+
+=== Java EE 프로파일
+JavaEE프로파일은 EE 스펙 중 일부를 일부를 묶어서 구분하는 개념이였습니다. 가령 "Web Profile"이라고 하면 EE 스펙 중웹기술에 해당하는 Servlet, JSP, jSTL, JTA, JPA, EJB 3.1 Lite를 포함하는 것이라고 했습니다.그래서 벤더들이 초점을 두고 싶은 프로파일만 구현하고, 이미 지나간 잘 안 쓰이는 스펙에 대해서는 구현할 필요가 없이 그 분야의 프로파일에 대해서만 인증을 받을 수도 있다는 것입니다. 좋은 개념이기는 하나 현실적으로 웹프로파일만 구현하고 있는 벤더는아직까지는 없다고 말했습니다. 그런데 컨퍼런스가 끝난 뒤에 http://mechsoft.com.tr/Mechsoft/software/en/acikkaynak/siwpas.html[SIwpas]라는 Web Profile만 구현한 서버를 우연찮게 발견하기도 했습니다.
+
+그리고 스프링은 플랫폼에서 어떤 라이브러리가 제공되던지 상관 없이 사용할 수 있으므로  Java EE 프로파일은 스프링에 영향을 미치지는 않는 개념입니다.
+
+=== Servlet 3.0
+Servlet3.0 스펙에는  web.xml을 간결하게 해주는 "framework auto deployment"기능이 포함되고, 스프링도자동배포 기능 추가를 계획하고 있었습니다. 그리고 비동기적인 Http처리인 Comet은 Spring MVC에서 특별한request/reponse 형식으로 지원할 것이라고 했습니다. 당연히 이전 서블릿 스펙을 지원하는 서버에서의 하위호환성도유지할 것이라고 합니다.
+
+=== JSF 2.0
+JSF 2.0에는 UI 컴퍼넌트 부분에서 Ajax 지원와 페이지 선언 언어 등이 개선됩니다.. 그리고 스프링의 @Component와 @Value와 유사한 역할인@ManagedBean, @ManagedProperty 애노테이션이 있습니다. 스프링에서는 현재의 JSF지원 기능을 새 버전에맞추어 이어나가면서 3.1버전에서는 JSF 지원을 더 확장할 수 있도록 연구 중에 있다고 했습니다.
+
+=== JPA 2.0
+JPA2.0에는 쿼리 타임아웃, 표준화된 쿼리 힌트 등이 추가되었습니다. 역시 스프링에서는 현재의 JPA의 지원기능을 이어나가고,트랜잭션 관리에서 JPA 2.0의 모든 기능을 다 열어준다고 했습니다. 이미 Spring 3.0에서 Hibernate,EclipseLink, OpenJPA 등의 최신버전들과 이런 기능들을 쓸 수 있다고 합니다.
+
+=== JSR-303 Bean Validation
+JSF 2.0과 JPA 2.0에서 동시에 지원하는 스펙인데, Spring 3.0에는 SpringMVC의 Validation기능으로 사용할 수 있습니다.
+
+=== JAX-RS
+JAX-RS((Java™API for RESTful Web Services)는 REST방식의 웹요청 처리를 지원하는 표준 API입니다. 이미Jersey같이 JAX-RS를 지원하는 프레임웍에서 Spring을 자연스럽게 같이 연결해서 사용할 수 있습니다.
+
+아래 코드에 @Path 아노테이션은 JAX-RS에서 정의된 것인데, 여기에 스프링의 `@Autowired` 를 같이 쓰고 있습니다.
+
+[source,java]
+----
+@Path("widgets")
+public class WidgetsResource {
+    @Autowired
+    private WidgetsService service;
+
+    @GET  @Path("{id}")  @Produces("text/html")
+    public String getWidget(@PathParam("id") int id){
+     ...
+    }
+
+}
+----
+
+스프링 3.0에서도 Spring web MVC에서 나름대로의 스펙을 가진 REST지원 기능이 있습니다. 사실 위의 @Path와@PathParam 은 스프링의 @RequestMapping, @RequsetParams 아노테이션과 무척 유사해보이는, 비슷한프로그래밍 모델을 가지고 있습니다. 왜 스프링개발자들이 Spring MVC에서 JAX-RS를 바로 지원 안하고 나름대로의 스펙을만들었는지에 대해서는, 스프링소스의 팀 블로그를 통해서 밝힌 적이 있습니다.
+
+* http://blog.springsource.com/2009/03/08/rest-in-spring-3-mvc/ 참조
+
+기존의 JAX-RS 스펙을 바로 지원하는 것도 프로토타이핑해봤지만, 자연스럽게 않게 억지로 끼워 맞추는 듯한 방식이 나왔고, 결국Spring MVC사용자들에게 더 일관적이고 편한 방식을 제공하는 나름대로의 기능을 넣기로 결정했다는 것이였습니다. 결국JAX-RS와 Spring MVC는 REST 지원부분에서 겹쳐지는 부분이 생겼고, 이를 두고 스프링은 표준 스펙을 존중하지않는다는 비난을 하는 사람도 있었습니다.
+
+이날 발표에서도 유겐할러는 Spring MVC는 근본적으로 MVC구조라서 View의 rendering을 하는 부분을 분리할 수 밖에 없고, 따라서JAX-RS 방식과 달라질 수 밖에 없다고 했습니다. 그리고 https://jersey.dev.java.net/[Jersey], http://www.jboss.org/resteasy/[RESTEasy], http://www.restlet.org/[Restlet]와같은 JAX-RS 구현체를 쓴다고 해도 Spring를 같이 쓸 수 있으니, 상황에 따라서 Spring MVC의 REST 기능이나JAX-RS 구현체를 모두 골라서 쓸 수 있다고 했습니다. UI페이지와 REST요청을 같이 처리해야하는 어플리케이션에서는Spring MVC로,  계층적인 리소스 구조처럼 REST 방식을 깊이까지 쓰는 어플리케이션이라면 JAX-RS 구현체를 쓰는것처럼 말이죠. 스프링은 언제나 그래왔듯이 선택에 대한 것이라는 말을 덧붙였습니다. (Spring is (and alwayswas) about choice),
+
+그리고 JAX-RS 스펙은 Java EE6에서 독립적인 스펙이고, 다른웹스펙과도 연관관계가 없고, JSF와 프로그래밍 모델도 다르다고 유겐할러는 설명했습니다.  스프링은 그런 관련성이 있는 스펙들을 일관성 있게 묶어가고 있다는 것을 대비시켜 보이기 위해서 굳이 그런 언급을 한 것이 아닐까하는 생각도 들었습니다.
+
+=== EJB 3.1
+
+EJB3.1는 EJB 3.0에 singleton bean과 비동기 메소드 호출, JNDI 이름에 대한 Convention 제공 등의기능이 추가된 것입니다. 그리고 Local session Bean과 Singleton Bean만을 가지는 "EJB 3.1Lite"라는 것도 정의했습니다. 대부분의 서비스 객체가 원격호출이나 Object pooling이 없이 쓰이는 스프링의 방식과유사한 것인데, 과거의 그런 기능들이 대부분의 상황에서 오버엔지니어링 이였음을 다시 한번 인정하는 스펙 추가가 아닌가 하는생각이 들었습니다.
+
+흥미로운 스펙은 컨테이너가 Lock 관리를 해준다는 것인데,(container-managed locking) 아래 코드에서 @Lock 아노테이션이 그런 역할을 하고 있습니다.
+
+
+[source,java]
+----
+@Singleton @Startup
+@DependsOn({"OhterBean1","OtherBean2"})
+public class SharedService {
+    private Data sharedData;
+    @Lock(READ)
+    public String returnSharedDataValue(){
+        return this.sharedData;
+  }
+}
+----
+
+그리고 @Singleton이 붙은 클래스의 모든 메소드는 기본적으로 쓰기 잠금이 걸린다고 합니다.
+
+유겐할러는 이런 스펙이 불필요할 상황이 많을 것이라고 했는데, ConcurrentHashMap 같이 thread-safe를 감안한자료구조를 선택할 수도 있고, synchronized나 volatile와 같은 키워드를 이용해서도 개발자가 그런 것들을 제어할수도 있다고 했습니다. 아뭏든 이런 Lock에 대한 디폴트 값을 제외하고는 @Singleton으로 설정되는 Bean은Spring이 관리하는 Bean과 상당히 유사해졌다고 말했습니다.
+
+ EJB가 컨테이너와 스프링과의 관계는 EJB3.1에서도 변하지 않는다고 했습니다. EJB 스펙은 나름대로의 Container에 의해서 지원되는 것이고, 필요하다면Spring에서 이를 접근할 수도 있는 것이죠. 그리고 EJB 3.1의 비동기 호출 스펙인 @Asynchronous은@Aysnc 로 Spring에  반영되어, 영향을 주었다고 했습니다.
+
+=== JSR-299 Web Beans - CDI(Contexts and Dependency Injection)
+"Webbeans"라는 이름으로 불렸던, 공식적으로는 "Contexts and Dependency injection"이라는 명칭으로붙여진 이 스펙과 스프링을 눌러싼 논쟁들은 표준 제정 과정 당시에도 가장 뜨거운 화제였었고, 이 날 발표에서도 개인적으로 가장관심이 가는 부분이였습니다.  이 스펙은 원래 JSF에서 Bean관리를  개선해서 JSF와 EJB를 잘 연결하는 역할을 위해만들어졌지만, 점점 확정된 스펙으로 발전해 나갔습니다.
+
+CDI에서는  Type-safe DepedencyInjection, Interceptor, 이벤트 통지, Web conversation context 등의 풍부한Dependency Injection모델을 Annotation을 통해서 제공합니다.  javax.decorator,javax.context, javax.inject, javax.event 등에 다양한 패키지에 나눠서 들어가 있고, 이미@Resource 등의 아노테이션이 있는 JSR-250이 담당하는 패키지인 javax.annotation,javax.interceptor 에도 추가되어 있습니다.
+
+발표 슬라이드에는 나와있지 않지만,여기서 유겐할러는 CDI의 부정적인 면들도 언급을 합니다. EJB 3.1이 이 Component 모델을 뒤에서 떠받치는 역할을하지만, EJB와 CDI는 각각의 나름대로의 역할과 생명주기를 가지고 있는 그렇게 다른 Semantics가 섞이면 혼란을 불러일으킬 수 있다고 합니다. 그런 혼란에서 오는 어려움은 그 날 발표 슬라이드나 어떤 슬라이드 내에서는 표현될 수 없고, 실제로개발을 해보고 디버깅을 해서 겪어봐야지 알 수 있다고 했습니다.
+
+그리고 이 스펙은  스프링의 프로그래밍 모델과겹쳐지는 부분이 있고, Spring 3.1에서는 스프링의 원래 프로그래밍 모델을 더 발전시켜서 JSR-299과 표현력과 기능을능가하겠다고 했습니다. 이미 Spring에서도 다양한 scope의 빈을 정의할 수도 있고, Stateful한 웹어플리케이션을개발할 수 있다는 Spring Web Flow가 따로 프로젝트로 나와있지만, Spring 3.1에서 추가될Conversation Management는 그런 것들을 더욱 일반화 시켜서 Spring Core 쪽으로 끌어올리겠다는 의미로해석됩니다.
+
+== Spring on Java EE6
+앞에서 언급했듯이, 유겐할러는 발표의 뒷부분에서 최근 논쟁에 대한 대답들을 정리해서  설명해줍니다.
+
+첫째,  Java EE6 서버는 스프링이 참조하는 미들웨어를 제공하는 좋은 실행환경이라는 것입니다. Java EE6 서버에서제공하는 Servlet 3.0, JSF 2.0, JPA 2.0 등의 플랫폼 기술들은 스프링은 소비자로서 사용할 수 있다고했습니다. 그리고 다소 Java EE 스펙과 중복이 될 수 있는 부분인 EJB나 CDI관련 부분은 Java EE6 기능의일부분에 불과하다는 것이였습니다. GlassFish에서는 코드량 기준으로 5% 정도만 차지할 뿐이고, 아마 5%가 넘는 다른기능들도 사용하지 않고 있는 것이 많을 것이라고 했습니다.
+
+둘째, 스프링을 사용하면 필요에 따라더 넓은 기술을 선택할 수 있기 때문에 그것이 Java EE6 서버를 사용하는 자연스러운 방식이라느 것입니다.  JSF대신 Wicket이나 GWT,  EE clustering대신 Coherence 등을  쓸 수 있고, , 스프링의 jar파일은 4MB바이트 정도로 크지 않아서 이 용량이 문제가 되는 경우는 거의 없다고 했습니다.
+
+셋째,Java EE6 서버 중 GlassFish만이 지금 GA(Generally Available)버전 이상인 상태이고, JBoss나WebSphere는 아직 안정화된 버전이전이기 때문에 Java EE 6서버만을 선택한다면 실행환경에 제약이 있다고 했습니다.스프링은 Tomcat 5,6,7버전, Java EE5 서버, 그리고 Google App Engine 같은 것에서도 돌아갈 수있고, Java EE5를 쓰면서도 스프링을 사용하면 Hibernate 3.6 같은 구현체를 써서 EE6 스펙을 쓰는 선택도가능하다고 했습니다. 다양한 플랫폼 환경에서 스프링이 조율역할을 한다는 것입니다. 실제로 최근에 올라온 http://www.dzone.com/links/r/cdi_a_major_risk_factor_in_java_ee_6.html[CDI - A Major Risk Factor in Java EE 6]라는 글에서는 아직 안정화되지 않은 버전의 서버에서 CDI를 적용하다 어려움을 겪은 이야기가 있습니다.
+
+넷째,  EE6는 2009년 초 기술환경에 맞춘 것이고, 그 후로 지금까지 분산캐쉬, Cloud 등 많은 기술들이 중요하게떠올랐는데,  그런 기술들을  스프링을 통해서 서버를 업그레이드할 필요없이 훨씬 빠른 시기에 지원받을 수 있다는 것입니다. 이번컨퍼런스 내내 NoSQL, 분산 캐쉬, Social network 같은 다양한 주제들이 강조된 것도 그런 강점을 강조하기 위한전략으로 보였습니다.
+
+정리하자면 Spring과 Java EE6는 잘 맞는 궁합이면서 중복되는역할의 라이브러리 용량은 현실적으로 문제될 것이 없으며, 스프링으로 더 다양한 기술과 실행환경을 활용하면서 일관된 프로그래밍모델로 개발할 수 있다는 것이 핵심 주장이였습니다.

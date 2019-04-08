@@ -1,0 +1,37 @@
+= Spring batch와 Spring integration의 만남
+정상혁
+2008-06-16
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: Spring,Spring-Batch,Spring-Integration,뉴스
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+Spring portfolio의 일부 중 최근에 관심을 제가 관심을 가지고 있는  Spring batch와 Spring integration을 연결한 프로토타입 코드들이 나왔습니다.
+
+Spring batch form에 최근에 올라온 글입니다.
+
+* http://forum.springframework.org/showthread.php?t=55863[Spring Integration Prototype]
+
+그리고 6월 18일에 이 것을 주제로 한 온라인 세미나 같은것이 있나 보네요.
+
+* http://www.springframework.org/node/687[Webinar: Enterprise Integration with Spring Batch]
+
+이 코드들은 Java 5를 사용하기 때문에 Spring batch 1.1 정식 배포판에는 들어가지 않을거라고 합니다. Spring batch 프로젝트에서는 2.0전까지 Java5 으로 가지는 않을거라고 하네요.
+
+http://zepag.blogspot.com/2008/06/springone08-spring-batch.html[SpringOne 08의 Spring batch 주제의 발표]에서도 관련 내용이 들어갈 것 같네요. Spring batch와 Spring integration의 convergence가 있는 것으로 보인다는 언급이 있습니다.
+
+http://www.egloos.com/egloo/insert.php?eid=d0032573[]
+
+Spring Batch와 Spring WS, Spring Integration은 얽히고 섥힌 관계라고 보입니다. Spring integration의 Web Service Adapters에서 Spring Web Service를 사용하고 있고, Spring batch에서도 XML파일 처리에 Spring WS의 일부인 http://static.springframework.org/spring-ws/site/reference/html/oxm.html[Spring OXM]를 통한 위임처리를 할 수 있습니다. 그리고 위와 같이 Spring integration는 Spring Batch도 연결시켰군요.
+
+Spring Batch의 Job은 Spring Application Flatform을 통해서 OSGi 번들로도  실행가능하게 되었습니다.
+
+* http://blog.springsource.com/main/2008/05/30/running-a-spring-batch-job-in-the-springsource-aplication-platform/[Running a Spring Batch Job in The SpringSource Application Platform]
+
+향후 버전에서는 더욱 더 배치에 특화된 기능들이 추가될 것이라고 하네요.
+
+Spring batch + Spring Integration + Spring WS + Spring Application Flatform.. 그 미래가 어떻게 될지 정말 기대가 됩니다.
+

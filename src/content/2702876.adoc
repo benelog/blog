@@ -1,0 +1,46 @@
+= PMD ruleset 검토 의견 사례
+정상혁
+2010-10-28
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: PMD, 정적분석
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+이전에 PMD 룰셋 검토했을 때 정리했던  의견입니다.
+
+Rule에 대한 유용성은 프로젝트의 상황에 따라서 많이 다르기 때문에, 아래 의견은 참고만 하셨으면 합니다.
+
+
+[cols=",,,,,,",]
+|===
+|*Rule Set* |*Rule name* |*Message* |*분류* |*의견* |*설명, 의견 사유* |*참고자료*
+|Basic Rules |EmptryInitializer | + |Warning |제외요망 |PMD 5.0에서 추가될 룰로 Maven plugin에서는 지원되지 않음 |
+|Braces Rules |IfStmtsMustUseBraces |Avoid using if statements without curly braces |Warning |논의필요 |if문뒤의 한줄짜리 처리문도 \{}가 없으면 경고를 줌. 가독성을 높여주므로 포함시키는 것이 바람직. |
+|Code Size Rules |TooManyMethods |This class has too many methods, consider refactoring it. |Warning |논의필요 |한 클래스에 지나치게 많은 메소드가 포함되면 나는 경고. 적당한 클래스 크기를 정하는데 도움을 주나, 정말 논리적 연관성이 있는 작업을 많이 담고 있는 클래스도 존재할 수 있으므로 적정 숫자에 대해서는 논의 필요함 |
+|Controversial Rules |OnlyOneReturnRule |A method should have only one exit point, and that should be the last statement in the method |Warning |제외요망 |메서드 중간의 return문은 복잡한 조건문의 구조를 단순하게 하는데 도움이 경우가 많고, 권장하는 사례도 있음. |켄트백의 구현패턴 - 7장 중 '보호절'
+|Controversial Rules |DataflowAnomalyAnalysis |Found 'DD'-anomaly for variable ... |Info |제외요망 |전체 데이터의 흐름을 분석해서 return값과 상관없는 변수에 값을 쓴다든지 하는 상식적이지 않은 경우를 잡아내줌. 캐쉬나 interceptor등 그런 흐름이 꼭 필요한 코드도 경고해줘서 지나치게 많은 경고를 생성함 |
+|Controversial Rules |Unused Modifer |Avoid modifiers which are implied by the context |Warning |논의필요 |interface는 당연히 모든 method가 public이니 따로 선언해줄 필요가 없는 현상등을 주의를 줌. 개발자에 따라서는 public이 있는 것이 더 명시적이라고 생각할 수도 있고, 이미 모든 인터페이스가 public으로 다 선언되어 있는 상황에서는 개발자들에게는 무의미한 수정으로 인식될 위험도 있음. |
+|Design Rules |UnnecessaryLocalBeforeReturn |Consider simply returning the value vs storing it in local variable …. |Warning |제외요망 |return 전에 따로 local 변수로 반환할 값을 선언할 때 주는 경고. 기능적으로는 별 의미 없는 코드이나, return 문장에는 @SupressWarning 의 Annotation을 추가할 수 없기 때문에, Annotation 적용 범위를 최소화하기 위해 그런 선언이 필요한 때도 있음. Debug Mode에서도 값의 추적에 약간의 편리성이 생길 수 있음. |Java Language Spec 9.7, Effective Java 2ed - Item 24
+|Design Rules |UncommentedEmptyConstructor |Document empty constructor |Warning |제외요망 |빈 생성자에 comment가 없어도 코드의 이해에 무리가 없는 경우가 많음 |
+|Design Rules |UncommentedEmptyMethod |Document empty method |Warning |제외요망 |Listener류의 인터페이스의 구현에는 특정 메소드는 아무 일도 하지 않는 메소드로 남겨놓을 때도 있고, 종종 발생하는 상황임. 그리고 그 상황에 주석이 없다고 해도, 코드 이해에 무리가 없음 |
+|Design Rules |ImmutableField |Private field '...' could be made final; it is only initialized in the declaration or constructor.
+EmptyInitializer + |Warning |제외요망 |멤버변수 중 선언되어서 한번만 값이 대입된 변수는 final로 할 수 있다고 알려주는 경고. 개발자가 Final로 의도하지 않지만, 현재 기능에서는 한번만 대입하고 있는 상황도 존재할 수 있다고 생각됨. |
+|Jakarta Commons Logging Rules |ProperLog |Logger should be defined private static final and have the correct class | + |논의필요 |private static final Log log = LogFactory.getLog(해당클래스) 로 로거를 선언할 것을 알려줌. 대체로 무난히 적용가능하나, 프로젝트의 로그 정책이 특별한 경우도 있으므로 논의해볼만 함 |
+|Java Bean Rules |BeanMemberShouldSerialize |Found non-transient, non-static member. Please mark as transient or provide accessors. |Warning |제외요망 |Java Bean의 명세를 검사하는 규칙. 일반적인 클래스는 transient하지 않으면서도 acessor가 없는 멥버 변수가 올 수 있는 경우가 많음. 스프링에서 선언하는 bean들은 setter만 가지는 경우가 많으므로 대부분 이 규칙에 어긋나게 됨. (스프링에서 bean은 java bean명세보다 보다 넓은 bean을 의미하는 것으로 생각하면 됨) |
+|Java Loggins Rules |Systemprintln |System.out.print is used |Error |논의필요 |웹Application에서는 반드시 피해야할 코드라서 출시시에는 꼭 걸러내야하나, 분류가 Error가 되어 있는 것에 대한 논의는 필요함. 그리고 Console에서 도는 간단한 프로그램이나 테스트코드에서는 System.out이 들어가는 것이 결함이 아니므로 폴더 범위나 네이밍룰을 추가한 보다 정교한 Rule지정하는 것이 바람직함(예를 들어 Controller, Service, DAO안에는 System.out불가) |
+|Junit Rules |JunitAssertionsShouldIncludeMessage |JUnit assertions should include a message |Warning |제외요망 |테스트 결과를 확인할 때, 메시지가 포함된 것이 바람직하나, 테스트 코드 작성을 장려하기 위해 테스트 코드에 대한 제약은 줄이는 것이 좋을 것으로 판단됨 |
+|Junit Rules |JunitTestsShouldIncludeAssert |JUnit tests should include assert() or fail() |Warning |제외요망 |assert나 fail이 있는 테스트코드가 의미가 있으나, 그렇지 않은 코드도 없는 것 보다는 나으므로, 테스트 코드 작성을 장려하기 위해 관대한 정책을 권장함 |
+|Migration Rules |Junit4TestShouldUseTestAnnotation |JUnit 4 tests that execute tests should use the @Test annotation |Warning |제외요망 |Junit3.8로 기준으로 작성된 코드에서 Junit4의 요건을 요구하면서 warning을 냄. |
+|Naming Rules |LongVariable |Avoid excessively long variable names like … |Warning |제외요망 |표현력이 높은 변수이름을 짓는 것을 권장하기 위해서 길이제한을 두는 것은 바람직하지 않음 |
+|Naming Rules |ShortVariable |Avoid variables with short names like… |Warning |논의필요 |"is","os"등의 2글자 변수명일 때 나는 경고. 실제로 2글자만으로도 문맥상으로 충분한 표현력을 가지는 상황도 있고, 한 메소드가 크게 길어지지만 않는다면 local variable의 경우에는 다소 관대한 정책을 넣는 것도 무리는 없음 |
+|Optimization Rules |AvoidInstantiatingObjectsInLoops |Avoid instantiating new objects inside loops |Warning |제외요망 |Loop안에서 new keyword가 존재하면 나는 경고임. 피할 수 있는 경우라면 피해야 겠지만, GC시점이 약간이나마 늦어질 수 있고, collection.clear같은 청소 매서드 호출이 필요해진다거나, Thread safe해지지 않는 경우 등 손해가 있는 상황이 있으므로, 항상 지켜야할 지침이라고는 보기 어려움 |
+|Optimization Rules |LocalVariableCouldBeFinal |Local variable '...' could be declared final |Warning |제외요망 |local 변수 중 final이 될 수 있는 것을 알려주는 정보. Final이 되면 경고를 주는 이와 상반된 룰도 존재함 |
+|Optimization Rules |MethodArgumentCouldBeFinal |Parameter '...' is not assigned and could be declared final |Warning |논의필요 |방어적 프로그래밍을 위해서 파라미터는 final로 선언하는 것이 바람직하나, 모든 메서드를 그렇게 하면 메소드 시그니처가 전부 다 길어지기 단점이 있음. 기술인프라성 공통코드에만 적용하는 방안이 바람직하다고 생각함 |
+|Strict Exception Rules |SignatureDeclareThrowsException |A method/constructor shouldn't explicitly throw java.lang.Exception |Warning |논의필요 |메소드나 생성자가 throws Exception으로 최상위 Exception을 던질때 주는 경고. Checked Exception의 남발을 막고, 정교한 Exception선언을 돕는다는 장점도 있어서 되도록 권장하고 싶지만, 기존 코드의 Exception 선언이 throws Exception이 남용되어 있을 때 등 프로젝트 후반기에는 적용이 어려움 |
+|String and StringBuffer |AvoidDpolicateLiterals |The String literal " rows, page " appears 4 times in this file; the first occurrence is on line 70 |Warning |논의필요 |중복 되는 문자열 상수가 많은 경우에 나타남. 내부적으로는 java의 상수풀을 사용하게 되므로 성능에는 영향은 없음. 반복되는 문자열도 따로 상수선언을 하게 하는, 좋은 코딩습관에 도움이 되나 ,테스트 클래스 등의 안내 메시지 등의 그리 중요하지 않은 부분에서 지나친 상수선언을 하게 할 수 있음. |
+|===
+
+

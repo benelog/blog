@@ -1,0 +1,18 @@
+= Spring 3.0에 대한 소식
+정상혁
+2008-06-17
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: Spring,뉴스
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+* http://www.springify.com/archives/15[Live from SpringOne 2008: Collected bits about Spring 3.0]
+
+벌써 3.0에 대한 이야기가 나오고 있습니다.
+
+잘 하면 2008년 4분기 정도에 GA(General Availability) release(일반사용 가능 버전)가 나온다고 하는군요. Spring Core 모듈이 Java 5에 대해 본격적으로 의존하고 이제 더 이상  Java 1.4에서는 돌아갈 수 없다고 합니다.
+
+이미 어느 정도 윤곽이 잡혀있듯이,  Spring MVC에서 REST에 대한 full scale 지원이 포함된다는군요. 그리고  Spring batch에서 지원되었던 repeat, retry, resume의 개념들과  Spring WS의 http://static.springframework.org/spring-ws/site/reference/html/oxm.html[Spring OXM] 등이 보다 상위 모듈에서 포함되어서 제공될지도 모르겠습니다. 또, Junit 3.8 기반의 통합테스트 클래스들은 deprecated로 표시될 것 같습니다. (아마도 http://static.springframework.org/spring/docs/2.0.x/api/org/springframework/test/AbstractSingleSpringContextTests.html[AbstractSingleSpringContextTests]같은 클래스들을 이야기하는 것이겠죠?)

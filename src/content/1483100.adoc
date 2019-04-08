@@ -1,0 +1,71 @@
+= JavaScript, JSUnit으로 풀어본 뉴질랜드 화폐 문제
+정상혁
+2007-09-19
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: 코딩연습
+:jabke-rootpath: /
+:rootpath: /
+:content.rootpath: /
+:idprefix:
+
+http://yaldex.com/JSFactory_Pro.htm[1st JavaScript editor]의 공짜 사용기한이 얼마 남지 않아서 JavaScript로 빨리 뭐라도 만들어봐야 겠다는 생각이 들었습니다. 프로젝트 업무 중에는 그런 일이 보이지 않아서 회사의 다른 팀원들이 하고 있는 스터디 모임에서 나왔던 http://blog.naver.com/i1j1jsy/70011900056[]뉴질랜드 화폐문제를 풀어보았습니다.
+
+== 문제
+원래 제가 문제를 봤던 URL : http://rdp.ahamoment.org/wiki/Dollars
+
+=== 요약
+뉴질랜드 화폐는 $100, $50, $20, $10, $5 지폐와   $2, $1, 50센트, 20센트, 10센트, 5센트  동전으로 이루어져 있다. 주여진 합계액에 대해서 몇 가지의 방법으로 돈을 구성할 수 있는지 세는 프로그램을 작성해라.
+
+예) 20센트는 4가지 방법으로 만들수 있다. : 1개의 20센트, 2개의 10센트, 10센트+ 2개의 5센트, 4개의 5센트
+
+원래 문제는 파일에서 입력값을 받게 되어 있지만, JavaScript로 풀다보니 그 부분은 생략했습니다. 직접 풀어보실 분들은 풀이를 나중에 보세요~
+
+== 풀이
+
+[source,javascript]
+----
+<script language="JavaScript" type="text/JavaScript" src="app/jsUnitCore.js"></script>
+<script language="JavaScript" type="text/JavaScript">
+
+    var unitList = [100, 50, 20, 10, 5, 2, 1, 0.5, 0.2, 0.1, 0.05];
+
+
+    function countWaysOfAmount(totalMoneyAmount, unitIndex, ways)\{
+        if (unitIndex == null) unitIndex = 0;
+        if (ways == null) ways = 0;
+
+        var unit = unitList[unitIndex];
+        var moneyLeft = totalMoneyAmount;
+
+        do\{
+          if (moneyLeft == 0) ways++;
+          else if (unitIndex < unitList.length)
+            ways = countWaysOfAmount(moneyLeft,unitIndex+1,ways);
+          moneyLeft =  Math.round( (moneyLeft - unit) *100) /100;
+        } while(moneyLeft >= 0)
+        return ways;
+    }
+
+    function testDollars()\{
+        assertEquals("0.05", countWaysOfAmount(0.05), 1);
+        assertEquals("0.1",  countWaysOfAmount(0.1 ), 2);
+        assertEquals("0.15", countWaysOfAmount(0.15), 2);
+        assertEquals("0.2",  countWaysOfAmount(0.2 ), 4);
+        assertEquals("2",  countWaysOfAmount(2), 293);
+    }
+
+    alert(countWaysOfAmount(2));
+</script>
+----
+
+코드를 더 다듬을 여지가 있는 것 같지만 일단 올려봅니다
+
+`moneyLeft =  Math.round( (moneyLeft - unit) *100) /100;` 부분은 다른 언어들과 마찬가지로 JavaScript에서도 소숫점 계산이 정확하지 않아서 붙인 부분입니다. 이걸 안해주니 5가 나와야하는 값이 4.999999  같이 나오더군요. 이 문제만 아니면 moneyLeft -= unit 으로 간단하게 쓸수 있는데 말이죠,
+Java로 이걸 짠다면 BigDecimal을 쓰거나 별도의 클래스를 정의해야겠죠.
+
+JSUnit 없이 로컬에서 수정해 보실 분은 `<script language="JavaScript" type="text/JavaScript" src="app/jsUnitCore.js"></script> 부분과 테스트 메서드만 지우고 돌려 보시면 되겠습니다.
+
+http://blog.naver.com/i1j1jsy/70011900056[ Internet Explorer Developer Toolbar], http://yaldex.com/JSFactory_Pro.htm[1st JavaScript editor], http://www.jsunit.net/[JSUnit], https://addons.mozilla.org/ko/firefox/addon/1843[FireBug] 를 한꺼번에 써서 코딩하니 이클립스가 부럽지 않았습니다 ^^; 그리고 jsunit에서 debug("로그"); 로 찍어보는 것도 상당히 유용했구요. 1st JavaScript edtior나 FireBug가 모두 디버거 기능이 훌륭하지만 반복문의 값을 추적하는 것은 break point 거는 것보다는 로그로 쫙 찍어보는 것이 편하더군요.
+
+
