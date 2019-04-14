@@ -7,7 +7,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8"/>
-    <title>${config.site_title}<#if (content.title)??> - <#escape x as x?xml>${content.title}</#escape></#if> ${content.rootpath}!</title>
+    <title>${config.site_title}<#if (content.title)??> - <#escape x as x?xml>${content.title}</#escape></#if></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="${content.author!config.site_author}">
@@ -32,13 +32,6 @@
     <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">-->
     <link rel="shortcut icon" href="<#if (content.rootpath)??>${content.rootpath}<#else></#if>img/favicon/favicon.png">
   </head>
-  <script>
-  var url = window.location.href;
-  var lastChar = url.substr(-1);
-  if (lastChar != '/') {
-      window.location.href = url + '/'; 
-  }
-  </script>
   <body>
      <!-- Wrapper -->
         <div id="wrapper">
