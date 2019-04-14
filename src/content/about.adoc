@@ -1,0 +1,6 @@
+= About
+:jbake-type: page
+:jbake-status: published
+~~~~~~
+
+SW 개발에 대한 글 모음
