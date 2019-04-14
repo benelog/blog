@@ -141,7 +141,7 @@
                         <a href="../../3120317.html"><p>시간대 DB에서 우리나라 시간의 오류</p></a>
                     </li>
                     <li>
-                        <a href="../../3017442.html"><p>Android App과 TDD - 임유진 (Kakao), GDG Korea Android 컨퍼런스 중에서</p></a>
+                        <a href="../../3017438.html"><p>Android에서 @Inject, @Test</p></a>
                     </li>
             </ul>
         </section>
@@ -160,7 +160,7 @@
 <article class="post">
    <header>
     <div class="title">
-                    <h2><a href="../2802946.html">Spring의 @Scheduled annotation으로 설정된 cron expression을 테스트하기</a></h2>
+                    <h2><a href="../2802943.html">Quartz 설정을 읽어서 CronExpression 테스트</a></h2>
 
 
     </div>
@@ -180,51 +180,142 @@
        <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>Spring 3.0부터는 Quartz가 없이도 실행 스케쥴 설정이 가능합니다. 설정과 테스트 방법을 정리했습니다.</p>
+<p>Cron expression은 실수하기가 쉽고, 오류가 뒤늦게서야 발견됩니다. 매일 5시 20분, 40분,60분에 실행될 일정을 지정하고자 했는데 "* 0/20 5 * * * ?"로 써야 할 표현식을  "* 0,20 5 * * * ?"으로 써놓고는 실운영 서버에 배포해서 하루가 지난 다음에 실행결과를 보고서야 실수를 발견한 경험을 해보신 분들이 많으실 것입니다.</p>
+</div>
+<div class="paragraph">
+<p>Cron expression도 테스트 코드를 짜서 검증을 해본다면 치명적인 실수를 막을 기회가 더 많아집니다.</p>
+</div>
+<div class="paragraph">
+<p>아래 예제는  ApplicationContext에 설정되어 있는 Quartz의 CronTrigger의 일정을 테스트하는 코드입니다.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="schedule_를_써서_크론_표현식_설정">@Schedule 를 써서 크론 표현식 설정</h2>
+<h2 id="applicationcontext의_스케쥴링_설정_파일">ApplicationContext의 스케쥴링 설정 파일</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p>실행을 하고 싶은 메소드를 <code>@Component</code>, <code>@Schedule</code> annotaion을 통해 지정을 합니다.</p>
-</div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Component
-public class BaseballScheduledJobLauncher extends JobLaunchSupport {
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;bean id="schedulerFactoryBean" class="org.springframework.scheduling.quartz.SchedulerFactoryBean"&gt;
+     &lt;property name="triggers" ref="triggers"/&gt;
+&lt;/bean&gt;
+&lt;util:list id="triggers"&gt;
+     &lt;bean p:jobName="baseballJob" p:cronE-pression="0 * * * * ?" parent="jobTrigger"/&gt;
+     &lt;bean p:jobName="baseballExportJob" p:cronE-pression="30 5-7 * * * ?" parent="jobTrigger"/&gt;
+&lt;/util:list&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>위의 설정 예제에서는 반복되는 설정을 간편하게 해주는 FactoryBean을 썼습니다. parent="jobTrigger"라고 지정된 부분이 FactoryBean 클래스와 연결되는 bean id를 지정한 속성입니다.
+여기에 쓰인 FactoryBean은 이"jobName"과 "cronExpression" 속성을 받아서 org.quartz.CronTrigger 타입의 bean을 생성해주는 역할을 합니다.</p>
+</div>
+<div class="listingblock">
+<div class="title">JobTriggerFactoryBean</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">package edu.batch.support.launch;
 
-.....
+import java.util.HashMap;
+import java.util.Map;
 
-    @Scheduled(cron="45 * * * * MON-FRI")
-    public void baseballJob() {
-        JobParameters params = createTimeParameter();
-        run("baseballJob", params);
+import org.quartz.Trigger;
+import org.springframework.batch.core.configuration.JobLocator;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.sample.quartz.JobLauncherDetails;
+import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.scheduling.quartz.CronTriggerBean;
+import org.springframework.scheduling.quartz.JobDetailBean;
+import org.springframework.util.Assert;
+
+/**
+ * @author sanghyuk.jung
+ */
+public class JobTriggerFactoryBean implements FactoryBean&lt;Trigger&gt;, InitializingBean {
+    private JobLocator jobLocator;
+    private JobLauncher jobLauncher;
+    private String jobName;
+    private String cronExpression;
+    private String triggerName;
+
+    /**
+     * @return
+     * @throws Exception
+     * @see org.springframework.beans.factory.FactoryBean#getObject()
+     */
+    public Trigger getObject() throws Exception {
+        CronTriggerBean trigger = new CronTriggerBean();
+        trigger.setCronExpression(cronExpression);
+        JobDetailBean jobDetail = createJobDetail();
+        trigger.setJobDetail(jobDetail);
+        if(triggerName == null ){
+        trigger.setName(jobName+"Trigger");
+        } else {
+            trigger.setName(triggerName);
+        }
+        trigger.afterPropertiesSet();
+        return trigger;
     }
 
-
-    @Scheduled(cron="45 10 5 * * MON-FRI")
-    public void baseballExportJob() {
-        JobParameters params = createTimeParameter();
-        run("baseballExportJob", params);
+    private JobDetailBean createJobDetail() {
+        JobDetailBean jobDetail = new JobDetailBean();
+        jobDetail.setName(jobName);
+        Map&lt;String, Object&gt; jobData = new HashMap&lt;String, Object&gt;();
+        jobData.put("jobName", jobName);
+        jobData.put("jobLocator", jobLocator);
+        jobData.put("jobLauncher", jobLauncher);
+        jobDetail.setJobDataAsMap(jobData);
+        jobDetail.setJobClass(JobLauncherDetails.class);
+        jobDetail.afterPropertiesSet();
+        return jobDetail;
     }
 
+    /**
+     * @return
+     * @see org.springframework.beans.factory.FactoryBean#getObjectType()
+     */
+    public Class&lt;Trigger&gt; getObjectType() {
+        return Trigger.class;
+    }
+
+    /**
+     * @return
+     * @see org.springframework.beans.factory.FactoryBean#isSingleton()
+     */
+    public boolean isSingleton() {
+        return false;
+    }
+
+    public void setJobLocator(JobLocator jobLocator) {
+        this.jobLocator = jobLocator;
+    }
+
+    public void setJobLauncher(JobLauncher jobLauncher) {
+        this.jobLauncher = jobLauncher;
+    }
+
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
+    }
+
+    public void setCronExpression(String cronExpression) {
+        this.cronExpression = cronExpression;
+    }
+
+    /**
+     * @throws Exception
+     * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+     */
+    public void afterPropertiesSet() throws Exception {
+        Assert.notNull(jobName, "jobName must be provided");
+        Assert.notNull(jobLocator, "jobLocator name must be provided");
+        Assert.notNull(jobLauncher, "jobLauncher name must be provided");
+    }
+
+    public void setTriggerName(String triggerName) {
+        this.triggerName = triggerName;
+
+    }
 }</code></pre>
 </div>
-</div>
-<div class="paragraph">
-<p>Java 파일에 설정된 Annotation을 인식하기 위해서 Application context의 xml파일에 component-scan과 annotation으로 schedule을 설정하겠다는 선언을 추가합니다.  그리고 schedule을 실행할 thread pool의 크기도 지정합니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">    &lt;context:component-scan base-package="edu.batch.baseball.schedule"/&gt;
-    &lt;task:scheduler id="myScheduler" pool-size="10"/&gt;
-    &lt;task:annotation-driven scheduler="myScheduler"/&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>'task&#8217;와 'component&#8217;의 namespace가 xml에 추가되어 있어야 합니다.</p>
 </div>
 </div>
 </div>
@@ -232,99 +323,104 @@ public class BaseballScheduledJobLauncher extends JobLaunchSupport {
 <h2 id="테스트_코드">테스트 코드</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>테스트 코드를 단순하게 만들기 위해서 크론표현식을 추출하고 검사하는 코드는 SpringCronExpressionTestUtils클래스로 분리했습니다.</p>
+<p>triggers라는 bean 이름으로 List&lt;CronTrigger&gt; type의 객체를 가지고 와서, List안에서 지정된 trigger의 이름을 탐색한다음에 그 안에서 그 trigger의 cron e-pression을 검사했습니다.  테스트 코드를 간결하게 유지하기 위해서 Cron e-pression을 검사하는 코드는  QuartzCronExpressionTestUtils라는 클래스로 분리해서 static import로 처리했습니다.
+QuartzCronExpressionTestUtils.findTriggerByName 메소드는 List&lt;CronTrigger&gt; 타입의 객체가 담고 있는 여러개의 CronTrigger에서 지정된 이름의 CronTrigger를 반환해줍니다.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-java" data-lang="java">package edu.batch.baseball.schedule;
 
-import static edu.batch.support.launch.SpringcronExpressionTestUtils.*;
+import static edu.batch.support.launch.QuartzCronE-pressionTestUtils.*;
 
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.quartz.CronTrigger;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import edu.batch.baseball.schedule.BaseballScheduledJobLauncher;
-
-public class BaseballScheduledJobLauncherTest {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration( { "classpath:/launch-context.xml" })
+public class BaseballQuartzScheduleTest {
 
     private static final String DATE_PATTERN = "yyyy/MM/dd hh:mm:ss";
 
+    @Resource(name = "triggers")
+    List&lt;CronTrigger&gt; triggers;
+
     @Test
-    public void testBaseballJobSchedule() {
+    public void testbaseballJobTriggerSchedule() throws ParseException {
+        CronTrigger trigger = findTriggerByName(triggers, "baseballJobTrigger");
         String initialTime = "2010/09/01 09:00:00";
         List&lt;String&gt; expectedTimeList = Arrays.asList(
-                "2010/09/01 09:00:45",
-                "2010/09/01 09:01:45",
-                "2010/09/01 09:02:45");
-        String cronExpression = getcronExpressionOfMethod(BaseballScheduledJobLauncher.class, "baseballJob");
-        assertSchedule(cronExpression, initialTime, expectedTimeList,DATE_PATTERN);
+                "2010/09/01 09:01:00",
+                "2010/09/01 09:02:00",
+                "2010/09/01 09:03:00",
+                "2010/09/01 09:04:00");
+        assertSchedule(trigger, initialTime, expectedTimeList, DATE_PATTERN);
+    }
+
+    @Test
+    public void testbaseballExportJobTriggerSchedule() throws ParseException {
+        CronTrigger trigger = findTriggerByName(triggers, "baseballExportJobTrigger");
+        String initialTime = "2010/09/01 09:00:00";
+        List&lt;String&gt; expectedTimeList = Arrays.asList(
+                "2010/09/01 09:05:30",
+                "2010/09/01 09:06:30",
+                "2010/09/01 09:07:30",
+                "2010/09/01 10:05:30",
+                "2010/09/01 10:06:30",
+                "2010/09/01 10:07:30");
+        assertSchedule(trigger, initialTime, expectedTimeList, DATE_PATTERN);
     }
 }</code></pre>
 </div>
 </div>
 <div class="listingblock">
-<div class="title">SpringCronExpressionTestUtils</div>
+<div class="title">QuartzCronExpressionTestUtils</div>
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-java" data-lang="java">package edu.batch.support.launch;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
-import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.DateUtils;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.support.CronTrigger;
-import org.springframework.scheduling.support.SimpleTriggerContext;
+import org.quartz.CronTrigger;
 
-public class SpringCronExpressionTestUtils {
+public class QuartzCronExpressionTestUtils {
 
-    public static String getCronExpressionOfMethod(Class&lt;?&gt; targetClass,
-            String methodName)  {
-        Method scheduledMethod;
-        try {
-            scheduledMethod = targetClass.getDeclaredMethod(methodName,
-                    new Class[] {});
-        } catch (SecurityException e) {
-            throw new IllegalArgumentException("cannot access the method : " + methodName, e);
-        } catch (NoSuchMethodException e) {
-            throw new IllegalArgumentException(e);
+    public static void assertSchedule(CronTrigger trigger, String initialTime,
+            List&lt;String&gt; expectedTimeList, String datePattern) throws ParseException {
+            Date previousStartTime = DateUtils.parseDate(initialTime,   new String[]{datePattern});
+
+            for(String expectedTime : expectedTimeList){
+                trigger.setStartTime(previousStartTime);
+                Date nextExecutionTime =  trigger.getFireTimeAfter(previousStartTime);
+                String actualTime = DateFormatUtils.format(nextExecutionTime, datePattern);
+                assertThat("executed on expected time", actualTime, is(expectedTime));
+                previousStartTime = nextExecutionTime;
+            }
         }
-        Scheduled scheduleInfo = scheduledMethod.getAnnotation(Scheduled.class);
-        String cronExpression = scheduleInfo.cron();
-        return cronExpression;
+
+    public static CronTrigger findTriggerByName(List&lt;CronTrigger&gt; triggers, String triggerName) {
+        for (CronTrigger trigger : triggers) {
+            if (triggerName.equals(trigger.getName())) {
+                return trigger;
+            }
+        }
+        throw new IllegalArgumentException("cannot find trigger : "
+                + triggerName);
     }
-
-    public static void assertSchedule(String cronExpression, String initialTime,
-            List&lt;String&gt; expectedTimeList, String datePattern) {
-        CronTrigger trigger = new CronTrigger(cronExpression);
-        Date startTime;
-        try {
-            startTime = DateUtils.parseDate(initialTime,
-                    new String[] { datePattern });
-        } catch (ParseException e) {
-            throw new IllegalArgumentException("wrong date format", e);
-        }
-        SimpleTriggerContext context = new SimpleTriggerContext();
-        context.update(startTime, startTime, startTime);
-
-        for (String exptectedTime : expectedTimeList) {
-            Date nextExecutionTime = trigger.nextExecutionTime(context);
-            String actualTime = DateFormatUtils.format(nextExecutionTime,
-                    datePattern);
-            assertThat("executed on expected time", actualTime,
-                    is(exptectedTime));
-            context.update(nextExecutionTime, nextExecutionTime,
-                    nextExecutionTime);
-        }
-    }
-
 }</code></pre>
 </div>
 </div>
@@ -337,43 +433,43 @@ public class SpringCronExpressionTestUtils {
 <!-- Social Share Button HTML -->
 
 <!-- Twitter -->
-<li><a href="//twitter.com/share?url=https://benelog.github.io/blog/2802946.html&text=Spring의 @Scheduled annotation으로 설정된 cron expression을 테스트하기&via=" target="_blank" class="share-btn twitter">
+<li><a href="//twitter.com/share?url=https://benelog.github.io/blog/2802943.html&text=Quartz 설정을 읽어서 CronExpression 테스트&via=" target="_blank" class="share-btn twitter">
     <i class="fa fa-twitter"></i>
     <p>Twitter</p>
 </a></li>
 
 <!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=https://benelog.github.io/blog/2802946.html" target="_blank" class="share-btn google-plus">
+<li><a href="//plus.google.com/share?url=https://benelog.github.io/blog/2802943.html" target="_blank" class="share-btn google-plus">
     <i class="fa fa-google-plus"></i>
     <p>Google+</p>
 </a></li>
 
 <!-- Facebook -->
-<li><a href="//www.facebook.com/sharer/sharer.php?u=https://benelog.github.io/blog/2802946.html" target="_blank" class="share-btn facebook">
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://benelog.github.io/blog/2802943.html" target="_blank" class="share-btn facebook">
     <i class="fa fa-facebook"></i>
     <p>Facebook</p>
 </a></li>
 
 <!-- Reddit (url, title) -->
-<li><a href="//reddit.com/submit?url=https://benelog.github.io/blog/2802946.html&title=Spring의 @Scheduled annotation으로 설정된 cron expression을 테스트하기" target="_blank" class="share-btn reddit">
+<li><a href="//reddit.com/submit?url=https://benelog.github.io/blog/2802943.html&title=Quartz 설정을 읽어서 CronExpression 테스트" target="_blank" class="share-btn reddit">
     <i class="fa fa-reddit-alien"></i>
     <p>Reddit</p>
 </a></li>
 
 <!-- LinkedIn -->
-<li><a href="//www.linkedin.com/shareArticle?url=https://benelog.github.io/blog/2802946.html&title=Spring의 @Scheduled annotation으로 설정된 cron expression을 테스트하기" target="_blank" class="share-btn linkedin">
+<li><a href="//www.linkedin.com/shareArticle?url=https://benelog.github.io/blog/2802943.html&title=Quartz 설정을 읽어서 CronExpression 테스트" target="_blank" class="share-btn linkedin">
     <i class="fa fa-linkedin"></i>
     <p>LinkedIn</p>
 </a></li>
 
 <!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=https://benelog.github.io/blog/2802946.html&title=Spring의 @Scheduled annotation으로 설정된 cron expression을 테스트하기" target="_blank" class="share-btn stumbleupon">
+<li><a href="//www.stumbleupon.com/submit?url=https://benelog.github.io/blog/2802943.html&title=Quartz 설정을 읽어서 CronExpression 테스트" target="_blank" class="share-btn stumbleupon">
     <i class="fa fa-stumbleupon"></i>
     <p>StumbleUpon</p>
 </a></li>
 
 <!-- Email -->
-<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://benelog.github.io/blog/2802946.html" target="_blank" class="share-btn email">
+<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://benelog.github.io/blog/2802943.html" target="_blank" class="share-btn email">
     <i class="fa fa-envelope"></i>
     <p>Email</p>
 </a></li>
@@ -386,12 +482,11 @@ public class SpringCronExpressionTestUtils {
 		<ul class="stats">
     	    <!-- Display the categories associated with this post -->
     	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/Spring.html'>Spring</a></li>
- 	        <li><a href='../tags/Cron.html'>Cron</a></li>
  	        <li><a href='../tags/test.html'>test</a></li>
  	        <li><a href='../tags/Spring-Test.html'>Spring-Test</a></li>
+ 	        <li><a href='../tags/Cron.html'>Cron</a></li>
 
-				<li><a class="icon fa-comment" href="../2802946.html#disqus_thread"> &nbsp;</a></li>
+				<li><a class="icon fa-comment" href="../2802943.html#disqus_thread"> &nbsp;</a></li>
  		</ul>
     	
     </footer>
@@ -931,7 +1026,7 @@ public class HostNameTest {
                     <li>
                         <article>
                             <header>
-                                <h3><a href="../3017442.html">Android App과 TDD - 임유진 (Kakao), GDG Korea Android 컨퍼런스 중에서</a></h3>
+                                <h3><a href="../3017438.html">Android에서 @Inject, @Test</a></h3>
                                  <time class="published"
 							            datetime='Apr 17, 2013'>
 							            Apr 17, 2013</time>
@@ -971,6 +1066,15 @@ public class HostNameTest {
                     <li>
                         <article>
                             <header>
+                                <a href="../tags/양병규.html">양병규</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
                                 <a href="../tags/Maven.html">Maven</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 6 </span>
@@ -981,15 +1085,6 @@ public class HostNameTest {
                         <article>
                             <header>
                                 <a href="../tags/Multiline.html">Multiline</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/양병규.html">양병규</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>
@@ -1133,18 +1228,18 @@ public class HostNameTest {
                     <li>
                         <article>
                             <header>
-                                <a href="../tags/Test.html">Test</a>
+                                <a href="../tags/개발.html">개발</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 7 </span>
+                                <span style="float:right;"> 1 </span>
                             </header>
                         </article>
                     </li>
                     <li>
                         <article>
                             <header>
-                                <a href="../tags/개발.html">개발</a>
+                                <a href="../tags/Test.html">Test</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
+                                <span style="float:right;"> 7 </span>
                             </header>
                         </article>
                     </li>
@@ -1223,7 +1318,7 @@ public class HostNameTest {
                     <li>
                         <article>
                             <header>
-                                <a href="../tags/autoboxing.html">autoboxing</a>
+                                <a href="../tags/JSTL.html">JSTL</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>
@@ -1232,7 +1327,7 @@ public class HostNameTest {
                     <li>
                         <article>
                             <header>
-                                <a href="../tags/JSTL.html">JSTL</a>
+                                <a href="../tags/autoboxing.html">autoboxing</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>
@@ -1340,6 +1435,15 @@ public class HostNameTest {
                     <li>
                         <article>
                             <header>
+                                <a href="../tags/open-API.html">open-API</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
                                 <a href="../tags/FindBugs.html">FindBugs</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
@@ -1349,7 +1453,7 @@ public class HostNameTest {
                     <li>
                         <article>
                             <header>
-                                <a href="../tags/open-API.html">open-API</a>
+                                <a href="../tags/SQL.html">SQL</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>
@@ -1361,15 +1465,6 @@ public class HostNameTest {
                                 <a href="../tags/Android.html">Android</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 3 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/SQL.html">SQL</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
                             </header>
                         </article>
                     </li>
@@ -1430,7 +1525,7 @@ public class HostNameTest {
                     <li>
                         <article>
                             <header>
-                                <a href="../tags/보안.html">보안</a>
+                                <a href="../tags/FTP.html">FTP</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>
@@ -1439,7 +1534,7 @@ public class HostNameTest {
                     <li>
                         <article>
                             <header>
-                                <a href="../tags/FTP.html">FTP</a>
+                                <a href="../tags/보안.html">보안</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>
@@ -1475,7 +1570,7 @@ public class HostNameTest {
                     <li>
                         <article>
                             <header>
-                                <a href="../tags/WAS.html">WAS</a>
+                                <a href="../tags/꿈.html">꿈</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>
@@ -1493,7 +1588,7 @@ public class HostNameTest {
                     <li>
                         <article>
                             <header>
-                                <a href="../tags/꿈.html">꿈</a>
+                                <a href="../tags/WAS.html">WAS</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>
@@ -1529,6 +1624,15 @@ public class HostNameTest {
                     <li>
                         <article>
                             <header>
+                                <a href="../tags/reload.html">reload</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
                                 <a href="../tags/자작도구.html">자작도구</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 4 </span>
@@ -1539,15 +1643,6 @@ public class HostNameTest {
                         <article>
                             <header>
                                 <a href="../tags/git.html">git</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/reload.html">reload</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>
@@ -1592,7 +1687,7 @@ public class HostNameTest {
                     <li>
                         <article>
                             <header>
-                                <a href="../tags/Oracle.html">Oracle</a>
+                                <a href="../tags/검색.html">검색</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>
@@ -1601,7 +1696,7 @@ public class HostNameTest {
                     <li>
                         <article>
                             <header>
-                                <a href="../tags/검색.html">검색</a>
+                                <a href="../tags/Oracle.html">Oracle</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>
