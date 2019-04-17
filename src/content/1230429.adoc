@@ -17,7 +17,7 @@ http://www.creativecommons.or.kr/[CCK(Creative Commons Korea)]의 Code can be an
 
 저도 이날 점심을 먹는 것도 잊고 나름대로 코드를 준비해 갔는데, 발표를 하지는 못했네요 .  발표자가 적은 분위기면 앞에 나가볼려고 노트북까지 들고 가기는 했었습니다 ^^; 그런데 열띤 호응으로  많은 분들이 발표를 하셨고, MSX 에뮬레이터로 하신 분 등 제가 말하고 싶었던 내용을 다른 분들이 더 훌륭히 말씀해 주셔서 큰 아쉬움은 없습니다.
 
-8bit 화면 같은 아래의 이 행사 로고를 보고 저도  제 세대에 맞게 Quick Basic으로 코드를 짜볼 생각을 해봤습니다. 이 행사 중에 '8bit kid의 생애'라는 패널토론 주제도 있었었죠. ^^; 저는 그 다음 시대인 IBM XT세대입니다. 허큘리스 그래픽카드, 5.25인치 FDD, 조금 지나서 ADLIB card, 2400bps MNP 모뎀 등이 저에게는 가슴을 파고드는 핵심단어들이에요.
+8bit 화면 같은 행사 로고를 보고 저도  제 세대에 맞게 Quick Basic으로 코드를 짜볼 생각을 해봤습니다. 이 행사 중에 '8bit kid의 생애'라는 패널토론 주제도 있었었죠. ^^; 저는 그 다음 시대인 IBM XT세대입니다. 허큘리스 그래픽카드, 5.25인치 FDD, 조금 지나서 ADLIB card, 2400bps MNP 모뎀 등이 저에게는 가슴을 파고드는 핵심단어들이에요.
 
 image:http://goodhyun.com/WindowsLiveWriter/Codecanbeanart_BB3/ccsalon_banner_1.gif[ccsalon_banner,width=320,height=230]
 
