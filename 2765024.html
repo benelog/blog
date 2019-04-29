@@ -558,12 +558,15 @@ API는 Application Programming Interface이니 포털의 User interface가 최�
 <div class="disqus">
   <div id="disqus_thread"></div>
   <script type="text/javascript">
+    var disqus_config = function () {
+      this.page.identifier = '2765024.html';
+    };
     var disqus_shortname = 'dev-benelog-1';
-    window.disqus_identifier = '2765024.html';
     /* * * DON'T EDIT BELOW THIS LINE * * */
     (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
         dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        dsq.setAttribute('data-timestamp', + new Date());
         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     })();
   </script>

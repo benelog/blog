@@ -351,12 +351,15 @@ Spring batch에서는 SimpleStepFactoryBean 클래스에서 commitInterval이라
 <div class="disqus">
   <div id="disqus_thread"></div>
   <script type="text/javascript">
+    var disqus_config = function () {
+      this.page.identifier = '1889589.html';
+    };
     var disqus_shortname = 'dev-benelog-1';
-    window.disqus_identifier = '1889589.html';
     /* * * DON'T EDIT BELOW THIS LINE * * */
     (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
         dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        dsq.setAttribute('data-timestamp', + new Date());
         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     })();
   </script>
