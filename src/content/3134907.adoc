@@ -9,7 +9,7 @@
 :content.rootpath: /
 :idprefix:
 
-image::http://developerfarm.cdn1.cafe24.com/cover/l/9788998139780.jpg[cover]
+image::img/book-cover/naver-java.jpg[cover]
 
 ( 이미지 출처 : http://wikibook.co.kr/how-naver-works-java/ )
 
