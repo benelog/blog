@@ -177,115 +177,120 @@
   
          
     <div id="content">
-       <div class="sect1">
+       <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>주로 Head first HTML/CSS에 있는 내용을 정리했습니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="여러개의_element_선택">여러개의 element 선택</h2>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code class="language-css" data-lang="css">h1, h2 \{ }
----
+<pre class="prettyprint highlight"><code class="language-css" data-lang="css">h1, h2 { }</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="class_선택자">class 선택자</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-css" data-lang="css">p.greentea { } /* class가 greentea인 &lt;p/&gt; 선택 */
 
-== class 선택자
-[source,css]</code></pre>
+.greentea { } /* class가 greentea인 모든 태그 */</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>p.greentea \{ } /* class가 greentea인 &lt;p/&gt; 선택 */</p>
-</div>
-<div class="listingblock">
-<div class="title">greentea\{ } /* class가 greentea인 모든 태그 */</div>
-<div class="content">
-<pre>== id 선택자
-[source,css]</pre>
 </div>
 </div>
-<div class="paragraph">
-<p>#footer \{ } /* id가 footer인 모든 태그 */</p>
-</div>
-<div class="paragraph">
-<p>p#footer\{}</p>
-</div>
+<div class="sect1">
+<h2 id="id_선택자">id 선택자</h2>
+<div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre>== 자식(Child) element 선택
-[source,css]</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>div h2\{ color:red} /* &lt;div/&gt; 하위에 있는&lt;h2/&gt; 선택  */</p>
-</div>
-<div class="listingblock">
-<div class="title">detail p \{}   /* class가 "detail"로 지정되어 있는 하위의 &lt;p/&gt; 선택 */</div>
-<div class="content">
-<pre>== 상태에 따른 선택자
-[source,css]</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>a:visited\{}</p>
-</div>
-<div class="paragraph">
-<p>a:link \{}</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>상태는 active, hover, link, visited, first-child 등
+<pre class="prettyprint highlight"><code class="language-css" data-lang="css">#footer {} /* id가 footer인 모든 태그 */
 
+p#footer {}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="자식child_element_선택">자식(Child) element 선택</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-css" data-lang="css">div h2 {color:red} /* &lt;div/&gt; 하위에 있는&lt;h2/&gt; 선택  */
 
-== 의사(Psdudo) element 선택자
+.detail p {}   /* class가 "detail"로 지정되어 있는 하위의 &lt;p/&gt; 선택 */</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="상태에_따른_선택자">상태에 따른 선택자</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-css" data-lang="css">a:visited\{}
 
-[source,css]</pre>
+a:link \{}</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>p:first-letter \{}</p>
+<p>상태는 active, hover, link, visited, first-child 등</p>
 </div>
-<div class="paragraph">
-<p>p:first-line \{}</p>
 </div>
+</div>
+<div class="sect1">
+<h2 id="의사psdudo_element_선택자">의사(Psdudo) element 선택자</h2>
+<div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre>== 속성(Attribute) 선택자
-[source,css]</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>img[width] \{border:black thin solid;} /* width 속성을 가진 모든 이미지 선택 */</p>
-</div>
-<div class="paragraph">
-<p>img[height="300"] \{border:red thin solid; } /* 값이 300인 height 속성을 가진 모든 이미지 선택 */</p>
-</div>
-<div class="paragraph">
-<p>image[alt~="flowers"]  \{border:red thin solid; }  /* "flowers"라는 단어를 포함하는 alt 속성을 가진 모든 이미지 */</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>== 형제(Sibling) element 선택자
+<pre class="prettyprint highlight"><code class="language-css" data-lang="css">p:first-letter {}
 
-[source,css]</pre>
+p:first-line {}</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>h1+p \{}  /* &lt;h1&gt; 다음에 오는 &lt;p&gt; 선택 */</p>
 </div>
+</div>
+<div class="sect1">
+<h2 id="속성attribute_선택자">속성(Attribute) 선택자</h2>
+<div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre>== 선택자 결합
-[source,css]</pre>
+<pre class="prettyprint highlight"><code class="language-css" data-lang="css">img[width] {border:black thin solid;} /* width 속성을 가진 모든 이미지 선택 */
+
+img[height="300"] {border:red thin solid; } /* 값이 300인 height 속성을 가진 모든 이미지 선택 */
+
+image[alt~="flowers"] {border:red thin solid; }  /* "flowers"라는 단어를 포함하는 alt 속성을 가진 모든 이미지 */</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>div#greentea &gt; blockquote \{}  /* &lt;blockquote/&gt;의 부모가 되어야하는 "greentea" id를 가진 &lt;div/&gt; 자손 선택자 */</p>
 </div>
-<div class="paragraph">
-<p>div#greentea &gt; blockquote p \{} /* &lt;blockquote/&gt;의 자손이자 "greentea" id를 가진 &lt;div/&gt;의 자손인 &lt;p/&gt; 선택 */</p>
 </div>
-<div class="paragraph">
-<p>div#greentea &gt; blockquote p:first-line /* 그 &lt;p/&gt;의 첫 줄 */</p>
-</div>
+<div class="sect1">
+<h2 id="형제sibling_element_선택자">형제(Sibling) element 선택자</h2>
+<div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre>추가: 주로 Head first HTML/CSS에 있는 내용을 정리했습니다.</pre>
+<pre class="prettyprint highlight"><code class="language-css" data-lang="css">h1+p {}  /* &lt;h1&gt; 다음에 오는 &lt;p&gt; 선택 */</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="선택자_결합">선택자 결합</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-css" data-lang="css">div#greentea &gt; blockquote {}  /* &lt;blockquote/&gt;의 부모가 되어야하는 "greentea" id를 가진 &lt;div/&gt; 자손 선택자 */
+
+div#greentea &gt; blockquote p {} /* &lt;blockquote/&gt;의 자손이자 "greentea" id를 가진 &lt;div/&gt;의 자손인 &lt;p/&gt; 선택 */
+
+div#greentea &gt; blockquote p:first-line /* 그 &lt;p/&gt;의 첫 줄 */</code></pre>
 </div>
 </div>
 </div>

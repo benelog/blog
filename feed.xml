@@ -6,8 +6,8 @@
     <atom:link href="https://blog2.benelog.net//feed.xml" rel="self" type="application/rss+xml" />
     <description>JBake Bootstrap Template</description>
     <language>en-gb</language>
-    <pubDate>Mon, 29 Apr 2019 20:01:21 +0000</pubDate>
-    <lastBuildDate>Mon, 29 Apr 2019 20:01:21 +0000</lastBuildDate>
+    <pubDate>Tue, 30 Apr 2019 21:34:45 +0000</pubDate>
+    <lastBuildDate>Tue, 30 Apr 2019 21:34:45 +0000</lastBuildDate>
 
     <item>
       <title>Robolectric을 활용한 안드로이드 쾌속 테스팅</title>
@@ -385,7 +385,7 @@ public void shouldBeTrueWhenThisContextIsForeground(){
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;imageblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
-&lt;img src=&quot;http://developerfarm.cdn1.cafe24.com/cover/l/9788998139780.jpg&quot; alt=&quot;cover&quot;&gt;
+&lt;img src=&quot;img/book-cover/naver-java.jpg&quot; alt=&quot;cover&quot;&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
@@ -11701,115 +11701,120 @@ Java로 이걸 짠다면 BigDecimal을 쓰거나 별도의 클래스를 정의�
       <pubDate>Thu, 6 Sep 2007 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1456715.html</guid>
       	<description>
-	&lt;div class=&quot;sect1&quot;&gt;
+	&lt;div id=&quot;preamble&quot;&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;주로 Head first HTML/CSS에 있는 내용을 정리했습니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
 &lt;h2 id=&quot;여러개의_element_선택&quot;&gt;여러개의 element 선택&lt;/h2&gt;
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
-&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;h1, h2 \{ }
----
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;h1, h2 { }&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;class_선택자&quot;&gt;class 선택자&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;p.greentea { } /* class가 greentea인 &amp;lt;p/&amp;gt; 선택 */
 
-== class 선택자
-[source,css]&lt;/code&gt;&lt;/pre&gt;
+.greentea { } /* class가 greentea인 모든 태그 */&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;p.greentea \{ } /* class가 greentea인 &amp;lt;p/&amp;gt; 선택 */&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;title&quot;&gt;greentea\{ } /* class가 greentea인 모든 태그 */&lt;/div&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre&gt;== id 선택자
-[source,css]&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;#footer \{ } /* id가 footer인 모든 태그 */&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;p#footer\{}&lt;/p&gt;
-&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;id_선택자&quot;&gt;id 선택자&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
-&lt;pre&gt;== 자식(Child) element 선택
-[source,css]&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;div h2\{ color:red} /* &amp;lt;div/&amp;gt; 하위에 있는&amp;lt;h2/&amp;gt; 선택  */&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;title&quot;&gt;detail p \{}   /* class가 &quot;detail&quot;로 지정되어 있는 하위의 &amp;lt;p/&amp;gt; 선택 */&lt;/div&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre&gt;== 상태에 따른 선택자
-[source,css]&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;a:visited\{}&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;a:link \{}&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre&gt;상태는 active, hover, link, visited, first-child 등
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;#footer {} /* id가 footer인 모든 태그 */
 
+p#footer {}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;자식child_element_선택&quot;&gt;자식(Child) element 선택&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;div h2 {color:red} /* &amp;lt;div/&amp;gt; 하위에 있는&amp;lt;h2/&amp;gt; 선택  */
 
-== 의사(Psdudo) element 선택자
+.detail p {}   /* class가 &quot;detail&quot;로 지정되어 있는 하위의 &amp;lt;p/&amp;gt; 선택 */&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;상태에_따른_선택자&quot;&gt;상태에 따른 선택자&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;a:visited\{}
 
-[source,css]&lt;/pre&gt;
+a:link \{}&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;p:first-letter \{}&lt;/p&gt;
+&lt;p&gt;상태는 active, hover, link, visited, first-child 등&lt;/p&gt;
 &lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;p:first-line \{}&lt;/p&gt;
 &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;의사psdudo_element_선택자&quot;&gt;의사(Psdudo) element 선택자&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
-&lt;pre&gt;== 속성(Attribute) 선택자
-[source,css]&lt;/pre&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;img[width] \{border:black thin solid;} /* width 속성을 가진 모든 이미지 선택 */&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;img[height=&quot;300&quot;] \{border:red thin solid; } /* 값이 300인 height 속성을 가진 모든 이미지 선택 */&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;image[alt~=&quot;flowers&quot;]  \{border:red thin solid; }  /* &quot;flowers&quot;라는 단어를 포함하는 alt 속성을 가진 모든 이미지 */&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre&gt;== 형제(Sibling) element 선택자
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;p:first-letter {}
 
-[source,css]&lt;/pre&gt;
+p:first-line {}&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;h1+p \{}  /* &amp;lt;h1&amp;gt; 다음에 오는 &amp;lt;p&amp;gt; 선택 */&lt;/p&gt;
 &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;속성attribute_선택자&quot;&gt;속성(Attribute) 선택자&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
-&lt;pre&gt;== 선택자 결합
-[source,css]&lt;/pre&gt;
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;img[width] {border:black thin solid;} /* width 속성을 가진 모든 이미지 선택 */
+
+img[height=&quot;300&quot;] {border:red thin solid; } /* 값이 300인 height 속성을 가진 모든 이미지 선택 */
+
+image[alt~=&quot;flowers&quot;] {border:red thin solid; }  /* &quot;flowers&quot;라는 단어를 포함하는 alt 속성을 가진 모든 이미지 */&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;div#greentea &amp;gt; blockquote \{}  /* &amp;lt;blockquote/&amp;gt;의 부모가 되어야하는 &quot;greentea&quot; id를 가진 &amp;lt;div/&amp;gt; 자손 선택자 */&lt;/p&gt;
 &lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;div#greentea &amp;gt; blockquote p \{} /* &amp;lt;blockquote/&amp;gt;의 자손이자 &quot;greentea&quot; id를 가진 &amp;lt;div/&amp;gt;의 자손인 &amp;lt;p/&amp;gt; 선택 */&lt;/p&gt;
 &lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;div#greentea &amp;gt; blockquote p:first-line /* 그 &amp;lt;p/&amp;gt;의 첫 줄 */&lt;/p&gt;
-&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;형제sibling_element_선택자&quot;&gt;형제(Sibling) element 선택자&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
-&lt;pre&gt;추가: 주로 Head first HTML/CSS에 있는 내용을 정리했습니다.&lt;/pre&gt;
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;h1+p {}  /* &amp;lt;h1&amp;gt; 다음에 오는 &amp;lt;p&amp;gt; 선택 */&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;선택자_결합&quot;&gt;선택자 결합&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;div#greentea &amp;gt; blockquote {}  /* &amp;lt;blockquote/&amp;gt;의 부모가 되어야하는 &quot;greentea&quot; id를 가진 &amp;lt;div/&amp;gt; 자손 선택자 */
+
+div#greentea &amp;gt; blockquote p {} /* &amp;lt;blockquote/&amp;gt;의 자손이자 &quot;greentea&quot; id를 가진 &amp;lt;div/&amp;gt;의 자손인 &amp;lt;p/&amp;gt; 선택 */
+
+div#greentea &amp;gt; blockquote p:first-line /* 그 &amp;lt;p/&amp;gt;의 첫 줄 */&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -12582,13 +12587,11 @@ group by s.hostname, s.ipaddr ,s.suid ) p&lt;/code&gt;&lt;/pre&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;이번에 고객이 다른 업무와 독립적으로 쓰여질 프로그램을 요청했는데, 그 페이지에는 새로운 css를 만들어서 적용하고 싶었습니다.  현재 프로젝트에 남은 3명의 인원만으로는 모든 페이지를 다 갈아 엎는 것은 무리라고 생각했었는데 적당한 시작점을 찾은 것이죠.&lt;/p&gt;
 &lt;/div&gt;
-&lt;div class=&quot;literalblock&quot;&gt;
-&lt;div class=&quot;content&quot;&gt;
-&lt;pre&gt;처음 수정한 부분은 화면의 큰 제목과 하위 제목이였습니다.&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;처음 수정한 부분은 화면의 큰 제목과 하위 제목이였습니다.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;img src=&quot;http://pds27.egloos.com/pds/201501/12/73/142770_headerSample.gif&quot; alt=&quot;image&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;img src=&quot;img/markup/header-sample.gif&quot; alt=&quot;image&quot;&gt;&lt;/span&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;와 같이 보여지는데, 기존 코드로는&lt;/p&gt;
