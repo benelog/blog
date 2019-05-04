@@ -1,15 +1,6 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'org.ajoberstar:gradle-git-publish:0.3.2'
-    }
-}
-
 plugins {
     id 'org.jbake.site' version '5.0.0'
+    id 'org.ajoberstar.git-publish' version '2.1.1'
 }
 
 buildDir = 'output'
