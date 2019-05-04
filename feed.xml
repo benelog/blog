@@ -6,8 +6,8 @@
     <atom:link href="https://blog.benelog.net//feed.xml" rel="self" type="application/rss+xml" />
     <description>JBake Bootstrap Template</description>
     <language>en-gb</language>
-    <pubDate>Tue, 30 Apr 2019 22:44:28 +0000</pubDate>
-    <lastBuildDate>Tue, 30 Apr 2019 22:44:28 +0000</lastBuildDate>
+    <pubDate>Sat, 4 May 2019 22:25:16 +0000</pubDate>
+    <lastBuildDate>Sat, 4 May 2019 22:25:16 +0000</lastBuildDate>
 
     <item>
       <title>Robolectric을 활용한 안드로이드 쾌속 테스팅</title>
