@@ -6,8 +6,8 @@
     <atom:link href="https://blog.benelog.net//feed.xml" rel="self" type="application/rss+xml" />
     <description>JBake Bootstrap Template</description>
     <language>en-gb</language>
-    <pubDate>Mon, 6 May 2019 21:55:51 +0000</pubDate>
-    <lastBuildDate>Mon, 6 May 2019 21:55:51 +0000</lastBuildDate>
+    <pubDate>Mon, 6 May 2019 22:00:00 +0000</pubDate>
+    <lastBuildDate>Mon, 6 May 2019 22:00:00 +0000</lastBuildDate>
 
     <item>
       <title>정적 사이트로 블로그 마이그레이션</title>
@@ -236,7 +236,7 @@ AsciiDoc으로 작성된 포스트의 원본은 &lt;a href=&quot;https://github.
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;빌드 스크립트는 &lt;a href=&quot;https://github.com/benelog/blog/blob/master/build.gradle&quot;&gt;build.gradle&lt;/a&gt;에서 확인이 가능합니다.
-Travis CI 설정인 &lt;a href=&quot;https://github.com/benelog/blog/blob/master/.travis.yml(.travis.yml)은&quot; class=&quot;bare&quot;&gt;https://github.com/benelog/blog/blob/master/.travis.yml(.travis.yml)은&lt;/a&gt; 아래와 같이 단순합니다.&lt;/p&gt;
+Travis CI 설정인 &lt;a href=&quot;https://github.com/benelog/blog/blob/master/.travis.yml&quot;&gt;.travis.yml&lt;/a&gt;은 아래와 같이 단순합니다.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
@@ -274,7 +274,7 @@ Netflify에는 Name 서버 기능까지 있어서 사용하던 Name 서버도 �
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;JBake 설정으로는 &lt;a href=&quot;https://blog.benelog.net/904735.html&quot; class=&quot;bare&quot;&gt;https://blog.benelog.net/904735.html&lt;/a&gt; 와 같이 HTML 확장자를 붙인 주소를 사용학게 설정했는데,
+&lt;p&gt;이 블로그의 JBake 설정으로는 &lt;a href=&quot;https://blog.benelog.net/904735.html&quot; class=&quot;bare&quot;&gt;https://blog.benelog.net/904735.html&lt;/a&gt; 와 같이 HTML 확장자를 붙인 주소를 씁니다.
 Egloos의 이전 포스트들은 &lt;a href=&quot;https://blog.benelog.net/904735&quot; class=&quot;bare&quot;&gt;https://blog.benelog.net/904735&lt;/a&gt; 와 같이 HTML 확정자가 없게 되어 있습니다.
 Netflify와 Github pages에서는 디폴트로 아무런 설정이 없어도 HTML 확장자가 없는 주소를 HTML 확장자가 붙은 주소와 동일하게 취급을 해주어서
 URL의 하위 호환성을 쉽게 유지할 수 있었습니다.
