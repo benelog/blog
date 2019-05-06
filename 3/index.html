@@ -132,6 +132,9 @@
                     <h3>Recent Posts</h3>
                 </header>
                     <li>
+                        <a href="../../migration-to-static-site.html"><p>정적 사이트로 블로그 마이그레이션</p></a>
+                    </li>
+                    <li>
                         <a href="../../robolectric.html"><p>Robolectric을 활용한 안드로이드 쾌속 테스팅</p></a>
                     </li>
                     <li>
@@ -139,9 +142,6 @@
                     </li>
                     <li>
                         <a href="../../3120317.html"><p>시간대 DB에서 우리나라 시간의 오류</p></a>
-                    </li>
-                    <li>
-                        <a href="../../3017438.html"><p>Android에서 @Inject, @Test</p></a>
                     </li>
             </ul>
         </section>
@@ -157,6 +157,387 @@
 </section>
 	
 	<div id="main">
+<article class="post">
+   <header>
+    <div class="title">
+                    <h2><a href="../3017439.html">10 things you need to know about Android and Google Play - Tony Chan (Google), GDG Korea Android 컨퍼런</a></h2>
+
+
+    </div>
+    <div class="meta">
+         <time class="published"
+            datetime='Apr 17, 2013'>
+            Apr 17, 2013</time>
+            <div class="published eta"></div>
+        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
+    </div>
+</header>
+
+    
+  
+         
+    <div id="content">
+       <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>지난 2013/04/13일, 종로 페럼타회에서 열렸던 '구글 개발자와 함께하는 GDG Korea Android 컨퍼런스 '에서 공유된 내용입니다.</p>
+</div>
+<div class="paragraph">
+<p>참석해서 메모했던 내용을 정리합니다.</p>
+</div>
+<div class="paragraph">
+<p>구글 Play와 API, 권장 UI스타일, 정책 등 다양한 주제를 이야기한 발표였습니다.  UX설계를 할 때 많은 고민이 필요하겠다고 느꼈습니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="1_think_global">1. Think Global</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>한 지역만 염두에 둔다면 기회를 놓히고 있는것이다. 구글 Play 수익의 67%가 미국외에서 나오고 있다.</p>
+</li>
+<li>
+<p>Localization을 고려해라. 구글 Play의 그래픽스와 비디오도 이제 로컬라이즈되었다.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>웹애플리케이션은 국제화에 대한 고려를 하는 비율이 높지 않습니다. 앱개발은 반대로 국제화를 고려하지 않는 것이 더 합당한 이유가 있어야하는 듯합니다. 기준이 차이가 생겼다고 느껴집니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="2_pure_android">2. Pure Android</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>다른 플랫폼의 UI형태를 모망하지 마라. 각각의 플랫폼은 고유한 스타일이 있다.</p>
+</li>
+<li>
+<p>플랫폼 특화된 아이콘을 밖에서 쓰지 말라.</p>
+</li>
+<li>
+<p>바닥에 붙은 탭바를 쓰지 마라. (아이폰 스타일)</p>
+</li>
+<li>
+<p>별도의 라벨이 붙은 백버튼, 'right point caret'(&gt;) 버튼을 쓰지 마라. 백버튼을 플랫폼에서 제공하는 것을 쓰도록 유도해야 한다.</p>
+</li>
+<li>
+<p>UI에 대한 지침을 지키지 않으면 사용자가 안 좋은 Rating을 할 것이다.</p>
+</li>
+<li>
+<p>이전의 안드로이드 버전에 지원하던 스타일의 레가시 버튼을 쓰지 마라.</p>
+</li>
+<li>
+<p>Action bar를 써라. 곧 support 라이브리리를 통해 하위 버전에서도 ActionBar를 쓸 수 있게 될 것이다. 지금도 오픈소스로 <a href="http://actionbarsherlock.com/">Actionbar-sherlock</a>이 있지만, 기본 SDK에서 이제 지원된다.</p>
+</li>
+<li>
+<p>가장 최신의 SDK에 targeting하라. 최신의 SDK에서만 돌아가야한다는 의미는 아니다. 하위버전에서도 돌아가도록 만들면서도 상위버전에서는 최신의 UI 요소들을 활용해야 한다.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>개별 앱의 UI는 같은 플랫폼 내에서의 일관성을 해치지 않아야한다는 지침을 강조했습니다. 같은 사용자가 2개의 다른 플랫폼을 오가면서 같은 앱을 사용하는 경우보다는, 하나의 플랫폼에서 여러 앱을 사용하므로 플랫폼 내에서의 일관성이 중요한 것은 당연한듯합니다.</p>
+</div>
+<div class="paragraph">
+<p>기획자나 디자이너 입장에서는 하나의 앱을 출시하면 여러 플랫폼이 동일한 UI로 나오기를 바랄 수도 있을 듯한데, 이러한 지침을 초기부터 염두에 두고 엔지니어가 피드백을 줄 수 있어야겠습니다. <a href="http://developer.android.com/design/index.html">안드로이드 디자인가이드</a>도 정독해봐야겠구나 싶었습니다.</p>
+</div>
+<div class="paragraph">
+<p>그리고 <a href="http://actionbarsherlock.com/">Actionbar-sherlock</a>에서 해주던 ActionBar의 하위 호환성 지원이 support 라이브러리에 들어간다는 소식도 반가웠습니다. Fragment가 support 라이브러리에서 지원되는 것을 생각하면 자연스러운 개선이기도 합니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="3_design_for_all_form_factors">3. Design for all form-factors</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Fragment를 써라</p>
+</li>
+<li>
+<p>타블릿과 폰을 위해서 별도의 프로젝트를 프로젝트를 만드는것은 바람직하지 않다. Fragment를 이용해서 타블릿에서는 하나의 Activity에 여러개의 Fragment가, 폰에서는 Activity당 하나의 Fragment를 보여주는 식으로 구성하면 얼마든지 하나의 프로젝트로 구성할 수 있다.</p>
+</li>
+<li>
+<p>UI요소의 크기는 기기의 해상도에 독립적이도록 DP를 쓰고, 텍스트에는 SP를 써라.</p>
+</li>
+<li>
+<p>적어도 3개의 레이아웃을 고려해라. 폰, 7인치 타블릿, 10인치 타블릿. DP는 해상도 문제만 해결할 뿐, 다른 사이즈에 대한 문제는 별도로 고려해야 한다.</p>
+</li>
+<li>
+<p>지원하려는 화면 밀도(Density), 해당도에 맞는 Asset, 이미지을 각각 준비해라. Aliasing은 보기에도 좋기않고 CPU를 많이 사용해서 배터리 사용시간을 짧아지게 한다.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>DP에 대해서는 아래 그림 1장이 직관적인 이해에 많은 도움이 되었습니다.
+<span class="image-wrap"><span class="image"><img src="http://cfile8.uf.tistory.com/image/11355F45516932300FB576" alt="11355F45516932300FB576"></span></span></p>
+</div>
+<div class="paragraph">
+<p>(이미지 출처 : <a href="http://www.kmshack.kr/317#.UWy9VIpdUbj" class="bare">http://www.kmshack.kr/317#.UWy9VIpdUbj</a> )</p>
+</div>
+<div class="paragraph">
+<p>웹에서는 '방탄형 웹&#8217;이나 '반응형 웹디자인&#8217;에 대한 많은 노하우가 공유되고 있는데, 안드로이드에서도 점점 더 섬세한 노하우들이 공유될 것 같습니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="4_correct_back_button_behaviors">4. Correct back button behaviors</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>앱의 메인 화면에서 사용자는 홈스크린으로 바로 돌아갈 수 있어야 한다. 종료 할때 다이얼로그로 종료할지 물어보는 방식으로 Back에 대한 이벤트를 강제적으로 막지마라.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>많은 앱이 이렇게 되어 있지 않기에 다소 의외의 가이드라고 느껴졌습니다. 이것도 일관성을 생각하면 의미 있는 지침입니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="5_proper_notification">5. Proper notification</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>핵심 기능에 대해서 통지해라. 광고에 Notification을 쓰지 마라.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="6_app_quality_improvement">6. App quality improvement</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://bit.ly/google-play-core-checklist" class="bare">http://bit.ly/google-play-core-checklist</a> 참고</p>
+</li>
+<li>
+<p><a href="http://bit.ly/google-play-tablet-checklist" class="bare">http://bit.ly/google-play-tablet-checklist</a> 참고</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>한글 번역도 <a href="http://googledevkr.blogspot.kr/2013/01/app-quality-guidelines.html" class="bare">http://googledevkr.blogspot.kr/2013/01/app-quality-guidelines.html</a> 에서 보실 수 있습니다.</p>
+</div>
+<div class="paragraph">
+<p>(이 포스트를 쓰고 난 후에 권순선님께서 알려주셨습니다.)</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="7_permission">7. Permission</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>핵심기능에 필요한 최소한의 권한만 부여하도록 해라.</p>
+</li>
+<li>
+<p>민감한 권한을 너무 많이 가지고 있으면 당신에게 해가 된다. 앱의 다운로드 숫자나 주목 받을 기회가 줄어들 것이다.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="8_google_play_service">8. Google play service</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>구글에서 제공하는 서비스 API를 나열하면서 소개.</p>
+</li>
+<li>
+<p>Maps API 2, Google+, Google Authorization, Google Play services APK 등</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>위 내용은 <a href="http://developer.android.com/google/play-services/index.html에" class="bare">http://developer.android.com/google/play-services/index.html에</a> 자세히 나와 있습니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="9_new_platform_api">9. New platform API</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>새로 추가된 API를 간단히 나열.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Lock screen widget</p>
+</li>
+<li>
+<p>Seconary display</p>
+</li>
+<li>
+<p>Day dreams (interactive screensaver mode)</p>
+</li>
+<li>
+<p>Natvie RTL(right-to-left) support</p>
+</li>
+<li>
+<p>Tablet sharing</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>최근 업데이트된 API 소개</p>
+<div class="ulist">
+<ul>
+<li>
+<p>GCM</p>
+</li>
+<li>
+<p>Analystic SDK</p>
+</li>
+<li>
+<p>In-app Billing V3 (V2는 더이상 쓰지마라)</p>
+</li>
+<li>
+<p>Youtube android player</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>자세한 내용은 <a href="http://developer.android.com/about/versions/jelly-bean.html에" class="bare">http://developer.android.com/about/versions/jelly-bean.html에</a> 있습니다.</p>
+</div>
+<div class="paragraph">
+<p>발표된지는 한참된 기능이지만, 이렇게 모아서 보니 앱개발자가 화면을 다양하게 활용할 수 있는 여지가 더 늘어나고 있다고 느껴졌습니다. 이에 따라 새로운 사업모델도 나올 수 있었는데, 이런 아이디어들이 기획부서에서만 나오기를 기다리는 것보다 개발자들도 적극 제안을 해 보면 어떨까하는 생각이 들었습니다. 개발자들은 새로운 API가 추가되는것을 늘 관심있게 보고 있기 때문에 자연스럽게 아이디어가 나올만도 합니다. Lock screen widget을 이용한 광고 제품이 나왔듯이, 앞으로도 그런 기회가 많이 남아 있을 것이라고 기대가 됩니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="10_publishing_on_google_play">10. Publishing on google play</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Google play는 풍부하게 미디어를 활용한다.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>특징을 멋지고 깔끔한 이미지로</p>
+</li>
+<li>
+<p>스크린샷</p>
+</li>
+<li>
+<p>짧은 유튜브 동영상</p>
+</li>
+<li>
+<p>로컬라이케이션</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>대표적인 정책 위반 사례들.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>3rd party 지불</p>
+</li>
+<li>
+<p>다운로드를 위해 3rd party 사이트로의 연결</p>
+</li>
+<li>
+<p>스팸 키워드</p>
+</li>
+<li>
+<p>별점에 인센티브 부과</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>정책에 대한 자세한 내용은 <a href="http://bit.ly/google-play-policy-edu" class="bare">http://bit.ly/google-play-policy-edu</a> 참조</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>정책에 따라 구현이 달라져야 할 부분을 미리 파악하고 있으려면 꾸준한 관심을 가져야겠습니다.</p>
+</div>
+</div>
+</div>
+    </div>
+	
+	<section id="social-share">
+        <ul class="icons">
+<!-- Social Share Button HTML -->
+
+<!-- Twitter -->
+<li><a href="//twitter.com/share?url=https://blog.benelog.net//3017439.html&text=10 things you need to know about Android and Google Play - Tony Chan (Google), GDG Korea Android 컨퍼런&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+</a></li>
+
+<!-- Google Plus -->
+<li><a href="//plus.google.com/share?url=https://blog.benelog.net//3017439.html" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+</a></li>
+
+<!-- Facebook -->
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//3017439.html" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+</a></li>
+
+<!-- Reddit (url, title) -->
+<li><a href="//reddit.com/submit?url=https://blog.benelog.net//3017439.html&title=10 things you need to know about Android and Google Play - Tony Chan (Google), GDG Korea Android 컨퍼런" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+</a></li>
+
+<!-- LinkedIn -->
+<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//3017439.html&title=10 things you need to know about Android and Google Play - Tony Chan (Google), GDG Korea Android 컨퍼런" target="_blank" class="share-btn linkedin">
+    <i class="fa fa-linkedin"></i>
+    <p>LinkedIn</p>
+</a></li>
+
+<!-- StumbleUpon (url, title) -->
+<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//3017439.html&title=10 things you need to know about Android and Google Play - Tony Chan (Google), GDG Korea Android 컨퍼런" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+</a></li>
+
+<!-- Email -->
+<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//3017439.html" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+</a></li>
+        </ul>
+    </section>
+     
+
+    <footer>
+	
+		<ul class="stats">
+    	    <!-- Display the categories associated with this post -->
+    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
+ 	        <li><a href='../tags/Android.html'>Android</a></li>
+ 	        <li><a href='../tags/행사후기.html'>행사후기</a></li>
+
+				<li><a class="icon fa-comment" href="../3017439.html#disqus_thread"> &nbsp;</a></li>
+ 		</ul>
+    	
+    </footer>
+</article>
 <article class="post">
    <header>
     <div class="title">
@@ -518,134 +899,13 @@ Markdown을 지원하는 서비스나 도구들은 앞으로 계속 나올 듯�
     	
     </footer>
 </article>
-<article class="post">
-   <header>
-    <div class="title">
-                    <h2><a href="../2999108.html">Java에서 여러줄에 걸친 문자열 선언을 편하게 하는 @Multiline</a></h2>
-
-
-    </div>
-    <div class="meta">
-         <time class="published"
-            datetime='Jan 29, 2013'>
-            Jan 29, 2013</time>
-            <div class="published eta"></div>
-        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
-    </div>
-</header>
-
-    
-  
-         
-    <div id="content">
-       <div class="paragraph">
-<p>Andrian Walker라는 영국 개발자가 만든 라이브러리를 제가 수정해서 Github에 올렸습니다.</p>
-</div>
-<div class="paragraph">
-<p>이 프로젝트에 대한 자세한 설명은 아래에 있습니다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="https://github.com/benelog/multiline/wiki/Java%EC%97%90%EC%84%9C-%EC%97%AC%EB%9F%AC%EC%A4%84%EC%97%90-%EA%B1%B8%EC%B9%9C-%EB%AC%B8%EC%9E%90%EC%97%B4-%EC%84%A0%EC%96%B8%EC%9D%84-%ED%8E%B8%ED%95%98%EA%B2%8C-%ED%95%98%EB%8A%94-%40Multiline">Java에서 여러줄에 걸친 문자열 선언을 편하게 하는 @Multiline</a></p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>(github wiki에 적고 블로그에 붙여넣기를 하니 코드 블럭이 깨지는 등 편집이 쉽지가 않네요. 그래서 링크로 대신 합니다.)</p>
-</div>
-<div class="paragraph">
-<p>위 글의 핵심 내용은 아래와 같습니다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Java에는 여러 줄에 걸친 문자열을 선언하는 문법이 없어서 긴 문자열을 편집하는 작업이 불편합니다.</p>
-</li>
-<li>
-<p>이를 보완하는 방법을 찾던 중 Adrian Walker라는 개발자가 만든 Multiline-string 이라는 라이브러리를 발견했고, Eclipse에서도 쓸 수 있도록 코드를 수정해서 원저자의 허락을 받고 Github에 올렸습니다. (<a href="https://github.com/benelog/multiline" class="bare">https://github.com/benelog/multiline</a>)</p>
-</li>
-<li>
-<p>이 과정 중에 Annotation Processing과 ECJ(Eclipse compiler for Java)에 대해서 알게 된 것들을 정리했습니다.</p>
-</li>
-<li>
-<p>이 라이브러리와 비슷한 기능을 Lombok에 추가하거나, 안드로이드에서 annotation Processing을 활용할만한 방안을 더 연구해볼만 합니다</p>
-</li>
-</ul>
-</div>
-    </div>
-	
-	<section id="social-share">
-        <ul class="icons">
-<!-- Social Share Button HTML -->
-
-<!-- Twitter -->
-<li><a href="//twitter.com/share?url=https://blog.benelog.net//2999108.html&text=Java에서 여러줄에 걸친 문자열 선언을 편하게 하는 @Multiline&via=" target="_blank" class="share-btn twitter">
-    <i class="fa fa-twitter"></i>
-    <p>Twitter</p>
-</a></li>
-
-<!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=https://blog.benelog.net//2999108.html" target="_blank" class="share-btn google-plus">
-    <i class="fa fa-google-plus"></i>
-    <p>Google+</p>
-</a></li>
-
-<!-- Facebook -->
-<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//2999108.html" target="_blank" class="share-btn facebook">
-    <i class="fa fa-facebook"></i>
-    <p>Facebook</p>
-</a></li>
-
-<!-- Reddit (url, title) -->
-<li><a href="//reddit.com/submit?url=https://blog.benelog.net//2999108.html&title=Java에서 여러줄에 걸친 문자열 선언을 편하게 하는 @Multiline" target="_blank" class="share-btn reddit">
-    <i class="fa fa-reddit-alien"></i>
-    <p>Reddit</p>
-</a></li>
-
-<!-- LinkedIn -->
-<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//2999108.html&title=Java에서 여러줄에 걸친 문자열 선언을 편하게 하는 @Multiline" target="_blank" class="share-btn linkedin">
-    <i class="fa fa-linkedin"></i>
-    <p>LinkedIn</p>
-</a></li>
-
-<!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//2999108.html&title=Java에서 여러줄에 걸친 문자열 선언을 편하게 하는 @Multiline" target="_blank" class="share-btn stumbleupon">
-    <i class="fa fa-stumbleupon"></i>
-    <p>StumbleUpon</p>
-</a></li>
-
-<!-- Email -->
-<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//2999108.html" target="_blank" class="share-btn email">
-    <i class="fa fa-envelope"></i>
-    <p>Email</p>
-</a></li>
-        </ul>
-    </section>
-     
-
-    <footer>
-	
-		<ul class="stats">
-    	    <!-- Display the categories associated with this post -->
-    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/Java.html'>Java</a></li>
- 	        <li><a href='../tags/String.html'>String</a></li>
- 	        <li><a href='../tags/Multiline.html'>Multiline</a></li>
- 	        <li><a href='../tags/자작도구.html'>자작도구</a></li>
-
-				<li><a class="icon fa-comment" href="../2999108.html#disqus_thread"> &nbsp;</a></li>
- 		</ul>
-    	
-    </footer>
-</article>
 		
 <ul class="actions pagination">
     <li><a href="../2/"
             class=" button big previous">PREVIOUS</a></li>
 
     <li><span
-            class="button big"> 3 of 29 </span></li>
+            class="button big"> 3 of 30 </span></li>
 
     <li><a href="../4/"
             class=" button big next">NEXT</a></li>
@@ -711,6 +971,17 @@ Markdown을 지원하는 서비스나 도구들은 앞으로 계속 나올 듯�
                     <li>
                         <article>
                             <header>
+                                <h3><a href="../migration-to-static-site.html">정적 사이트로 블로그 마이그레이션</a></h3>
+                                 <time class="published"
+							            datetime='May 06, 2019'>
+							            May 06, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
                                 <h3><a href="../robolectric.html">Robolectric을 활용한 안드로이드 쾌속 테스팅</a></h3>
                                  <time class="published"
 							            datetime='Oct 10, 2016'>
@@ -737,17 +1008,6 @@ Markdown을 지원하는 서비스나 도구들은 앞으로 계속 나올 듯�
                                  <time class="published"
 							            datetime='Nov 03, 2014'>
 							            Nov 03, 2014</time>
-                            </header>
-                        </article>
-                    </li>
-
-                    <li>
-                        <article>
-                            <header>
-                                <h3><a href="../3017438.html">Android에서 @Inject, @Test</a></h3>
-                                 <time class="published"
-							            datetime='Apr 17, 2013'>
-							            Apr 17, 2013</time>
                             </header>
                         </article>
                     </li>
@@ -1325,6 +1585,15 @@ Markdown을 지원하는 서비스나 도구들은 앞으로 계속 나올 듯�
                         <article>
                             <header>
                                 <a href="../tags/DependencyInjection.html">DependencyInjection</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="../tags/static-site.html">static-site</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>

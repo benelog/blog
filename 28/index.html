@@ -132,6 +132,9 @@
                     <h3>Recent Posts</h3>
                 </header>
                     <li>
+                        <a href="../../migration-to-static-site.html"><p>정적 사이트로 블로그 마이그레이션</p></a>
+                    </li>
+                    <li>
                         <a href="../../robolectric.html"><p>Robolectric을 활용한 안드로이드 쾌속 테스팅</p></a>
                     </li>
                     <li>
@@ -139,9 +142,6 @@
                     </li>
                     <li>
                         <a href="../../3120317.html"><p>시간대 DB에서 우리나라 시간의 오류</p></a>
-                    </li>
-                    <li>
-                        <a href="../../3017438.html"><p>Android에서 @Inject, @Test</p></a>
                     </li>
             </ul>
         </section>
@@ -157,6 +157,230 @@
 </section>
 	
 	<div id="main">
+<article class="post">
+   <header>
+    <div class="title">
+                    <h2><a href="../1314658.html">HTML &amp; CSS 정리해본 예</a></h2>
+
+
+    </div>
+    <div class="meta">
+         <time class="published"
+            datetime='Jul 04, 2007'>
+            Jul 04, 2007</time>
+            <div class="published eta"></div>
+        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
+    </div>
+</header>
+
+    
+  
+         
+    <div id="content">
+       <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>제가 있는 프로젝트의 UI표준은  2004년 10월경에 처음 정해진 것입니다. 연속 사업 중 첫번째 사업 때 정해진 틀을 그 뒤에도 수정없이 copy&amp;paste로 입혀서 쓰고 있는 중이죠. 디자이너가 html으로 파일을 만들어 주었을 당시에는 팀원 중에 웹표준에 대해서 신경을 썼던 사람이 없었습니다.  지금 다시 들어다보니 css를 잘 정의했으면 훨씬 깔끔하게 중복없이 만들수 있었던 코드가 많이 보입니다.</p>
+</div>
+<div class="paragraph">
+<p>저도 작년에 파주시 프로젝트에서 웹표준에 맞춰서 개발을 하고 있다는 말을 듣기 전까지는 스스로 css를 정리해볼 생각은 없었습니다. 그런 작업은 디자이너의 영역이라고 안이한  생각을 하고 있었던 것이죠 ^^; 새로 프로젝트 들어가면 깔끔하게 UI표준 만들어주는 사람을 만나기를 바라는 마음만 있을 뿐이였습니다.  그러다가 정동인씨나 최효근씨 같은 후배들에게 배우고 느낀 바가 많아서 저도 현재의 프로젝트에서도 서서히 적용하겠다는 의지를 가지게 되었습니다.</p>
+</div>
+<div class="paragraph">
+<p>이번에 고객이 다른 업무와 독립적으로 쓰여질 프로그램을 요청했는데, 그 페이지에는 새로운 css를 만들어서 적용하고 싶었습니다.  현재 프로젝트에 남은 3명의 인원만으로는 모든 페이지를 다 갈아 엎는 것은 무리라고 생각했었는데 적당한 시작점을 찾은 것이죠.</p>
+</div>
+<div class="paragraph">
+<p>처음 수정한 부분은 화면의 큰 제목과 하위 제목이였습니다.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/markup/header-sample.gif" alt="image"></span></p>
+</div>
+<div class="paragraph">
+<p>와 같이 보여지는데, 기존 코드로는</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-html" data-lang="html">&lt;table border="0" cellpadding="0" cellspacing="0" width="100%"&gt;
+ &lt;!-- 제목 --&gt;
+ &lt;tr&gt;
+  &lt;td&gt;
+   &lt;table border="0" cellpadding="0" cellspacing="0" width="100%"&gt;
+    &lt;tr&gt;&lt;td class="title1"&gt;&lt;img src="/image/title_header.gif" align="absmiddle"&gt;&amp;nbsp;감사사항 목록&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td class="tilte_space"&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td class="title_line"&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td class="tilte_space"&gt;&lt;/td&gt;&lt;/tr&gt;
+   &lt;/table&gt;
+  &lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;!-- 조회조건 --&gt;
+ &lt;tr&gt;
+  &lt;td&gt;
+   &lt;table border="0" cellpadding="0" cellspacing="0" width="100%"&gt;
+    &lt;tr&gt;
+        &lt;td align="left" class="title_small"&gt;
+            &lt;img src="/image/title_small.gif" align="absmiddle"&gt;&amp;nbsp;조회조건
+        &lt;/td&gt;
+    &lt;/tr&gt;
+   &lt;/table&gt;
+  &lt;/td&gt;
+ &lt;/tr&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>로 나와있는 부분입니다. 이걸  css를 새로 만들고 나니</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-html" data-lang="html">  &lt;h1&gt;감사사항 목록&lt;/h1&gt;
+  &lt;h2&gt;조회조건&lt;/h2&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>이렇게 딱 두줄로 바꿀수가 있네요.
+CSS에 다음과 같이 배경이미지, 선 등을 넣어서 정리한 것이죠.
+매페이지마다 반복되는 글자 앞의 이미지, 선과 여백을 위한 <code>table</code>, <code>tr</code>, <code>td</code> 문장들이 모두 정리됩니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-css" data-lang="css">h1 {
+  font-size:14px; color:#5C5C5C;
+  font-family: 돋움, arial;
+  font-weight:bold;
+  height:14px;
+  padding-left: 20px;
+  padding-bottom: 10px;
+  margin: 10px 10px 2px 10px;
+  background-image: url(/image/title_header.gif);
+    background-position: 0% 10% ;
+  background-repeat: no-repeat;
+  border-color:#C0C3C6;
+  border-width:1px;
+  border-bottom-style: solid;
+}
+
+h2 {
+  font-family: 돋움, arial;
+  font-weight:bold;
+  font-size:12px;
+  height:13px;
+  color: #4f4f30;
+  padding-left: 20px;
+  margin-bottom: 4px
+  padding-bottom: 10px;
+  margin: 10px;
+  background-image: url(/image/title_small.gif);
+  background-position: 0% 0% ;
+  background-repeat: no-repeat;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>그리고 새로 개발되는 화면에 좌측 메뉴부분이 있는데,  css에서   float:left 선언을 이용하니 table없이 레이아웃을 잡을 수가 있었습니다. 웹표준을 설명하는 자료에서 많이 드는 예제이죠. 반복되는 class 지정에도 선택자를 잘 활용하면 클래스 지정없는 태크만으로 처리할 수 있는 부분이 많아보였습니다.</p>
+</div>
+<div class="paragraph">
+<p>이제 기초적인 것을 적용시킨 것 뿐이고 제가 공부할 것이 아직 많아서 갈 길이 멀다는 기분이에요. 그래도 간결한 jsp를 보니 몇달만에 방청소 했을 때보다 더 속이 시원합니다.</p>
+</div>
+<div class="paragraph">
+<p>그동안 UI단 코드의 중복에는 지나치게 관대하게 살아왔었다고 반성했습니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="웹표준관련_권장_자료">웹표준관련 권장 자료</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>(부서 후배 최효근씨가 추천해준 자료입니다)</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>한국소프트웨어진흥원의 실전웹표준가이드</p>
+</li>
+<li>
+<p>Head First HTML(XHTML, CSS) -한빛미디어-</p>
+</li>
+<li>
+<p>실용예제로 배우는 웹표준 -에이콘-                // 본격적인 활용기</p>
+</li>
+<li>
+<p>웹2.0을 이끄는 방탄웹 -에이콘-                    // 아이디어가 넘치는 책</p>
+</li>
+<li>
+<p>CSS 마스터 전략 -에이콘-</p>
+</li>
+<li>
+<p>CSS designing without tables -sitepoint-(원서)    // 무릅을 탁 치게 되는 책</p>
+</li>
+<li>
+<p>CSS the css anthology -sitepoint-(원서)</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+	
+	<section id="social-share">
+        <ul class="icons">
+<!-- Social Share Button HTML -->
+
+<!-- Twitter -->
+<li><a href="//twitter.com/share?url=https://blog.benelog.net//1314658.html&text=HTML &amp; CSS 정리해본 예&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+</a></li>
+
+<!-- Google Plus -->
+<li><a href="//plus.google.com/share?url=https://blog.benelog.net//1314658.html" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+</a></li>
+
+<!-- Facebook -->
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//1314658.html" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+</a></li>
+
+<!-- Reddit (url, title) -->
+<li><a href="//reddit.com/submit?url=https://blog.benelog.net//1314658.html&title=HTML &amp; CSS 정리해본 예" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+</a></li>
+
+<!-- LinkedIn -->
+<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//1314658.html&title=HTML &amp; CSS 정리해본 예" target="_blank" class="share-btn linkedin">
+    <i class="fa fa-linkedin"></i>
+    <p>LinkedIn</p>
+</a></li>
+
+<!-- StumbleUpon (url, title) -->
+<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//1314658.html&title=HTML &amp; CSS 정리해본 예" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+</a></li>
+
+<!-- Email -->
+<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//1314658.html" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+</a></li>
+        </ul>
+    </section>
+     
+
+    <footer>
+	
+		<ul class="stats">
+    	    <!-- Display the categories associated with this post -->
+    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
+ 	        <li><a href='../tags/CSS.html'>CSS</a></li>
+ 	        <li><a href='../tags/HTML.html'>HTML</a></li>
+
+				<li><a class="icon fa-comment" href="../1314658.html#disqus_thread"> &nbsp;</a></li>
+ 		</ul>
+    	
+    </footer>
+</article>
 <article class="post">
    <header>
     <div class="title">
@@ -479,200 +703,13 @@ ACM 강연의 원문, PDF 파일</p>
     	
     </footer>
 </article>
-<article class="post">
-   <header>
-    <div class="title">
-                    <h2><a href="../1230429.html">QB로 만든 Code can be an art 출력</a></h2>
-
-
-    </div>
-    <div class="meta">
-         <time class="published"
-            datetime='Jun 01, 2007'>
-            Jun 01, 2007</time>
-            <div class="published eta"></div>
-        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
-    </div>
-</header>
-
-    
-  
-         
-    <div id="content">
-       <div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p><a href="http://www.creativecommons.or.kr/">CCK(Creative Commons Korea)</a>의 Code can be an art 행사에서는 '코드잼&#8217;이라는 순서가 있었습니다.</p>
-</div>
-<div class="paragraph">
-<p>'Code can be an art&#8217;라는 문자열을 출력하는 프로그램을 자유롭게 짜서 발표하는 것이였죠.</p>
-</div>
-<div class="paragraph">
-<p>코드잼 설명 :  <a href="http://ccsalon.tistory.com/4" class="bare">http://ccsalon.tistory.com/4</a></p>
-</div>
-<div class="paragraph">
-<p>저도 이날 점심을 먹는 것도 잊고 나름대로 코드를 준비해 갔는데, 발표를 하지는 못했네요 .  발표자가 적은 분위기면 앞에 나가볼려고 노트북까지 들고 가기는 했었습니다 ^^; 그런데 열띤 호응으로  많은 분들이 발표를 하셨고, MSX 에뮬레이터로 하신 분 등 제가 말하고 싶었던 내용을 다른 분들이 더 훌륭히 말씀해 주셔서 큰 아쉬움은 없습니다.</p>
-</div>
-<div class="paragraph">
-<p>8bit 화면 같은 행사 로고를 보고 저도  제 세대에 맞게 Quick Basic으로 코드를 짜볼 생각을 해봤습니다. 이 행사 중에 '8bit kid의 생애&#8217;라는 패널토론 주제도 있었었죠. ^^; 저는 그 다음 시대인 IBM XT세대입니다. 허큘리스 그래픽카드, 5.25인치 FDD, 조금 지나서 ADLIB card, 2400bps MNP 모뎀 등이 저에게는 가슴을 파고드는 핵심단어들이에요.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="http://goodhyun.com/WindowsLiveWriter/Codecanbeanart_BB3/ccsalon_banner_1.gif" alt="ccsalon_banner" width="320" height="230"></span></p>
-</div>
-<div class="paragraph">
-<p>그 추억의 시절에 제가 가장 많아 가지고 놀았던 프로그램 언어가 Quick-Basic이였습니다. Basic에서 행번호를 없애고 구조화프로그래밍 개념을 도입한, 당시 저에게는 충격적으로 대단한 언어였어요.   이 도구에다  basic을 배웠던 사람이면 누구나 회상할 추억의 명령어 line(선긋기), play(음악연주), read,data(데이터 읽는 구문)을 넣어서 코딩을 해봐야겠다고 마음 먹었습니다. 대신 제 PC환경상 그때의 Quick-basic 대신 Window XP에 내장되어 있는 q-basic을 사용할 수 밖에 없었어요. 프롬프트에서 qbasic이라고 치면 언제나 튀어나오는 도구죠.</p>
-</div>
-<div class="paragraph">
-<p>Quick-Basic과 q-basic이 뭐가 다르냐구요? 문법은 거의 똑같은것 같아요. Quick-basic은 따로 패키지로 나와서 버전4.5까지 발표되었었는데, q-basic은 어느 새 MS-DOS의 상위버전에 포함되어서 나오더군요 . Quick-Basic에서는 실행파일(.exe)도 만들 수 있고, 각종 라이브러리도 많았었습니다. 아뭏든 대타로 q-basic을 썼기에 실행할때는  아래와 같이 치면 됩니다.</p>
-</div>
-<div class="quoteblock">
-<blockquote>
-<div class="paragraph">
-<p>프롬프트&gt; qbasic/run cba2.bas</p>
-</div>
-</blockquote>
-</div>
-<div class="paragraph">
-<p>단순히 화면에 큰 글자를 찍어주는 것 밖에 없지만, 꽤나 시행착오 작업을 많이 거쳤었습니다. 예전 Quick-Basic에서는 screen 12라는 화면모드를 주로 썼었었는데, 이번 환경에서는 screen 2 밖에 안 먹는 것이였습니다. 화면 전체 해상도가 몇곱하기 몇 인지도 모르고 그냥 무작정 네모를 그리는 숫자값을 바꿔가면서 화면을 만들어 봤습니다. 결국 한참 후에야 그럭저럭 화면중간에 크게 들어간 글자를 얻어낼 수가 있었죠. 평소에 일할 때 이렇게 무식하게 작업을 한다면 스스로 한심하게 느껴졌겠지만 이번에는 그것조차도 옛 추억을 되살리는 즐거움이였습니다.</p>
-</div>
-<div class="paragraph">
-<p>그리고 이 프로그램에 들어간 멜로디를 아시는 분이라면 아마 저하고 비슷한 컴퓨터 세대이실 것 같아요. 불후의 고전명작게임 'Loom&#8217;의 메인테마 입니다. 처음에 노트북을 들고 행사장에 갈때까지만 해도 프로그램에서는 단순히 '도미솔' 정도의 소리만 났었습니다. 그러다가 행사가 끝난 다음 주에 문득 여기에다 듣기좋은 멜로디를 넣어보고 싶다는 충동을 느꼈고, 그때 게임 'Loom&#8217;의 음악이 머리 속에 떠올랐습니다. 당연히 악보 같은 건 없었고 기억하는 멜로디를 스스로 휘파람으로 불어서 청음으로 코드를 만들었습니다. 남다른 음감각을 가진 것도 아니어서 계속 시행착오를 거치면서  play문에 들어가는 음표코드를 넣었죠. 어쩐지 박자와 음이 약간 어설프고 불안정한 느낌이 들지 않나요?</p>
-</div>
-<div class="paragraph">
-<p>행사 때 김국헌님께서 발표하시는 분들마다 물어보셨던 말이 있었습니다. '이 작업을 하시면서 즐거웠습니까?'' 저도 여기에 그떄 다른 분들이 하셨던 말과 똑같이 '네. 굉장히 즐거웠습니다&#8217;라고 말할 수 밖에 없네요. 한 때는 왠만한 단축키는 다 외웠었던 Quick-Basic이였는데 오랜만에 쓸려니 함수 선언방법 조차도 가물가물 하더군요. 그래도 기억을 되살려 가면서 작업을 하다보니 이런 도구로 고등학교 때 축제 전시회 때 내놓을 게임을 만들던 일이 생각이 났었습니다. 그 때 정말 밥 먹는 시간도 잊어 버릴 정도로 매달려서 어설픈 게임을 만들었고, 어쩌면, 아니 확실히 그런 기억들 때문에 지금도 컴퓨터 코드를 짜는 일을 하고 있다는 사실도 새삼스럽게 떠올랐습니다.</p>
-</div>
-<div class="paragraph">
-<p>뭐 어떤 분들은 이 글을 보시면, 몇줄 안되고 실행결과도 허접한 프로그램 짜놓고 제목은 아트니 뭐니 되어 있고 되게 거창한 척을 한다고 느끼실 것 같습니다. 하지만 누가 뭐래든 이 코드를 짜던 순간, 그리고 Quick-Basic이 어떤거니 하는 , 요즘은 별 정보도 되지 않을 이런 글을 주절주절 쓰고 있는 이 순간까지도 행복감의 여운을 느낌니다.</p>
-</div>
-<div class="paragraph">
-<p>다 해놓고 보니 코드는 그리 길지는 않네요~</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-basic" data-lang="basic">DECLARE SUB display (c$, p$)
-
-SCREEN 2
-lg$ = " Code can be an art! "
-DATA "t90O1p4","e8","a8","b8","&gt;c+8","g8","f8","&lt;a8"
-DATA "&gt;d8","c+8","&lt;e2","e8","a4","b8","&gt;c+4","&lt;b8","a2","e2","p4","p4","p4","p4"
-FOR i = 1 TO LEN(lg$)
-    READ p$
-    display MID$(lg$, i, 1), p$
-NEXT i
-SCREEN 0
-END
-
-SUB display (c$, p$)
-PLAY p$
-CLS
-PRINT c$
-FOR i = 0 TO 10
-  FOR j = 0 TO 10
-    IF POINT(j, i) THEN LINE (j * 60 + 80, i * 25 + 10)-(j * 60 + 140, i * 25 + 40), 1, BF
-  NEXT j
-NEXT i
-LOCATE 1, 1
-PRINT " "
-
-END SUB</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="다른분들의_발표작">다른분들의 발표작</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="http://www.uxkorea.net/blog_post_65.aspx" class="bare">http://www.uxkorea.net/blog_post_65.aspx</a></p>
-</li>
-<li>
-<p><a href="http://blog.bizarre07.com/6" class="bare">http://blog.bizarre07.com/6</a></p>
-</li>
-<li>
-<p><a href="http://colus.egloos.com/3421372" class="bare">http://colus.egloos.com/3421372</a></p>
-</li>
-<li>
-<p><a href="http://wookay.egloos.com/3130646" class="bare">http://wookay.egloos.com/3130646</a></p>
-</li>
-<li>
-<p><a href="http://blog.naver.com/htouya/60037720407" class="bare">http://blog.naver.com/htouya/60037720407</a></p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-    </div>
-	
-	<section id="social-share">
-        <ul class="icons">
-<!-- Social Share Button HTML -->
-
-<!-- Twitter -->
-<li><a href="//twitter.com/share?url=https://blog.benelog.net//1230429.html&text=QB로 만든 Code can be an art 출력&via=" target="_blank" class="share-btn twitter">
-    <i class="fa fa-twitter"></i>
-    <p>Twitter</p>
-</a></li>
-
-<!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=https://blog.benelog.net//1230429.html" target="_blank" class="share-btn google-plus">
-    <i class="fa fa-google-plus"></i>
-    <p>Google+</p>
-</a></li>
-
-<!-- Facebook -->
-<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//1230429.html" target="_blank" class="share-btn facebook">
-    <i class="fa fa-facebook"></i>
-    <p>Facebook</p>
-</a></li>
-
-<!-- Reddit (url, title) -->
-<li><a href="//reddit.com/submit?url=https://blog.benelog.net//1230429.html&title=QB로 만든 Code can be an art 출력" target="_blank" class="share-btn reddit">
-    <i class="fa fa-reddit-alien"></i>
-    <p>Reddit</p>
-</a></li>
-
-<!-- LinkedIn -->
-<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//1230429.html&title=QB로 만든 Code can be an art 출력" target="_blank" class="share-btn linkedin">
-    <i class="fa fa-linkedin"></i>
-    <p>LinkedIn</p>
-</a></li>
-
-<!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//1230429.html&title=QB로 만든 Code can be an art 출력" target="_blank" class="share-btn stumbleupon">
-    <i class="fa fa-stumbleupon"></i>
-    <p>StumbleUpon</p>
-</a></li>
-
-<!-- Email -->
-<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//1230429.html" target="_blank" class="share-btn email">
-    <i class="fa fa-envelope"></i>
-    <p>Email</p>
-</a></li>
-        </ul>
-    </section>
-     
-
-    <footer>
-	
-		<ul class="stats">
-    	    <!-- Display the categories associated with this post -->
-    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/코딩연습.html'>코딩연습</a></li>
-
-				<li><a class="icon fa-comment" href="../1230429.html#disqus_thread"> &nbsp;</a></li>
- 		</ul>
-    	
-    </footer>
-</article>
 		
 <ul class="actions pagination">
     <li><a href="../27/"
             class=" button big previous">PREVIOUS</a></li>
 
     <li><span
-            class="button big"> 28 of 29 </span></li>
+            class="button big"> 28 of 30 </span></li>
 
     <li><a href="../29/"
             class=" button big next">NEXT</a></li>
@@ -738,6 +775,17 @@ END SUB</code></pre>
                     <li>
                         <article>
                             <header>
+                                <h3><a href="../migration-to-static-site.html">정적 사이트로 블로그 마이그레이션</a></h3>
+                                 <time class="published"
+							            datetime='May 06, 2019'>
+							            May 06, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
                                 <h3><a href="../robolectric.html">Robolectric을 활용한 안드로이드 쾌속 테스팅</a></h3>
                                  <time class="published"
 							            datetime='Oct 10, 2016'>
@@ -764,17 +812,6 @@ END SUB</code></pre>
                                  <time class="published"
 							            datetime='Nov 03, 2014'>
 							            Nov 03, 2014</time>
-                            </header>
-                        </article>
-                    </li>
-
-                    <li>
-                        <article>
-                            <header>
-                                <h3><a href="../3017438.html">Android에서 @Inject, @Test</a></h3>
-                                 <time class="published"
-							            datetime='Apr 17, 2013'>
-							            Apr 17, 2013</time>
                             </header>
                         </article>
                     </li>
@@ -1352,6 +1389,15 @@ END SUB</code></pre>
                         <article>
                             <header>
                                 <a href="../tags/DependencyInjection.html">DependencyInjection</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="../tags/static-site.html">static-site</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>

@@ -132,6 +132,9 @@
                     <h3>Recent Posts</h3>
                 </header>
                     <li>
+                        <a href="../../migration-to-static-site.html"><p>정적 사이트로 블로그 마이그레이션</p></a>
+                    </li>
+                    <li>
                         <a href="../../robolectric.html"><p>Robolectric을 활용한 안드로이드 쾌속 테스팅</p></a>
                     </li>
                     <li>
@@ -139,9 +142,6 @@
                     </li>
                     <li>
                         <a href="../../3120317.html"><p>시간대 DB에서 우리나라 시간의 오류</p></a>
-                    </li>
-                    <li>
-                        <a href="../../3017438.html"><p>Android에서 @Inject, @Test</p></a>
                     </li>
             </ul>
         </section>
@@ -157,6 +157,253 @@
 </section>
 	
 	<div id="main">
+<article class="post">
+   <header>
+    <div class="title">
+                    <h2><a href="../1478801.html">Sybase 날짜형(datetime)의 문자열 변환시 style number</a></h2>
+
+
+    </div>
+    <div class="meta">
+         <time class="published"
+            datetime='Sep 17, 2007'>
+            Sep 17, 2007</time>
+            <div class="published eta"></div>
+        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
+    </div>
+</header>
+
+    
+  
+         
+    <div id="content">
+       <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>sybase에서 select convert(varchar,getdate(),112)로 찍어보면 오늘 날짜가 20070831 형식으로 나오죠. 이런 형식들이 정리된 자료를 한 번 만들어 보았습니다.</p>
+</div>
+<div class="paragraph">
+<p>제가 쓰는 sybase 버전은 12.5.3입니다. (select @@version)으로 확인할 수 있죠)</p>
+</div>
+<div class="paragraph">
+<p><code>select convert(varchar,날짜데이터, <strong><em>convertType</em></strong>)`</code> 형식으로 쓰고 <em>*convertType *</em> 위치에 숫자가  들어갈 때 옆에 적힌 형식대로 나온다고 보시면 됩니다. 예시로 옆에 찍힌 날짜는 2007년 8월27일입니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="style_number">Style number</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>0 = Aug 27 2007  5:28PM</p>
+</li>
+<li>
+<p>1 = 08/27/07</p>
+</li>
+<li>
+<p>2 = 07.08.27</p>
+</li>
+<li>
+<p>3 = 27/08/07</p>
+</li>
+<li>
+<p>4 = 27.08.07</p>
+</li>
+<li>
+<p>5 = 27-08-07</p>
+</li>
+<li>
+<p>6 = 27 Aug 07</p>
+</li>
+<li>
+<p>7 = Aug 27, 07</p>
+</li>
+<li>
+<p>8 = 17:23:35</p>
+</li>
+<li>
+<p>9 = Aug 27 2007  5:28:08:563PM</p>
+</li>
+<li>
+<p>10 = 08-27-07</p>
+</li>
+<li>
+<p>11 = 07/08/27</p>
+</li>
+<li>
+<p>12 = 070827</p>
+</li>
+<li>
+<p>13 = 07/27/08</p>
+</li>
+<li>
+<p>14 = 08/07/27</p>
+</li>
+<li>
+<p>15 = 27/07/08</p>
+</li>
+<li>
+<p>16 = Aug 23 2007 17:28:08</p>
+</li>
+<li>
+<p>18 = 15:17:08</p>
+</li>
+<li>
+<p>19 = 5:11:39:086PM</p>
+</li>
+<li>
+<p>20 = 17:12:30:633</p>
+</li>
+<li>
+<p>21 = 07/08/27</p>
+</li>
+<li>
+<p>22 = 07/08/27</p>
+</li>
+<li>
+<p>100 = Aug 27 2007  5:28PM</p>
+</li>
+<li>
+<p>101 = 08/27/2007</p>
+</li>
+<li>
+<p>102 = 2007.08.07</p>
+</li>
+<li>
+<p>103 = 27/08/2007</p>
+</li>
+<li>
+<p>104 = 27.08.2007</p>
+</li>
+<li>
+<p>105 = 27-08-2007</p>
+</li>
+<li>
+<p>106 = 27 Aug 2007</p>
+</li>
+<li>
+<p>107 = Aug 27, 2007</p>
+</li>
+<li>
+<p>108 = 17:28:08</p>
+</li>
+<li>
+<p>109 = Aug 27 2007 5:28:08:563PM</p>
+</li>
+<li>
+<p>110 = 08-27-2007</p>
+</li>
+<li>
+<p>111 = 2007/08/27</p>
+</li>
+<li>
+<p>112 = 20070827</p>
+</li>
+<li>
+<p>113 = 2007/27/08</p>
+</li>
+<li>
+<p>114 = 08/2007/27</p>
+</li>
+<li>
+<p>115 = 27/2007/08</p>
+</li>
+<li>
+<p>116 = Aug 23 2007 17:28:08</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="응용">응용</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><code>select convert(char,GETDATE(),112)</code> : 오늘날짜를 YYYYMMDD로</p>
+</li>
+<li>
+<p><code>select convert(char(8), DATEADD(DD,-1,getdate()) ,112)</code> : 현재 날짜 하루전을 yymmdd형식으로 출력</p>
+</li>
+<li>
+<p><code>select convert(char(8), DATEADD(DD,-1,'20070827') ,112)</code> : 2007년 8월 27일 전날을 출력. string &#8594; datetime은 convert라는 함수를 사용하지 않고 내부적(implicit)으로 자동으로 변경됩니다</p>
+</li>
+<li>
+<p><code>select str_replace( convert(varchar,getdate(),20),':',null)</code> : 현재 분일초,밀리세컨드까지: 152515853</p>
+</li>
+<li>
+<p><code>select convert(varchar,GETDATE(),112) || str_replace( convert(varchar,getdate(),20),':',null)</code> : 현재 연월일시분초밀리세컨드를 다 붙여서</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+	
+	<section id="social-share">
+        <ul class="icons">
+<!-- Social Share Button HTML -->
+
+<!-- Twitter -->
+<li><a href="//twitter.com/share?url=https://blog.benelog.net//1478801.html&text=Sybase 날짜형(datetime)의 문자열 변환시 style number&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+</a></li>
+
+<!-- Google Plus -->
+<li><a href="//plus.google.com/share?url=https://blog.benelog.net//1478801.html" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+</a></li>
+
+<!-- Facebook -->
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//1478801.html" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+</a></li>
+
+<!-- Reddit (url, title) -->
+<li><a href="//reddit.com/submit?url=https://blog.benelog.net//1478801.html&title=Sybase 날짜형(datetime)의 문자열 변환시 style number" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+</a></li>
+
+<!-- LinkedIn -->
+<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//1478801.html&title=Sybase 날짜형(datetime)의 문자열 변환시 style number" target="_blank" class="share-btn linkedin">
+    <i class="fa fa-linkedin"></i>
+    <p>LinkedIn</p>
+</a></li>
+
+<!-- StumbleUpon (url, title) -->
+<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//1478801.html&title=Sybase 날짜형(datetime)의 문자열 변환시 style number" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+</a></li>
+
+<!-- Email -->
+<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//1478801.html" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+</a></li>
+        </ul>
+    </section>
+     
+
+    <footer>
+	
+		<ul class="stats">
+    	    <!-- Display the categories associated with this post -->
+    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
+ 	        <li><a href='../tags/Sybase.html'>Sybase</a></li>
+ 	        <li><a href='../tags/날짜.html'>날짜</a></li>
+
+				<li><a class="icon fa-comment" href="../1478801.html#disqus_thread"> &nbsp;</a></li>
+ 		</ul>
+    	
+    </footer>
+</article>
 <article class="post">
    <header>
     <div class="title">
@@ -1033,132 +1280,13 @@ ng/Object;
     	
     </footer>
 </article>
-<article class="post">
-   <header>
-    <div class="title">
-                    <h2><a href="../1375660.html">구글 검색 기록과 스위칭 코스트</a></h2>
-
-
-    </div>
-    <div class="meta">
-         <time class="published"
-            datetime='Jul 31, 2007'>
-            Jul 31, 2007</time>
-            <div class="published eta"></div>
-        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
-    </div>
-</header>
-
-    
-  
-         
-    <div id="content">
-       <div class="paragraph">
-<p>많은 분들이 그렇듯이 저도 생활정보는 네이버로 찾고  일과 관련된 정보나  웹을 구석구석 뒤지고 싶을 때는 google을 쓰고 있습니다.  google을 써오기는 해도  "검색기록"이라고는 것을 신경도 안 쓰고 있었는데, 얼마 전에 한번 찍어보니 꽤나 신기하더군요.</p>
-</div>
-<div class="paragraph">
-<p><a href="http://www.google.co.kr/history/" class="bare">http://www.google.co.kr/history/</a></p>
-</div>
-<div class="paragraph">
-<p>이 기능을 의식을 하고 쓴 것은 아니였는데 , 제가 어떤 키워드로 검색을 했는지 오래전의 기록부터 쫙 나오니깐 기분이 묘했습니다. 상위질문, 상위사이트, 상위클릭, 월별 일별 통계까지 나오니 좀 섬뜻하기도 했어요  삭제하고 싶은 키워드도 있는데  어떻게 삭제하는지 모르겠습니다 ^^;다음부터는 기록에 남기고 싶지 않는 검색어는 "일시중지"를 선택하고 검색해야겠군요. 얼마 전에 "http://blog.daum.net/suk5kyu/11605503[구글, 사용자 검색기록 보관기간 18개월로 단축 ]" 이라는 기사를 보았었는데, 정말 이것이 축적되면  무서운 도구가 될 수도 있을 것 같아요. 찜찜하신 분들은 구글에서 로그인하지 않은 상태로 검색하거나  기록 기능을 꺼야겠죠.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="img/google/google-search-history1.jpeg" alt="google search history1"></span></p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="img/google/google-search-history2.jpeg" alt="google search history2"></span></p>
-</div>
-<div class="paragraph">
-<p>검색기록의 첫 페이지에 나와 있는 다음의 문구가 눈에 띕니다.</p>
-</div>
-<div class="quoteblock">
-<blockquote>
-<div class="paragraph">
-<p>맞춤 검색은 Google 검색을 개선한 기능으로서 이전의 검색을 토대로 귀하의 검색 결과를 표시합니다. 처음에는 큰 차이를 느낄 수 없지만 검색 기록이 축적되면서 맞춤 검색 결과가 지속적으로 향상됩니다.</p>
-</div>
-</blockquote>
-</div>
-<div class="paragraph">
-<p>이번달 16일, <a href="http://www.joonj.com/">jmirror</a>님이 주최하신 'http://www.joonj.com/wordpress/archives/319[차세대 검색에 대한 블러거 토론회]'에 참석했습니다. 저는 특별한 발언없이 경청만 하다 왔지만, 다른 분들의 깊이 있는 말씀을 듣고 생각을 정리해볼 수 있는 자리였습니다. 거기서 몇몇 분들이 '검색의 개인화&#8217;가 앞으로 필요하다고 말씀하셨습니다. 그 때 저는 그 실제 적용 사례가 생각나지 않았었는데, 바로 이 구글의 검색기록을 한 번 찍어보고 갔었더라면 위의 화면이 머리 속에서 연결이 되었을건데 하는 아쉬움이 지금에서야 듭니다.</p>
-</div>
-<div class="paragraph">
-<p>위의 토론회에서 들은 말인데, 구글이 유투브 동영상 검색에서 야후를 야후의 동영상 검색을 누르는데 걸린 시간은 6주였고, 국내  3위 업체였던 네이버는 지식검색으로  야후,  엠파스를 4주만에 추월했다고 합니다. 그렇게 짧은 시간내에 그것이 가능했던 이유는 검색엔진을 바꾸는 것에 대한 이사비용(스위칭코스트)이 거의 없기 때문이 아닐까 합니다. 메일, 블로그,커뮤니티의 경우에는 서비스를 바꾼다면 데이터 이전, 바뀐 주소 홍보 등의 번거로움을 감수해야하는 것에 비해서 검색은 그렇지 않다는 것이죠. 그리고 검색결과의 상호비교가 쉽기 때문에  조금이라도 나은 점이 보이는 서비스로 지체없이 옮겨갈 수 있습니다.</p>
-</div>
-<div class="paragraph">
-<p>검색에서도 구글 검색 기록과 같이 쌓여가는 데이터가 있고, 그것을 바탕으로 개인화된 서비스를 제공할 수 있다면  스위칭코스트를 낳을 수 있다고 봅니다. 그리고 개인 검색기록  데이터를 쌓고  그 것을 바탕으로 개인화된 검색결과를 내놓을 수 있는 기술은 쉽게 따라할수 있는 일이 아닐 것 같아요. 네이버에 있는 지식인의 자료, 광고, 알바가 정리한 정보도 큰 자산이지만  그것만으로 사용자를 완벽히 묶어둘 수는 없지 않을까요?</p>
-</div>
-    </div>
-	
-	<section id="social-share">
-        <ul class="icons">
-<!-- Social Share Button HTML -->
-
-<!-- Twitter -->
-<li><a href="//twitter.com/share?url=https://blog.benelog.net//1375660.html&text=구글 검색 기록과 스위칭 코스트&via=" target="_blank" class="share-btn twitter">
-    <i class="fa fa-twitter"></i>
-    <p>Twitter</p>
-</a></li>
-
-<!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=https://blog.benelog.net//1375660.html" target="_blank" class="share-btn google-plus">
-    <i class="fa fa-google-plus"></i>
-    <p>Google+</p>
-</a></li>
-
-<!-- Facebook -->
-<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//1375660.html" target="_blank" class="share-btn facebook">
-    <i class="fa fa-facebook"></i>
-    <p>Facebook</p>
-</a></li>
-
-<!-- Reddit (url, title) -->
-<li><a href="//reddit.com/submit?url=https://blog.benelog.net//1375660.html&title=구글 검색 기록과 스위칭 코스트" target="_blank" class="share-btn reddit">
-    <i class="fa fa-reddit-alien"></i>
-    <p>Reddit</p>
-</a></li>
-
-<!-- LinkedIn -->
-<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//1375660.html&title=구글 검색 기록과 스위칭 코스트" target="_blank" class="share-btn linkedin">
-    <i class="fa fa-linkedin"></i>
-    <p>LinkedIn</p>
-</a></li>
-
-<!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//1375660.html&title=구글 검색 기록과 스위칭 코스트" target="_blank" class="share-btn stumbleupon">
-    <i class="fa fa-stumbleupon"></i>
-    <p>StumbleUpon</p>
-</a></li>
-
-<!-- Email -->
-<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//1375660.html" target="_blank" class="share-btn email">
-    <i class="fa fa-envelope"></i>
-    <p>Email</p>
-</a></li>
-        </ul>
-    </section>
-     
-
-    <footer>
-	
-		<ul class="stats">
-    	    <!-- Display the categories associated with this post -->
-    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/Google.html'>Google</a></li>
- 	        <li><a href='../tags/검색.html'>검색</a></li>
- 	        <li><a href='../tags/행사후기.html'>행사후기</a></li>
-
-				<li><a class="icon fa-comment" href="../1375660.html#disqus_thread"> &nbsp;</a></li>
- 		</ul>
-    	
-    </footer>
-</article>
 		
 <ul class="actions pagination">
     <li><a href="../25/"
             class=" button big previous">PREVIOUS</a></li>
 
     <li><span
-            class="button big"> 26 of 29 </span></li>
+            class="button big"> 26 of 30 </span></li>
 
     <li><a href="../27/"
             class=" button big next">NEXT</a></li>
@@ -1224,6 +1352,17 @@ ng/Object;
                     <li>
                         <article>
                             <header>
+                                <h3><a href="../migration-to-static-site.html">정적 사이트로 블로그 마이그레이션</a></h3>
+                                 <time class="published"
+							            datetime='May 06, 2019'>
+							            May 06, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
                                 <h3><a href="../robolectric.html">Robolectric을 활용한 안드로이드 쾌속 테스팅</a></h3>
                                  <time class="published"
 							            datetime='Oct 10, 2016'>
@@ -1250,17 +1389,6 @@ ng/Object;
                                  <time class="published"
 							            datetime='Nov 03, 2014'>
 							            Nov 03, 2014</time>
-                            </header>
-                        </article>
-                    </li>
-
-                    <li>
-                        <article>
-                            <header>
-                                <h3><a href="../3017438.html">Android에서 @Inject, @Test</a></h3>
-                                 <time class="published"
-							            datetime='Apr 17, 2013'>
-							            Apr 17, 2013</time>
                             </header>
                         </article>
                     </li>
@@ -1838,6 +1966,15 @@ ng/Object;
                         <article>
                             <header>
                                 <a href="../tags/DependencyInjection.html">DependencyInjection</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="../tags/static-site.html">static-site</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>

@@ -132,6 +132,9 @@
                     <h3>Recent Posts</h3>
                 </header>
                     <li>
+                        <a href="../../migration-to-static-site.html"><p>정적 사이트로 블로그 마이그레이션</p></a>
+                    </li>
+                    <li>
                         <a href="../../robolectric.html"><p>Robolectric을 활용한 안드로이드 쾌속 테스팅</p></a>
                     </li>
                     <li>
@@ -139,9 +142,6 @@
                     </li>
                     <li>
                         <a href="../../3120317.html"><p>시간대 DB에서 우리나라 시간의 오류</p></a>
-                    </li>
-                    <li>
-                        <a href="../../3017438.html"><p>Android에서 @Inject, @Test</p></a>
                     </li>
             </ul>
         </section>
@@ -157,6 +157,254 @@
 </section>
 	
 	<div id="main">
+<article class="post">
+   <header>
+    <div class="title">
+                    <h2><a href="../2079841.html">FindBugs + Eclipse + Maven2 + Hudson</a></h2>
+
+
+    </div>
+    <div class="meta">
+         <time class="published"
+            datetime='Sep 30, 2008'>
+            Sep 30, 2008</time>
+            <div class="published eta"></div>
+        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
+    </div>
+</header>
+
+    
+  
+         
+    <div id="content">
+       <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="http://findbugs.sourceforge.net/">FindBugs</a>를 이용한 코드검사를 Maven2을 통해 실행하고, Hudson을 통해 확인하는 설정을 정리해 봅니다.</p>
+</div>
+<div class="paragraph">
+<p>Eclipse에서 findbugs로 코드검사를 해볼 수 있는 툴은 <a href="http://findbugs.cs.umd.edu/eclipse/" class="bare">http://findbugs.cs.umd.edu/eclipse/</a> 를 update site로 지정하면 설치할 수 있습니다. 설치가 잘 되었다면 소스 폴더를 선택하고 마우스 우클릭을 하면 'Find Bugs&#8217;라는 메뉴가 생긴 것이 보일 것입니다.
+그 메뉴를 통해 원하는 프로젝트를 검사하고, Bug Explorer 탭을 선택하보면 아래와 같은 화면이 나옵니다.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/findbugs/eclipse-findbugs.jpg" alt="eclipse-findbugs.jpg"></span></p>
+</div>
+<div class="paragraph">
+<p>Bug Explorer 탭에서는 버그를 유형별로 정리해서 보여주고, 소스탭에서는 해당하는 코드에 벌레 모양 아이콘을 찍어줍니다. 그리고 Problems 창에서는 Eclipse에서 잡아내는 다른 경고처럼 warning으로 해당 소스를 표시해 줍니다. Bug Details 탭을 누르면 버그에 대한 자세한 설명도 볼 수 있습니다.</p>
+</div>
+<div class="paragraph">
+<p>프로젝트의 Properties 메뉴에서 FindBugs 설정란으로 가면 검사할 규칙 등을 선택할 수 있습니다.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/findbugs/eclipse-findbugs-config1.jpg" alt="eclipse-findbugs-config1.jpg"></span></p>
+</div>
+<div class="paragraph">
+<p>이 설정화면에서 'Run FindBugs automatically&#8217;를 선택하면, 소스가 바뀔 때마다 자동으로 검사를 수행해 줍니다. 이 기능이 선택되어 있지 않다면, 지적된 소스를 수정해도 다시 수동으로 검사를 돌려야지 경고메시지 지워지므로, 이클립스가 아주 느리다는 느낌이 안 들정도라면 선택하는 것이 좋습니다. 이 기능을 선택해서, Eclipse의 Problems 탭에서 코드 작성 즉시 에러와 경로를 확인할 수 있게 되었다면 .project 파일에 아래와 같은 부분이 추가되어 있을 것입니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;natures&gt;
+
+    ....
+
+  &lt;nature&gt;edu.umd.cs.findbugs.plugin.eclipse.findbugsNature&lt;/nature&gt;
+
+&lt;/natures&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>FindBugs 설정 화면 중 Detector Configuration 탭에서는 검사할 규칙들을 지정할 수 있고, Reporter configuration 탭에서는 보고해 줄 버그의 경고단계와 분류를 선택할 수 있습니다.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/findbugs/eclipse-findbugs-config2.jpg" alt="eclipse-findbugs-config2.jpg"></span></p>
+</div>
+<div class="paragraph">
+<p>Filter files 탭에서는 별도의 XML파일로 선언된 포함하거나 제외시킬 버그와 파일에 대한 설정을 가지고 올 수 있습니다.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/findbugs/eclipse-findbugs-config3.jpg" alt="eclipse-findbugs-config3.jpg"></span></p>
+</div>
+<div class="paragraph">
+<p>아래에 자세히 설명하겠지만, Maven 설정에서 참조하는 findBugsExclude.xml을 Eclipse plugin에서도 똑같이 지정해서 Maven과 Eclipse에서 같은 기준으로  검사가 수행되도록 했습니다.</p>
+</div>
+<div class="paragraph">
+<p>Maven2의 <a href="http://mojo.codehaus.org/findbugs-maven-plugin/">findbugs-maven-plugin</a>은  pom.xml에 아래와 같이 설정됩니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;plugin&gt;
+  &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;
+  &lt;artifactId&gt;findbugs-maven-plugin&lt;/artifactId&gt;
+  &lt;version&gt;2.4.0&lt;/version&gt;
+  &lt;configuration&gt;
+    &lt;findbugsXmlOutput&gt;true&lt;/findbugsXmlOutput&gt;
+    &lt;findbugsXmlWithMessages&gt;true&lt;/findbugsXmlWithMessages&gt;
+    &lt;xmlOutput&gt;true&lt;/xmlOutput&gt;
+    &lt;excludeFilterFile&gt;$\{basedir}/findBugsExclude.xml&lt;/excludeFilterFile&gt;
+   &lt;/configuration&gt;
+&lt;/plugin&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>위의 설정에 들어가는 속성들에 대해서는 <a href="http://mojo.codehaus.org/findbugs-maven-plugin/findbugs-mojo.html">findbugs-maven-plugin 설명 페이지</a>에서 자세한 내용을 보실 수 있습니다.</p>
+</div>
+<div class="paragraph">
+<p>저는 제외할 검사규칙을 지정하기 위해서 excludeFilterFile속성에 findBugsExclude.xml을 지정했습니다.</p>
+</div>
+<div class="paragraph">
+<p>findBugsExclude.xml의 내용은 아래와 같이 설정했습니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">....
+&lt;FindBugsFilter&gt;
+....
+....
+  &lt;Match&gt;
+....
+....
+   &lt;Bug code="Se,SnVI,Dm,UwF,EI,EI2" /&gt;
+....
+....
+  &lt;/Match&gt;
+....
+....
+&lt;/FindBugsFilter&gt;
+....</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>제외할 것을 선언하는 파일에 이렇게 적었으니 Bug code가 "Se,SnVI,Dm"에 해당하는 버그검사는 제외한다는 의미입니다. Filter의 설정 방법에 대해서는 <a href="http://mojo.codehaus.org/findbugs-maven-plugin/findbugs-mojo.html">findbugs의 매뉴얼</a>을 참조하시면 됩니다.</p>
+</div>
+<div class="paragraph">
+<p>버그 코드 중 Se,SnVI는 serialVersionUID에 관한 것이고 Dm은 String.toUpperCase 등의 메소드에서 Local설정을 권유하는 검사입니다.   (<a href="http://findbugs.sourceforge.net/bugDescriptions.html">버그 코드에 대한 설명 페이지</a> 참조)</p>
+</div>
+<div class="paragraph">
+<p>이렇게 설정을 하고 <code>mvn findbugs:findbugs</code> 로 maven을 실행시키면 필요한 라이브러리들을 다운로드 받고 빌드가 실행됩니다. 실행이 성공했다면 목적지 폴더에 findbugs.xml과 findbugsXml.xml파일이 생성이 되었을 것입니다.</p>
+</div>
+<div class="paragraph">
+<p>이것을 Hudson을 통해서 보기 위해서는 Hudson에서도 findbugs plugin을 설치해야 됩니다.</p>
+</div>
+<div class="paragraph">
+<p>Hudson 첫 화면에서 Manage Hudson - Manage Plugins 메뉴를 찾아갑니다. Available 탭에서 findbugs를 선택하고 화면 우측하단의 'install&#8217;버튼을 누르면 Hudson이 알아서 라이브러리를 다운 받아줍니다. 설치한 plug-in이 실행되기 위해서는 Hudson을 재시작해야 합니다.</p>
+</div>
+<div class="paragraph">
+<p>그런 다음에 findbugs를 적용하고자 하는 프로젝트에 가서 Configure메뉴를 선택하면 아래와 같이 Publish FindBugs Analysis Result라는 부분이 추가된 것을 보실 수 있을 것입니다.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/findbugs/hudson-findbugs-config.jpg" alt="hudson-findbugs-config.jpg"></span></p>
+</div>
+<div class="paragraph">
+<p>이것을 선택하고 원하는 기준값이 있을 경우 입력한 뒤에 "save&#8217;버튼을 누르고 build를 해보면 됩니다. 물론 build에는 findbugs:findbugs goal이 포함되어야 하겠죠.</p>
+</div>
+<div class="paragraph">
+<p>빌드가 성공하는 것을 보고 프로젝트의 메뉴를 보면 FindBugs Warnings라는 메뉴가 추가된 것을 확인하실 수 있습니다.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/findbugs/hudson-findbugs-menu.jpg" alt="hudson-findbugs-menu.jpg"></span></p>
+</div>
+<div class="paragraph">
+<p>그 메뉴를 누르면 생성된 보고서가 보입니다.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/findbugs/hudson-findbugs-report.jpg" alt="hudson-findbugs-report.jpg"></span></p>
+</div>
+<div class="paragraph">
+<p>warning이 존재할 경우 건수를 클릭하면 해당하는 클래스들이 나오고, 클래스를 선택하면 소스에서 warning을 발생시키는 부분까지 보여줍니다.</p>
+</div>
+<div class="paragraph">
+<p>만약 hudson의 findbugs plugin을 실행할 때 Cannot find setter nor field in org.apache.maven.plugins.site.SiteMojo for 'xmlOutput' 와 같은 에러가 난다면 <a href="http://blog.benelog.net/2208375">Hudson plugin 수동으로 빌드&amp;업로드</a>를 참조해서 최신 버전으로 플러그인을 업데이트 해보시기 바랍니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="관련_자료">관련 자료</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://okjsp.tistory.com/1165643579">Sun Techdays 2008 Lightning Talk 발표자료; findbugs</a></p>
+</li>
+<li>
+<p><a href="http://okjsp.tistory.com/1165643626">Hudson의 Findbugs 플러그인 이용하기</a></p>
+</li>
+<li>
+<p><a href="http://okjsp.tistory.com/1165643570">findbugs eclipse plugin 설치</a></p>
+</li>
+<li>
+<p><a href="http://www.buggymind.com/177">FindBugs: 코드의 정적 분석을 통한 버그 탐색</a> : 동영상 강연을 보니 구글에서도 이 도구를 사용하고 있다고 합니다.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+	
+	<section id="social-share">
+        <ul class="icons">
+<!-- Social Share Button HTML -->
+
+<!-- Twitter -->
+<li><a href="//twitter.com/share?url=https://blog.benelog.net//2079841.html&text=FindBugs + Eclipse + Maven2 + Hudson&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+</a></li>
+
+<!-- Google Plus -->
+<li><a href="//plus.google.com/share?url=https://blog.benelog.net//2079841.html" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+</a></li>
+
+<!-- Facebook -->
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//2079841.html" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+</a></li>
+
+<!-- Reddit (url, title) -->
+<li><a href="//reddit.com/submit?url=https://blog.benelog.net//2079841.html&title=FindBugs + Eclipse + Maven2 + Hudson" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+</a></li>
+
+<!-- LinkedIn -->
+<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//2079841.html&title=FindBugs + Eclipse + Maven2 + Hudson" target="_blank" class="share-btn linkedin">
+    <i class="fa fa-linkedin"></i>
+    <p>LinkedIn</p>
+</a></li>
+
+<!-- StumbleUpon (url, title) -->
+<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//2079841.html&title=FindBugs + Eclipse + Maven2 + Hudson" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+</a></li>
+
+<!-- Email -->
+<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//2079841.html" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+</a></li>
+        </ul>
+    </section>
+     
+
+    <footer>
+	
+		<ul class="stats">
+    	    <!-- Display the categories associated with this post -->
+    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
+ 	        <li><a href='../tags/FindBugs.html'>FindBugs</a></li>
+ 	        <li><a href='../tags/Maven.html'>Maven</a></li>
+ 	        <li><a href='../tags/Hudson.html'>Hudson</a></li>
+ 	        <li><a href='../tags/Eclipse.html'>Eclipse</a></li>
+ 	        <li><a href='../tags/정적분석.html'>정적분석</a></li>
+
+				<li><a class="icon fa-comment" href="../2079841.html#disqus_thread"> &nbsp;</a></li>
+ 		</ul>
+    	
+    </footer>
+</article>
 <article class="post">
    <header>
     <div class="title">
@@ -444,203 +692,13 @@ public class JDBCTest {
     	
     </footer>
 </article>
-<article class="post">
-   <header>
-    <div class="title">
-                    <h2><a href="../1978345.html">Apache commons DbUtils 활용하기</a></h2>
-
-
-    </div>
-    <div class="meta">
-         <time class="published"
-            datetime='Jul 15, 2008'>
-            Jul 15, 2008</time>
-            <div class="published eta"></div>
-        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
-    </div>
-</header>
-
-    
-  
-         
-    <div id="content">
-       <div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>개발을 하다보면 간단한 화면 1~2개만 독립적으로 돌아가는 웹어플리케이션을 만들 때도 있습니다. 예를 들면 로그조회 프로그램 같은 것들이죠.</p>
-</div>
-<div class="paragraph">
-<p>그런 곳에는 Hibernate나 iBatis를 쓰기에는 너무 거창하다는 느낌이 들기도 합니다. 그렇다고 JDBC로 날코딩하기는 성가실때, 이럴 때는 <a href="http://commons.apache.org/dbutils/">Apache Commons DbUtils</a>를 써볼만 합니다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>다운로드 : <a href="http://commons.apache.org/downloads/download_dbutils.cgi" class="bare">http://commons.apache.org/downloads/download_dbutils.cgi</a></p>
-</li>
-<li>
-<p>API 문서 : <a href="http://commons.apache.org/dbutils/apidocs/index.html" class="bare">http://commons.apache.org/dbutils/apidocs/index.html</a></p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p><a href="http://blog.benelog.net/1898928">JDBC에서 Connection, Statement,ResultSet의 close</a> 글에 나온 것처럼 Connection을 닫는 번거로운 처리가 DbUtils.closeQuietly(con);로 끝나는 것만 해도 상당히 편합니다.</p>
-</div>
-<div class="paragraph">
-<p>아래 예제는  DBUtils + JSTL로 간단한 조회화면을 만들어 본 것입니다.</p>
-</div>
-<div class="paragraph">
-<p>(Connection은 실무에서는 DataSource를 통해 얻어와야합니다.)</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-jsp" data-lang="jsp">&lt;%@ page language="java" contentType="text/html; charset=EUC-KR"
-    pageEncoding="EUC-KR"%&gt;
-&lt;%@ page import = "java.sql.*" %&gt;
-&lt;%@ page import = "java.util.Properties" %&gt;
-&lt;%@ page import = "org.apache.commons.dbutils.DbUtils" %&gt;
-&lt;%@ page import = "org.apache.commons.dbutils.QueryRunner" %&gt;
-&lt;%@ page import = " org.apache.commons.dbutils.handlers.MapListHandler" %&gt;
-&lt;%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %&gt;
-&lt;%!
-  private static final String SELECT_STMT =
-                  "SELECT id, name, email, cell_phone_number FROM quiz_user";
-%&gt;
-&lt;%
- String url = "jdbc:hsqldb:hsql://localhost/sampledb";
- Properties prop = new Properties();
- prop.put("user","sa");
- prop.put("password","");
- Connection con =  null;
- try\{
-  Class.forName ("org.hsqldb.jdbcDriver");
-  con = DriverManager.getConnection(url,prop);
-        QueryRunner runner = new QueryRunner();
-        Object resultList = runner.query(con,SELECT_STMT, new MapListHandler());
-        request.setAttribute("list",resultList);
-   } catch (SQLException ex) \{
-
-      throw new RuntimeException(ex);
-   } finally \{
-     DbUtils.closeQuietly(con);
-   }
- %&gt;
-&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"&gt;
-&lt;html&gt;
-&lt;head&gt;
-&lt;meta http-equiv="Content-Type" content="text/html; charset=EUC-KR"&gt;
-&lt;title&gt;사용자&lt;/title&gt;
-&lt;/head&gt;
-&lt;body&gt;
-  &lt;h1&gt;사용자  조회&lt;/h1&gt;
-  &lt;h2&gt;사용자  목록&lt;/h2&gt;
-  &lt;table class="list"&gt;
-   &lt;tr&gt;
-    &lt;th&gt;id&lt;/th&gt;&lt;th&gt;이름&lt;/th&gt;&lt;th&gt;전화번호&lt;/th&gt; &lt;th&gt;이메일&lt;/th&gt;
- &lt;/tr&gt;
-    &lt;c:forEach var="item" items="$\{list}" varStatus="status"&gt;
- &lt;tr&gt;
-  &lt;td&gt;$\{item.id}&lt;/td&gt;
-  &lt;td align="center"&gt;$\{item.name}&lt;/td&gt;
-  &lt;td&gt;$\{item.cell_phone_number}&lt;/td&gt;
-  &lt;td align="center"&gt;$\{item.email}&lt;/td&gt;
- &lt;/tr&gt;
- &lt;/c:forEach&gt;
-  &lt;/table&gt;
-&lt;/body&gt;
-&lt;/html&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>몇 년전에 DbUtils와 비슷한 클래스를 만든 적이 있었는데, 그때도 좀 찾아볼 걸 그랬나봅니다. 그러고 보면 저도 Apache Commons에 이미 있는 것을 많이도 만들어본 삽질의 시간들을 겪었었습니다. 신입 때 <a href="http://commons.apache.org/beanutils/">commons beanutils</a>하고 <a href="http://commons.apache.org/io/">commons io</a>에 포함된 것 비슷한 유틸리티 만들어 놓고 혼자서 뿌듯해 했었죠 -_-;</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="참고자료">참고자료</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="http://blog.naver.com/levin01/100011050694">Commons-DbUtils</a></p>
-</li>
-<li>
-<p><a href="http://blog.naver.com/webman/30000419500">dbutils 활용방법</a></p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-    </div>
-	
-	<section id="social-share">
-        <ul class="icons">
-<!-- Social Share Button HTML -->
-
-<!-- Twitter -->
-<li><a href="//twitter.com/share?url=https://blog.benelog.net//1978345.html&text=Apache commons DbUtils 활용하기&via=" target="_blank" class="share-btn twitter">
-    <i class="fa fa-twitter"></i>
-    <p>Twitter</p>
-</a></li>
-
-<!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=https://blog.benelog.net//1978345.html" target="_blank" class="share-btn google-plus">
-    <i class="fa fa-google-plus"></i>
-    <p>Google+</p>
-</a></li>
-
-<!-- Facebook -->
-<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//1978345.html" target="_blank" class="share-btn facebook">
-    <i class="fa fa-facebook"></i>
-    <p>Facebook</p>
-</a></li>
-
-<!-- Reddit (url, title) -->
-<li><a href="//reddit.com/submit?url=https://blog.benelog.net//1978345.html&title=Apache commons DbUtils 활용하기" target="_blank" class="share-btn reddit">
-    <i class="fa fa-reddit-alien"></i>
-    <p>Reddit</p>
-</a></li>
-
-<!-- LinkedIn -->
-<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//1978345.html&title=Apache commons DbUtils 활용하기" target="_blank" class="share-btn linkedin">
-    <i class="fa fa-linkedin"></i>
-    <p>LinkedIn</p>
-</a></li>
-
-<!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//1978345.html&title=Apache commons DbUtils 활용하기" target="_blank" class="share-btn stumbleupon">
-    <i class="fa fa-stumbleupon"></i>
-    <p>StumbleUpon</p>
-</a></li>
-
-<!-- Email -->
-<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//1978345.html" target="_blank" class="share-btn email">
-    <i class="fa fa-envelope"></i>
-    <p>Email</p>
-</a></li>
-        </ul>
-    </section>
-     
-
-    <footer>
-	
-		<ul class="stats">
-    	    <!-- Display the categories associated with this post -->
-    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/JDBC.html'>JDBC</a></li>
- 	        <li><a href='../tags/JSTL.html'>JSTL</a></li>
-
-				<li><a class="icon fa-comment" href="../1978345.html#disqus_thread"> &nbsp;</a></li>
- 		</ul>
-    	
-    </footer>
-</article>
 		
 <ul class="actions pagination">
     <li><a href="../17/"
             class=" button big previous">PREVIOUS</a></li>
 
     <li><span
-            class="button big"> 18 of 29 </span></li>
+            class="button big"> 18 of 30 </span></li>
 
     <li><a href="../19/"
             class=" button big next">NEXT</a></li>
@@ -706,6 +764,17 @@ public class JDBCTest {
                     <li>
                         <article>
                             <header>
+                                <h3><a href="../migration-to-static-site.html">정적 사이트로 블로그 마이그레이션</a></h3>
+                                 <time class="published"
+							            datetime='May 06, 2019'>
+							            May 06, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
                                 <h3><a href="../robolectric.html">Robolectric을 활용한 안드로이드 쾌속 테스팅</a></h3>
                                  <time class="published"
 							            datetime='Oct 10, 2016'>
@@ -732,17 +801,6 @@ public class JDBCTest {
                                  <time class="published"
 							            datetime='Nov 03, 2014'>
 							            Nov 03, 2014</time>
-                            </header>
-                        </article>
-                    </li>
-
-                    <li>
-                        <article>
-                            <header>
-                                <h3><a href="../3017438.html">Android에서 @Inject, @Test</a></h3>
-                                 <time class="published"
-							            datetime='Apr 17, 2013'>
-							            Apr 17, 2013</time>
                             </header>
                         </article>
                     </li>
@@ -1320,6 +1378,15 @@ public class JDBCTest {
                         <article>
                             <header>
                                 <a href="../tags/DependencyInjection.html">DependencyInjection</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="../tags/static-site.html">static-site</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>

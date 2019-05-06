@@ -132,6 +132,9 @@
                     <h3>Recent Posts</h3>
                 </header>
                     <li>
+                        <a href="../../migration-to-static-site.html"><p>정적 사이트로 블로그 마이그레이션</p></a>
+                    </li>
+                    <li>
                         <a href="../../robolectric.html"><p>Robolectric을 활용한 안드로이드 쾌속 테스팅</p></a>
                     </li>
                     <li>
@@ -139,9 +142,6 @@
                     </li>
                     <li>
                         <a href="../../3120317.html"><p>시간대 DB에서 우리나라 시간의 오류</p></a>
-                    </li>
-                    <li>
-                        <a href="../../3017438.html"><p>Android에서 @Inject, @Test</p></a>
                     </li>
             </ul>
         </section>
@@ -157,6 +157,196 @@
 </section>
 	
 	<div id="main">
+<article class="post">
+   <header>
+    <div class="title">
+                    <h2><a href="../1978345.html">Apache commons DbUtils 활용하기</a></h2>
+
+
+    </div>
+    <div class="meta">
+         <time class="published"
+            datetime='Jul 15, 2008'>
+            Jul 15, 2008</time>
+            <div class="published eta"></div>
+        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
+    </div>
+</header>
+
+    
+  
+         
+    <div id="content">
+       <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>개발을 하다보면 간단한 화면 1~2개만 독립적으로 돌아가는 웹어플리케이션을 만들 때도 있습니다. 예를 들면 로그조회 프로그램 같은 것들이죠.</p>
+</div>
+<div class="paragraph">
+<p>그런 곳에는 Hibernate나 iBatis를 쓰기에는 너무 거창하다는 느낌이 들기도 합니다. 그렇다고 JDBC로 날코딩하기는 성가실때, 이럴 때는 <a href="http://commons.apache.org/dbutils/">Apache Commons DbUtils</a>를 써볼만 합니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>다운로드 : <a href="http://commons.apache.org/downloads/download_dbutils.cgi" class="bare">http://commons.apache.org/downloads/download_dbutils.cgi</a></p>
+</li>
+<li>
+<p>API 문서 : <a href="http://commons.apache.org/dbutils/apidocs/index.html" class="bare">http://commons.apache.org/dbutils/apidocs/index.html</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><a href="http://blog.benelog.net/1898928">JDBC에서 Connection, Statement,ResultSet의 close</a> 글에 나온 것처럼 Connection을 닫는 번거로운 처리가 DbUtils.closeQuietly(con);로 끝나는 것만 해도 상당히 편합니다.</p>
+</div>
+<div class="paragraph">
+<p>아래 예제는  DBUtils + JSTL로 간단한 조회화면을 만들어 본 것입니다.</p>
+</div>
+<div class="paragraph">
+<p>(Connection은 실무에서는 DataSource를 통해 얻어와야합니다.)</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-jsp" data-lang="jsp">&lt;%@ page language="java" contentType="text/html; charset=EUC-KR"
+    pageEncoding="EUC-KR"%&gt;
+&lt;%@ page import = "java.sql.*" %&gt;
+&lt;%@ page import = "java.util.Properties" %&gt;
+&lt;%@ page import = "org.apache.commons.dbutils.DbUtils" %&gt;
+&lt;%@ page import = "org.apache.commons.dbutils.QueryRunner" %&gt;
+&lt;%@ page import = " org.apache.commons.dbutils.handlers.MapListHandler" %&gt;
+&lt;%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %&gt;
+&lt;%!
+  private static final String SELECT_STMT =
+                  "SELECT id, name, email, cell_phone_number FROM quiz_user";
+%&gt;
+&lt;%
+ String url = "jdbc:hsqldb:hsql://localhost/sampledb";
+ Properties prop = new Properties();
+ prop.put("user","sa");
+ prop.put("password","");
+ Connection con =  null;
+ try\{
+  Class.forName ("org.hsqldb.jdbcDriver");
+  con = DriverManager.getConnection(url,prop);
+        QueryRunner runner = new QueryRunner();
+        Object resultList = runner.query(con,SELECT_STMT, new MapListHandler());
+        request.setAttribute("list",resultList);
+   } catch (SQLException ex) \{
+
+      throw new RuntimeException(ex);
+   } finally \{
+     DbUtils.closeQuietly(con);
+   }
+ %&gt;
+&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta http-equiv="Content-Type" content="text/html; charset=EUC-KR"&gt;
+&lt;title&gt;사용자&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;사용자  조회&lt;/h1&gt;
+  &lt;h2&gt;사용자  목록&lt;/h2&gt;
+  &lt;table class="list"&gt;
+   &lt;tr&gt;
+    &lt;th&gt;id&lt;/th&gt;&lt;th&gt;이름&lt;/th&gt;&lt;th&gt;전화번호&lt;/th&gt; &lt;th&gt;이메일&lt;/th&gt;
+ &lt;/tr&gt;
+    &lt;c:forEach var="item" items="$\{list}" varStatus="status"&gt;
+ &lt;tr&gt;
+  &lt;td&gt;$\{item.id}&lt;/td&gt;
+  &lt;td align="center"&gt;$\{item.name}&lt;/td&gt;
+  &lt;td&gt;$\{item.cell_phone_number}&lt;/td&gt;
+  &lt;td align="center"&gt;$\{item.email}&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/c:forEach&gt;
+  &lt;/table&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>몇 년전에 DbUtils와 비슷한 클래스를 만든 적이 있었는데, 그때도 좀 찾아볼 걸 그랬나봅니다. 그러고 보면 저도 Apache Commons에 이미 있는 것을 많이도 만들어본 삽질의 시간들을 겪었었습니다. 신입 때 <a href="http://commons.apache.org/beanutils/">commons beanutils</a>하고 <a href="http://commons.apache.org/io/">commons io</a>에 포함된 것 비슷한 유틸리티 만들어 놓고 혼자서 뿌듯해 했었죠 -_-;</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="참고자료">참고자료</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://blog.naver.com/levin01/100011050694">Commons-DbUtils</a></p>
+</li>
+<li>
+<p><a href="http://blog.naver.com/webman/30000419500">dbutils 활용방법</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+	
+	<section id="social-share">
+        <ul class="icons">
+<!-- Social Share Button HTML -->
+
+<!-- Twitter -->
+<li><a href="//twitter.com/share?url=https://blog.benelog.net//1978345.html&text=Apache commons DbUtils 활용하기&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+</a></li>
+
+<!-- Google Plus -->
+<li><a href="//plus.google.com/share?url=https://blog.benelog.net//1978345.html" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+</a></li>
+
+<!-- Facebook -->
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//1978345.html" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+</a></li>
+
+<!-- Reddit (url, title) -->
+<li><a href="//reddit.com/submit?url=https://blog.benelog.net//1978345.html&title=Apache commons DbUtils 활용하기" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+</a></li>
+
+<!-- LinkedIn -->
+<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//1978345.html&title=Apache commons DbUtils 활용하기" target="_blank" class="share-btn linkedin">
+    <i class="fa fa-linkedin"></i>
+    <p>LinkedIn</p>
+</a></li>
+
+<!-- StumbleUpon (url, title) -->
+<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//1978345.html&title=Apache commons DbUtils 활용하기" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+</a></li>
+
+<!-- Email -->
+<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//1978345.html" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+</a></li>
+        </ul>
+    </section>
+     
+
+    <footer>
+	
+		<ul class="stats">
+    	    <!-- Display the categories associated with this post -->
+    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
+ 	        <li><a href='../tags/JDBC.html'>JDBC</a></li>
+ 	        <li><a href='../tags/JSTL.html'>JSTL</a></li>
+
+				<li><a class="icon fa-comment" href="../1978345.html#disqus_thread"> &nbsp;</a></li>
+ 		</ul>
+    	
+    </footer>
+</article>
 <article class="post">
    <header>
     <div class="title">
@@ -371,150 +561,13 @@
     	
     </footer>
 </article>
-<article class="post">
-   <header>
-    <div class="title">
-                    <h2><a href="../1935914.html">Spring batch와 Spring integration의 만남</a></h2>
-
-
-    </div>
-    <div class="meta">
-         <time class="published"
-            datetime='Jun 16, 2008'>
-            Jun 16, 2008</time>
-            <div class="published eta"></div>
-        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
-    </div>
-</header>
-
-    
-  
-         
-    <div id="content">
-       <div class="paragraph">
-<p>Spring portfolio의 일부 중 최근에 관심을 제가 관심을 가지고 있는  Spring batch와 Spring integration을 연결한 프로토타입 코드들이 나왔습니다.</p>
-</div>
-<div class="paragraph">
-<p>Spring batch form에 최근에 올라온 글입니다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="http://forum.springframework.org/showthread.php?t=55863">Spring Integration Prototype</a></p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>그리고 6월 18일에 이 것을 주제로 한 온라인 세미나 같은것이 있나 보네요.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="http://www.springframework.org/node/687">Webinar: Enterprise Integration with Spring Batch</a></p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>이 코드들은 Java 5를 사용하기 때문에 Spring batch 1.1 정식 배포판에는 들어가지 않을거라고 합니다. Spring batch 프로젝트에서는 2.0전까지 Java5 으로 가지는 않을거라고 하네요.</p>
-</div>
-<div class="paragraph">
-<p><a href="http://zepag.blogspot.com/2008/06/springone08-spring-batch.html">SpringOne 08의 Spring batch 주제의 발표</a>에서도 관련 내용이 들어갈 것 같네요. Spring batch와 Spring integration의 convergence가 있는 것으로 보인다는 언급이 있습니다.</p>
-</div>
-<div class="paragraph">
-<p><a href="http://www.egloos.com/egloo/insert.php?eid=d0032573" class="bare">http://www.egloos.com/egloo/insert.php?eid=d0032573</a></p>
-</div>
-<div class="paragraph">
-<p>Spring Batch와 Spring WS, Spring Integration은 얽히고 섥힌 관계라고 보입니다. Spring integration의 Web Service Adapters에서 Spring Web Service를 사용하고 있고, Spring batch에서도 XML파일 처리에 Spring WS의 일부인 <a href="http://static.springframework.org/spring-ws/site/reference/html/oxm.html">Spring OXM</a>를 통한 위임처리를 할 수 있습니다. 그리고 위와 같이 Spring integration는 Spring Batch도 연결시켰군요.</p>
-</div>
-<div class="paragraph">
-<p>Spring Batch의 Job은 Spring Application Flatform을 통해서 OSGi 번들로도  실행가능하게 되었습니다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="http://blog.springsource.com/main/2008/05/30/running-a-spring-batch-job-in-the-springsource-aplication-platform/">Running a Spring Batch Job in The SpringSource Application Platform</a></p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>향후 버전에서는 더욱 더 배치에 특화된 기능들이 추가될 것이라고 하네요.</p>
-</div>
-<div class="paragraph">
-<p>Spring batch + Spring Integration + Spring WS + Spring Application Flatform.. 그 미래가 어떻게 될지 정말 기대가 됩니다.</p>
-</div>
-    </div>
-	
-	<section id="social-share">
-        <ul class="icons">
-<!-- Social Share Button HTML -->
-
-<!-- Twitter -->
-<li><a href="//twitter.com/share?url=https://blog.benelog.net//1935914.html&text=Spring batch와 Spring integration의 만남&via=" target="_blank" class="share-btn twitter">
-    <i class="fa fa-twitter"></i>
-    <p>Twitter</p>
-</a></li>
-
-<!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=https://blog.benelog.net//1935914.html" target="_blank" class="share-btn google-plus">
-    <i class="fa fa-google-plus"></i>
-    <p>Google+</p>
-</a></li>
-
-<!-- Facebook -->
-<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//1935914.html" target="_blank" class="share-btn facebook">
-    <i class="fa fa-facebook"></i>
-    <p>Facebook</p>
-</a></li>
-
-<!-- Reddit (url, title) -->
-<li><a href="//reddit.com/submit?url=https://blog.benelog.net//1935914.html&title=Spring batch와 Spring integration의 만남" target="_blank" class="share-btn reddit">
-    <i class="fa fa-reddit-alien"></i>
-    <p>Reddit</p>
-</a></li>
-
-<!-- LinkedIn -->
-<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//1935914.html&title=Spring batch와 Spring integration의 만남" target="_blank" class="share-btn linkedin">
-    <i class="fa fa-linkedin"></i>
-    <p>LinkedIn</p>
-</a></li>
-
-<!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//1935914.html&title=Spring batch와 Spring integration의 만남" target="_blank" class="share-btn stumbleupon">
-    <i class="fa fa-stumbleupon"></i>
-    <p>StumbleUpon</p>
-</a></li>
-
-<!-- Email -->
-<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//1935914.html" target="_blank" class="share-btn email">
-    <i class="fa fa-envelope"></i>
-    <p>Email</p>
-</a></li>
-        </ul>
-    </section>
-     
-
-    <footer>
-	
-		<ul class="stats">
-    	    <!-- Display the categories associated with this post -->
-    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/Spring.html'>Spring</a></li>
- 	        <li><a href='../tags/Spring-Batch.html'>Spring-Batch</a></li>
- 	        <li><a href='../tags/Spring-Integration.html'>Spring-Integration</a></li>
- 	        <li><a href='../tags/뉴스.html'>뉴스</a></li>
-
-				<li><a class="icon fa-comment" href="../1935914.html#disqus_thread"> &nbsp;</a></li>
- 		</ul>
-    	
-    </footer>
-</article>
 		
 <ul class="actions pagination">
     <li><a href="../18/"
             class=" button big previous">PREVIOUS</a></li>
 
     <li><span
-            class="button big"> 19 of 29 </span></li>
+            class="button big"> 19 of 30 </span></li>
 
     <li><a href="../20/"
             class=" button big next">NEXT</a></li>
@@ -580,6 +633,17 @@
                     <li>
                         <article>
                             <header>
+                                <h3><a href="../migration-to-static-site.html">정적 사이트로 블로그 마이그레이션</a></h3>
+                                 <time class="published"
+							            datetime='May 06, 2019'>
+							            May 06, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
                                 <h3><a href="../robolectric.html">Robolectric을 활용한 안드로이드 쾌속 테스팅</a></h3>
                                  <time class="published"
 							            datetime='Oct 10, 2016'>
@@ -606,17 +670,6 @@
                                  <time class="published"
 							            datetime='Nov 03, 2014'>
 							            Nov 03, 2014</time>
-                            </header>
-                        </article>
-                    </li>
-
-                    <li>
-                        <article>
-                            <header>
-                                <h3><a href="../3017438.html">Android에서 @Inject, @Test</a></h3>
-                                 <time class="published"
-							            datetime='Apr 17, 2013'>
-							            Apr 17, 2013</time>
                             </header>
                         </article>
                     </li>
@@ -1194,6 +1247,15 @@
                         <article>
                             <header>
                                 <a href="../tags/DependencyInjection.html">DependencyInjection</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="../tags/static-site.html">static-site</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>

@@ -132,6 +132,9 @@
                     <h3>Recent Posts</h3>
                 </header>
                     <li>
+                        <a href="../../migration-to-static-site.html"><p>정적 사이트로 블로그 마이그레이션</p></a>
+                    </li>
+                    <li>
                         <a href="../../robolectric.html"><p>Robolectric을 활용한 안드로이드 쾌속 테스팅</p></a>
                     </li>
                     <li>
@@ -139,9 +142,6 @@
                     </li>
                     <li>
                         <a href="../../3120317.html"><p>시간대 DB에서 우리나라 시간의 오류</p></a>
-                    </li>
-                    <li>
-                        <a href="../../3017438.html"><p>Android에서 @Inject, @Test</p></a>
                     </li>
             </ul>
         </section>
@@ -157,6 +157,179 @@
 </section>
 	
 	<div id="main">
+<article class="post">
+   <header>
+    <div class="title">
+                    <h2><a href="../2212119.html">EMMA + Eclipse + Maven2 + Hudson</a></h2>
+
+
+    </div>
+    <div class="meta">
+         <time class="published"
+            datetime='Jan 23, 2009'>
+            Jan 23, 2009</time>
+            <div class="published eta"></div>
+        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
+    </div>
+</header>
+
+    
+  
+         
+    <div id="content">
+       <div class="paragraph">
+<p><a href="http://emma.sourceforge.net/">EMMA</a>는 테스트코드가 검증해 주는 코드영역에 대해서 보고해 주는 도구입니다. 전체 코드 중 몇 %가 테스트 코드를 거쳐가고 있는지 쉽게 수치를 낼 수 있습니다.</p>
+</div>
+<div class="paragraph">
+<p>EMMA의  Eclipse plugin인 EclEmma는 <a href="http://update.eclemma.org/를" class="bare">http://update.eclemma.org/를</a> plugin의 update site로 지정하면 설치할 수 있습니다.  설치 후 프로젝트에서 우클릭-Coverage As - JUnit Test 메뉴를 선택하면 전체 Junit Test를 실행하고, Test Coverage에 대한 보고서를 생성해 줍니다.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/emma/eclipse-emma-menu.jpg" alt="eclipse-emma-menu.jpg"></span></p>
+</div>
+<div class="paragraph">
+<p>EMMA의 Maven2 plugin인 <a href="http://mojo.codehaus.org/emma-maven-plugin/">Emma Maven Plugin Maven</a>을  pom.xml파일의 reporting 선언에 아래와 같은 설정을 추가합니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;reporting&gt;
+  &lt;plugins&gt;
+   ...
+    &lt;plugin&gt;
+      &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;
+      &lt;artifactId&gt;emma-maven-plugin&lt;/artifactId&gt;
+      &lt;/plugin&gt;
+    &lt;/plugins&gt;
+&lt;/reporting&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><a href="http://hudson.gotdns.com/wiki/display/HUDSON/Emma+Plugin%20">Hudson의 위키에 있는 Emma plugin 설명페이지</a>나 <a href="http://mojo.codehaus.org/emma-maven-plugin/usage.html">Maven의 emma-plugin 설명페이지</a>를 보면 build절에도 plugin 설정을 추가하라고 되어있는데, 그렇게 하지 않아도 잘  실행이 되었습니다.
+오히려 그렇게 추가를 하니, mvn test site처럼 test와 site phrase가 같이 돌아갈 때 아래와 같은 에러가 발생했습니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>java.lang.IllegalStateException: class [......] appears to be instrumented already</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Emma plugin 설정을 reporting 부분에 넣으면 테스트가 실행되므로 일부러 test phrase를 넣어줄 필요는 없습니다. 즉 이 때는 mvn site만 돌려주시면 테스트 결과와 Coverage Report를 모두 얻을 수 있습니다.
+Emma plugin이 있을 때 'mvn test site&#8217;로 실행시켜서 테스트가 두번 돌면 Hudson에서 보고하는 테스트 개수도 2번씩 중복 집계가 되므로 더 혼동만 줍니다.</p>
+</div>
+<div class="paragraph">
+<p><a href="http://mojo.codehaus.org/emma-maven-plugin/usage.html">Maven의 emma-plugin 설명페이지</a>에 따르면,  maven-surefire-plugin 설정에서 별도의 JVM으로 테스트를 실행시키위해 forkMode를 always로 설정하는 것은 중요하다고 합니다.
+EMMA가 JVM의 종료 때도 기록을 하기 때문에 그렇다는군요. 다음과 같이 설정합니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;plugin&gt;
+        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+        &lt;artifactId&gt;maven-surefire-plugin&lt;/artifactId&gt;
+        &lt;inherited&gt;true&lt;/inherited&gt;
+        &lt;configuration&gt;
+          &lt;forkMode&gt;always&lt;/forkMode&gt;
+          &lt;reportFormat&gt;xml&lt;/reportFormat&gt;
+        &lt;/configuration&gt;
+&lt;/plugin&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>이렇게 Maven을 통해 생성한 리포트를  Huson으로 보기 위해서는 <strong>Manage Hudson&gt;Manage Plugins</strong> 메뉴에서 Hudson Emma plugin을 설치하고 Hudson을 재시작합니다.</p>
+</div>
+<div class="paragraph">
+<p>설치가 잘 되었다면, 프로젝트의 Configure 메뉴에서 EMMA의 보고서에 대해서 설정할 수 있는 항목이 생깁니다.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/emma/hudson-emma-config.jpg" alt="hudson-emma-config.jpg"></span></p>
+</div>
+<div class="paragraph">
+<p>여기에서 Emma XML report 항목에 workspace를 기준으로 한 상대적인 경로로 coverage.xml의 위치를 지정해줍니다.
+<a href="http://hudson.gotdns.com/wiki/display/HUDSON/Emma+Plugin%20">Hudson의 위키에 있는 Emma plugin 설명페이지</a>에 보면 이 항목이 target/site/emma/coverage.xml으로 되어 있어서 혼동이 오기 쉬운데, trunk와 같은 Local module directory를 반드시 포함시켜줘야 합니다.
+보통 SVN을 쓸 때 프로젝트 설정에서 별도로 지정을 하지 않으면 trunk같은 SVN의 path의 마지막 디렉토리가 Local module directory로 지정됩니다.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/emma/hudson-svn-config.jpg" alt="hudson-svn-config.jpg"></span></p>
+</div>
+<div class="paragraph">
+<p>Emma 보고서 설정란에서 the work space root라는 링크를 눌러도 금방 확인 할 수 있습니다.</p>
+</div>
+<div class="paragraph">
+<p>위와 같이 설정된 프로젝트를 build하면 빌드의 맨 끝에 Recording Emma reports trunk/target/site/emma/coverage.xml 와 같은 메시지가 Console out 화면에서 뜰 것입니다.  그렇게 생성된 보고서는 "프로젝트명&gt;빌드번호&gt;Coverage Report" 메뉴에서 보실 수 있습니다.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/emma/hudson-emma-menu.jpg" alt="hudson-emma-menu.jpg"></span></p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/emma/hudson-emma-report.jpg" alt="hudson-emma-report.jpg"></span></p>
+</div>
+<div class="paragraph">
+<p>만약 Hudson에서 Emma를 실행한 빌드번호의 메뉴에서 'Coverage Report&#8217;라는 메뉴가 보이지 않는다면 <a href="http://blog.benelog.net/2208375">Hudson plugin 수동으로 빌드&amp;업로드</a>를 참조해서 최신 버전으로 플러그인을 업데이트 해보시기 바랍니다.</p>
+</div>
+    </div>
+	
+	<section id="social-share">
+        <ul class="icons">
+<!-- Social Share Button HTML -->
+
+<!-- Twitter -->
+<li><a href="//twitter.com/share?url=https://blog.benelog.net//2212119.html&text=EMMA + Eclipse + Maven2 + Hudson&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+</a></li>
+
+<!-- Google Plus -->
+<li><a href="//plus.google.com/share?url=https://blog.benelog.net//2212119.html" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+</a></li>
+
+<!-- Facebook -->
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//2212119.html" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+</a></li>
+
+<!-- Reddit (url, title) -->
+<li><a href="//reddit.com/submit?url=https://blog.benelog.net//2212119.html&title=EMMA + Eclipse + Maven2 + Hudson" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+</a></li>
+
+<!-- LinkedIn -->
+<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//2212119.html&title=EMMA + Eclipse + Maven2 + Hudson" target="_blank" class="share-btn linkedin">
+    <i class="fa fa-linkedin"></i>
+    <p>LinkedIn</p>
+</a></li>
+
+<!-- StumbleUpon (url, title) -->
+<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//2212119.html&title=EMMA + Eclipse + Maven2 + Hudson" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+</a></li>
+
+<!-- Email -->
+<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//2212119.html" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+</a></li>
+        </ul>
+    </section>
+     
+
+    <footer>
+	
+		<ul class="stats">
+    	    <!-- Display the categories associated with this post -->
+    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
+ 	        <li><a href='../tags/EMMA.html'>EMMA</a></li>
+ 	        <li><a href='../tags/Eclipse.html'>Eclipse</a></li>
+ 	        <li><a href='../tags/Maven.html'>Maven</a></li>
+ 	        <li><a href='../tags/Hudson.html'>Hudson</a></li>
+
+				<li><a class="icon fa-comment" href="../2212119.html#disqus_thread"> &nbsp;</a></li>
+ 		</ul>
+    	
+    </footer>
+</article>
 <article class="post">
    <header>
     <div class="title">
@@ -575,214 +748,13 @@
     	
     </footer>
 </article>
-<article class="post">
-   <header>
-    <div class="title">
-                    <h2><a href="../2176171.html">PMD + Eclipse + Maven2 + Hudson</a></h2>
-
-
-    </div>
-    <div class="meta">
-         <time class="published"
-            datetime='Dec 19, 2008'>
-            Dec 19, 2008</time>
-            <div class="published eta"></div>
-        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
-    </div>
-</header>
-
-    
-  
-         
-    <div id="content">
-       <div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>코드 검사도구인 <a href="http://pmd.sourceforge.net/">PMD</a> 를 Eclipse plugin을 설정하고, Maven을 통해서도 같은 규칙으로 코드를 검사한 보고서를 생성하고, Hudson을 통해서 확인하는 과정을 정리해 봤습니다.</p>
-</div>
-<div class="paragraph">
-<p>Eclipse에서는 update site를 <a href="http://pmd.sf.net/eclipse" class="bare">http://pmd.sf.net/eclipse</a> 로 지정해서 플러인을 설치합니다.</p>
-</div>
-<div class="paragraph">
-<p>Eclipse 메뉴의 Window- Preferences를 가면 Rule설정 파일을 export, import할 수 있는 기능이 있습니다.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="img/pmd/eclipse-pmd-rule.jpg" alt="eclipse-pmd-rule.jpg"></span></p>
-</div>
-<div class="paragraph">
-<p>Project의 Properties에도 PMD관련 설정이 있습니다. 외부에서 만든 Rule파일을 바로 참조해도 되고, 여기서 설정된 것을파일로 생성할 수도 있습니다. 이미 있는 프로젝트에서 Rule를 설정할 때는 Project의 Properties에서 Rule들을고른 후에 생기는 warning이나 error를 보고 warning이 안 뜨게 소스를 고거나 Rule을 제외한 후, 최종결정Rule들로 Ruleset 정의 파일을 생성하는 것이 편리할 것입니다. 저는 처음에 모든 Rule을 다 선택한 다음에warning들을 없애가면서 Rule들을 하나하나 검토해 나갔었습니다.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="img/pmd/eclipse-pmd-project.jpg" alt="eclipse-pmd-project.jpg"></span></p>
-</div>
-<div class="paragraph">
-<p>위의 화면에서 Enable PMD를 선택하면 .project파일에 아래와 같은 부분이 추가될 것입니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;natures&gt;
-      ....
-   &lt;nature&gt;net.sourceforge.pmd.eclipse.plugin.pmdNature&lt;/nature&gt;
-&lt;/natures&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>이제 해당 프로젝트는 Eclipse의 Problems View에서 PMD에서 보고하는 error, warning까지 모두 다 뜨게됩니다. 개발을 하면서 Rule 준수에 대한 빠른 피드백을 얻기 위해 되도록 이 기능을 사용하는 것이 좋습니다. 대신 이미Project에 warning이 많으면 새로운 warning들이 잘 눈에 띄지 않게 되므로, Project를 warning없이깨끗히 정리한 다음에 사용할 것을 권장해 드립니다.</p>
-</div>
-<div class="paragraph">
-<p>모든 Rule을 다 적용하면 아마 굉장히 많은 warning과 때로는 에러까지도 나올 것입니다. 그런 것들을 다 검토해서 포함시킬지를 결정해야 합니다. <a href="http://pmd.sourceforge.net/rule-guidelines.html를" class="bare">http://pmd.sourceforge.net/rule-guidelines.html를</a> 참조하셔서, 프로젝트 상황에 맞게 적용해야겠죠. 그중 몇가지 Rule에 대해서만 언급을 하고 넘어가겠습니다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="http://pmd.sourceforge.net/rules/basic.html">Basic Rules</a>-EmptryInitializer:  PMD 5.0에서 추가된 룰로 Maven의 PMD plugin버전 2.4에서는 PMD 버전 4.2.2를 참조하기 때문에 이Rule은 지원되지 않습니다. 따라서 PMD의 Eclipse plugin에서 이를 지원한다고 할지라도 Maven plugin과같이 쓰기 위해서는 이 Rule을 반드시 제외해야 합니다.</p>
-</li>
-<li>
-<p><a href="http://pmd.sourceforge.net/rules/optimizations.html">Optimization Rules</a>-LocalVariableCouldBeFinal과 Controversial Rules-AvoidFinalLocalVariable : 서로 상반되는 Rule로 한쪽 Rule을피하면 다른 쪽에 걸려드는 Rule입니다. 그래서 warning을 안보려면 둘 중에 하나는 꼭 제외해야 합니다. 그런데,final을 Local variable에 일일히 선언하는 것도 번거로운 일이고, 메소드 내의 inner class에서 참조해야되어서 꼭 final이 되어야하는 local variable도 있으므로, 둘 다 제외하는 것도 좋습니다</p>
-</li>
-<li>
-<p><a href="http://pmd.sourceforge.net/rules/controversial.html">Controversial Rules</a>-OnlyOneReturnRule :  메서드에서 return문이 여러 개일 경우 경고를 주는데, 메서드 중간의 return문은 복잡한 조건문의 구조를 단순하게 하는데 도움이 경우가 많고, <a href="http://www.yes24.com/Goods/FTGoodsView.aspx?goodsNo=2824034&amp;CategoryNumber=001001003016001006">켄트벡의 구현패턴</a> 7장 중 '보호절&#8217;을 보면 이를 권장하고 있습니다.</p>
-</li>
-<li>
-<p><a href="http://pmd.sourceforge.net/rules/design.html">Design Rules</a>-UnnecessaryLocalBeforeReturn: return 전에 따로 local 변수로 반환할 값을 선언할 때 주는 경고인데, 기능적으로는 별 의미 없는 코드이나,return 문장에는 @SupressWarning 의 Annotation을 추가할 수 없기 때문에,  Annotation 적용범위를 최소화하기 위해 그런 선언이 필요한 때도 있습니다. (Java Language Spec 9.7, EffectiveJava 2nd Edition Item 24 참조)</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>검토해보니 가장 부담없이 적용가능한 RuleSet이 괄호에 대한 규칙을 정의하는 Braces Rules이고, Controversial Rules가 이름 그래도 가장 제외할 것이 많은 Rule Set입니다.</p>
-</div>
-<div class="paragraph">
-<p>이런 과정을 거쳐서 선별된 Rule 정의 파일이 만들어지면 그것을 Maven의 PMD plugin에서도 참조할 수 있게 설정합니다. 저는 Rule설정 파일이름을 .ruleset으로 하고 pom.xml에 추가했습니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">  &lt;reporting&gt;
-    &lt;plugins&gt;
-      &lt;plugin&gt;
-        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
-        &lt;artifactId&gt;maven-pmd-plugin&lt;/artifactId&gt;
-        &lt;version&gt;2.4&lt;/version&gt;
-        &lt;configuration&gt;
-          &lt;rulesets&gt;
-            &lt;ruleset&gt;$\{basedir}/.ruleset&lt;/ruleset&gt;
-          &lt;/rulesets&gt;
-          &lt;sourceEncoding&gt;utf-8&lt;/sourceEncoding&gt;
-          &lt;targetJdk&gt;1.6&lt;/targetJdk&gt;
-          &lt;minimumTokens&gt;10&lt;/minimumTokens&gt;
-        &lt;/configuration&gt;
-      &lt;/plugin&gt;
-  &lt;/reporting&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>그리고는 mvn site 혹은 mvn pmd:pmd pmd:cpd 처럼 PMD plugin의 goal을 포함시킨 빌드를 한번 실행시켜 봅니다.</p>
-</div>
-<div class="paragraph">
-<p>문제가 없이 돌아갔으면 hudson에도 PMD플러그인을 설정합니다.. PMD 플러그인의 goal이 포함된 빌드를 돌리고 나면PMD warning라는 링크가 해당 프로젝트에 생기고, 거기서 아래와 같은 보고서를 확인할 수 있습니다.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="img/pmd/hudson-pmd-report.jpg" alt="hudson-pmd-report.jpg"></span></p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="관련자료">관련자료</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="http://www.ibm.com/developerworks/kr/library/j-pmd/">PMD로 버그 잡기</a></p>
-</li>
-<li>
-<p><a href="http://pmd.sourceforge.net/rule-guidelines.html">PMD Rule guideline</a></p>
-</li>
-<li>
-<p><a href="http://moai.tistory.com/541">PMD로 코드리뷰 자동으로 수행하기</a></p>
-</li>
-<li>
-<p><a href="http://blog.empas.com/seeiris/14381547">PMD 이클립스 플러그인 사용법</a></p>
-</li>
-<li>
-<p><a href="http://ecogeo.tistory.com/70">Hudson : 리포트/차트 보기</a></p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-    </div>
-	
-	<section id="social-share">
-        <ul class="icons">
-<!-- Social Share Button HTML -->
-
-<!-- Twitter -->
-<li><a href="//twitter.com/share?url=https://blog.benelog.net//2176171.html&text=PMD + Eclipse + Maven2 + Hudson&via=" target="_blank" class="share-btn twitter">
-    <i class="fa fa-twitter"></i>
-    <p>Twitter</p>
-</a></li>
-
-<!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=https://blog.benelog.net//2176171.html" target="_blank" class="share-btn google-plus">
-    <i class="fa fa-google-plus"></i>
-    <p>Google+</p>
-</a></li>
-
-<!-- Facebook -->
-<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//2176171.html" target="_blank" class="share-btn facebook">
-    <i class="fa fa-facebook"></i>
-    <p>Facebook</p>
-</a></li>
-
-<!-- Reddit (url, title) -->
-<li><a href="//reddit.com/submit?url=https://blog.benelog.net//2176171.html&title=PMD + Eclipse + Maven2 + Hudson" target="_blank" class="share-btn reddit">
-    <i class="fa fa-reddit-alien"></i>
-    <p>Reddit</p>
-</a></li>
-
-<!-- LinkedIn -->
-<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//2176171.html&title=PMD + Eclipse + Maven2 + Hudson" target="_blank" class="share-btn linkedin">
-    <i class="fa fa-linkedin"></i>
-    <p>LinkedIn</p>
-</a></li>
-
-<!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//2176171.html&title=PMD + Eclipse + Maven2 + Hudson" target="_blank" class="share-btn stumbleupon">
-    <i class="fa fa-stumbleupon"></i>
-    <p>StumbleUpon</p>
-</a></li>
-
-<!-- Email -->
-<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//2176171.html" target="_blank" class="share-btn email">
-    <i class="fa fa-envelope"></i>
-    <p>Email</p>
-</a></li>
-        </ul>
-    </section>
-     
-
-    <footer>
-	
-		<ul class="stats">
-    	    <!-- Display the categories associated with this post -->
-    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/PMD.html'>PMD</a></li>
- 	        <li><a href='../tags/Maven.html'>Maven</a></li>
- 	        <li><a href='../tags/Hudson.html'>Hudson</a></li>
- 	        <li><a href='../tags/Eclipse.html'>Eclipse</a></li>
- 	        <li><a href='../tags/정적분석.html'>정적분석</a></li>
-
-				<li><a class="icon fa-comment" href="../2176171.html#disqus_thread"> &nbsp;</a></li>
- 		</ul>
-    	
-    </footer>
-</article>
 		
 <ul class="actions pagination">
     <li><a href="../15/"
             class=" button big previous">PREVIOUS</a></li>
 
     <li><span
-            class="button big"> 16 of 29 </span></li>
+            class="button big"> 16 of 30 </span></li>
 
     <li><a href="../17/"
             class=" button big next">NEXT</a></li>
@@ -848,6 +820,17 @@
                     <li>
                         <article>
                             <header>
+                                <h3><a href="../migration-to-static-site.html">정적 사이트로 블로그 마이그레이션</a></h3>
+                                 <time class="published"
+							            datetime='May 06, 2019'>
+							            May 06, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
                                 <h3><a href="../robolectric.html">Robolectric을 활용한 안드로이드 쾌속 테스팅</a></h3>
                                  <time class="published"
 							            datetime='Oct 10, 2016'>
@@ -874,17 +857,6 @@
                                  <time class="published"
 							            datetime='Nov 03, 2014'>
 							            Nov 03, 2014</time>
-                            </header>
-                        </article>
-                    </li>
-
-                    <li>
-                        <article>
-                            <header>
-                                <h3><a href="../3017438.html">Android에서 @Inject, @Test</a></h3>
-                                 <time class="published"
-							            datetime='Apr 17, 2013'>
-							            Apr 17, 2013</time>
                             </header>
                         </article>
                     </li>
@@ -1462,6 +1434,15 @@
                         <article>
                             <header>
                                 <a href="../tags/DependencyInjection.html">DependencyInjection</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="../tags/static-site.html">static-site</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>

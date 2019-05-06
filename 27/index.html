@@ -132,6 +132,9 @@
                     <h3>Recent Posts</h3>
                 </header>
                     <li>
+                        <a href="../../migration-to-static-site.html"><p>정적 사이트로 블로그 마이그레이션</p></a>
+                    </li>
+                    <li>
                         <a href="../../robolectric.html"><p>Robolectric을 활용한 안드로이드 쾌속 테스팅</p></a>
                     </li>
                     <li>
@@ -139,9 +142,6 @@
                     </li>
                     <li>
                         <a href="../../3120317.html"><p>시간대 DB에서 우리나라 시간의 오류</p></a>
-                    </li>
-                    <li>
-                        <a href="../../3017438.html"><p>Android에서 @Inject, @Test</p></a>
                     </li>
             </ul>
         </section>
@@ -157,6 +157,125 @@
 </section>
 	
 	<div id="main">
+<article class="post">
+   <header>
+    <div class="title">
+                    <h2><a href="../1375660.html">구글 검색 기록과 스위칭 코스트</a></h2>
+
+
+    </div>
+    <div class="meta">
+         <time class="published"
+            datetime='Jul 31, 2007'>
+            Jul 31, 2007</time>
+            <div class="published eta"></div>
+        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
+    </div>
+</header>
+
+    
+  
+         
+    <div id="content">
+       <div class="paragraph">
+<p>많은 분들이 그렇듯이 저도 생활정보는 네이버로 찾고  일과 관련된 정보나  웹을 구석구석 뒤지고 싶을 때는 google을 쓰고 있습니다.  google을 써오기는 해도  "검색기록"이라고는 것을 신경도 안 쓰고 있었는데, 얼마 전에 한번 찍어보니 꽤나 신기하더군요.</p>
+</div>
+<div class="paragraph">
+<p><a href="http://www.google.co.kr/history/" class="bare">http://www.google.co.kr/history/</a></p>
+</div>
+<div class="paragraph">
+<p>이 기능을 의식을 하고 쓴 것은 아니였는데 , 제가 어떤 키워드로 검색을 했는지 오래전의 기록부터 쫙 나오니깐 기분이 묘했습니다. 상위질문, 상위사이트, 상위클릭, 월별 일별 통계까지 나오니 좀 섬뜻하기도 했어요  삭제하고 싶은 키워드도 있는데  어떻게 삭제하는지 모르겠습니다 ^^;다음부터는 기록에 남기고 싶지 않는 검색어는 "일시중지"를 선택하고 검색해야겠군요. 얼마 전에 "http://blog.daum.net/suk5kyu/11605503[구글, 사용자 검색기록 보관기간 18개월로 단축 ]" 이라는 기사를 보았었는데, 정말 이것이 축적되면  무서운 도구가 될 수도 있을 것 같아요. 찜찜하신 분들은 구글에서 로그인하지 않은 상태로 검색하거나  기록 기능을 꺼야겠죠.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/google/google-search-history1.jpeg" alt="google search history1"></span></p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/google/google-search-history2.jpeg" alt="google search history2"></span></p>
+</div>
+<div class="paragraph">
+<p>검색기록의 첫 페이지에 나와 있는 다음의 문구가 눈에 띕니다.</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>맞춤 검색은 Google 검색을 개선한 기능으로서 이전의 검색을 토대로 귀하의 검색 결과를 표시합니다. 처음에는 큰 차이를 느낄 수 없지만 검색 기록이 축적되면서 맞춤 검색 결과가 지속적으로 향상됩니다.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>이번달 16일, <a href="http://www.joonj.com/">jmirror</a>님이 주최하신 'http://www.joonj.com/wordpress/archives/319[차세대 검색에 대한 블러거 토론회]'에 참석했습니다. 저는 특별한 발언없이 경청만 하다 왔지만, 다른 분들의 깊이 있는 말씀을 듣고 생각을 정리해볼 수 있는 자리였습니다. 거기서 몇몇 분들이 '검색의 개인화&#8217;가 앞으로 필요하다고 말씀하셨습니다. 그 때 저는 그 실제 적용 사례가 생각나지 않았었는데, 바로 이 구글의 검색기록을 한 번 찍어보고 갔었더라면 위의 화면이 머리 속에서 연결이 되었을건데 하는 아쉬움이 지금에서야 듭니다.</p>
+</div>
+<div class="paragraph">
+<p>위의 토론회에서 들은 말인데, 구글이 유투브 동영상 검색에서 야후를 야후의 동영상 검색을 누르는데 걸린 시간은 6주였고, 국내  3위 업체였던 네이버는 지식검색으로  야후,  엠파스를 4주만에 추월했다고 합니다. 그렇게 짧은 시간내에 그것이 가능했던 이유는 검색엔진을 바꾸는 것에 대한 이사비용(스위칭코스트)이 거의 없기 때문이 아닐까 합니다. 메일, 블로그,커뮤니티의 경우에는 서비스를 바꾼다면 데이터 이전, 바뀐 주소 홍보 등의 번거로움을 감수해야하는 것에 비해서 검색은 그렇지 않다는 것이죠. 그리고 검색결과의 상호비교가 쉽기 때문에  조금이라도 나은 점이 보이는 서비스로 지체없이 옮겨갈 수 있습니다.</p>
+</div>
+<div class="paragraph">
+<p>검색에서도 구글 검색 기록과 같이 쌓여가는 데이터가 있고, 그것을 바탕으로 개인화된 서비스를 제공할 수 있다면  스위칭코스트를 낳을 수 있다고 봅니다. 그리고 개인 검색기록  데이터를 쌓고  그 것을 바탕으로 개인화된 검색결과를 내놓을 수 있는 기술은 쉽게 따라할수 있는 일이 아닐 것 같아요. 네이버에 있는 지식인의 자료, 광고, 알바가 정리한 정보도 큰 자산이지만  그것만으로 사용자를 완벽히 묶어둘 수는 없지 않을까요?</p>
+</div>
+    </div>
+	
+	<section id="social-share">
+        <ul class="icons">
+<!-- Social Share Button HTML -->
+
+<!-- Twitter -->
+<li><a href="//twitter.com/share?url=https://blog.benelog.net//1375660.html&text=구글 검색 기록과 스위칭 코스트&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+</a></li>
+
+<!-- Google Plus -->
+<li><a href="//plus.google.com/share?url=https://blog.benelog.net//1375660.html" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+</a></li>
+
+<!-- Facebook -->
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//1375660.html" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+</a></li>
+
+<!-- Reddit (url, title) -->
+<li><a href="//reddit.com/submit?url=https://blog.benelog.net//1375660.html&title=구글 검색 기록과 스위칭 코스트" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+</a></li>
+
+<!-- LinkedIn -->
+<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//1375660.html&title=구글 검색 기록과 스위칭 코스트" target="_blank" class="share-btn linkedin">
+    <i class="fa fa-linkedin"></i>
+    <p>LinkedIn</p>
+</a></li>
+
+<!-- StumbleUpon (url, title) -->
+<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//1375660.html&title=구글 검색 기록과 스위칭 코스트" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+</a></li>
+
+<!-- Email -->
+<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//1375660.html" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+</a></li>
+        </ul>
+    </section>
+     
+
+    <footer>
+	
+		<ul class="stats">
+    	    <!-- Display the categories associated with this post -->
+    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
+ 	        <li><a href='../tags/Google.html'>Google</a></li>
+ 	        <li><a href='../tags/검색.html'>검색</a></li>
+ 	        <li><a href='../tags/행사후기.html'>행사후기</a></li>
+
+				<li><a class="icon fa-comment" href="../1375660.html#disqus_thread"> &nbsp;</a></li>
+ 		</ul>
+    	
+    </footer>
+</article>
 <article class="post">
    <header>
     <div class="title">
@@ -416,237 +535,13 @@ group by s.hostname, s.ipaddr ,s.suid ) p</code></pre>
     	
     </footer>
 </article>
-<article class="post">
-   <header>
-    <div class="title">
-                    <h2><a href="../1314658.html">HTML &amp; CSS 정리해본 예</a></h2>
-
-
-    </div>
-    <div class="meta">
-         <time class="published"
-            datetime='Jul 04, 2007'>
-            Jul 04, 2007</time>
-            <div class="published eta"></div>
-        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
-    </div>
-</header>
-
-    
-  
-         
-    <div id="content">
-       <div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>제가 있는 프로젝트의 UI표준은  2004년 10월경에 처음 정해진 것입니다. 연속 사업 중 첫번째 사업 때 정해진 틀을 그 뒤에도 수정없이 copy&amp;paste로 입혀서 쓰고 있는 중이죠. 디자이너가 html으로 파일을 만들어 주었을 당시에는 팀원 중에 웹표준에 대해서 신경을 썼던 사람이 없었습니다.  지금 다시 들어다보니 css를 잘 정의했으면 훨씬 깔끔하게 중복없이 만들수 있었던 코드가 많이 보입니다.</p>
-</div>
-<div class="paragraph">
-<p>저도 작년에 파주시 프로젝트에서 웹표준에 맞춰서 개발을 하고 있다는 말을 듣기 전까지는 스스로 css를 정리해볼 생각은 없었습니다. 그런 작업은 디자이너의 영역이라고 안이한  생각을 하고 있었던 것이죠 ^^; 새로 프로젝트 들어가면 깔끔하게 UI표준 만들어주는 사람을 만나기를 바라는 마음만 있을 뿐이였습니다.  그러다가 정동인씨나 최효근씨 같은 후배들에게 배우고 느낀 바가 많아서 저도 현재의 프로젝트에서도 서서히 적용하겠다는 의지를 가지게 되었습니다.</p>
-</div>
-<div class="paragraph">
-<p>이번에 고객이 다른 업무와 독립적으로 쓰여질 프로그램을 요청했는데, 그 페이지에는 새로운 css를 만들어서 적용하고 싶었습니다.  현재 프로젝트에 남은 3명의 인원만으로는 모든 페이지를 다 갈아 엎는 것은 무리라고 생각했었는데 적당한 시작점을 찾은 것이죠.</p>
-</div>
-<div class="paragraph">
-<p>처음 수정한 부분은 화면의 큰 제목과 하위 제목이였습니다.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="img/markup/header-sample.gif" alt="image"></span></p>
-</div>
-<div class="paragraph">
-<p>와 같이 보여지는데, 기존 코드로는</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-html" data-lang="html">&lt;table border="0" cellpadding="0" cellspacing="0" width="100%"&gt;
- &lt;!-- 제목 --&gt;
- &lt;tr&gt;
-  &lt;td&gt;
-   &lt;table border="0" cellpadding="0" cellspacing="0" width="100%"&gt;
-    &lt;tr&gt;&lt;td class="title1"&gt;&lt;img src="/image/title_header.gif" align="absmiddle"&gt;&amp;nbsp;감사사항 목록&lt;/td&gt;&lt;/tr&gt;
-    &lt;tr&gt;&lt;td class="tilte_space"&gt;&lt;/td&gt;&lt;/tr&gt;
-    &lt;tr&gt;&lt;td class="title_line"&gt;&lt;/td&gt;&lt;/tr&gt;
-    &lt;tr&gt;&lt;td class="tilte_space"&gt;&lt;/td&gt;&lt;/tr&gt;
-   &lt;/table&gt;
-  &lt;/td&gt;
- &lt;/tr&gt;
- &lt;!-- 조회조건 --&gt;
- &lt;tr&gt;
-  &lt;td&gt;
-   &lt;table border="0" cellpadding="0" cellspacing="0" width="100%"&gt;
-    &lt;tr&gt;
-        &lt;td align="left" class="title_small"&gt;
-            &lt;img src="/image/title_small.gif" align="absmiddle"&gt;&amp;nbsp;조회조건
-        &lt;/td&gt;
-    &lt;/tr&gt;
-   &lt;/table&gt;
-  &lt;/td&gt;
- &lt;/tr&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>로 나와있는 부분입니다. 이걸  css를 새로 만들고 나니</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-html" data-lang="html">  &lt;h1&gt;감사사항 목록&lt;/h1&gt;
-  &lt;h2&gt;조회조건&lt;/h2&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>이렇게 딱 두줄로 바꿀수가 있네요.
-CSS에 다음과 같이 배경이미지, 선 등을 넣어서 정리한 것이죠.
-매페이지마다 반복되는 글자 앞의 이미지, 선과 여백을 위한 <code>table</code>, <code>tr</code>, <code>td</code> 문장들이 모두 정리됩니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-css" data-lang="css">h1 {
-  font-size:14px; color:#5C5C5C;
-  font-family: 돋움, arial;
-  font-weight:bold;
-  height:14px;
-  padding-left: 20px;
-  padding-bottom: 10px;
-  margin: 10px 10px 2px 10px;
-  background-image: url(/image/title_header.gif);
-    background-position: 0% 10% ;
-  background-repeat: no-repeat;
-  border-color:#C0C3C6;
-  border-width:1px;
-  border-bottom-style: solid;
-}
-
-h2 {
-  font-family: 돋움, arial;
-  font-weight:bold;
-  font-size:12px;
-  height:13px;
-  color: #4f4f30;
-  padding-left: 20px;
-  margin-bottom: 4px
-  padding-bottom: 10px;
-  margin: 10px;
-  background-image: url(/image/title_small.gif);
-  background-position: 0% 0% ;
-  background-repeat: no-repeat;
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>그리고 새로 개발되는 화면에 좌측 메뉴부분이 있는데,  css에서   float:left 선언을 이용하니 table없이 레이아웃을 잡을 수가 있었습니다. 웹표준을 설명하는 자료에서 많이 드는 예제이죠. 반복되는 class 지정에도 선택자를 잘 활용하면 클래스 지정없는 태크만으로 처리할 수 있는 부분이 많아보였습니다.</p>
-</div>
-<div class="paragraph">
-<p>이제 기초적인 것을 적용시킨 것 뿐이고 제가 공부할 것이 아직 많아서 갈 길이 멀다는 기분이에요. 그래도 간결한 jsp를 보니 몇달만에 방청소 했을 때보다 더 속이 시원합니다.</p>
-</div>
-<div class="paragraph">
-<p>그동안 UI단 코드의 중복에는 지나치게 관대하게 살아왔었다고 반성했습니다.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="웹표준관련_권장_자료">웹표준관련 권장 자료</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>(부서 후배 최효근씨가 추천해준 자료입니다)</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>한국소프트웨어진흥원의 실전웹표준가이드</p>
-</li>
-<li>
-<p>Head First HTML(XHTML, CSS) -한빛미디어-</p>
-</li>
-<li>
-<p>실용예제로 배우는 웹표준 -에이콘-                // 본격적인 활용기</p>
-</li>
-<li>
-<p>웹2.0을 이끄는 방탄웹 -에이콘-                    // 아이디어가 넘치는 책</p>
-</li>
-<li>
-<p>CSS 마스터 전략 -에이콘-</p>
-</li>
-<li>
-<p>CSS designing without tables -sitepoint-(원서)    // 무릅을 탁 치게 되는 책</p>
-</li>
-<li>
-<p>CSS the css anthology -sitepoint-(원서)</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-    </div>
-	
-	<section id="social-share">
-        <ul class="icons">
-<!-- Social Share Button HTML -->
-
-<!-- Twitter -->
-<li><a href="//twitter.com/share?url=https://blog.benelog.net//1314658.html&text=HTML &amp; CSS 정리해본 예&via=" target="_blank" class="share-btn twitter">
-    <i class="fa fa-twitter"></i>
-    <p>Twitter</p>
-</a></li>
-
-<!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=https://blog.benelog.net//1314658.html" target="_blank" class="share-btn google-plus">
-    <i class="fa fa-google-plus"></i>
-    <p>Google+</p>
-</a></li>
-
-<!-- Facebook -->
-<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//1314658.html" target="_blank" class="share-btn facebook">
-    <i class="fa fa-facebook"></i>
-    <p>Facebook</p>
-</a></li>
-
-<!-- Reddit (url, title) -->
-<li><a href="//reddit.com/submit?url=https://blog.benelog.net//1314658.html&title=HTML &amp; CSS 정리해본 예" target="_blank" class="share-btn reddit">
-    <i class="fa fa-reddit-alien"></i>
-    <p>Reddit</p>
-</a></li>
-
-<!-- LinkedIn -->
-<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//1314658.html&title=HTML &amp; CSS 정리해본 예" target="_blank" class="share-btn linkedin">
-    <i class="fa fa-linkedin"></i>
-    <p>LinkedIn</p>
-</a></li>
-
-<!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//1314658.html&title=HTML &amp; CSS 정리해본 예" target="_blank" class="share-btn stumbleupon">
-    <i class="fa fa-stumbleupon"></i>
-    <p>StumbleUpon</p>
-</a></li>
-
-<!-- Email -->
-<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//1314658.html" target="_blank" class="share-btn email">
-    <i class="fa fa-envelope"></i>
-    <p>Email</p>
-</a></li>
-        </ul>
-    </section>
-     
-
-    <footer>
-	
-		<ul class="stats">
-    	    <!-- Display the categories associated with this post -->
-    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/CSS.html'>CSS</a></li>
- 	        <li><a href='../tags/HTML.html'>HTML</a></li>
-
-				<li><a class="icon fa-comment" href="../1314658.html#disqus_thread"> &nbsp;</a></li>
- 		</ul>
-    	
-    </footer>
-</article>
 		
 <ul class="actions pagination">
     <li><a href="../26/"
             class=" button big previous">PREVIOUS</a></li>
 
     <li><span
-            class="button big"> 27 of 29 </span></li>
+            class="button big"> 27 of 30 </span></li>
 
     <li><a href="../28/"
             class=" button big next">NEXT</a></li>
@@ -712,6 +607,17 @@ h2 {
                     <li>
                         <article>
                             <header>
+                                <h3><a href="../migration-to-static-site.html">정적 사이트로 블로그 마이그레이션</a></h3>
+                                 <time class="published"
+							            datetime='May 06, 2019'>
+							            May 06, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
                                 <h3><a href="../robolectric.html">Robolectric을 활용한 안드로이드 쾌속 테스팅</a></h3>
                                  <time class="published"
 							            datetime='Oct 10, 2016'>
@@ -738,17 +644,6 @@ h2 {
                                  <time class="published"
 							            datetime='Nov 03, 2014'>
 							            Nov 03, 2014</time>
-                            </header>
-                        </article>
-                    </li>
-
-                    <li>
-                        <article>
-                            <header>
-                                <h3><a href="../3017438.html">Android에서 @Inject, @Test</a></h3>
-                                 <time class="published"
-							            datetime='Apr 17, 2013'>
-							            Apr 17, 2013</time>
                             </header>
                         </article>
                     </li>
@@ -1326,6 +1221,15 @@ h2 {
                         <article>
                             <header>
                                 <a href="../tags/DependencyInjection.html">DependencyInjection</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="../tags/static-site.html">static-site</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>

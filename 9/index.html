@@ -132,6 +132,9 @@
                     <h3>Recent Posts</h3>
                 </header>
                     <li>
+                        <a href="../../migration-to-static-site.html"><p>정적 사이트로 블로그 마이그레이션</p></a>
+                    </li>
+                    <li>
                         <a href="../../robolectric.html"><p>Robolectric을 활용한 안드로이드 쾌속 테스팅</p></a>
                     </li>
                     <li>
@@ -139,9 +142,6 @@
                     </li>
                     <li>
                         <a href="../../3120317.html"><p>시간대 DB에서 우리나라 시간의 오류</p></a>
-                    </li>
-                    <li>
-                        <a href="../../3017438.html"><p>Android에서 @Inject, @Test</p></a>
                     </li>
             </ul>
         </section>
@@ -157,6 +157,245 @@
 </section>
 	
 	<div id="main">
+<article class="post">
+   <header>
+    <div class="title">
+                    <h2><a href="../2802946.html">Spring의 @Scheduled annotation으로 설정된 cron expression을 테스트하기</a></h2>
+
+
+    </div>
+    <div class="meta">
+         <time class="published"
+            datetime='May 23, 2011'>
+            May 23, 2011</time>
+            <div class="published eta"></div>
+        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
+    </div>
+</header>
+
+    
+  
+         
+    <div id="content">
+       <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Spring 3.0부터는 Quartz가 없이도 실행 스케쥴 설정이 가능합니다. 설정과 테스트 방법을 정리했습니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="schedule_를_써서_크론_표현식_설정">@Schedule 를 써서 크론 표현식 설정</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>실행을 하고 싶은 메소드를 <code>@Component</code>, <code>@Schedule</code> annotaion을 통해 지정을 합니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Component
+public class BaseballScheduledJobLauncher extends JobLaunchSupport {
+
+.....
+
+    @Scheduled(cron="45 * * * * MON-FRI")
+    public void baseballJob() {
+        JobParameters params = createTimeParameter();
+        run("baseballJob", params);
+    }
+
+
+    @Scheduled(cron="45 10 5 * * MON-FRI")
+    public void baseballExportJob() {
+        JobParameters params = createTimeParameter();
+        run("baseballExportJob", params);
+    }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Java 파일에 설정된 Annotation을 인식하기 위해서 Application context의 xml파일에 component-scan과 annotation으로 schedule을 설정하겠다는 선언을 추가합니다.  그리고 schedule을 실행할 thread pool의 크기도 지정합니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">    &lt;context:component-scan base-package="edu.batch.baseball.schedule"/&gt;
+    &lt;task:scheduler id="myScheduler" pool-size="10"/&gt;
+    &lt;task:annotation-driven scheduler="myScheduler"/&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>'task&#8217;와 'component&#8217;의 namespace가 xml에 추가되어 있어야 합니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="테스트_코드">테스트 코드</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>테스트 코드를 단순하게 만들기 위해서 크론표현식을 추출하고 검사하는 코드는 SpringCronExpressionTestUtils클래스로 분리했습니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">package edu.batch.baseball.schedule;
+
+import static edu.batch.support.launch.SpringcronExpressionTestUtils.*;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.Test;
+
+import edu.batch.baseball.schedule.BaseballScheduledJobLauncher;
+
+public class BaseballScheduledJobLauncherTest {
+
+    private static final String DATE_PATTERN = "yyyy/MM/dd hh:mm:ss";
+
+    @Test
+    public void testBaseballJobSchedule() {
+        String initialTime = "2010/09/01 09:00:00";
+        List&lt;String&gt; expectedTimeList = Arrays.asList(
+                "2010/09/01 09:00:45",
+                "2010/09/01 09:01:45",
+                "2010/09/01 09:02:45");
+        String cronExpression = getcronExpressionOfMethod(BaseballScheduledJobLauncher.class, "baseballJob");
+        assertSchedule(cronExpression, initialTime, expectedTimeList,DATE_PATTERN);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">SpringCronExpressionTestUtils</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">package edu.batch.support.launch;
+
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+
+import java.lang.reflect.Method;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang.time.DateUtils;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.support.CronTrigger;
+import org.springframework.scheduling.support.SimpleTriggerContext;
+
+public class SpringCronExpressionTestUtils {
+
+    public static String getCronExpressionOfMethod(Class&lt;?&gt; targetClass,
+            String methodName)  {
+        Method scheduledMethod;
+        try {
+            scheduledMethod = targetClass.getDeclaredMethod(methodName,
+                    new Class[] {});
+        } catch (SecurityException e) {
+            throw new IllegalArgumentException("cannot access the method : " + methodName, e);
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException(e);
+        }
+        Scheduled scheduleInfo = scheduledMethod.getAnnotation(Scheduled.class);
+        String cronExpression = scheduleInfo.cron();
+        return cronExpression;
+    }
+
+    public static void assertSchedule(String cronExpression, String initialTime,
+            List&lt;String&gt; expectedTimeList, String datePattern) {
+        CronTrigger trigger = new CronTrigger(cronExpression);
+        Date startTime;
+        try {
+            startTime = DateUtils.parseDate(initialTime,
+                    new String[] { datePattern });
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("wrong date format", e);
+        }
+        SimpleTriggerContext context = new SimpleTriggerContext();
+        context.update(startTime, startTime, startTime);
+
+        for (String exptectedTime : expectedTimeList) {
+            Date nextExecutionTime = trigger.nextExecutionTime(context);
+            String actualTime = DateFormatUtils.format(nextExecutionTime,
+                    datePattern);
+            assertThat("executed on expected time", actualTime,
+                    is(exptectedTime));
+            context.update(nextExecutionTime, nextExecutionTime,
+                    nextExecutionTime);
+        }
+    }
+
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+    </div>
+	
+	<section id="social-share">
+        <ul class="icons">
+<!-- Social Share Button HTML -->
+
+<!-- Twitter -->
+<li><a href="//twitter.com/share?url=https://blog.benelog.net//2802946.html&text=Spring의 @Scheduled annotation으로 설정된 cron expression을 테스트하기&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+</a></li>
+
+<!-- Google Plus -->
+<li><a href="//plus.google.com/share?url=https://blog.benelog.net//2802946.html" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+</a></li>
+
+<!-- Facebook -->
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//2802946.html" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+</a></li>
+
+<!-- Reddit (url, title) -->
+<li><a href="//reddit.com/submit?url=https://blog.benelog.net//2802946.html&title=Spring의 @Scheduled annotation으로 설정된 cron expression을 테스트하기" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+</a></li>
+
+<!-- LinkedIn -->
+<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//2802946.html&title=Spring의 @Scheduled annotation으로 설정된 cron expression을 테스트하기" target="_blank" class="share-btn linkedin">
+    <i class="fa fa-linkedin"></i>
+    <p>LinkedIn</p>
+</a></li>
+
+<!-- StumbleUpon (url, title) -->
+<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//2802946.html&title=Spring의 @Scheduled annotation으로 설정된 cron expression을 테스트하기" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+</a></li>
+
+<!-- Email -->
+<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//2802946.html" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+</a></li>
+        </ul>
+    </section>
+     
+
+    <footer>
+	
+		<ul class="stats">
+    	    <!-- Display the categories associated with this post -->
+    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
+ 	        <li><a href='../tags/Spring.html'>Spring</a></li>
+ 	        <li><a href='../tags/Cron.html'>Cron</a></li>
+ 	        <li><a href='../tags/test.html'>test</a></li>
+ 	        <li><a href='../tags/Spring-Test.html'>Spring-Test</a></li>
+
+				<li><a class="icon fa-comment" href="../2802946.html#disqus_thread"> &nbsp;</a></li>
+ 		</ul>
+    	
+    </footer>
+</article>
 <article class="post">
    <header>
     <div class="title">
@@ -754,180 +993,13 @@ public class QuartzCronExpressionTestUtils {
     	
     </footer>
 </article>
-<article class="post">
-   <header>
-    <div class="title">
-                    <h2><a href="../2795888.html">java.net.InetAddress + SpEL로 서버이름을 Bean 설정에서 바로 얻어오기</a></h2>
-
-
-    </div>
-    <div class="meta">
-         <time class="published"
-            datetime='May 06, 2011'>
-            May 06, 2011</time>
-            <div class="published eta"></div>
-        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
-    </div>
-</header>
-
-    
-  
-         
-    <div id="content">
-       <div class="paragraph">
-<p>Spring 3.0부터 추가된 SpEL(Spring E-pression Language)를 응용한 사례입니다.</p>
-</div>
-<div class="paragraph">
-<p>application context 파일 선언만으로 특정 빈의 속성에 서버 이름을 넣으려면 어떻게 해야하냐는 질문을 받았습니다.</p>
-</div>
-<div class="paragraph">
-<p>질문자는 아래의 bean설정에 "serverName"이라고 지정된 곳에 각각 실행되는 서버마다 다른 이름을 넣고 싶어했습니다.</p>
-</div>
-<div class="listingblock">
-<div class="title">persistentMessageStore 선언</div>
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;bean id="persistentMessageStore" class="org.springframework.integration.jdbc.JdbcMessageStore"&gt;
-   &lt;property name="region" value="serverName" /&gt;
-....
-
-&lt;/bean&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>나름대로의 FactoryBean을 따로 만들거나 JavaConfig을 써도 쉽게 풀리는 문제이지만, SpEL을 활용하는 것이 기존 설정을 가장 적게 바꾸는 방식입니다.</p>
-</div>
-<div class="paragraph">
-<p>아래와 같이 java.net.InetAddress.getLocalHost를 bean으로 등록합니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;bean id="localHost" class="java.net.InetAddress" factory-method="getLocalHost"/&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>SPel이 잘 먹는지는 다음와 같이 테스트 할 수 있습니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
-public class HostNameTest {
-    @Value("#{localHost.hostName}") String hostName;
-    @Test
-    public void hostNameShouldBePrinted() throws Exception {
-        String expectedHostName = InetAddress.getLocalHost().getHostName();
-        assertThat(hostName,is(expectedHostName));
-        System.out.println(hostName);
-    }
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>위의 테스트 코드에서는 @ContextConfiuguration선언 뒤에 Application context 파일 위치를 지정하지 않았으므로,  default로 참조되는 같은 패키지 디렉토리의 HostNameTest-context.xml에 'localHost' bean이 선언되어 있어야 겠죠.</p>
-</div>
-<div class="paragraph">
-<p>제일 처음의 코드1의 bean선언에서도 마찬가지로 <code>#{localHost.hostName}</code> 을 참조할 수 있습니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;bean id="persistentMessageStore" class="org.springframework.integration.jdbc.JdbcMessageStore"&gt;
-   &lt;property name="region" value="#{localHost.hostName}" /&gt;
-....
-
-&lt;/bean&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>SpEL을 활용하면 아래와 같이 bean사이의 연결을 더 유연하게 할 수도 있지만, 컴파일타임에 검증되지 않는다는 단점이 있습니다. 이를 보완하려면 오타를 검증할 수 있는 테스트 코드가 있어야 합니다.</p>
-</div>
-<div class="paragraph">
-<p>다른 방법으로는,  JavaConfig를 활용해서 직접 명시적으로 메소드를 호출해서 hostName을 주입해도 됩니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Bean JdbcMessageStore persistentMessageStore(){
-    JdbcMessageStore store = new JdbcMessageStore ();
-    store.setRegion(localHost.getHostName());
-    return store;
-}
-
-@Bean public InetAddress localHost() throws UnknownHostException {
-    return  InetAddress.getLocalHost();
-}</code></pre>
-</div>
-</div>
-    </div>
-	
-	<section id="social-share">
-        <ul class="icons">
-<!-- Social Share Button HTML -->
-
-<!-- Twitter -->
-<li><a href="//twitter.com/share?url=https://blog.benelog.net//2795888.html&text=java.net.InetAddress + SpEL로 서버이름을 Bean 설정에서 바로 얻어오기&via=" target="_blank" class="share-btn twitter">
-    <i class="fa fa-twitter"></i>
-    <p>Twitter</p>
-</a></li>
-
-<!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=https://blog.benelog.net//2795888.html" target="_blank" class="share-btn google-plus">
-    <i class="fa fa-google-plus"></i>
-    <p>Google+</p>
-</a></li>
-
-<!-- Facebook -->
-<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//2795888.html" target="_blank" class="share-btn facebook">
-    <i class="fa fa-facebook"></i>
-    <p>Facebook</p>
-</a></li>
-
-<!-- Reddit (url, title) -->
-<li><a href="//reddit.com/submit?url=https://blog.benelog.net//2795888.html&title=java.net.InetAddress + SpEL로 서버이름을 Bean 설정에서 바로 얻어오기" target="_blank" class="share-btn reddit">
-    <i class="fa fa-reddit-alien"></i>
-    <p>Reddit</p>
-</a></li>
-
-<!-- LinkedIn -->
-<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//2795888.html&title=java.net.InetAddress + SpEL로 서버이름을 Bean 설정에서 바로 얻어오기" target="_blank" class="share-btn linkedin">
-    <i class="fa fa-linkedin"></i>
-    <p>LinkedIn</p>
-</a></li>
-
-<!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//2795888.html&title=java.net.InetAddress + SpEL로 서버이름을 Bean 설정에서 바로 얻어오기" target="_blank" class="share-btn stumbleupon">
-    <i class="fa fa-stumbleupon"></i>
-    <p>StumbleUpon</p>
-</a></li>
-
-<!-- Email -->
-<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//2795888.html" target="_blank" class="share-btn email">
-    <i class="fa fa-envelope"></i>
-    <p>Email</p>
-</a></li>
-        </ul>
-    </section>
-     
-
-    <footer>
-	
-		<ul class="stats">
-    	    <!-- Display the categories associated with this post -->
-    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/Spring.html'>Spring</a></li>
- 	        <li><a href='../tags/Spring-Test.html'>Spring-Test</a></li>
- 	        <li><a href='../tags/test.html'>test</a></li>
-
-				<li><a class="icon fa-comment" href="../2795888.html#disqus_thread"> &nbsp;</a></li>
- 		</ul>
-    	
-    </footer>
-</article>
 		
 <ul class="actions pagination">
     <li><a href="../8/"
             class=" button big previous">PREVIOUS</a></li>
 
     <li><span
-            class="button big"> 9 of 29 </span></li>
+            class="button big"> 9 of 30 </span></li>
 
     <li><a href="../10/"
             class=" button big next">NEXT</a></li>
@@ -993,6 +1065,17 @@ public class HostNameTest {
                     <li>
                         <article>
                             <header>
+                                <h3><a href="../migration-to-static-site.html">정적 사이트로 블로그 마이그레이션</a></h3>
+                                 <time class="published"
+							            datetime='May 06, 2019'>
+							            May 06, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
                                 <h3><a href="../robolectric.html">Robolectric을 활용한 안드로이드 쾌속 테스팅</a></h3>
                                  <time class="published"
 							            datetime='Oct 10, 2016'>
@@ -1019,17 +1102,6 @@ public class HostNameTest {
                                  <time class="published"
 							            datetime='Nov 03, 2014'>
 							            Nov 03, 2014</time>
-                            </header>
-                        </article>
-                    </li>
-
-                    <li>
-                        <article>
-                            <header>
-                                <h3><a href="../3017438.html">Android에서 @Inject, @Test</a></h3>
-                                 <time class="published"
-							            datetime='Apr 17, 2013'>
-							            Apr 17, 2013</time>
                             </header>
                         </article>
                     </li>
@@ -1607,6 +1679,15 @@ public class HostNameTest {
                         <article>
                             <header>
                                 <a href="../tags/DependencyInjection.html">DependencyInjection</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="../tags/static-site.html">static-site</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>

@@ -132,6 +132,9 @@
                     <h3>Recent Posts</h3>
                 </header>
                     <li>
+                        <a href="../../migration-to-static-site.html"><p>정적 사이트로 블로그 마이그레이션</p></a>
+                    </li>
+                    <li>
                         <a href="../../robolectric.html"><p>Robolectric을 활용한 안드로이드 쾌속 테스팅</p></a>
                     </li>
                     <li>
@@ -139,9 +142,6 @@
                     </li>
                     <li>
                         <a href="../../3120317.html"><p>시간대 DB에서 우리나라 시간의 오류</p></a>
-                    </li>
-                    <li>
-                        <a href="../../3017438.html"><p>Android에서 @Inject, @Test</p></a>
                     </li>
             </ul>
         </section>
@@ -157,6 +157,454 @@
 </section>
 	
 	<div id="main">
+<article class="post">
+   <header>
+    <div class="title">
+                    <h2><a href="../3120317.html">시간대 DB에서 우리나라 시간의 오류</a></h2>
+
+
+    </div>
+    <div class="meta">
+         <time class="published"
+            datetime='Nov 03, 2014'>
+            Nov 03, 2014</time>
+            <div class="published eta"></div>
+        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
+    </div>
+</header>
+
+    
+  
+         
+    <div id="content">
+       <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>변경이력</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>2015/02/13</p>
+<div class="ulist">
+<ul>
+<li>
+<p>tzdata2014j에 반영 사실 갱신</p>
+</li>
+<li>
+<p>북한의 시간대에 대한 진행 상황 설명</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>2014년 2월, 회사의 기술블로그인 <a href="http://helloworld.naver.com에" class="bare">http://helloworld.naver.com에</a> <a href="http://helloworld.naver.com/helloworld/64560">Java의 날짜와 시간 API</a>이라는 글을 기고한 적이 있습니다. 그 글을 쓰던 도중에 우리나라의 타임존 데이터에 대한 몇가지 의문을 가지게 되었지만 완벽히 해결하지는 못했었습니다.</p>
+</div>
+<div class="paragraph">
+<p>얼마 전에 이 문제를 좀 더 깊이 파악을 해보았고, 원천 데이터인 IANA Timezone 데이터베이스에 패치를 전달해서 반영되었습니다. 조사과정에서 1920년대부터 1999년까지의 과거 뉴스를 조회하는 네이버의 뉴스라이브러리 서비스 ( <a href="http://newslibrary.naver.com/" class="bare">http://newslibrary.naver.com/</a>) 가 큰 도움이 되었습니다.</p>
+</div>
+<div class="paragraph">
+<p>이 오류는 tzdata2014j에 반영되고, 이를 참조하는 Java, Android, FreeBSD에서도 2014년 11월경에 반영되었습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://permalink.gmane.org/gmane.comp.time.tz/9111">tzdata2014j의 릴리즈노트</a></p>
+</li>
+<li>
+<p><a href="https://bugs.openjdk.java.net/browse/JDK-8064560">JDK-8064560</a> : Open JDK의 반영. TZUpdater 1.4.10가 오류가 수정된 이 데이터를 참조하고, JDK 8u40, JDK
+7u80, JDK 7u75등 여러 버전에 백포트 패치</p>
+</li>
+<li>
+<p><a href="https://android.googlesource.com/platform/bionic.git/+/b11d8e057c86c3926128af9d07180d9328e144c6">Android에 반영 Commit</a></p>
+</li>
+<li>
+<p><a href="http://lists.freebsd.org/pipermail/svn-src-stable-10/2014-November/003831.html">FreeBSD에 반영 Commit</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>플랫폼별로 반영시점은 다르겠지만, 다른 OS에서 이를 반영할 것으로 예상합니다.</p>
+</div>
+<div class="paragraph">
+<p>현시점에서는 드물것 같지만, 혹시 우리나라의 1912 ~ 1980년대의 섬머타임과 시간대 변경에 영향받은 프로그램을 만드셨던 분이 있다면 참고로 알아둘만 합니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="섬머타임의_오류_발견">섬머타임의 오류 발견</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>처음 발견한 오류는 1988년의 섬머타임이 시작된 시간이였습니다. 아래 자료에 따르면 이 해의 섬머타임은 5월 8일 새벽 2시부터 시작되었습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>'한국 표준시', 위키백과, <a href="http://ko.wikipedia.org/wiki/한국_표준시" class="bare">http://ko.wikipedia.org/wiki/한국_표준시</a></p>
+</li>
+<li>
+<p><a href="http://newslibrary.naver.com/viewer/index.nhn?articleId=1988050700099215012&amp;editNo=1&amp;printCount=1&amp;publishDate=1988-05-07&amp;officeId=00009&amp;pageNo=15&amp;printNo=6822&amp;publishType=00020">'내일부터 서머타임&#8230;&#8203; 새벽2시를 3시로'</a>, 매일경제, 1988. 5. 7.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>그러나 Java프로그램으로는 1988년 5월 7일 23시의 1시간 후가 5월8일 1시인것으로 나와서 00시를 기점으로 섬머타임이 적용되어 있습니다. 아래 테스트는 아직 오류수정이 정식 릴리즈되지 않은 지금 시점에서는 통과합니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Test
+public void shouldGetAfterOneHour() {
+    TimeZone seoul = TimeZone.getTimeZone("Asia/Seoul");
+    Calendar calendar = Calendar.getInstance(seoul);
+    calendar.set(1988, Calendar.MAY , 7, 23, 0);
+    String pattern = "yyyy.MM.dd HH:mm";
+    String theTime = toString(calendar, pattern, seoul);
+    assertThat(theTime).isEqualTo("1988.05.07 23:00");
+    calendar.add(Calendar.HOUR_OF_DAY, 1);
+    String after1Hour = toString(calendar, pattern, seoul);
+    assertThat(after1Hour).isEqualTo("1988.05.08 01:00");}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>(자세한 설명은 <a href="http://helloworld.naver.com/helloworld/645609">Java의 날짜와 시간 API</a>,전체 소스는 <a href="https://github.com/benelog/java-date-time/blob/master/jdk7-date-time/src/test/java/com/nbp/weblab/date/OldJdkDateTest.java">OldJdkDateTest.java)</a> 참조)</p>
+</div>
+<div class="paragraph">
+<p>시간대 변경에 대한 정보는 윈도우즈, 안드로이드, OSX, 리눅스, Java, 오라클 등 거의 모든 플랫폼에서 Internet Assigned Numbers Authority (IANA)라는 조직에서 관리하는 시간대 데이터베이스를 원천으로 참조합니다. 처음에는 이 타임존 데이터베이스의 오류일지 아니면 다른 이유가 있을지 확신을 하지 못했습니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="오류의_역사">오류의 역사</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Helloworld에 글이 나간 후에 이응준님께서 알려주셔서 우리나라의 섬머타임을 기록한 사람이 누구인지 알게 되었습니다. Github에 올라간 <a href="https://github.com/eggert/tz의" class="bare">https://github.com/eggert/tz의</a> 커밋로그를 바탕으로 이를 자세히 분석해봤습니다.</p>
+</div>
+<div class="paragraph">
+<p>우리나라의 섬머타임에 대한 기록은 'Arthur David Olson&#8217;의 <a href="https://github.com/eggert/tz/commit/79373b10463c3b59a1b2af49491dc308efbad09d">1988년 1월 3일의 커밋</a>에 아래와 같이 처음으로 등장합니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code># Republic of Korea. According to someone at the Korean Times in San Francisco,# Daylight Savings Time was not observed until 1987. He did not know# at what time of day DST starts or ends.# Rule NAME FROM TO TYPE IN ON AT SAVE LETTER/SRule ROK 1987 max - May Sun&lt;=14 2:00 1:00 DRule ROK 1987 max - Oct Sun&lt;=14 3:00 0 S</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>주석을 봐서는 섬머타임의 시작시기도 정확히 몰랐던 사람의 증언을 참고로 한 듯합니다. 그리고 1987년 이전에는 우리나라에 섬머타임이 없었다는 이야기도 사실과 다릅니다.</p>
+</div>
+<div class="paragraph">
+<p>위의 코드로는 1987년부터 섬머타임이 계속되고 있다고 정의되었습니다. 1987,1988년에 우리나라에서 섬머타임이 실행되었으니 commit시점에서는 적어도 이 년도에 대해서는 맞는 데이터였습니다.</p>
+</div>
+<div class="paragraph">
+<p>그러나 1988년 이후로도 우리나라에서는 섬머타임이 계속되어 있는것처럼 한동안 유지가 됩니다. 1993년에 이르러서야 이 데이터는 정정됩니다.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/eggert/tz/commit/61315cadc3d0e8b4ef559539502a606cf58fc0f7">1993년 11월23일의 커밋</a>으로 다음의 날짜가 다시 반영됩니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>Rule ROK 1960 only - May 15 0:00 1:00 DRule ROK 1960 only - Sep 13 0:00 0 SRule ROK 1987 1988 - May Sun&lt;=14 0:00 1:00 DRule ROK 1987 1988 - Oct Sun&lt;=14 0:00 0 S</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>이 commit은 아래 2가지 오류를 담고 있습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>1987~1988년도의 섬머타임은 시작시간 2시부터인데 0시부터로 표기되었습니다.</p>
+</li>
+<li>
+<p>새로 추가한 1960년의 섬머타임은 실제로는 5월1일부터 9월18일까지였습니다. 위키페디아와 옛날신문의 자료가 일치합니다.</p>
+</li>
+<li>
+<p><a href="http://newslibrary.naver.com/viewer/index.nhn?articleId=1960050100209103019&amp;editNo=2&amp;printCount=1&amp;publishDate=1960-05-01&amp;officeId=00020&amp;pageNo=3&amp;printNo=11713&amp;publishType=00010">썸머타임 1일부터</a>, 동아일보, 1960.05.01</p>
+</li>
+<li>
+<p><a href="http://newslibrary.naver.com/viewer/index.nhn?articleId=1960091800209103010&amp;editNo=2&amp;printCount=1&amp;publishDate=1960-09-18&amp;officeId=00020&amp;pageNo=3&amp;printNo=11853&amp;publishType=00010">없어지는 섬머타임</a>, 동아일보, 1960.09.18</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>이외에도 이 Commit은 우리나라 시간대 변경에 대한 많은 오류를 포함하고 있습니다. 섬머타임 외의 오류는 나중에 다시 살펴보도록 하겠습니다.</p>
+</div>
+<div class="paragraph">
+<p>주석으로 볼때 위의 <a href="https://github.com/eggert/tz/commit/61315cadc3d0e8b4ef559539502a606cf58fc0f7">1993년 11월23일의 커밋</a>은 <a href="http://en.wikipedia.org/wiki/Thomas_G._Shanks">Thomas G. Shanks</a>의 The International Atlas의 제3판에 있는 내용을 반영한것을 보입니다. 주석에도 아래와 같이 미국이외의 타임존 정보는 별다른 명시가 없다면 이 책을 참고로 했다고 나옵니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code># A good source for time zone historical data outside the U.S. is# Thomas G. Shanks, The International Atlas (3rd edition),# San Diego: ACS Publications, Inc. (1991).# Except where otherwise noted, it is the source for the data below.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>지금 이 책은 <a href="http://www.amazon.com/International-Atlas-6th-Thomas-Shanks/dp/0935127887/">6판</a>까지 나와있고, 이후의 commit에서도 5판,6판을 따라서 수정한 내용이 보입니다.</p>
+</div>
+<div class="paragraph">
+<p>그 이후 <a href="https://github.com/eggert/tz/commit/da23b4d3897fd8a9e302ca0e85b25ce921f95ec7">2012년 7월 18일의 커밋</a>이 한번더 섬머타임 데이터를 수정했습니다. 1987년, 1988년의 표현규칙을 바꾼것으로 근본적인 오류가 수정되지는 않았습니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>Rule ROK 1987 1988 - May Sun&gt;=8    0:00 1:00 DRule ROK 1987 1988 - Oct Sun&gt;=8    0:00 0 S</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>1960년 이전의 데이터까지 포함한다면, IANA 데이터베이스에서 우리나라의 섬머타임이 제대로 반영된 적은 한번도 없었던 것입니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="패치_전달와_반영">패치 전달와 반영</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>조사결과 섬머타임의 오류를 확신하고, 이를 수정하는 패치파일을 직접 만들어서 시간대데이터를 관리하는 IANA에 메일(<a href="mailto:tz@iana.org">tz@iana.org</a> )로 보냈습니다. 여러 옛날 신문들을 많이 찾아본결과 <a href="http://ko.wikipedia.org/wiki/한국_표준시">위키페이디아의 '한국표준시&#8217;페이지</a>의 정보가 신뢰할만하다고 판단했습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>1948.06.01. 00:00 ~ 1948.09.13. 00:00</p>
+</li>
+<li>
+<p>1949.04.03. 00:00 ~ 1949.09.11. 00:00</p>
+</li>
+<li>
+<p>1950.04.01. 00:00 ~ 1950.09.10. 00:00</p>
+</li>
+<li>
+<p>1951.05.06. 00:00 ~ 1951.09.09. 00:00</p>
+</li>
+<li>
+<p>1955.05.05. 00:00 ~ 1955.09.09. 00:00</p>
+</li>
+<li>
+<p>1956.05.20. 00:00 ~ 1956.09.30. 00:00</p>
+</li>
+<li>
+<p>1957.05.05. 00:00 ~ 1957.09.22. 00:00</p>
+</li>
+<li>
+<p>1958.05.04. 00:00 ~ 1958.09.21. 00:00</p>
+</li>
+<li>
+<p>1959.05.03. 00:00 ~ 1959.09.20. 00:00</p>
+</li>
+<li>
+<p>1960.05.01. 00:00 ~ 1960.09.18. 00:00</p>
+</li>
+<li>
+<p>1987.05.10. 02:00 ~ 1987.10.11. 03:00</p>
+</li>
+<li>
+<p>1988.05.08. 02:00 ~ 1988.10.09. 03:00</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>예를 들면 1948년의 정보는 <a href="http://newslibrary.naver.com/viewer/index.nhn?articleId=1948060100209202008&amp;editNo=1&amp;printCount=1&amp;publishDate=1948-06-01&amp;officeId=00020&amp;pageNo=2&amp;printNo=7607&amp;publishType=00020">1948년 6월1일자 동아일보 기사</a>에서 확인할수 있습니다.</p>
+</div>
+<div class="paragraph">
+<p>패치절차는 시간대데이터베이스의 소스에 있는 <a href="https://github.com/eggert/tz/blob/master/CONTRIBUTING">CONTRIBUTING</a>파일에 잘 설명되어 있습니다. 정식절차와는 별도로 github에도 올려봤습니다. ( <a href="https://github.com/eggert/tz/pull/9" class="bare">https://github.com/eggert/tz/pull/9</a> )</p>
+</div>
+<div class="paragraph">
+<p>얼마 후 제가 보낸 패치를 포함하는 <a href="https://github.com/eggert/tz/commit/929c14a3d8ce505a9b8fb7099bee3a03ccf7e8e4">2014년 10월30일의 Commit</a>이 올라왔습니다. 'Unreleased, experimental changes&#8217;라는 문구가 포함되었지만, 이를 뒤집는 증거가 발견되지 않는한 정식릴리즈에 포함될 것으로 예상합니다.</p>
+</div>
+<div class="paragraph">
+<p>IANA쪽에서 이 수정을 받아준 Paul Eggert은 제가 섬머타임 변경의 근거로 보낸 <a href="http://ko.wikipedia.org/wiki/한국_표준시">위키페이디아의 '한국표준시&#8217;페이지</a>를 보고 우리나라의 시간대 변경시점에 대한 오류도 추가로 수정을 했습니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="시간대_변경시점의_오류">시간대 변경시점의 오류</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>처음에 보낸 패치에는 포함되지 못했지만 섬머타임 외에도 우리나라 시간대 변경에 대한 의문도 있었습니다. "yyyy.MM.dd HH:mm (Z)"을 포멧으로 해서, 1954년, 1961년, 1968년의 특정시간과 그 때와 UTC와의 차이를 출력해보면, 아래와 같이 나옵니다. (소스는 <a href="https://github.com/benelog/java-date-time/blob/master/jdk7-date-time/src/main/java/com/nbp/weblab/date/TimeZoneChangePoint.java">TimeZoneChangePoint.java</a> 참조 )</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>1954.03.20 22:59 (+0900)1954.03.20 23:00 (+0800)1961.08.09 23:59 (+0800)1961.08.10 00:30 (+0830)1968.09.30 23:59 (+0830)1968.10.01 00:30 (+0900)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>이 소스의 결과는 <a href="https://github.com/eggert/tz/commit/61315cadc3d0e8b4ef559539502a606cf58fc0f7">1993년 11월23일의 수정</a> 때 반영된 타임존DB의 정보에 의지합니다. 위의 결과라면 우리나라의 시간대 변경시점은 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>1954년 : UTC+0900 &#8594; UTC+0800</p>
+</li>
+<li>
+<p>1961년 : UTC+0800 &#8594; UTC+0830</p>
+</li>
+<li>
+<p>1968년 : UTC+0830 &#8594; UTC+090</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>그러나 과거 신문에서 확인한 역사적 사실은 아래와 같습니다. 위키페디아의 내용과도 일치합니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>1954년 : UTC+0900 &#8594; UTC+0830</p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://newslibrary.naver.com/viewer/index.nhn?articleId=1954032100209203002&amp;editNo=1&amp;printCount=1&amp;publishDate=1954-03-21&amp;officeId=00020&amp;pageNo=3&amp;printNo=9522&amp;publishType=00020">'오늘은 춘분 시간도 광복'</a>, 동아일보, 1954.03.21</p>
+</li>
+<li>
+<p><a href="http://newslibrary.naver.com/viewer/index.nhn?articleId=1954032100329203006&amp;editNo=1&amp;printCount=1&amp;publishDate=1954-03-21&amp;officeId=00032&amp;pageNo=3&amp;printNo=2462&amp;publishType=00020">'입일일은 춘분, 표준시간광복의 날'</a>. 경향신문, 1954.03.21</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>1961년 : UTC+0830 &#8594; UTC+0900</p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://newslibrary.naver.com/viewer/index.nhn?articleId=1961080900329203009&amp;editNo=2&amp;printCount=1&amp;publishDate=1961-08-09&amp;officeId=00032&amp;pageNo=3&amp;printNo=4796&amp;publishType=00020">'구일밤 통금 싸이렌 불면 시계 바늘을 12시반으로</a>, 경향신문, 1961.8.09</p>
+</li>
+<li>
+<p><a href="http://newslibrary.naver.com/viewer/index.nhn?articleId=1961081000209204005&amp;editNo=2&amp;printCount=1&amp;publishDate=1961-08-10&amp;officeId=00020&amp;pageNo=4&amp;printNo=12179&amp;publishType=00020">'새 표준자오선이란?'</a>, 동아일보, 1961.08.10</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>즉 현재의 시간대데이터로는 1961~1968년사이는 아예 우리나라의 시간대가 잘못 계산되어 나온다는 것입니다.</p>
+</div>
+<div class="paragraph">
+<p>이 부분은 섬머타임이 반영되는 것을 보고 조금 더 조사를 한 후에 추가 패치를 하려고 생각했었습니다. 기존 데이터가 그렇게까지 다 틀렸다는 것이 믿기가 어려웠고, 우리나라의 시간대 정보에 대한 거의 모든것을 한번에 고치기가 조심스러웠기 때문입니다. 그런데 Paul Eggert가 먼저 적극적으로 반영해주었습니다.</p>
+</div>
+<div class="paragraph">
+<p>Paul Eggert는 이와 더불어 <a href="http://ko.wikipedia.org/wiki/한국_표준시">위키페이디아의 '한국표준시&#8217;페이지</a>에 따르면 1912년에 UTC+0900로 변경이 있었는데, 1910년에도 같은 변경이 있었던것으로 기록된 부분이 혼동된다며 이를 명확히 확인해주었다면 좋겠다고 했습니다. 위키페디아에서 1910년도 변경의 근거로 든 '여적 표준시 변경, 경향신문, 2000-08-14.'라는 자료는 현재 인터넷으로 찾을 수 없어서 대신 여러 기록을 확인해보았습니다. 많은 자료가 1912년에 변경되었다는것으로 일치했고, 1910년도의 변경기록은 누군가가 한일합방 연도와 혼동한것이 아닐까하는 의견을 답장으로 보냈습니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="북한의_타임존_데이터">북한의 타임존 데이터</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>또하나 의문이였던 점은 <a href="https://github.com/eggert/tz/commit/61315cadc3d0e8b4ef559539502a606cf58fc0f7">1993년 11월23일의 커밋</a>으로 북한의 시간대가 1961년에 UTC+0900으로 변경되었다는 내용입니다. 그때 남한 쪽에서 시간대 변경이 있었는데, 당시 신문을 다 찾아봐도 남북한이 동시에 추진을 했다는 내용은 없었습니다.</p>
+</div>
+<div class="paragraph">
+<p>Paul Eggert도 이를 이상하게 여겨 일단은 북한쪽은 1940년대 이후로 변화가 없는것으로 가정했다고 합니다.</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>While we&#8217;re in the neighborhood, it&#8217;s completely implausible that Pyongyang faithfully mimicked Seoul time during and after the Korean war (which is what Shanks says), so let&#8217;s remove that obviously-bogus guess.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>저도 답장으로 북한쪽의 변경에 대한 의미있는 기록을 찾지 못했고, Paul Eggert의 가정에 동의한다는 내용을 보냈습니다.</p>
+</div>
+<div class="paragraph">
+<p>tzdata2014j버전대로라면 1954년과 1961년 사이 서울과 평양사이에는 30분의 시차가 존재합니다. 이 것이 역사적 사실과 부합하는지 알아내려고 계속 알아보고 있는 중입니다. 현재 한국표준과학연구원과 통일부, 국정원에 문의를 했지만, 의미있는 답변은 받지 못했습니다. 특히 친절히 전화까지 해주신 통일부 직원분께 감사드립니다.</p>
+</div>
+<div class="paragraph">
+<p>1954년과 1961년 사이에 남파/북파 간첩활동을 한 분이 있다면, 그 사실을 정확히 알고 있을 것 같기도 합니다. 그런데 과거 간첩사건을 조사해보니 생각보다 간첩들의 나이가 많아서 지금까지 생존한 분이 계실 가능성은 별로 없어보입니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="마치며">마치며</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>재미있게도 위의 오류를 신고한지 얼마뒤인 2014년 11월 1일에 'https://github.com/eggert/tz/commit/bee436b03e28bd5ea984534fcc5e4f3a4d18b47a[Be less enthusiastic about Shanks and clarify UT vs UTC.] '라는 제목으로 commit이 올라왔습니다. 우리나라 시간대에 대한 잘못된 정보의 출처였던 Shanks의 저서에 많은 오류가 있음을 지적하는 주석이 들어갔습니다. 아시아, 아프리카, 오스트랄라시아, 유럽 등 지역별 정보를 기록하는 모든 파일에 'A good source for time zone historical data outside the U.S. is..'라는 내용이 삭제되고, 'unfortunately this book contains many errors and cites no sources.'라는 문장이 추가되었습니다.</p>
+</div>
+<div class="paragraph">
+<p>저의 신고가 영향을 준것인지는 알 수 없지만, 이 주석을 기점으로 기존의 데이터를 조금 더 의심하는 계기가 될 것으로 기대합니다.</p>
+</div>
+<div class="paragraph">
+<p>비록 오래전 과거데이터라서 지금 시점의 영향성은 적지만, 믿음직한 표준데이터라고 생각했던 IANA Timezone DB에 이렇게 오류가 많았다는 점, 특히 우리나라 관련한 데이터에는 제대로 된 것이 거의 없었다는 사실은 놀랍습니다. 우리나라의 과거 자료와는 별도로, 국제화관련 개발을 하는 사람이라면 내 컴퓨터/내 담당서버에 들어와있는 타임존데이터베이스가 언제 시점인지, 업데이트는 잘 되어 있는지도 잘 확인해봐야겠습니다.</p>
+</div>
+<div class="paragraph">
+<p>지금까지의 내용과 관련된 메일스레드는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>2014년 10월 30일 00:07:24 (UTC) From 정상혁, To <a href="mailto:tz@iana.org">tz@iana.org</a> : 최초 패치를 보낸 메일 <a href="http://mm.icann.org/pipermail/tz/2014-October/021830.html" class="bare">http://mm.icann.org/pipermail/tz/2014-October/021830.html</a></p>
+</li>
+<li>
+<p>2014년 10월 30일 06:53:09 (UTC) From Paul Eggert, To 정상혁 : 답장과 1910년 시간대 변경에 대한 문의 <a href="http://mm.icann.org/pipermail/tz/2014-October/021831.html" class="bare">http://mm.icann.org/pipermail/tz/2014-October/021831.html</a></p>
+</li>
+<li>
+<p>2014년 10월 30일 09:18:57 (UTC) From 정상혁, To Paul Eggert : 1910년의 시간대 변경과 북한시간대에 대한 의견 : <a href="http://mm.icann.org/pipermail/tz/2014-October/021833.html" class="bare">http://mm.icann.org/pipermail/tz/2014-October/021833.html</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+	
+	<section id="social-share">
+        <ul class="icons">
+<!-- Social Share Button HTML -->
+
+<!-- Twitter -->
+<li><a href="//twitter.com/share?url=https://blog.benelog.net//3120317.html&text=시간대 DB에서 우리나라 시간의 오류&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+</a></li>
+
+<!-- Google Plus -->
+<li><a href="//plus.google.com/share?url=https://blog.benelog.net//3120317.html" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+</a></li>
+
+<!-- Facebook -->
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//3120317.html" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+</a></li>
+
+<!-- Reddit (url, title) -->
+<li><a href="//reddit.com/submit?url=https://blog.benelog.net//3120317.html&title=시간대 DB에서 우리나라 시간의 오류" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+</a></li>
+
+<!-- LinkedIn -->
+<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//3120317.html&title=시간대 DB에서 우리나라 시간의 오류" target="_blank" class="share-btn linkedin">
+    <i class="fa fa-linkedin"></i>
+    <p>LinkedIn</p>
+</a></li>
+
+<!-- StumbleUpon (url, title) -->
+<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//3120317.html&title=시간대 DB에서 우리나라 시간의 오류" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+</a></li>
+
+<!-- Email -->
+<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//3120317.html" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+</a></li>
+        </ul>
+    </section>
+     
+
+    <footer>
+	
+		<ul class="stats">
+    	    <!-- Display the categories associated with this post -->
+    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
+ 	        <li><a href='../tags/timezone.html'>timezone</a></li>
+ 	        <li><a href='../tags/시간대.html'>시간대</a></li>
+ 	        <li><a href='../tags/날짜.html'>날짜</a></li>
+
+				<li><a class="icon fa-comment" href="../3120317.html#disqus_thread"> &nbsp;</a></li>
+ 		</ul>
+    	
+    </footer>
+</article>
 <article class="post">
    <header>
     <div class="title">
@@ -538,394 +986,13 @@ Robolectric.bindShadowClass(ShadowLog.class);</code></pre>
     	
     </footer>
 </article>
-<article class="post">
-   <header>
-    <div class="title">
-                    <h2><a href="../3017439.html">10 things you need to know about Android and Google Play - Tony Chan (Google), GDG Korea Android 컨퍼런</a></h2>
-
-
-    </div>
-    <div class="meta">
-         <time class="published"
-            datetime='Apr 17, 2013'>
-            Apr 17, 2013</time>
-            <div class="published eta"></div>
-        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
-    </div>
-</header>
-
-    
-  
-         
-    <div id="content">
-       <div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>지난 2013/04/13일, 종로 페럼타회에서 열렸던 '구글 개발자와 함께하는 GDG Korea Android 컨퍼런스 '에서 공유된 내용입니다.</p>
-</div>
-<div class="paragraph">
-<p>참석해서 메모했던 내용을 정리합니다.</p>
-</div>
-<div class="paragraph">
-<p>구글 Play와 API, 권장 UI스타일, 정책 등 다양한 주제를 이야기한 발표였습니다.  UX설계를 할 때 많은 고민이 필요하겠다고 느꼈습니다.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="1_think_global">1. Think Global</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>한 지역만 염두에 둔다면 기회를 놓히고 있는것이다. 구글 Play 수익의 67%가 미국외에서 나오고 있다.</p>
-</li>
-<li>
-<p>Localization을 고려해라. 구글 Play의 그래픽스와 비디오도 이제 로컬라이즈되었다.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>웹애플리케이션은 국제화에 대한 고려를 하는 비율이 높지 않습니다. 앱개발은 반대로 국제화를 고려하지 않는 것이 더 합당한 이유가 있어야하는 듯합니다. 기준이 차이가 생겼다고 느껴집니다.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="2_pure_android">2. Pure Android</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>다른 플랫폼의 UI형태를 모망하지 마라. 각각의 플랫폼은 고유한 스타일이 있다.</p>
-</li>
-<li>
-<p>플랫폼 특화된 아이콘을 밖에서 쓰지 말라.</p>
-</li>
-<li>
-<p>바닥에 붙은 탭바를 쓰지 마라. (아이폰 스타일)</p>
-</li>
-<li>
-<p>별도의 라벨이 붙은 백버튼, 'right point caret'(&gt;) 버튼을 쓰지 마라. 백버튼을 플랫폼에서 제공하는 것을 쓰도록 유도해야 한다.</p>
-</li>
-<li>
-<p>UI에 대한 지침을 지키지 않으면 사용자가 안 좋은 Rating을 할 것이다.</p>
-</li>
-<li>
-<p>이전의 안드로이드 버전에 지원하던 스타일의 레가시 버튼을 쓰지 마라.</p>
-</li>
-<li>
-<p>Action bar를 써라. 곧 support 라이브리리를 통해 하위 버전에서도 ActionBar를 쓸 수 있게 될 것이다. 지금도 오픈소스로 <a href="http://actionbarsherlock.com/">Actionbar-sherlock</a>이 있지만, 기본 SDK에서 이제 지원된다.</p>
-</li>
-<li>
-<p>가장 최신의 SDK에 targeting하라. 최신의 SDK에서만 돌아가야한다는 의미는 아니다. 하위버전에서도 돌아가도록 만들면서도 상위버전에서는 최신의 UI 요소들을 활용해야 한다.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>개별 앱의 UI는 같은 플랫폼 내에서의 일관성을 해치지 않아야한다는 지침을 강조했습니다. 같은 사용자가 2개의 다른 플랫폼을 오가면서 같은 앱을 사용하는 경우보다는, 하나의 플랫폼에서 여러 앱을 사용하므로 플랫폼 내에서의 일관성이 중요한 것은 당연한듯합니다.</p>
-</div>
-<div class="paragraph">
-<p>기획자나 디자이너 입장에서는 하나의 앱을 출시하면 여러 플랫폼이 동일한 UI로 나오기를 바랄 수도 있을 듯한데, 이러한 지침을 초기부터 염두에 두고 엔지니어가 피드백을 줄 수 있어야겠습니다. <a href="http://developer.android.com/design/index.html">안드로이드 디자인가이드</a>도 정독해봐야겠구나 싶었습니다.</p>
-</div>
-<div class="paragraph">
-<p>그리고 <a href="http://actionbarsherlock.com/">Actionbar-sherlock</a>에서 해주던 ActionBar의 하위 호환성 지원이 support 라이브러리에 들어간다는 소식도 반가웠습니다. Fragment가 support 라이브러리에서 지원되는 것을 생각하면 자연스러운 개선이기도 합니다.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="3_design_for_all_form_factors">3. Design for all form-factors</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>Fragment를 써라</p>
-</li>
-<li>
-<p>타블릿과 폰을 위해서 별도의 프로젝트를 프로젝트를 만드는것은 바람직하지 않다. Fragment를 이용해서 타블릿에서는 하나의 Activity에 여러개의 Fragment가, 폰에서는 Activity당 하나의 Fragment를 보여주는 식으로 구성하면 얼마든지 하나의 프로젝트로 구성할 수 있다.</p>
-</li>
-<li>
-<p>UI요소의 크기는 기기의 해상도에 독립적이도록 DP를 쓰고, 텍스트에는 SP를 써라.</p>
-</li>
-<li>
-<p>적어도 3개의 레이아웃을 고려해라. 폰, 7인치 타블릿, 10인치 타블릿. DP는 해상도 문제만 해결할 뿐, 다른 사이즈에 대한 문제는 별도로 고려해야 한다.</p>
-</li>
-<li>
-<p>지원하려는 화면 밀도(Density), 해당도에 맞는 Asset, 이미지을 각각 준비해라. Aliasing은 보기에도 좋기않고 CPU를 많이 사용해서 배터리 사용시간을 짧아지게 한다.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>DP에 대해서는 아래 그림 1장이 직관적인 이해에 많은 도움이 되었습니다.
-<span class="image-wrap"><span class="image"><img src="http://cfile8.uf.tistory.com/image/11355F45516932300FB576" alt="11355F45516932300FB576"></span></span></p>
-</div>
-<div class="paragraph">
-<p>(이미지 출처 : <a href="http://www.kmshack.kr/317#.UWy9VIpdUbj" class="bare">http://www.kmshack.kr/317#.UWy9VIpdUbj</a> )</p>
-</div>
-<div class="paragraph">
-<p>웹에서는 '방탄형 웹&#8217;이나 '반응형 웹디자인&#8217;에 대한 많은 노하우가 공유되고 있는데, 안드로이드에서도 점점 더 섬세한 노하우들이 공유될 것 같습니다.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="4_correct_back_button_behaviors">4. Correct back button behaviors</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>앱의 메인 화면에서 사용자는 홈스크린으로 바로 돌아갈 수 있어야 한다. 종료 할때 다이얼로그로 종료할지 물어보는 방식으로 Back에 대한 이벤트를 강제적으로 막지마라.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>많은 앱이 이렇게 되어 있지 않기에 다소 의외의 가이드라고 느껴졌습니다. 이것도 일관성을 생각하면 의미 있는 지침입니다.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="5_proper_notification">5. Proper notification</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>핵심 기능에 대해서 통지해라. 광고에 Notification을 쓰지 마라.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="6_app_quality_improvement">6. App quality improvement</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="http://bit.ly/google-play-core-checklist" class="bare">http://bit.ly/google-play-core-checklist</a> 참고</p>
-</li>
-<li>
-<p><a href="http://bit.ly/google-play-tablet-checklist" class="bare">http://bit.ly/google-play-tablet-checklist</a> 참고</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>한글 번역도 <a href="http://googledevkr.blogspot.kr/2013/01/app-quality-guidelines.html" class="bare">http://googledevkr.blogspot.kr/2013/01/app-quality-guidelines.html</a> 에서 보실 수 있습니다.</p>
-</div>
-<div class="paragraph">
-<p>(이 포스트를 쓰고 난 후에 권순선님께서 알려주셨습니다.)</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="7_permission">7. Permission</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>핵심기능에 필요한 최소한의 권한만 부여하도록 해라.</p>
-</li>
-<li>
-<p>민감한 권한을 너무 많이 가지고 있으면 당신에게 해가 된다. 앱의 다운로드 숫자나 주목 받을 기회가 줄어들 것이다.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="8_google_play_service">8. Google play service</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>구글에서 제공하는 서비스 API를 나열하면서 소개.</p>
-</li>
-<li>
-<p>Maps API 2, Google+, Google Authorization, Google Play services APK 등</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>위 내용은 <a href="http://developer.android.com/google/play-services/index.html에" class="bare">http://developer.android.com/google/play-services/index.html에</a> 자세히 나와 있습니다.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="9_new_platform_api">9. New platform API</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>새로 추가된 API를 간단히 나열.</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Lock screen widget</p>
-</li>
-<li>
-<p>Seconary display</p>
-</li>
-<li>
-<p>Day dreams (interactive screensaver mode)</p>
-</li>
-<li>
-<p>Natvie RTL(right-to-left) support</p>
-</li>
-<li>
-<p>Tablet sharing</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>최근 업데이트된 API 소개</p>
-<div class="ulist">
-<ul>
-<li>
-<p>GCM</p>
-</li>
-<li>
-<p>Analystic SDK</p>
-</li>
-<li>
-<p>In-app Billing V3 (V2는 더이상 쓰지마라)</p>
-</li>
-<li>
-<p>Youtube android player</p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>자세한 내용은 <a href="http://developer.android.com/about/versions/jelly-bean.html에" class="bare">http://developer.android.com/about/versions/jelly-bean.html에</a> 있습니다.</p>
-</div>
-<div class="paragraph">
-<p>발표된지는 한참된 기능이지만, 이렇게 모아서 보니 앱개발자가 화면을 다양하게 활용할 수 있는 여지가 더 늘어나고 있다고 느껴졌습니다. 이에 따라 새로운 사업모델도 나올 수 있었는데, 이런 아이디어들이 기획부서에서만 나오기를 기다리는 것보다 개발자들도 적극 제안을 해 보면 어떨까하는 생각이 들었습니다. 개발자들은 새로운 API가 추가되는것을 늘 관심있게 보고 있기 때문에 자연스럽게 아이디어가 나올만도 합니다. Lock screen widget을 이용한 광고 제품이 나왔듯이, 앞으로도 그런 기회가 많이 남아 있을 것이라고 기대가 됩니다.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="10_publishing_on_google_play">10. Publishing on google play</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>Google play는 풍부하게 미디어를 활용한다.</p>
-<div class="ulist">
-<ul>
-<li>
-<p>특징을 멋지고 깔끔한 이미지로</p>
-</li>
-<li>
-<p>스크린샷</p>
-</li>
-<li>
-<p>짧은 유튜브 동영상</p>
-</li>
-<li>
-<p>로컬라이케이션</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>대표적인 정책 위반 사례들.</p>
-<div class="ulist">
-<ul>
-<li>
-<p>3rd party 지불</p>
-</li>
-<li>
-<p>다운로드를 위해 3rd party 사이트로의 연결</p>
-</li>
-<li>
-<p>스팸 키워드</p>
-</li>
-<li>
-<p>별점에 인센티브 부과</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>정책에 대한 자세한 내용은 <a href="http://bit.ly/google-play-policy-edu" class="bare">http://bit.ly/google-play-policy-edu</a> 참조</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>정책에 따라 구현이 달라져야 할 부분을 미리 파악하고 있으려면 꾸준한 관심을 가져야겠습니다.</p>
-</div>
-</div>
-</div>
-    </div>
-	
-	<section id="social-share">
-        <ul class="icons">
-<!-- Social Share Button HTML -->
-
-<!-- Twitter -->
-<li><a href="//twitter.com/share?url=https://blog.benelog.net//3017439.html&text=10 things you need to know about Android and Google Play - Tony Chan (Google), GDG Korea Android 컨퍼런&via=" target="_blank" class="share-btn twitter">
-    <i class="fa fa-twitter"></i>
-    <p>Twitter</p>
-</a></li>
-
-<!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=https://blog.benelog.net//3017439.html" target="_blank" class="share-btn google-plus">
-    <i class="fa fa-google-plus"></i>
-    <p>Google+</p>
-</a></li>
-
-<!-- Facebook -->
-<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//3017439.html" target="_blank" class="share-btn facebook">
-    <i class="fa fa-facebook"></i>
-    <p>Facebook</p>
-</a></li>
-
-<!-- Reddit (url, title) -->
-<li><a href="//reddit.com/submit?url=https://blog.benelog.net//3017439.html&title=10 things you need to know about Android and Google Play - Tony Chan (Google), GDG Korea Android 컨퍼런" target="_blank" class="share-btn reddit">
-    <i class="fa fa-reddit-alien"></i>
-    <p>Reddit</p>
-</a></li>
-
-<!-- LinkedIn -->
-<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//3017439.html&title=10 things you need to know about Android and Google Play - Tony Chan (Google), GDG Korea Android 컨퍼런" target="_blank" class="share-btn linkedin">
-    <i class="fa fa-linkedin"></i>
-    <p>LinkedIn</p>
-</a></li>
-
-<!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//3017439.html&title=10 things you need to know about Android and Google Play - Tony Chan (Google), GDG Korea Android 컨퍼런" target="_blank" class="share-btn stumbleupon">
-    <i class="fa fa-stumbleupon"></i>
-    <p>StumbleUpon</p>
-</a></li>
-
-<!-- Email -->
-<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//3017439.html" target="_blank" class="share-btn email">
-    <i class="fa fa-envelope"></i>
-    <p>Email</p>
-</a></li>
-        </ul>
-    </section>
-     
-
-    <footer>
-	
-		<ul class="stats">
-    	    <!-- Display the categories associated with this post -->
-    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/Android.html'>Android</a></li>
- 	        <li><a href='../tags/행사후기.html'>행사후기</a></li>
-
-				<li><a class="icon fa-comment" href="../3017439.html#disqus_thread"> &nbsp;</a></li>
- 		</ul>
-    	
-    </footer>
-</article>
 		
 <ul class="actions pagination">
     <li><a href="../"
             class=" button big previous">PREVIOUS</a></li>
 
     <li><span
-            class="button big"> 2 of 29 </span></li>
+            class="button big"> 2 of 30 </span></li>
 
     <li><a href="../3/"
             class=" button big next">NEXT</a></li>
@@ -991,6 +1058,17 @@ Robolectric.bindShadowClass(ShadowLog.class);</code></pre>
                     <li>
                         <article>
                             <header>
+                                <h3><a href="../migration-to-static-site.html">정적 사이트로 블로그 마이그레이션</a></h3>
+                                 <time class="published"
+							            datetime='May 06, 2019'>
+							            May 06, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
                                 <h3><a href="../robolectric.html">Robolectric을 활용한 안드로이드 쾌속 테스팅</a></h3>
                                  <time class="published"
 							            datetime='Oct 10, 2016'>
@@ -1017,17 +1095,6 @@ Robolectric.bindShadowClass(ShadowLog.class);</code></pre>
                                  <time class="published"
 							            datetime='Nov 03, 2014'>
 							            Nov 03, 2014</time>
-                            </header>
-                        </article>
-                    </li>
-
-                    <li>
-                        <article>
-                            <header>
-                                <h3><a href="../3017438.html">Android에서 @Inject, @Test</a></h3>
-                                 <time class="published"
-							            datetime='Apr 17, 2013'>
-							            Apr 17, 2013</time>
                             </header>
                         </article>
                     </li>
@@ -1605,6 +1672,15 @@ Robolectric.bindShadowClass(ShadowLog.class);</code></pre>
                         <article>
                             <header>
                                 <a href="../tags/DependencyInjection.html">DependencyInjection</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="../tags/static-site.html">static-site</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>

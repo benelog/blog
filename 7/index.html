@@ -132,6 +132,9 @@
                     <h3>Recent Posts</h3>
                 </header>
                     <li>
+                        <a href="../../migration-to-static-site.html"><p>정적 사이트로 블로그 마이그레이션</p></a>
+                    </li>
+                    <li>
                         <a href="../../robolectric.html"><p>Robolectric을 활용한 안드로이드 쾌속 테스팅</p></a>
                     </li>
                     <li>
@@ -139,9 +142,6 @@
                     </li>
                     <li>
                         <a href="../../3120317.html"><p>시간대 DB에서 우리나라 시간의 오류</p></a>
-                    </li>
-                    <li>
-                        <a href="../../3017438.html"><p>Android에서 @Inject, @Test</p></a>
                     </li>
             </ul>
         </section>
@@ -157,6 +157,249 @@
 </section>
 	
 	<div id="main">
+<article class="post">
+   <header>
+    <div class="title">
+                    <h2><a href="../2875999.html">Winstone, 경량 Servlet container</a></h2>
+
+
+    </div>
+    <div class="meta">
+         <time class="published"
+            datetime='Nov 25, 2011'>
+            Nov 25, 2011</time>
+            <div class="published eta"></div>
+        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
+    </div>
+</header>
+
+    
+  
+         
+    <div id="content">
+       <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Winstone(<a href="http://winstone.sourceforge.net/" class="bare">http://winstone.sourceforge.net/</a> )은 jar파일 하나로 실행되는 간단한 Servlet Container입니다.</p>
+</div>
+<div class="paragraph">
+<p>FTP처럼 서버에 있는 파일을 다운로드 할 때나, 웹애플리케이션을 jar파일로 패키징해서 WAS 설치없이 독립적으로 실행되도록 만드는 용도로 사용할 수 있습니다.</p>
+</div>
+<div class="paragraph">
+<p>참고로, Hudson에서도 winstone을 활용하고 있습니다.  hudson.war를 WAS에 설치하지 않아도  java -jar 로 바로 실행시킬 수도 있는데, 이 기능이 Hudson 패키징 파일 안에 내장된 winstone을 이용하는 방식입니다.</p>
+</div>
+<div class="paragraph">
+<p>이 winstone을 간단하게 활용하는 방법을 정리해봤습니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ftp대용으로_쓰기">FTP대용으로 쓰기</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>아래 URL에서 winstone의 jar파일이 제공됩니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://sourceforge.net/projects/winstone/files/" class="bare">http://sourceforge.net/projects/winstone/files/</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>저는 접근하기 편한 URL에 올려놓고 wget 으로 다운로드하고 있습니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>wget benelog.net/winstone.jar</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>받은 파일을 <code>java -jar</code> 로 간단하게 실행하면 됩니다.</p>
+</div>
+<div class="paragraph">
+<p>현재 디렉토리를 최상위 폴더로 실행하려면 아래와 같이 하면 됩니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>java -jar winstone.jar --webroot=.</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>HTTP 포트를 지정하려면 --httpPort 옵션을 붙이면 됩니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>java -jar winstone.jar --webroot=. --httpPort=18080</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>그런 다음 해당서버에 지정된 포트로 접근하면 디렉토리의 파일 목록이 뜹니다. FTP와는 다르게 비밀번호가 없이 접근이 되므로 보안문제가 염려된다면 외부에 공개되지 않은 포트로 띄어야 하겠습니다.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/web-server/winstone.jpg" alt="winstone" title="winstone.jpg"></span></p>
+</div>
+<div class="paragraph">
+<p>그외의 다양한 옵션은 Winstone의 사이트(<a href="http://winstone.sourceforge.net/">http://winstone.sourceforge.net/</a> )에 자세히 나와 있습니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="웹애플리케이션을_jar파일_하나로_실행되도록_패키징">웹애플리케이션을 jar파일 하나로 실행되도록 패키징</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>앞선 hudson의 사례처럼, 별도의 WAS설치 없이 웹어플리션 배포 파일 자체에 WAS를 내장하는 방식입니다.</p>
+</div>
+<div class="paragraph">
+<p>Jetty를  애플리케이션 안에서 직접 심어서(Embedding) 실행시켜도 같은 효과가 있습니다. 제가 간단하게 만들었던, <a href="http://blog.benelog.net/2874354">dumper</a>라는 도구에서도 그 방식을 활용했습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/benelog/dumper/blob/master/src/main/java/Start.java" class="bare">https://github.com/benelog/dumper/blob/master/src/main/java/Start.java</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Jetty를 war파일 안에 패키징해서 독립적을 실행가능한 방식도 있습니다. 아래 자료에 설명되어 있습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://eclipsesource.com/blogs/2009/10/02/executable-wars-with-jetty/">http://eclipsesource.com/blogs/2009/10/02/executable-wars-with-jetty/</a></p>
+</li>
+<li>
+<p><a href="http://www.jowisoftware.de/blog/archives/26-Creating-runnable-wars-with-Maven-and-Jetty.html">http://www.jowisoftware.de/blog/archives/26-Creating-runnable-wars-with-Maven-and-Jetty.html</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>그런데 위의 방식은 따로 실행 시작점이 되는 클래스를 만들어줘야하고, maven설정을 다소 많이 고쳐야하는 단점이 있습니다.</p>
+</div>
+<div class="paragraph">
+<p>이에 반해서 winstone은 소스파일은 하나도 건드릴 필요없이, maven 설정도 건드리지 않거나 약간만 추가해서 혼자서 실행되는 jar파일을 만들어줍니다.</p>
+</div>
+<div class="paragraph">
+<p>아무런 설정이 없어도 아래와 같이 실행하면 taget 폴더 아래에 .jar파일을 만들어 줍니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>mvn net.sf.alchim:winstone-maven-plugin:embed</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>그리고 pom.xml에 아래 설정을 추가하면 'mvn package&#8217;로 패키징을 할 때마다 war파일과 함께 독립실행 가능한 jar파일도 만들어줍니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">      &lt;plugin&gt;
+        &lt;groupId&gt;net.sf.alchim&lt;/groupId&gt;
+        &lt;artifactId&gt;winstone-maven-plugin&lt;/artifactId&gt;
+        &lt;version&gt;1.2&lt;/version&gt;
+        &lt;executions&gt;
+          &lt;execution&gt;
+            &lt;phase&gt;package&lt;/phase&gt;
+            &lt;goals&gt;
+              &lt;goal&gt;embed&lt;/goal&gt;
+            &lt;/goals&gt;
+          &lt;/execution&gt;
+        &lt;/executions&gt;
+      &lt;/plugin&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>제가 만든 예제인  <a href="http://blog.benelog.net/2864739">간단하게 서버에 파일을 올리는 프로그램</a>에서도 이 방식을 썼습니다. 아래의 pom.xml에 이 설정에 포함되어 있습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/benelog/uploader/blob/master/pom.xml" class="bare">https://github.com/benelog/uploader/blob/master/pom.xml</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>위 프로젝트를 받고서 mvn package를 하면 target 폴더 아래에 uploader.jar가 생기는데 <code>java -jar uploader.jar</code> 만 하면 웹애플리케이션이 실행되는 것이죠.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="어디에_쓸까">어디에 쓸까?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>직접 서비스 운영과 서버관리를 담당하는 일반적인 웹애플리션에서는 Winstone을 쓸 일이 그다지 많아보이지는 않습니다. 다만 Huson처럼 패키징해서 배포하고, 여러 가지 옵션을 제공하는 패키지성 웹애플리케이션에서는 고려해볼만도 합니다. 유사하게 Lucene바탕의 API서버인 Solr(<a href="http://lucene.apache.org/solr/)에서는" class="bare">http://lucene.apache.org/solr/)에서는</a> Jetty를 이용한 stand-alone 실행모드를 제공합니다. 그리고 간단히 소수의 인원이 쓰는 관리도구나, Desktop application 성격의 프로그램이라도 Swing, AWT대신 Web의 UI 기술을 이용하고 싶을 때도 Winstone할 포함한 패키징을 고려해볼만도 합니다.</p>
+</div>
+<div class="paragraph">
+<p>하지만 비슷한 용도의 Jetty와 비교해볼 때  winstone이  유망하다고 생각하지는 않습니다.  2008년도 이후에는 프로젝트 업데이트가 안 되고 있어서 앞으로의 전망이 어두워보입니다. 계속 이런 상태라면 Hudson에서도 언젠가는 Jetty로 갈아타지 않을까하는 생각도 듭니다. 별도로 클래스를 만들지 않아도 되는 장점등도 언젠가는 Jetty에서도 제공될수 있어 보입니다. 그리고 jsp를 쓰는 프로젝트에서는 따로 라이브러리를 지정해야 하는 것도 다소 번거롭습니다.</p>
+</div>
+<div class="paragraph">
+<p>그래도 Wistone은 알아두면 서버에서 파일 주고 받을 때라도 유용하게 쓸 수도 있고, 교육 용도의 실습 프로젝트, 취미용 프로젝트에도 편하게 활용해볼만한 도구입니다.</p>
+</div>
+</div>
+</div>
+    </div>
+	
+	<section id="social-share">
+        <ul class="icons">
+<!-- Social Share Button HTML -->
+
+<!-- Twitter -->
+<li><a href="//twitter.com/share?url=https://blog.benelog.net//2875999.html&text=Winstone, 경량 Servlet container&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+</a></li>
+
+<!-- Google Plus -->
+<li><a href="//plus.google.com/share?url=https://blog.benelog.net//2875999.html" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+</a></li>
+
+<!-- Facebook -->
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//2875999.html" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+</a></li>
+
+<!-- Reddit (url, title) -->
+<li><a href="//reddit.com/submit?url=https://blog.benelog.net//2875999.html&title=Winstone, 경량 Servlet container" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+</a></li>
+
+<!-- LinkedIn -->
+<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//2875999.html&title=Winstone, 경량 Servlet container" target="_blank" class="share-btn linkedin">
+    <i class="fa fa-linkedin"></i>
+    <p>LinkedIn</p>
+</a></li>
+
+<!-- StumbleUpon (url, title) -->
+<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//2875999.html&title=Winstone, 경량 Servlet container" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+</a></li>
+
+<!-- Email -->
+<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//2875999.html" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+</a></li>
+        </ul>
+    </section>
+     
+
+    <footer>
+	
+		<ul class="stats">
+    	    <!-- Display the categories associated with this post -->
+    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
+ 	        <li><a href='../tags/Winstone.html'>Winstone</a></li>
+ 	        <li><a href='../tags/Jetty.html'>Jetty</a></li>
+
+				<li><a class="icon fa-comment" href="../2875999.html#disqus_thread"> &nbsp;</a></li>
+ 		</ul>
+    	
+    </footer>
+</article>
 <article class="post">
    <header>
     <div class="title">
@@ -482,221 +725,13 @@ java -jar uploader.jar --httpPort=2010 (포트지정)</code></pre>
     	
     </footer>
 </article>
-<article class="post">
-   <header>
-    <div class="title">
-                    <h2><a href="../2855201.html">Btrace로 DBCP의 connection정보를 모니터링 하기</a></h2>
-
-
-    </div>
-    <div class="meta">
-         <time class="published"
-            datetime='Sep 28, 2011'>
-            Sep 28, 2011</time>
-            <div class="published eta"></div>
-        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
-    </div>
-</header>
-
-    
-  
-         
-    <div id="content">
-       <div class="paragraph">
-<p>Connection pool을 library로 DBCP를 많이 사용하고 있습니다. DataSouce가 선언되어 있는 설정 파일을 보면 min, max Connection 숫자는 쉽게 알 있지만, 현재 Active 한 것이 몇개 인지등은 실행시간에 쉽게 알아보기가 쉽지가 않죠. 그래서 JMX로 현재 Active한 Connection 수 등을 노출하는, DBCP를 한번 감싼 DataSource를 사용하기도 합니다.</p>
-</div>
-<div class="paragraph">
-<p>Btrace를 이용하면 비교적 간단하게 DBCP의 속성들을 값들을 확인할 수 있습니다. 이미 실행되고 있는 JVM에도 붙일 수 있으니 설정을 바꾸고 WAS를 재시작하지 않아도 됩니다.</p>
-</div>
-<div class="paragraph">
-<p>아래와 같이 간단한 소스로도 가능합니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">import static com.sun.btrace.BTraceUtils.*;
-import java.lang.reflect.Field;
-import com.sun.btrace.BTraceUtils.Sys;
-import com.sun.btrace.annotations.BTrace;
-import com.sun.btrace.annotations.OnMethod;
-import com.sun.btrace.annotations.Self;
-
-@BTrace
-public class DbcpMonitorSimple {
-
-  private static final String DS_CLASS = "org.apache.commons.dbcp.BasicDataSource";
-
-  @OnMethod(clazz = DS_CLASS, method = "getConnection")
-  public static void onGetConnection(@Self Object basicDataSource) {
-    Field urlField = field(DS_CLASS, "url");
-    Object url = get(urlField, basicDataSource);
-    print("=====DBCP BasicDataSource info (");
-    print(url);
-    println(" ) ==========");
-    printFields(basicDataSource);
-    Field poolField = field(DS_CLASS, "connectionPool");
-
-    Object pool = get(poolField, basicDataSource);
-    println("=====connectionPool (GenericObjectPool) info====");
-    printFields(pool);
-    println("==========");
-    Sys.exit(0);
-  }
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>DataSource.getConnection 요청이 있을 때 해당 객체를 얻어와서 속성값들을 찍어줍니다.</p>
-</div>
-<div class="paragraph">
-<p>그리고 필요한 필드만 찍는다던지, 보기좋게 정렬한다던지 하는 작업은 필요에 따라 하면 되겠죠.</p>
-</div>
-<div class="paragraph">
-<p>jps로 모니터링하고자 하는 JVM의 pid를 확인하고,
-<code>btrace [pid] DbcpSimpleMonitor.java</code> 로 실행하면 아래와 같이 속성값들을 쭉 찍어줍니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code>&gt;btrace 4288 DbcpMonitor.java
-
-
-=====DBCP BasicDataSource info (jdbc:hsqldb:file:store;shutdown=true ) ========
-
-{defaultAutoCommit=true, defaultReadOnly=null, defaultTransactionIsolation=-1, d
-
-efaultCatalog=null, driverClassName=org.hsqldb.jdbcDriver, driverClassLoader=nul
-
-l, maxActive=8, maxIdle=8, minIdle=0, initialSize=0, maxWait=-1, poolPreparedSta
-
-tements=false, maxOpenPreparedStatements=-1, testOnBorrow=false, testOnReturn=fa
-
-lse, timeBetweenEvictionRunsMillis=-1, numTestsPerEvictionRun=3, minEvictableIdl
-
-eTimeMillis=1800000, testWhileIdle=false, password=, url=jdbc:hsqldb:file:store;
-
-shutdown=true, username=sa, validationQuery=null, validationQueryTimeout=-1, con
-
-nectionInitSqls=null, accessToUnderlyingConnectionAllowed=false, restartNeeded=t
-
-rue, connectionPool=org.apache.commons.pool.impl.GenericObjectPool@1f31079, conn
-
-ectionProperties={user=sa, password=}, dataSource=org.apache.commons.dbcp.Poolin
-
-gDataSource@be8958, logWriter=java.io.PrintWriter@12b1ff9, abandonedConfig=null,
-
- closed=false, }
-
-===== number of Active : 0
-
-==========</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>FIeld 객체를 얻어올 때 field(String,String)을 쓰면 static 필드초기화나 @OnMethod 메소드가 붙지 않은 메소드에서는 객체가 얻어지지 않는  에러가 있었습니다.</p>
-</div>
-<div class="paragraph">
-<p>인터넷을 찾아보니 아래와 같이 비슷한 현상을 겪은 사람이 있었습니다.</p>
-</div>
-<div class="paragraph">
-<p><a href="http://kenai.com/projects/btrace/forums/forum/topics/1366-Drilling-into-a-method-argument-s-properties">http://kenai.com/projects/btrace/forums/forum/topics/1366-Drilling-into-a-method-argument-s-properties</a></p>
-</div>
-<div class="paragraph">
-<p>결국 <code>@OnMethod</code> 가 붙지 않는 메소드에서 호출을 할 때는 <code>field(classof(obj), "fieldName")</code> 과 같이 피해가는 방법을 썼습니다. 되도록 메소드에서 매번 호출할 필요가 없는 부분은 static 초기화를 시킬 수 있었으면 하는데, static 초기화로는 하는 것도 잘 되지 않았습니다. 직접 field(BasicDataSource.class, "fieldName)으로 를 참조하기는 것도 잘 안 되었고, field(String,String)으로는 참조가 안 되었습니다.
-이것만 아니면 좀 더 최적된 호출을 할 수 있었을 것 같습니다.</p>
-</div>
-<div class="paragraph">
-<p>첨부한 파일들은 아래와 같은 다소 다른 방식이나 출력형식으로 택했습니다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="https://gist.github.com/1246239#file_dbcp_monitor_simple.java">DbcpMonitorSimple.java</a> : BasicDataSource.getConnection이 한번 호출될 때 BasicDataSource의 모든 정보와 BasicDataSource.connetionPool의 정보를 출력</p>
-</li>
-<li>
-<p><a href="https://gist.github.com/1246239#file_dbcp_monitor.java">DbcpMonitor.java</a> :  이벤트 방식은 1과 같고, BasicDataSource의 모든 필드와 BasicDataSource.connetionPool에서 _numActive 값만을 보여줌</p>
-</li>
-<li>
-<p><a href="https://gist.github.com/1246239#file_dbcp_active_connection_monitor.java">DbcpActiveConnectionMonitor.java</a> : 여러 개의 Datasource의 Active connection 갯수를 구할 때 사용. getConnection에서 URL별로 active connection 갯수를 저장해 두었다가, Btrace에서 이벤트를 날리면 출력을 해주고 종료</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>첨부한 스크립트 중 1,2번은 getConnection이 한번 호출되고 나면 스크립트를 종료하는 구조라서 큰 부하는 없겠지만, 증가 추이 등의 통계 정보를 쌓는기능 등이 필요하다면 Field poolField = field(DS_CLASS, "connectionPool"); 같은 부분도 중복호출되지 않게 하는 처리가 필요합니다.</p>
-</div>
-<div class="paragraph">
-<p>소스는 gist에 올렸습니다. ( <a href="https://gist.github.com/1246239" class="bare">https://gist.github.com/1246239</a> )</p>
-</div>
-    </div>
-	
-	<section id="social-share">
-        <ul class="icons">
-<!-- Social Share Button HTML -->
-
-<!-- Twitter -->
-<li><a href="//twitter.com/share?url=https://blog.benelog.net//2855201.html&text=Btrace로 DBCP의 connection정보를 모니터링 하기&via=" target="_blank" class="share-btn twitter">
-    <i class="fa fa-twitter"></i>
-    <p>Twitter</p>
-</a></li>
-
-<!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=https://blog.benelog.net//2855201.html" target="_blank" class="share-btn google-plus">
-    <i class="fa fa-google-plus"></i>
-    <p>Google+</p>
-</a></li>
-
-<!-- Facebook -->
-<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//2855201.html" target="_blank" class="share-btn facebook">
-    <i class="fa fa-facebook"></i>
-    <p>Facebook</p>
-</a></li>
-
-<!-- Reddit (url, title) -->
-<li><a href="//reddit.com/submit?url=https://blog.benelog.net//2855201.html&title=Btrace로 DBCP의 connection정보를 모니터링 하기" target="_blank" class="share-btn reddit">
-    <i class="fa fa-reddit-alien"></i>
-    <p>Reddit</p>
-</a></li>
-
-<!-- LinkedIn -->
-<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//2855201.html&title=Btrace로 DBCP의 connection정보를 모니터링 하기" target="_blank" class="share-btn linkedin">
-    <i class="fa fa-linkedin"></i>
-    <p>LinkedIn</p>
-</a></li>
-
-<!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//2855201.html&title=Btrace로 DBCP의 connection정보를 모니터링 하기" target="_blank" class="share-btn stumbleupon">
-    <i class="fa fa-stumbleupon"></i>
-    <p>StumbleUpon</p>
-</a></li>
-
-<!-- Email -->
-<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//2855201.html" target="_blank" class="share-btn email">
-    <i class="fa fa-envelope"></i>
-    <p>Email</p>
-</a></li>
-        </ul>
-    </section>
-     
-
-    <footer>
-	
-		<ul class="stats">
-    	    <!-- Display the categories associated with this post -->
-    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/Btrace.html'>Btrace</a></li>
- 	        <li><a href='../tags/JDBC.html'>JDBC</a></li>
- 	        <li><a href='../tags/Monitoring.html'>Monitoring</a></li>
-
-				<li><a class="icon fa-comment" href="../2855201.html#disqus_thread"> &nbsp;</a></li>
- 		</ul>
-    	
-    </footer>
-</article>
 		
 <ul class="actions pagination">
     <li><a href="../6/"
             class=" button big previous">PREVIOUS</a></li>
 
     <li><span
-            class="button big"> 7 of 29 </span></li>
+            class="button big"> 7 of 30 </span></li>
 
     <li><a href="../8/"
             class=" button big next">NEXT</a></li>
@@ -762,6 +797,17 @@ gDataSource@be8958, logWriter=java.io.PrintWriter@12b1ff9, abandonedConfig=null,
                     <li>
                         <article>
                             <header>
+                                <h3><a href="../migration-to-static-site.html">정적 사이트로 블로그 마이그레이션</a></h3>
+                                 <time class="published"
+							            datetime='May 06, 2019'>
+							            May 06, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
                                 <h3><a href="../robolectric.html">Robolectric을 활용한 안드로이드 쾌속 테스팅</a></h3>
                                  <time class="published"
 							            datetime='Oct 10, 2016'>
@@ -788,17 +834,6 @@ gDataSource@be8958, logWriter=java.io.PrintWriter@12b1ff9, abandonedConfig=null,
                                  <time class="published"
 							            datetime='Nov 03, 2014'>
 							            Nov 03, 2014</time>
-                            </header>
-                        </article>
-                    </li>
-
-                    <li>
-                        <article>
-                            <header>
-                                <h3><a href="../3017438.html">Android에서 @Inject, @Test</a></h3>
-                                 <time class="published"
-							            datetime='Apr 17, 2013'>
-							            Apr 17, 2013</time>
                             </header>
                         </article>
                     </li>
@@ -1376,6 +1411,15 @@ gDataSource@be8958, logWriter=java.io.PrintWriter@12b1ff9, abandonedConfig=null,
                         <article>
                             <header>
                                 <a href="../tags/DependencyInjection.html">DependencyInjection</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="../tags/static-site.html">static-site</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>

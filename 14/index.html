@@ -132,6 +132,9 @@
                     <h3>Recent Posts</h3>
                 </header>
                     <li>
+                        <a href="../../migration-to-static-site.html"><p>정적 사이트로 블로그 마이그레이션</p></a>
+                    </li>
+                    <li>
                         <a href="../../robolectric.html"><p>Robolectric을 활용한 안드로이드 쾌속 테스팅</p></a>
                     </li>
                     <li>
@@ -139,9 +142,6 @@
                     </li>
                     <li>
                         <a href="../../3120317.html"><p>시간대 DB에서 우리나라 시간의 오류</p></a>
-                    </li>
-                    <li>
-                        <a href="../../3017438.html"><p>Android에서 @Inject, @Test</p></a>
                     </li>
             </ul>
         </section>
@@ -157,6 +157,129 @@
 </section>
 	
 	<div id="main">
+<article class="post">
+   <header>
+    <div class="title">
+                    <h2><a href="../2669675.html">로또 번호 생성기 파이썬으로 만들어보기</a></h2>
+
+
+    </div>
+    <div class="meta">
+         <time class="published"
+            datetime='Aug 28, 2010'>
+            Aug 28, 2010</time>
+            <div class="published eta"></div>
+        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
+    </div>
+</header>
+
+    
+  
+         
+    <div id="content">
+       <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>오래 전에 블로그에 Java를 이용한 로또 번호 생성기(<a href="http://blog.benelog.net/1646013" class="bare">http://blog.benelog.net/1646013</a> )코드를 올린 적이 있었습니다.</p>
+</div>
+<div class="paragraph">
+<p>갑자기 생각이 나서, 이번에는 Python으로 코딩해봤습니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="문제">문제</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>1부터 45까지의 숫자 중에 6개를 뽑는다.6개의 값이 다 달라야 한다.</p>
+</li>
+<li>
+<p>출력시 작은 숫자부터 순서대로 출력</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="풀이">풀이</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-python" data-lang="python">import random
+balls = range(1,46)
+random.shuffle(balls)
+print sorted(balls[0:6])</code></pre>
+</div>
+</div>
+</div>
+</div>
+    </div>
+	
+	<section id="social-share">
+        <ul class="icons">
+<!-- Social Share Button HTML -->
+
+<!-- Twitter -->
+<li><a href="//twitter.com/share?url=https://blog.benelog.net//2669675.html&text=로또 번호 생성기 파이썬으로 만들어보기&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+</a></li>
+
+<!-- Google Plus -->
+<li><a href="//plus.google.com/share?url=https://blog.benelog.net//2669675.html" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+</a></li>
+
+<!-- Facebook -->
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//2669675.html" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+</a></li>
+
+<!-- Reddit (url, title) -->
+<li><a href="//reddit.com/submit?url=https://blog.benelog.net//2669675.html&title=로또 번호 생성기 파이썬으로 만들어보기" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+</a></li>
+
+<!-- LinkedIn -->
+<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//2669675.html&title=로또 번호 생성기 파이썬으로 만들어보기" target="_blank" class="share-btn linkedin">
+    <i class="fa fa-linkedin"></i>
+    <p>LinkedIn</p>
+</a></li>
+
+<!-- StumbleUpon (url, title) -->
+<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//2669675.html&title=로또 번호 생성기 파이썬으로 만들어보기" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+</a></li>
+
+<!-- Email -->
+<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//2669675.html" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+</a></li>
+        </ul>
+    </section>
+     
+
+    <footer>
+	
+		<ul class="stats">
+    	    <!-- Display the categories associated with this post -->
+    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
+ 	        <li><a href='../tags/코딩연습.html'>코딩연습</a></li>
+ 	        <li><a href='../tags/Lotto.html'>Lotto</a></li>
+ 	        <li><a href='../tags/Python.html'>Python</a></li>
+
+				<li><a class="icon fa-comment" href="../2669675.html#disqus_thread"> &nbsp;</a></li>
+ 		</ul>
+    	
+    </footer>
+</article>
 <article class="post">
    <header>
     <div class="title">
@@ -821,299 +944,13 @@ assertTrue(output.contains("&lt;span class='r'&gt;"));
     	
     </footer>
 </article>
-<article class="post">
-   <header>
-    <div class="title">
-                    <h2><a href="../2271302.html">Oracle을 사용해 입출력하는 Map-Reduce</a></h2>
-
-
-    </div>
-    <div class="meta">
-         <time class="published"
-            datetime='Mar 25, 2009'>
-            Mar 25, 2009</time>
-            <div class="published eta"></div>
-        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
-    </div>
-</header>
-
-    
-  
-         
-    <div id="content">
-       <div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>Hadoop의 Map-Reduce처리에서는 DB를 바로 연결해서 처리할 수 있는  <a href="http://hadoop.apache.org/core/docs/current/api/org/apache/hadoop/mapred/lib/db/DBInputFormat.html">DBInputFormat</a>, <a href="http://hadoop.apache.org/core/docs/current/api/org/apache/hadoop/mapred/lib/db/DBOutputFormat.html">DBOutputFormat</a>의 클래스가 제공되고 있습니다.</p>
-</div>
-<div class="paragraph">
-<p>그러나 이 클래스들은 이름이 'DB&#8217;가 붙어있는 것이 무색하게 Oracle과 연결해서 사용해보면 에러가 납니다. <a href="http://hadoop.apache.org/core/docs/current/api/org/apache/hadoop/mapred/lib/db/DBInputFormat.html">DBInputFormat</a>에서는 웹에서의 페이지 처리 쿼리처럼 데이터를 잘라서 가지고 오기 위해 원래 쿼리에다 LIMIT와 OFFSET 키워드를 붙이는데, 이 것은 Oracle에서는 지원되지 않습니다. 그리고 <a href="http://hadoop.apache.org/core/docs/current/api/org/apache/hadoop/mapred/lib/db/DBOutputFormat.html">DBOutputFormat</a>에서는 insert문의 맨 뒤에 세미콜론(;)을 붙여버리는데, 이것 역시 Oracle의 JDBC를 사용할 때는 에러를 냅니다.</p>
-</div>
-<div class="paragraph">
-<p>따라서, 결국 이 클래스들을 Oracle에서 쓸 수 있도록 상속해서 구현을 해 줄수 밖에 없었습니다. 얼핏 생각하면 쿼리만 바꾸어주면 되는 것이니 메소드 하나만 오버라이딩 해주면 될 것으로 예상했으나, 원래 클래스들의 구조가 그 정도로 단순하지 않았습니다.Inner클래스가 많아서 여러 클래스와 메서드들을 다 overriding해 줄 수 밖에 없었습니다. 더군다나, 새로 상속한 클래스의 내부에서 꼭 호출해야 하는 DBConfiguration클래스의 생성자가 public이 아닌 package private(아무것도 선언안한 디폴트 접근자)인 탓에, 패키지를 원래의 <a href="http://hadoop.apache.org/core/docs/current/api/org/apache/hadoop/mapred/lib/db/DBInputFormat.html">DBInputFormat</a>, <a href="http://hadoop.apache.org/core/docs/current/api/org/apache/hadoop/mapred/lib/db/DBOutputFormat.html">DBOutputFormat</a>와 같은 패키지로 맞추어야 하는 불편함도 있었습니다. protected로 선언된 메소드들이 많은 것보면 분명히 상속해서 덮어쓰라고 만들어놓은 클래스 같은데, 막상 그렇게 활용하기에는 간편하지 않았던 것이죠.</p>
-</div>
-<div class="paragraph">
-<p>그리고 또 구조적으로 아쉬운 점은 두 클래스가 같은 DBConfiguration을 보게 있어서 Map에서 입력자료를 얻어오는 DB와 Reduce에서 쓰는 DB가 다를 때는 다시 별도의 클래스를 만들어주어야 한다는 것입니다.</p>
-</div>
-<div class="paragraph">
-<p>Spring Batch에서도 <a href="http://static.springsource.org/spring-batch/apidocs/org/springframework/batch/item/database/JdbcPagingItemReader.html">JdbcPagingItemReader</a>라는 약간 유사한 클래스가 있습니다. <a href="http://hadoop.apache.org/core/docs/current/api/org/apache/hadoop/mapred/lib/db/DBInputFormat.html">DBInputFormat</a>이 하나의 쿼리에서 가지고 올 데이터를 동시에 여러번 쿼리해서 나누어 가지고 오는 반면에 <a href="http://static.springsource.org/spring-batch/apidocs/org/springframework/batch/item/database/JdbcPagingItemReader.html">JdbcPagingItemReader</a>에서는 부분씩 가지고 오더라도 순차적으로 쿼리를 하는 차이점이 있기는 합니다. 그래도, 페이지 처리 쿼리처럼, 데이터를 나누어서 가지고 오는 쿼리를 제공한다는 점에서는 유사합니다. <a href="http://static.springsource.org/spring-batch/apidocs/org/springframework/batch/item/database/JdbcPagingItemReader.html">JdbcPagingItemReader</a>에서는 내부적으로 <a href="http://static.springsource.org/spring-batch/apidocs/org/springframework/batch/item/database/PagingQueryProvider.html">PagingQueryProvider</a> 라는 인터페이스를 사용하게 되어 있고, 이 인터페이스는 각 DB종류별로 OraclePagingQueryProvider, HsqlPagingQueryProvider, MySqlPagingQueryProvider, SqlServerPagingQueryProvider, SybasePagingQueryProvider 등의 구현클래스를 가지고 있습니다.
-Hadoop의 <a href="http://hadoop.apache.org/core/docs/current/api/org/apache/hadoop/mapred/lib/db/DBInputFormat.html">DBInputFormat</a>도 이런 구조였다면 이를 응용하려는 개발자가 훨씬 쉽게 클래스 확장방법을  이해했을 것입니다.</p>
-</div>
-<div class="paragraph">
-<p>아뭏든 지금까지 현재 공개된 API만으로는 Hadoop의 DB연결 지원 클래스들은 빈약해 보이고, API도 좋은 설계요건을 갖추었다고 느껴지지는 않습니다. 아무래도 포털 등에서 대용량 데이터를 처리하는 곳에 쓰이다보니 DB와 함께 연결되는 쓰임새가 그리 많지는 않았나봅니다. 더군다나 Oracle에서는 한번도 안 돌려본 클래스가 버젓이 DB&#8230;&#8203;로 시작되는 이름으로 들어간 것 보면 Oracle이 쓰이는 동네와 Hadoop이 사는 곳은 아주 멀리 떨어져 있었던 것 같습니다. 그러나, 앞으로  엔터프라이즈 환경에서도 Hadoop이 쓰이려면 DB와의 integration은 반드시 거쳐야할 다리인 것 같습니다. <a href="http://www.jaso.co.kr/283">Enterprise 시장에서의 mapreduce</a> 링크를 보아도 이미 그런 시도들이 시작된 것을 알 수 있습니다.</p>
-</div>
-<div class="paragraph">
-<p>한편, Hadoop의 <a href="http://hadoop.apache.org/core/docs/current/api/org/apache/hadoop/mapred/FileInputFormat.html">FileInputFormat</a>가 Spring batch의 <a href="http://static.springsource.org/spring-batch/apidocs/org/springframework/batch/item/file/FlatFileItemReader.html">FlatFileItemReader</a>와 유사한 것 등이나 Spring batch도 2.0에서 아직 분산, 동시처리 등을 지원하기 시작했다는 점은 두 프레임웍의 겹치는 지점이 늘어날 수도 있다는 생각도 듭니다. 뭐 아직 Spring batch의 분산지원은 걸음마 단계이기는 합니다만, DB에서 HDFS에 들어가는 파일을 쓸 때 Spring batch의 API를 활용하는 것 깉은 활용법은 시도해 볼만하다고 생각됩니다.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="소스">소스</h2>
-<div class="sectionbody">
-<div class="listingblock">
-<div class="title">OracleInputFormat</div>
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">package org.apache.hadoop.mapred.lib.db;
-
-import java.io.IOException;
-import java.sql.SQLException;
-
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.mapred.InputSplit;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.RecordReader;
-import org.apache.hadoop.mapred.Reporter;
-
-public class OracleInputFormat&lt;T extends DBWritable&gt; extends DBInputFormat&lt;T&gt;{
-
-    private DBConfiguration dbConf = null;
-    private DBInputSplit split;
-
-    @Override
-    public RecordReader&lt;LongWritable,T&gt; getRecordReader(InputSplit split, JobConf job,
-            Reporter reporter) throws IOException {
-        dbConf = new DBConfiguration(job);
-        this.split = (DBInputSplit)split;
-
-        @SuppressWarnings("unchecked")
-        Class inputClass = dbConf.getInputClass();
-        try {
-            @SuppressWarnings("unchecked")
-            RecordReader&lt;LongWritable,T&gt; reader = new OracleRecordReader((DBInputSplit) split, inputClass, job);
-            return reader;
-        } catch (SQLException ex) {
-            throw new IOException(ex.getMessage());
-        }
-    }
-
-    public static void setInput(JobConf job, Class&lt;? extends DBWritable&gt; inputClass,
-              String inputQuery, String inputCountQuery) {
-        DBInputFormat.setInput(job, inputClass, inputQuery, inputCountQuery);
-        job.setInputFormat(OracleInputFormat.class);
-     }
-
-    protected class OracleRecordReader extends DBRecordReader{
-        protected OracleRecordReader(DBInputSplit split, Class&lt;T&gt; inputClass,
-                JobConf conf) throws SQLException {
-            super(split, inputClass, conf);
-        }
-
-        @Override
-        protected String getSelectQuery() {
-            long length = 0;
-            long start = 0;
-            try{
-                length = split.getLength();
-                start = split.getStart();
-            } catch(IOException e){
-                throw new IllegalArgumentException
-                        ("cannot read length or start variable from DBInputSplit",e);
-            }
-            StringBuilder query = new StringBuilder();
-            query.append(" SELECT * \r\n");
-            query.append(" FROM (SELECT m.* , ROWNUM rno ");
-            query.append("       FROM ( ");
-            query.append(              dbConf.getInputQuery());
-            query.append("             )  m");
-            query.append("       WHERE ROWNUM &lt;= " + start + " + " + length + ")");
-            query.append(" WHERE RNO &gt; " + start);
-            System.out.println(query.toString());
-            return query.toString();
-        }
-    }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">OracleOutputFormat</div>
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">package org.apache.hadoop.mapred.lib.db;
-import org.apache.hadoop.mapred.JobConf;
-
-public class OracleOutputFormat&lt;K  extends DBWritable, V&gt; extends DBOutputFormat&lt;DBWritable, V&gt;{
-    @Override
-    protected String constructQuery(String table, String[] fieldNames) {
-            if(fieldNames == null) {
-              throw new IllegalArgumentException("Field names may not be null");
-            }
-            StringBuilder query = new StringBuilder();
-            query.append("INSERT INTO ").append(table);
-
-            if (fieldNames.length &gt; 0 &amp;&amp; fieldNames[0] != null) {
-              query.append(" (");
-              for (int i = 0; i &lt; fieldNames.length; i++) {
-                query.append(fieldNames[i]);
-                if (i != fieldNames.length - 1) {
-                  query.append(",");
-                }
-              }
-              query.append(")");
-            }
-            query.append(" VALUES (");
-
-            for (int i = 0; i &lt; fieldNames.length; i++) {
-              query.append("?");
-              if(i != fieldNames.length - 1) {
-                query.append(",");
-              }
-            }
-            query.append(")");
-            return query.toString();
-          }
-    public static void setOutput(JobConf job, String tableName, String... fieldNames) {
-        DBOutputFormat.setOutput(job, tableName, fieldNames);
-        job.setOutputFormat(OracleOutputFormat.class);
-    }
-}</code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Job 구성 예</div>
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class SampleJob {
-
-    public static void main(String args[]) throws IOException, URISyntaxException{
-        JobConf conf = new JobConf(SampleJob.class);
-        initClasspath(conf);
-        conf.setJobName("sampleJob");
-        DBConfiguration.configureDB(conf, "oracle.jdbc.driver.OracleDriver",
-                "jdbc:oracle:thin:@localhost:1525:TEST",
-                "myuser", "mypassword");
-        OracleInputFormat.setInput(conf, Query.class,
-                "SELECT query, category, user_id FROM query_log ",
-                "SELECT COUNT(*) FROM query_log");
-        conf.setOutputKeyClass(Query.class);
-        conf.setOutputValueClass(IntWritable.class);
-        conf.setMapperClass(SampleMapper.class);
-        conf.setReducerClass(SampleReducer.class);
-        conf.setCombinerClass(SampleReducer.class);
-        OracleOutputFormat.setOutput(conf, "category", "user_id","cnt");
-
-        JobClient.runJob(conf);
-    }
-
-    private static void initClasspath(JobConf conf) throws URISyntaxException,
-            IOException {
-        DistributedCache.addCacheFile(new URI("lib/ojdbc5-11.1.0.6.jar"), conf);
-        DistributedCache.addFileToClassPath(new Path("lib/ojdbc5-11.1.0.6.jar"), conf);
-    }
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="hadoop의_dbinputformat_참고자료">hadoop의 DBInputFormat 참고자료</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="http://developer.yahoo.net/blogs/hadoop/DBInputFormat.ppt" class="bare">http://developer.yahoo.net/blogs/hadoop/DBInputFormat.ppt</a></p>
-</li>
-<li>
-<p><a href="http://www.cloudera.com/blog/wp-content/uploads/DBInputFormat.pdf" class="bare">http://www.cloudera.com/blog/wp-content/uploads/DBInputFormat.pdf</a></p>
-</li>
-<li>
-<p><a href="http://www.cloudera.com/blog/2009/03/06/database-access-with-hadoop/" class="bare">http://www.cloudera.com/blog/2009/03/06/database-access-with-hadoop/</a></p>
-</li>
-<li>
-<p><a href="http://www.cloudera.com/blog/tag/dbinputformat/" class="bare">http://www.cloudera.com/blog/tag/dbinputformat/</a></p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-    </div>
-	
-	<section id="social-share">
-        <ul class="icons">
-<!-- Social Share Button HTML -->
-
-<!-- Twitter -->
-<li><a href="//twitter.com/share?url=https://blog.benelog.net//2271302.html&text=Oracle을 사용해 입출력하는 Map-Reduce&via=" target="_blank" class="share-btn twitter">
-    <i class="fa fa-twitter"></i>
-    <p>Twitter</p>
-</a></li>
-
-<!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=https://blog.benelog.net//2271302.html" target="_blank" class="share-btn google-plus">
-    <i class="fa fa-google-plus"></i>
-    <p>Google+</p>
-</a></li>
-
-<!-- Facebook -->
-<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//2271302.html" target="_blank" class="share-btn facebook">
-    <i class="fa fa-facebook"></i>
-    <p>Facebook</p>
-</a></li>
-
-<!-- Reddit (url, title) -->
-<li><a href="//reddit.com/submit?url=https://blog.benelog.net//2271302.html&title=Oracle을 사용해 입출력하는 Map-Reduce" target="_blank" class="share-btn reddit">
-    <i class="fa fa-reddit-alien"></i>
-    <p>Reddit</p>
-</a></li>
-
-<!-- LinkedIn -->
-<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//2271302.html&title=Oracle을 사용해 입출력하는 Map-Reduce" target="_blank" class="share-btn linkedin">
-    <i class="fa fa-linkedin"></i>
-    <p>LinkedIn</p>
-</a></li>
-
-<!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//2271302.html&title=Oracle을 사용해 입출력하는 Map-Reduce" target="_blank" class="share-btn stumbleupon">
-    <i class="fa fa-stumbleupon"></i>
-    <p>StumbleUpon</p>
-</a></li>
-
-<!-- Email -->
-<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//2271302.html" target="_blank" class="share-btn email">
-    <i class="fa fa-envelope"></i>
-    <p>Email</p>
-</a></li>
-        </ul>
-    </section>
-     
-
-    <footer>
-	
-		<ul class="stats">
-    	    <!-- Display the categories associated with this post -->
-    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/Hadoop.html'>Hadoop</a></li>
- 	        <li><a href='../tags/Oracle.html'>Oracle</a></li>
-
-				<li><a class="icon fa-comment" href="../2271302.html#disqus_thread"> &nbsp;</a></li>
- 		</ul>
-    	
-    </footer>
-</article>
 		
 <ul class="actions pagination">
     <li><a href="../13/"
             class=" button big previous">PREVIOUS</a></li>
 
     <li><span
-            class="button big"> 14 of 29 </span></li>
+            class="button big"> 14 of 30 </span></li>
 
     <li><a href="../15/"
             class=" button big next">NEXT</a></li>
@@ -1179,6 +1016,17 @@ public class OracleOutputFormat&lt;K  extends DBWritable, V&gt; extends DBOutput
                     <li>
                         <article>
                             <header>
+                                <h3><a href="../migration-to-static-site.html">정적 사이트로 블로그 마이그레이션</a></h3>
+                                 <time class="published"
+							            datetime='May 06, 2019'>
+							            May 06, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
                                 <h3><a href="../robolectric.html">Robolectric을 활용한 안드로이드 쾌속 테스팅</a></h3>
                                  <time class="published"
 							            datetime='Oct 10, 2016'>
@@ -1205,17 +1053,6 @@ public class OracleOutputFormat&lt;K  extends DBWritable, V&gt; extends DBOutput
                                  <time class="published"
 							            datetime='Nov 03, 2014'>
 							            Nov 03, 2014</time>
-                            </header>
-                        </article>
-                    </li>
-
-                    <li>
-                        <article>
-                            <header>
-                                <h3><a href="../3017438.html">Android에서 @Inject, @Test</a></h3>
-                                 <time class="published"
-							            datetime='Apr 17, 2013'>
-							            Apr 17, 2013</time>
                             </header>
                         </article>
                     </li>
@@ -1793,6 +1630,15 @@ public class OracleOutputFormat&lt;K  extends DBWritable, V&gt; extends DBOutput
                         <article>
                             <header>
                                 <a href="../tags/DependencyInjection.html">DependencyInjection</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="../tags/static-site.html">static-site</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>

@@ -132,6 +132,9 @@
                     <h3>Recent Posts</h3>
                 </header>
                     <li>
+                        <a href="../../migration-to-static-site.html"><p>정적 사이트로 블로그 마이그레이션</p></a>
+                    </li>
+                    <li>
                         <a href="../../robolectric.html"><p>Robolectric을 활용한 안드로이드 쾌속 테스팅</p></a>
                     </li>
                     <li>
@@ -139,9 +142,6 @@
                     </li>
                     <li>
                         <a href="../../3120317.html"><p>시간대 DB에서 우리나라 시간의 오류</p></a>
-                    </li>
-                    <li>
-                        <a href="../../3017438.html"><p>Android에서 @Inject, @Test</p></a>
                     </li>
             </ul>
         </section>
@@ -157,6 +157,189 @@
 </section>
 	
 	<div id="main">
+<article class="post">
+   <header>
+    <div class="title">
+                    <h2><a href="../1889589.html">Batch job에서의 바람직한 트랜잭션 처리 방식</a></h2>
+
+
+    </div>
+    <div class="meta">
+         <time class="published"
+            datetime='May 15, 2008'>
+            May 15, 2008</time>
+            <div class="published eta"></div>
+        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
+    </div>
+</header>
+
+    
+  
+         
+    <div id="content">
+       <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>일반적인 온라인 어플리케이션에서는 사용자가 보내는 event 한번에 하나의 트랜잭션을 묶어서 처리합니다. 하지만 배치처리에서는 하나의 처리가 하나의 트랜잭션으로 관리되는 것은 때로는 문제가 될 여지가 있습니다.</p>
+</div>
+<div class="paragraph">
+<p>몇 만 건 이상의 행과 같이 대용량 데이터를 다루는 경우에는 roll back segment 같은 공간의 부족현상이 생길 위험이 있습니다. 그리고 상대적으로 긴 처리 시간동안 DB에 lock을 걸리게 해서 전체 시스템에 병목을 만들지도 모릅니다. 사용자가 많은 웹어플리케이션이 동시에 접근하는 DB에서 배치처리를 돌릴 때는 이를 더 염두에 두어야 할 것입니다.</p>
+</div>
+<div class="paragraph">
+<p>또, 데이터가 건마다 독립성을 가지고 있는 경우라면 한 두건의 처리실패 때문에 앞에 성공한 건들도 다 Roll back이 되어버린다면 더 많은 건의 데이터가 의도하지 않은 상태로 오래 유지됩니다. 배치처리의 에러가 발생 즉시 해결되지 않을 수도 있기 때문에 때문에 업무 규칙상으로 가능한 경우라면 부분적으로 성공한 건이라도 DB에 반영되는 것이 좋습니다. 그렇지 않을 경우에 재시도시에 다시 모든 데이터를 처리해야 하니 그 처리시간이 더 길어지게 됩니다.</p>
+</div>
+<div class="paragraph">
+<p>그렇다고 해서 데이터 매 건마다 따로 트랜잭션 처리를 하는 것도 성능상 좋지 못합니다. 트랜잭션을 시작하고 끝낼 때 드는 비용도 감안해야 되기 때문입니다.</p>
+</div>
+<div class="paragraph">
+<p>따라서 일정한 행 단위를 묶어서 처리를 하는 것이 배치처리에서는 더 바람직한 방식입니다.</p>
+</div>
+<div class="paragraph">
+<p>WebSphere XD Compute Grid에서는 check-point algorithm을 time-based와 record-based 두 가지 방식으로 제공해서 이런 문제에 대한 해결책을 제시하고 있습니다.
+Spring batch에서는 SimpleStepFactoryBean 클래스에서 commitInterval이라는 속성으로 주기적인 commit을 설정할 수 있습니다. 데이터 특성이나 업무규칙에 따라서 적절한 값을 트랜잭션 단위로 묶이는 건수를 지정할 수 있는 것입니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="참고자료_1">참고자료 1</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="http://www.devx.com/Java/Article/20791/1763/page/1">High-volume Transaction Processing in J2EE</a> :</p>
+</div>
+<div class="paragraph">
+<p>세번째 페이지의 Job Partitioning and Chunking 단락에서 아래와 같이 설명하고 있습니다.</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Running your job as one long-lived transaction isn&#8217;t a good idea. Long-lived transactions are more fragile than short-lived transactions. They are more susceptible to errors and DBMS locking problems because the locks are held longer. Smaller chunks are more reliable and less likely to exceed your connection and session timeouts.</p>
+</div>
+</blockquote>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="참고자료2">참고자료2</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="http://www.speakeasy.org/~jwilton/oracle/dedicated-rbs.html">Misconception: Big batch jobs should use a ‘dedicated’ rollback segment</a> :</p>
+</div>
+<div class="paragraph">
+<p>Oracle의 경우를 설명한 글입니다. DBA들이 보통 긴 transaction을 유지하는 batch job에 전용 role back segment를 할당하는데 실제로는 이것이 별도움이 못 된다고 말합니다. 결국 다른 session들이 사용할 수 있는 roll back segment를 사용하는 것은 똑같기 때문에 ORA-01555 에러를 유발할 수 있다고 합니다. 결국 보다 작은 transaction 단위를 가지고 가는 것이 근본적인 해결책입니다.</p>
+</div>
+<div class="paragraph">
+<p>그리고 실패시 재시도를 위해서 지난 번 처리한 영역까지 표시하거나 앞에 성공한 건들을 다 지워줘야 하는 경우 때문에  큰 transaction을 가지고 가는 문제가 .생기는데, 재시도를 위한 기능을 트랜잭션에서 제공받기 전에 응용프로그램에서 적절한 로직으로 처리하는 것이 필요하다고 나와 있습니다.</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>The problem that needs to be addressed in cases such as these is the design of the batch processes that require such a huge transaction.  Transactions in Oracle should normally be kept fairly short.  While it is undesirable to commit for every row processed (which will cause excessive redolog buffer flushing and high waits on “log file sync”), it makes sense to have batch processes commit for every few hundred rows processed.</p>
+</div>
+</blockquote>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Often the greatest barrier to changing batch jobs to commit continuously is failure tolerance.  If a batch job that commits continuously fails part way through, then there must be a way to restart that batch job where it left off, or clean up from the first attempt so that the job can be started over.  Whereas before this restart capability was provided by rolling back the large transaction, the proposed rollback-friendly model requires that the appropriate application logic be built into the batch processing software.</p>
+</div>
+</blockquote>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>If you allow your semi-frequently committing batch jobs to randomly select rollback segments like all the rest of the transactions in your system, you will be less likely to overwrite recently committed changes, since the burden of the batch transactions is spread around, rather than concentrated in a single rollback segment</p>
+</div>
+</blockquote>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="참고자료3">참고자료3</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="http://www.ibm.com/developerworks/websphere/library/techarticles/0606_antani/0606_antani.html">Solving Business Problems with WebSphere Extended Deployment</a> :</p>
+</div>
+<div class="paragraph">
+<p>WebSphere XD에서 제공하고 있는 check-point algorithm에 대한 설명을 볼 수 있습니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="참고자료4">참고자료4</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="http://static.springframework.org/spring-batch/spring-batch-docs/reference/html/execution.html#d0e3602">Spring batch documentation - 4.4.1.2. Configuring a CommitInterval</a> :</p>
+</div>
+<div class="paragraph">
+<p>Spring batch에서 주기적인 commit을 설정하는 방법입니다.</p>
+</div>
+</div>
+</div>
+    </div>
+	
+	<section id="social-share">
+        <ul class="icons">
+<!-- Social Share Button HTML -->
+
+<!-- Twitter -->
+<li><a href="//twitter.com/share?url=https://blog.benelog.net//1889589.html&text=Batch job에서의 바람직한 트랜잭션 처리 방식&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+</a></li>
+
+<!-- Google Plus -->
+<li><a href="//plus.google.com/share?url=https://blog.benelog.net//1889589.html" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+</a></li>
+
+<!-- Facebook -->
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//1889589.html" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+</a></li>
+
+<!-- Reddit (url, title) -->
+<li><a href="//reddit.com/submit?url=https://blog.benelog.net//1889589.html&title=Batch job에서의 바람직한 트랜잭션 처리 방식" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+</a></li>
+
+<!-- LinkedIn -->
+<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//1889589.html&title=Batch job에서의 바람직한 트랜잭션 처리 방식" target="_blank" class="share-btn linkedin">
+    <i class="fa fa-linkedin"></i>
+    <p>LinkedIn</p>
+</a></li>
+
+<!-- StumbleUpon (url, title) -->
+<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//1889589.html&title=Batch job에서의 바람직한 트랜잭션 처리 방식" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+</a></li>
+
+<!-- Email -->
+<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//1889589.html" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+</a></li>
+        </ul>
+    </section>
+     
+
+    <footer>
+	
+		<ul class="stats">
+    	    <!-- Display the categories associated with this post -->
+    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
+ 	        <li><a href='../tags/batch.html'>batch</a></li>
+ 	        <li><a href='../tags/Spring-Batch.html'>Spring-Batch</a></li>
+ 	        <li><a href='../tags/Spring.html'>Spring</a></li>
+
+				<li><a class="icon fa-comment" href="../1889589.html#disqus_thread"> &nbsp;</a></li>
+ 		</ul>
+    	
+    </footer>
+</article>
 <article class="post">
    <header>
     <div class="title">
@@ -463,223 +646,13 @@
     	
     </footer>
 </article>
-<article class="post">
-   <header>
-    <div class="title">
-                    <h2><a href="../1846356.html">마인드맵(mind map) 그리기 도구들</a></h2>
-
-
-    </div>
-    <div class="meta">
-         <time class="published"
-            datetime='Apr 16, 2008'>
-            Apr 16, 2008</time>
-            <div class="published eta"></div>
-        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
-    </div>
-</header>
-
-    
-  
-         
-    <div id="content">
-       <div class="sect1">
-<h2 id="마인드맵_관련_자료">마인드맵 관련 자료</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="http://moai.tistory.com/197">생각을 확장해주는 마인드 맵(Mind Map)</a></p>
-</li>
-<li>
-<p><a href="http://news.naver.com/main/read.nhn?mode=LSD&amp;amp;mid=sec&amp;amp;sid1=101&amp;amp;oid=008&amp;amp;aid=0000858692">마인드맵핑, 회의 생산성 200% 향상</a></p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="마인드맵_도구와_관련_포스트">마인드맵 도구와 관련 포스트</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="http://www.mindmeister.com/">MindMeister</a> : 웹기반 공유 마인드맵.</p>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="http://hsgames.com/blog/160">웹2.0 마인드맵도구 Mindmeister</a></p>
-</li>
-<li>
-<p><a href="http://ypshin.com/2690262">웹상에서 작성하는 무료 MindMap - mindmester.com</a></p>
-</li>
-<li>
-<p><a href="http://dirtybit.tistory.com/118">mindmeister를 소개합니다</a></p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p><a href="http://www.thoughtex.net/">Thoughtex</a> : 웹기반, WPF 기반</p>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="http://blog.naver.com/sjkang73/80038617402">WPF 기반의 온라인 마인드 맵 도구 입니다.</a></p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p><a href="http://www.mind42.com/">Mind42</a> : 웹기반</p>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="http://alones.kr/blog/824">웹 기반의 멋진 마인드맵 (mindmap) - Mind42 를 써보자</a></p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p><a href="http://www.conceptdraw.com/">ConceptDraw</a></p>
-</li>
-<li>
-<p></p>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="http://boomup.tistory.com/entry/%EB%A7%88%EC%9D%B8%EB%93%9C%EB%A7%B5%EC%9C%BC%EB%A1%9C-%EC%9D%B4%EB%B6%81-%EB%A7%8C%EB%93%A4%EA%B8%B0-ConceptDraw-53">ConceptDraw MINDMAP 5.3 비주얼 이북 만들기</a></p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p><a href="http://www.thinkwise.co.kr/main/main.asp">ThinkWise</a> :</p>
-</li>
-<li>
-<p></p>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="http://blog.naver.com/nihilbox/140050405578">MindManager에서 ThinkWise로</a></p>
-</li>
-<li>
-<p><a href="http://www.mindmapper.com/">MindMapper</a> : <a href="http://www.thinkwise.co.kr/main/main.asp">ThinkWise</a>의 해외 버전</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p><a href="http://www.mindjet.com/us/">MindManager</a></p>
-</li>
-<li>
-<p><a href="http://freemind.sourceforge.net/">freemind</a> : Java 기반, 오픈소스</p>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="http://skcha.tistory.com/10">마인드 맵을 그리는 FreeMind</a></p>
-</li>
-<li>
-<p><a href="http://hanburn.tistory.com/59">무료 마인드맵(Mind Map) - Freemind</a></p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p><a href="http://www.smartdraw.com/">SmartDraw</a></p>
-</li>
-<li>
-<p><a href="http://www.conceptleader.com/">ConceptLeader</a></p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>자료나 생각을 정리할 때 마인드맵을 활용하고 싶다는 생각은 오래 전부터 해왔지만 쉽게 실현하지는 못했습니다. 제가 마인드맵을 처음 접한 것은 고등학교 때였는데, 몇 번 정도 공책필기 내용을 정리해보다가 그만두고 말았었습니다. 정리하는 내용이 재미가 없어서도 그랬었겠지만, 아무래도 책에서 본 예제처럼 이쁘게 마인드맵이 그려지지 않았던 이유도 컸었던 것 같습니다. 그후로도 몇번 마인드맵과 마주쳤지만 선뜻 작성해볼 의지가 생기지는 않았습니다.</p>
-</div>
-<div class="paragraph">
-<p>위에 소개된  마인드맵 작성을 도와주는 프로그램들이 저 같은 사람에게 도움이 될 것입니다. 여러 도구를 다 써봐도 여전히 손으로 그리는 것이 가장 효율적이라고 생각하시는 분도  계실 것 같습니다만, 저의 경우는 손재주가 없어서 인지 프로그램이 더 편하게 느껴지더군요.</p>
-</div>
-<div class="paragraph">
-<p>이 중에 <a href="http://www.mindmeister.com/">MindMeister</a>, <a href="http://www.mind42.com/">Mind42</a> , <a href="http://www.thoughtex.net/">Thoughtex</a> 는 별도의 프로그램 설치없이 웹에서 마인드맵을 그릴 수 있습니다. 공동작업을 하거나 작업결과를 웹으로 공개할 때 편하게 쓸 수 있어 보입니다.</p>
-</div>
-<div class="paragraph">
-<p>그리고 얼마전에 알게된 <a href="http://www.conceptleader.com/">ConceptLeader</a> 는 연결선의 시각적 효과가 돋보입니다.
-제가 읽었던 마인드맵을 설명하는 책에서는  선을 뿌리 쪽에는 두껍께, 말단부로 갈 수록 가늘게 그리라고 되어있는데, 다른 프로그램들에서는 이런 효과를 줄 수 없었습니다.  <a href="http://www.conceptleader.com/">ConceptLeader</a>는 홈페이지에서 사용자 등록을 하면 상업적이지 않은 목적의 개인사용자는 무료로 쓸 수 있습니다.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="http://conceptleader.com/conceptleadercokr/01_pro/images/screen_01.jpg" alt="conceptLeader.JPG" width="740" height="672" title="conceptLeader.JPG"></span></p>
-</div>
-</div>
-</div>
-    </div>
-	
-	<section id="social-share">
-        <ul class="icons">
-<!-- Social Share Button HTML -->
-
-<!-- Twitter -->
-<li><a href="//twitter.com/share?url=https://blog.benelog.net//1846356.html&text=마인드맵(mind map) 그리기 도구들&via=" target="_blank" class="share-btn twitter">
-    <i class="fa fa-twitter"></i>
-    <p>Twitter</p>
-</a></li>
-
-<!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=https://blog.benelog.net//1846356.html" target="_blank" class="share-btn google-plus">
-    <i class="fa fa-google-plus"></i>
-    <p>Google+</p>
-</a></li>
-
-<!-- Facebook -->
-<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//1846356.html" target="_blank" class="share-btn facebook">
-    <i class="fa fa-facebook"></i>
-    <p>Facebook</p>
-</a></li>
-
-<!-- Reddit (url, title) -->
-<li><a href="//reddit.com/submit?url=https://blog.benelog.net//1846356.html&title=마인드맵(mind map) 그리기 도구들" target="_blank" class="share-btn reddit">
-    <i class="fa fa-reddit-alien"></i>
-    <p>Reddit</p>
-</a></li>
-
-<!-- LinkedIn -->
-<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//1846356.html&title=마인드맵(mind map) 그리기 도구들" target="_blank" class="share-btn linkedin">
-    <i class="fa fa-linkedin"></i>
-    <p>LinkedIn</p>
-</a></li>
-
-<!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//1846356.html&title=마인드맵(mind map) 그리기 도구들" target="_blank" class="share-btn stumbleupon">
-    <i class="fa fa-stumbleupon"></i>
-    <p>StumbleUpon</p>
-</a></li>
-
-<!-- Email -->
-<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//1846356.html" target="_blank" class="share-btn email">
-    <i class="fa fa-envelope"></i>
-    <p>Email</p>
-</a></li>
-        </ul>
-    </section>
-     
-
-    <footer>
-	
-		<ul class="stats">
-    	    <!-- Display the categories associated with this post -->
-    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/생산성-도구.html'>생산성-도구</a></li>
-
-				<li><a class="icon fa-comment" href="../1846356.html#disqus_thread"> &nbsp;</a></li>
- 		</ul>
-    	
-    </footer>
-</article>
 		
 <ul class="actions pagination">
     <li><a href="../21/"
             class=" button big previous">PREVIOUS</a></li>
 
     <li><span
-            class="button big"> 22 of 29 </span></li>
+            class="button big"> 22 of 30 </span></li>
 
     <li><a href="../23/"
             class=" button big next">NEXT</a></li>
@@ -745,6 +718,17 @@
                     <li>
                         <article>
                             <header>
+                                <h3><a href="../migration-to-static-site.html">정적 사이트로 블로그 마이그레이션</a></h3>
+                                 <time class="published"
+							            datetime='May 06, 2019'>
+							            May 06, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
                                 <h3><a href="../robolectric.html">Robolectric을 활용한 안드로이드 쾌속 테스팅</a></h3>
                                  <time class="published"
 							            datetime='Oct 10, 2016'>
@@ -771,17 +755,6 @@
                                  <time class="published"
 							            datetime='Nov 03, 2014'>
 							            Nov 03, 2014</time>
-                            </header>
-                        </article>
-                    </li>
-
-                    <li>
-                        <article>
-                            <header>
-                                <h3><a href="../3017438.html">Android에서 @Inject, @Test</a></h3>
-                                 <time class="published"
-							            datetime='Apr 17, 2013'>
-							            Apr 17, 2013</time>
                             </header>
                         </article>
                     </li>
@@ -1359,6 +1332,15 @@
                         <article>
                             <header>
                                 <a href="../tags/DependencyInjection.html">DependencyInjection</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="../tags/static-site.html">static-site</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>
