@@ -4,6 +4,7 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: static-site
+:jbake-description: 이 블로그를 마이그레이션 했던 과정에서 얻은 경험을 정리했습니다. Github와 AsiiDoc, JBake, Gradle, Netflify 등의 기술을 이용했습니다.
 :idprefix:
 
 == 블로그를 이전한 동기
