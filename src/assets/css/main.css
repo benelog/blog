@@ -1518,7 +1518,6 @@
 		letter-spacing: 0.25em;
 		line-height: 1.65;
 		margin: 0 0 1em 0;
-		text-transform: uppercase;
 	}
 
 		h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
@@ -2438,7 +2437,6 @@
 						font-weight: 400;
 						letter-spacing: 0.25em;
 						margin: -0.625em 0 1.7em 0;
-						text-transform: uppercase;
 					}
 
 					ul.posts article header > :last-child {
@@ -2516,7 +2514,6 @@
 				font-weight: 400;
 				letter-spacing: 0.25em;
 				margin: -0.625em 0 1.7em 0;
-				text-transform: uppercase;
 			}
 
 			.mini-post header .author {
@@ -2632,7 +2629,6 @@
 					font-weight: 800;
 					letter-spacing: 0.25em;
 					margin-top: 0.5em;
-					text-transform: uppercase;
 					white-space: nowrap;
 				}
 
@@ -2873,7 +2869,6 @@
 		letter-spacing: 0.25em;
 		line-height: 2.5;
 		margin-top: -1em;
-		text-transform: uppercase;
 	}
 
 /* Table */
@@ -3029,7 +3024,6 @@
 					font-size: 0.7em;
 					font-weight: 400;
 					letter-spacing: 0.25em;
-					text-transform: uppercase;
 				}
 
 		#header .main {
