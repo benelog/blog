@@ -13,6 +13,7 @@
     <meta name="author" content="${content.author!config.site_author}">
     <meta name="keywords" content="<#if content.tags?has_content><#list content.tags as tag>${tag}<#sep>, </#list></#if>">
     <meta name="generator" content="JBake">
+	<meta property="og:image" content="${config.site_host}<#if (content.og)??>${content.og.image}<#else>${config.sidebar_intro_pic_src}</#if>"/>
 
     <link rel="stylesheet" href="<#if (content.rootpath)??>${content.rootpath}<#else></#if>css/google-font.css" />
     <link rel="stylesheet" href="<#if (content.rootpath)??>${content.rootpath}<#else></#if>css/font-awesome.min.css" />
