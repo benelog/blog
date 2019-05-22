@@ -7,6 +7,8 @@
 :jbake-description: 이 블로그를 마이그레이션 했던 과정에서 얻은 경험을 정리했습니다. Github와 AsiiDoc, JBake, Gradle, Netflify 등의 기술을 이용했습니다.
 :jbake-og: {"image": "img/blog-migration/netflify.png"}
 :idprefix:
+:toc:
+:sectnums:
 
 == 블로그를 이전한 동기
 저는 이 블로그를 http://www.egloos.com[Egloos]에서 커스텀 URL(blog.benelog.net)을 설정하여 쓰고 있었습니다.
