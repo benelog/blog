@@ -1,7 +1,7 @@
 = Robolectric을 활용한 안드로이드 쾌속 테스팅
 정상혁
 2016-10-10
-:jbake-last_updated: 2014-08-01
+:jbake-last_updated: 2018-05-23
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: testing, android
