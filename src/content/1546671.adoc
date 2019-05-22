@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: 책
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 http://www.yes24.com/Goods/FTGoodsView.aspx?goodsNo=2657930&CategoryNumber=001001003005006001[image:http://image.yes24.com/momo/TopCate57/MidCate09/5683498.jpg[momo/TopCate57/MidCate09/5683498.jpg,title="momo/TopCate57/MidCate09/5683498.jpg",width=168,height=220]]

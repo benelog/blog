@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: test,Spring-Test,Cron
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 Cron expression은 실수하기가 쉽고, 오류가 뒤늦게서야 발견됩니다. 매일 5시 20분, 40분,60분에 실행될 일정을 지정하고자 했는데 "* 0/20 5 * * * ?"로 써야 할 표현식을  "* 0,20 5 * * * ?"으로 써놓고는 실운영 서버에 배포해서 하루가 지난 다음에 실행결과를 보고서야 실수를 발견한 경험을 해보신 분들이 많으실 것입니다.

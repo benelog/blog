@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: timezone,시간대,날짜
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 변경이력

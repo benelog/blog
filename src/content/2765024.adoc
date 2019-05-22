@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: Spring,cloud,행사후기,Spring-One
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 (덧붙임: 이글을 쓰던 시점의 CloudFoundry는 지금의 CloudFoundry와는 다른 기술이였고,  이전 CloudFoundry는 http://classic.cloudfoundry.com/ 으로 옮기어 갔습니다. )

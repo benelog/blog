@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: Test
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 image:http://farm4.static.flickr.com/3215/2986232393_20848d9b65.jpg[image,width=332,height=500]

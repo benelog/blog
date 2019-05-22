@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: Spring,Spring-One,행사후기
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 작년 SpringOne에서도 Spring Roo에 대한 발표가 있었고, Google IO 등 다른 컨퍼런스에서도 꾸준히 Spring Roo는 홍보되었지만, 이번 SpringOne에서는 부쩍 그 비중이 높게 느껴졌습니다.

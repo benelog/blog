@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: CSS,HTML
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 제가 있는 프로젝트의 UI표준은  2004년 10월경에 처음 정해진 것입니다. 연속 사업 중 첫번째 사업 때 정해진 틀을 그 뒤에도 수정없이 copy&paste로 입혀서 쓰고 있는 중이죠. 디자이너가 html으로 파일을 만들어 주었을 당시에는 팀원 중에 웹표준에 대해서 신경을 썼던 사람이 없었습니다.  지금 다시 들어다보니 css를 잘 정의했으면 훨씬 깔끔하게 중복없이 만들수 있었던 코드가 많이 보입니다.

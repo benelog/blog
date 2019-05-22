@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: effective-Java,Java
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 Amazon에서 예약주문 단계에서 판매상태로 바뀌었습니다.

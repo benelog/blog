@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: Spring,Spring-One,행사후기
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 2010년 10월 19일부터 22일까지 시카고에서 열리는 SpringOne2GX 2010 행사에 참석하고 있는 중입니다. 정리가 완벽하게 되지 않아도 중간중간 듣고 본 것들을 올리도록 하겠습니다.

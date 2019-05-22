@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: Spring,Spring-One,행사후기
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 스프링 프레임웍의 핵심 개발자 유겐할러는 "Spring 3.0 -> 3.1 -> 3.2 Themes & Trends"라는 제목으로 두번째 날 첫시간에  발표를 했습니다. 로드존슨은 http://www.yes24.com/24/goods/3691866[어느 인터뷰]에서 지금까지 만났던 가장 뛰어난 개발자는 생각할 것도 없이 유겐할러라고 말한 적이 있었고, 그렇게 전적인 신임을 받고 있어서 인지 유겐할러는 스프링 core 모듈의 대부분의 코드를 만들었다고 합니다. 그래서 유겐할러는 스프링 커뮤니티에서 로드존슨에 버금가는 유명인인데, 예상대로 이 날 발표 장소에는 사람들이 꽉 차게 몰려왔습니다.

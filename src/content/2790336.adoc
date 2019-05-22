@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: Servlet,Spring,Spring-Test,Test
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 파일 update를 처리하는 Servlet도 Spring의 MockHttpSerlvetRequest와 MockHttpServletResponse로 테스트 할 수 있습니다.

@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: Spring,Spring-Batch,뉴스
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 Spring batch 프레임웍은  스프링 프레임웍의 본부인 SpringSource와 컨설팅 회사 Accenture가 협업해서 개발하고 있습니다. SpringSource의 기술력과 Accenture의 현장경험이 합쳐진 것이죠. 작년 5월에 국내에도 이 소식이 보도된 기사가 있군요.

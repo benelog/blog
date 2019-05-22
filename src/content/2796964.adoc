@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: Java,reload,Eclipse
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 SpringSource Tool Suite의 Java Agent based reloading은 개발할 때  .class파일을 고치면 그 파일만 리로딩을 시켜주는 기능입니다. JRebel과도 유사한데 아직 "Experimental' 표시가 붙어있고, 생긴지가 얼마안되는 기능이라서 JRebel만큼 성숙한 기술인지는 잘 모르겠습니다. 그래도 모든 경우에 다 reloading이 되지 않더라도 한번이라도 서버내렸다 올리는 시간을 절약할 수 있으면 그만큼 이득이기 때문에 없는 것보다는 도움이 됩니다.

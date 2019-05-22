@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: Java, 자작도구
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 실행 중인 Java 프로세스의 Stack dump를 뜨는 작업은 간단합니다.  Jstack 이나 kill -3 뒤에 process id를 지정하기만 하면 됩니다. Stack dump를 서버에 있는 stack dump파일을 PC로 옮길때면 Secure CRT나 putty에서 console에 찍히는 내용을 파일로 저장하는 기능을 주로 쓰고 있습니다.

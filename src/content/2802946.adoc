@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: Spring,Cron,test,Spring-Test
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 Spring 3.0부터는 Quartz가 없이도 실행 스케쥴 설정이 가능합니다. 설정과 테스트 방법을 정리했습니다.

@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: Maven,Eclipse,정적분석
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 http://clarkware.com/software/JDepend.html[JDepend]는 Java패키지간의 의존성에 대한 수치들을 알려 주는 도구입니다.

@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: Spring,Spring-Batch,뉴스
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 (수정이력: 2008.01.19 - 스프링배치 관련 링크들은 http://www.ksug.org/94로 옮기고, 최근 자료를 포함시켰습니다.)

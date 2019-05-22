@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: Spring,Spring-Test,test
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 Spring 3.0부터 추가된 SpEL(Spring E-pression Language)를 응용한 사례입니다.

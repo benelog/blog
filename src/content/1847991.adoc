@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: Java,Effective-java
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 Effective Java의 Second Edition이 나올 때가 되지 않았나 싶어서 아마존에 가봤더니 아직이군요. 5월28일로 발매가 예정되어 있습니다. (http://www.amazon.com/Effective-Java-Second-2nd/dp/0321356683/ref=pd_bbs_sr_1?ie=UTF8&s=books&qid=1208402810&sr=8-1)

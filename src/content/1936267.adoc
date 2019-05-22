@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: 책
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 존경하는 임백준님의 책 'http://blog.hanb.co.kr/11[뉴욕의 프로그래머]'에 있는 내용입니다.

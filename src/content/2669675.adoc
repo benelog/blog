@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: 코딩연습,Lotto,Python
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 오래 전에 블로그에 Java를 이용한 로또 번호 생성기(http://blog.benelog.net/1646013 )코드를 올린 적이 있었습니다.

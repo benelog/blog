@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags:
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 http://www.creativecommons.or.kr/[CCK(Creative Commons Korea)]의 http://ccsalon.tistory.com/['Code can be an art.' 행사 소식]을 처음 들었을 때, 생각났던 자료들을 정리해서 올려봅니다.

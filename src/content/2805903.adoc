@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: AOP,Spring,test,Spring-Test
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 Spring AOP에서 동일한 target클래스에 결합되는 Aspect의 우선순위는  http://static.springsource.org/spring/docs/3.0.x/api/org/springframework/core/Ordered.html[Ordered] 인터페이스를 구현하거나 @Order 애노테이션으로 지정합니다.

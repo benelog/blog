@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: JDBC,JSTL
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 개발을 하다보면 간단한 화면 1~2개만 독립적으로 돌아가는 웹어플리케이션을 만들 때도 있습니다. 예를 들면 로그조회 프로그램 같은 것들이죠.

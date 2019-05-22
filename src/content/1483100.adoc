@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: 코딩연습
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 http://yaldex.com/JSFactory_Pro.htm[1st JavaScript editor]의 공짜 사용기한이 얼마 남지 않아서 JavaScript로 빨리 뭐라도 만들어봐야 겠다는 생각이 들었습니다. 프로젝트 업무 중에는 그런 일이 보이지 않아서 회사의 다른 팀원들이 하고 있는 스터디 모임에서 나왔던 http://blog.naver.com/i1j1jsy/70011900056[]뉴질랜드 화폐문제를 풀어보았습니다.

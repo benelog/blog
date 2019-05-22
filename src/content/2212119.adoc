@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: EMMA,Eclipse,Maven,Hudson
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 http://emma.sourceforge.net/[EMMA]는 테스트코드가 검증해 주는 코드영역에 대해서 보고해 주는 도구입니다. 전체 코드 중 몇 %가 테스트 코드를 거쳐가고 있는지 쉽게 수치를 낼 수 있습니다.

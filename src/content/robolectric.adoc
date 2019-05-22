@@ -5,9 +5,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: testing, android
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :description: Android 테스팅 프레임워크 Robolec에 대한 소개
 :idprefix:
 

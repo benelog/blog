@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: spiral-array,코딩연습
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 2007년 회사 워크샵 갔었을 때 풀었던 문제와 답

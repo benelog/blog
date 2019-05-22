@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: 코딩연습,spiral-array
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 지난 2월에 회사 워크샵에서 풀었던 나선형 배열 문제에 대한 글을 올린 적이 있었지요. ( http://blog.benelog.net/901106 )

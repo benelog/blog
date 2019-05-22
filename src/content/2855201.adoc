@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: Btrace,JDBC,Monitoring
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 Connection pool을 library로 DBCP를 많이 사용하고 있습니다. DataSouce가 선언되어 있는 설정 파일을 보면 min, max Connection 숫자는 쉽게 알 있지만, 현재 Active 한 것이 몇개 인지등은 실행시간에 쉽게 알아보기가 쉽지가 않죠. 그래서 JMX로 현재 Active한 Connection 수 등을 노출하는, DBCP를 한번 감싼 DataSource를 사용하기도 합니다.

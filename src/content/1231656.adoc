@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: 행사후기
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 지난 2007/05/19(토)에  http://www.creativecommons.or.kr/[CCK(Creative Commons Korea)]에서 주최한  http://ccsalon.tistory.com/[ccSalon] 행사가 있었습니다 . 이날의 행사 제목은 'Code can be an art'였었죠

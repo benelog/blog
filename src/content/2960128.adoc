@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: 코딩연습
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 출판사 인사이트 블로그에 아래와 같은 퀴즈가 올라왔네요

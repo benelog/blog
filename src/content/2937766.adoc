@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: git,svn
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 
 == https://gist.github.com/benelog/2922437#%EB%B2%84%EC%A0%84-%EA%B4%80%EB%A6%AC-%EC%8B%9C%EC%8A%A4%ED%85%9C-%EC%9C%A0%EB%9E%91%EA%B8%B0-%EA%B7%B8%EB%A6%AC%EA%B3%A0-git-%EC%A0%81%EC%9D%91%EA%B8%B0[]버전 관리 시스템 유랑기, 그리고 Git 적응기

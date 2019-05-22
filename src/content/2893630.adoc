@@ -4,9 +4,6 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: AOP,Spring-Test,Spring,test
-:jabke-rootpath: /
-:rootpath: /
-:content.rootpath: /
 :idprefix:
 AOP에서 AspectJ표현식은 다양하고 강력한 기능을 제공합니다.
 예를 들면 Aspect가 결합될 JoinPoint를 아래와 같이 표현을 할 수 있습니다.
