@@ -179,8 +179,24 @@
   
          
     <div id="content">
-       <div class="sect1">
-<h2 id="블로그를_이전한_동기">블로그를 이전한 동기</h2>
+       <div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#블로그를_이전한_동기">1. 블로그를 이전한 동기</a></li>
+<li><a href="#요구사항">2. 요구사항</a></li>
+<li><a href="#선택한_기술">3. 선택한 기술</a>
+<ul class="sectlevel2">
+<li><a href="#정적_사이트_생성기">3.1. 정적 사이트 생성기</a></li>
+<li><a href="#git_저장소_빌드배포">3.2. Git 저장소, 빌드/배포</a></li>
+<li><a href="#편집기">3.3. 편집기</a></li>
+<li><a href="#마이그리에션_프로그램">3.4. 마이그리에션 프로그램</a></li>
+</ul>
+</li>
+<li><a href="#마치며">4. 마치며</a></li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="블로그를_이전한_동기">1. 블로그를 이전한 동기</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>저는 이 블로그를 <a href="http://www.egloos.com">Egloos</a>에서 커스텀 URL(blog.benelog.net)을 설정하여 쓰고 있었습니다.
@@ -194,7 +210,7 @@ Egloos는 무난한 블로깅 플랫폼입니다. 그러나 개발과 관련된 
 </div>
 </div>
 <div class="sect1">
-<h2 id="요구사항">요구사항</h2>
+<h2 id="요구사항">2. 요구사항</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>블로그 플랫폼을 선택하는데 염두에 둔 조건은 아래와 같았습니다.</p>
@@ -225,7 +241,7 @@ Egloos는 무난한 블로깅 플랫폼입니다. 그러나 개발과 관련된 
 </div>
 </div>
 <div class="sect1">
-<h2 id="선택한_기술">선택한 기술</h2>
+<h2 id="선택한_기술">3. 선택한 기술</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>앞의 요구사항을 충족시키는 다음과 같은 서비스/도구들을 선택했습니다.</p>
@@ -262,7 +278,7 @@ Egloos는 무난한 블로깅 플랫폼입니다. 그러나 개발과 관련된 
 <p>사용할 기술을 선택하면서 했던 고민들은 아래에 정리했습니다.</p>
 </div>
 <div class="sect2">
-<h3 id="정적_사이트_생성기">정적 사이트 생성기</h3>
+<h3 id="정적_사이트_생성기">3.1. 정적 사이트 생성기</h3>
 <div class="paragraph">
 <p>정적 사이트 생성기로 JBake를 선택한 이유는 다음과 같습니다.</p>
 </div>
@@ -389,7 +405,7 @@ Egloos는 무난한 블로깅 플랫폼입니다. 그러나 개발과 관련된 
 </div>
 </div>
 <div class="sect2">
-<h3 id="git_저장소_빌드배포">Git 저장소, 빌드/배포</h3>
+<h3 id="git_저장소_빌드배포">3.2. Git 저장소, 빌드/배포</h3>
 <div class="paragraph">
 <p>Git 저장소는 많이 쓰이는 GitHub를 무난하게 선택했습니다.
 AsciiDoc으로 작성된 포스트의 원본은 <a href="https://github.com/benelog/blog/tree/master/src/content">github/benelog/blog/src/content</a> 에서 이력을 관리합니다.</p>
@@ -473,7 +489,7 @@ JBake의 설정으로 HTML 확장자를 제외하는 것도 시도해보았지�
 </div>
 </div>
 <div class="sect2">
-<h3 id="편집기">편집기</h3>
+<h3 id="편집기">3.3. 편집기</h3>
 <div class="paragraph">
 <p>긴 글을 편집할 때는 IntelliJ Community Edition을 사용했습니다.
 평소 개발할 때의 편집방식, 단축키와 Git 저장소 연동 방식을 그대로 활용할 수 있습니다.
@@ -509,7 +525,7 @@ HTML으로 렌더링될 모습을 동시에 보면서 편집을 할 수 있고 �
 </div>
 </div>
 <div class="sect2">
-<h3 id="마이그리에션_프로그램">마이그리에션 프로그램</h3>
+<h3 id="마이그리에션_프로그램">3.4. 마이그리에션 프로그램</h3>
 <div class="paragraph">
 <p>마이그리에션 프로그램의 소스와 사용법은 <a href="https://github.com/benelog/egloos-migration/" class="bare">https://github.com/benelog/egloos-migration/</a> 을 참고하시기 바랍니다.
 이것도 제가 알고 있는 기술들을 활용해서 Kotlin + Spring 으로 작성했습니다.</p>
@@ -553,7 +569,7 @@ pring Batch를 쓰지 않았어도 비슷한 기능 단위로 쪼갯을 것 같�
 </div>
 </div>
 <div class="sect1">
-<h2 id="마치며">마치며</h2>
+<h2 id="마치며">4. 마치며</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>오랜 숙원 사업이였던 블로그 이전을 마쳐서 뿌듯합니다.

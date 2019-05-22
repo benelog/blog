@@ -6,8 +6,8 @@
     <atom:link href="https://blog.benelog.net//feed.xml" rel="self" type="application/rss+xml" />
     <description>JBake Bootstrap Template</description>
     <language>en-gb</language>
-    <pubDate>Wed, 22 May 2019 22:13:51 +0000</pubDate>
-    <lastBuildDate>Wed, 22 May 2019 22:13:51 +0000</lastBuildDate>
+    <pubDate>Wed, 22 May 2019 22:22:15 +0000</pubDate>
+    <lastBuildDate>Wed, 22 May 2019 22:22:15 +0000</lastBuildDate>
 
     <item>
       <title>정적 사이트로 블로그 마이그레이션</title>
@@ -15,8 +15,24 @@
       <pubDate>Mon, 6 May 2019 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">migration-to-static-site.html</guid>
       	<description>
-	&lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;블로그를_이전한_동기&quot;&gt;블로그를 이전한 동기&lt;/h2&gt;
+	&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
+&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
+&lt;ul class=&quot;sectlevel1&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#블로그를_이전한_동기&quot;&gt;1. 블로그를 이전한 동기&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#요구사항&quot;&gt;2. 요구사항&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#선택한_기술&quot;&gt;3. 선택한 기술&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#정적_사이트_생성기&quot;&gt;3.1. 정적 사이트 생성기&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#git_저장소_빌드배포&quot;&gt;3.2. Git 저장소, 빌드/배포&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#편집기&quot;&gt;3.3. 편집기&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#마이그리에션_프로그램&quot;&gt;3.4. 마이그리에션 프로그램&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#마치며&quot;&gt;4. 마치며&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;블로그를_이전한_동기&quot;&gt;1. 블로그를 이전한 동기&lt;/h2&gt;
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;저는 이 블로그를 &lt;a href=&quot;http://www.egloos.com&quot;&gt;Egloos&lt;/a&gt;에서 커스텀 URL(blog.benelog.net)을 설정하여 쓰고 있었습니다.
@@ -30,7 +46,7 @@ Egloos는 무난한 블로깅 플랫폼입니다. 그러나 개발과 관련된 
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;요구사항&quot;&gt;요구사항&lt;/h2&gt;
+&lt;h2 id=&quot;요구사항&quot;&gt;2. 요구사항&lt;/h2&gt;
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;블로그 플랫폼을 선택하는데 염두에 둔 조건은 아래와 같았습니다.&lt;/p&gt;
@@ -61,7 +77,7 @@ Egloos는 무난한 블로깅 플랫폼입니다. 그러나 개발과 관련된 
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;선택한_기술&quot;&gt;선택한 기술&lt;/h2&gt;
+&lt;h2 id=&quot;선택한_기술&quot;&gt;3. 선택한 기술&lt;/h2&gt;
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;앞의 요구사항을 충족시키는 다음과 같은 서비스/도구들을 선택했습니다.&lt;/p&gt;
@@ -98,7 +114,7 @@ Egloos는 무난한 블로깅 플랫폼입니다. 그러나 개발과 관련된 
 &lt;p&gt;사용할 기술을 선택하면서 했던 고민들은 아래에 정리했습니다.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;정적_사이트_생성기&quot;&gt;정적 사이트 생성기&lt;/h3&gt;
+&lt;h3 id=&quot;정적_사이트_생성기&quot;&gt;3.1. 정적 사이트 생성기&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;정적 사이트 생성기로 JBake를 선택한 이유는 다음과 같습니다.&lt;/p&gt;
 &lt;/div&gt;
@@ -225,7 +241,7 @@ Egloos는 무난한 블로깅 플랫폼입니다. 그러나 개발과 관련된 
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;git_저장소_빌드배포&quot;&gt;Git 저장소, 빌드/배포&lt;/h3&gt;
+&lt;h3 id=&quot;git_저장소_빌드배포&quot;&gt;3.2. Git 저장소, 빌드/배포&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Git 저장소는 많이 쓰이는 GitHub를 무난하게 선택했습니다.
 AsciiDoc으로 작성된 포스트의 원본은 &lt;a href=&quot;https://github.com/benelog/blog/tree/master/src/content&quot;&gt;github/benelog/blog/src/content&lt;/a&gt; 에서 이력을 관리합니다.&lt;/p&gt;
@@ -309,7 +325,7 @@ JBake의 설정으로 HTML 확장자를 제외하는 것도 시도해보았지�
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;편집기&quot;&gt;편집기&lt;/h3&gt;
+&lt;h3 id=&quot;편집기&quot;&gt;3.3. 편집기&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;긴 글을 편집할 때는 IntelliJ Community Edition을 사용했습니다.
 평소 개발할 때의 편집방식, 단축키와 Git 저장소 연동 방식을 그대로 활용할 수 있습니다.
@@ -345,7 +361,7 @@ HTML으로 렌더링될 모습을 동시에 보면서 편집을 할 수 있고 �
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;마이그리에션_프로그램&quot;&gt;마이그리에션 프로그램&lt;/h3&gt;
+&lt;h3 id=&quot;마이그리에션_프로그램&quot;&gt;3.4. 마이그리에션 프로그램&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;마이그리에션 프로그램의 소스와 사용법은 &lt;a href=&quot;https://github.com/benelog/egloos-migration/&quot; class=&quot;bare&quot;&gt;https://github.com/benelog/egloos-migration/&lt;/a&gt; 을 참고하시기 바랍니다.
 이것도 제가 알고 있는 기술들을 활용해서 Kotlin + Spring 으로 작성했습니다.&lt;/p&gt;
@@ -389,7 +405,7 @@ pring Batch를 쓰지 않았어도 비슷한 기능 단위로 쪼갯을 것 같�
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;마치며&quot;&gt;마치며&lt;/h2&gt;
+&lt;h2 id=&quot;마치며&quot;&gt;4. 마치며&lt;/h2&gt;
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;오랜 숙원 사업이였던 블로그 이전을 마쳐서 뿌듯합니다.
