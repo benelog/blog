@@ -6,8 +6,8 @@
     <atom:link href="https://blog.benelog.net//feed.xml" rel="self" type="application/rss+xml" />
     <description>JBake Bootstrap Template</description>
     <language>en-gb</language>
-    <pubDate>Wed, 22 May 2019 21:19:46 +0000</pubDate>
-    <lastBuildDate>Wed, 22 May 2019 21:19:46 +0000</lastBuildDate>
+    <pubDate>Wed, 22 May 2019 21:27:51 +0000</pubDate>
+    <lastBuildDate>Wed, 22 May 2019 21:27:51 +0000</lastBuildDate>
 
     <item>
       <title>정적 사이트로 블로그 마이그레이션</title>
@@ -409,11 +409,18 @@ pring Batch를 쓰지 않았어도 비슷한 기능 단위로 쪼갯을 것 같�
       	<description>
 	&lt;div id=&quot;preamble&quot;&gt;
 &lt;div class=&quot;sectionbody&quot;&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;( 2014년 8월1일 &lt;a href=&quot;http://d2.naver.com/helloworld/870369&quot;&gt;제9회 오픈 세미나 in 대구&lt;/a&gt; 행사에서 한 발표입니다. )&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;2014년 8월1일 &lt;a href=&quot;http://d2.naver.com/helloworld/870369&quot;&gt;제9회 오픈 세미나 in 대구&lt;/a&gt; 행사에서 한 발표입니다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;예제 코드들은 당시의 Rolbectric의 최신 버전을 기준으로 한 것이라 현재의 최신 버전에서는 그대로 실행되지 않을 수 있습니다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;안녕하세요, 네이버랩스 웹플랫폼개발랩의 정상혁입니다. 오늘 발표에서는 테스트 프레임워크인 Robolectric을 사용하면서 실무에서 얻었던 경험을 공유하고자합니다.&lt;/p&gt;
+&lt;p&gt;오늘 발표에서는 테스트 프레임워크인 Robolectric을 사용하면서 실무에서 얻었던 경험을 공유하고자합니다.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;먼저 테스트코드란 무엇인지와 안드로이드에서 테스트 작성을 어렵게 하는 난관등을 말씀드리고 Robolectric을 활용하는 방법을 소개하겠습니다.&lt;/p&gt;
