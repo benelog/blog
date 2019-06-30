@@ -6,8 +6,8 @@
     <atom:link href="https://blog.benelog.net//feed.xml" rel="self" type="application/rss+xml" />
     <description>JBake Bootstrap Template</description>
     <language>en-gb</language>
-    <pubDate>Sun, 30 Jun 2019 23:43:04 +0000</pubDate>
-    <lastBuildDate>Sun, 30 Jun 2019 23:43:04 +0000</lastBuildDate>
+    <pubDate>Sun, 30 Jun 2019 23:55:10 +0000</pubDate>
+    <lastBuildDate>Sun, 30 Jun 2019 23:55:10 +0000</lastBuildDate>
 
     <item>
       <title>여러 개의 JDK를 설치하고 선택해서 사용하기</title>
@@ -542,9 +542,9 @@ direnv: export ~JAVA_HOME ~PATH&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;jenv를 다른 도구와 잘 어우러지게 사용하기 위해서는 동작 원리를 알아두는 것이 좋습니다.
-jenv로 JDK 버전을 지정한 후 &lt;code&gt;which java&lt;/code&gt; 로 어느 디렉토리에 있는 &lt;code&gt;java`와 연결되는지 확인을 해보면
-`~/.jenv/shims/java&lt;/code&gt; 가 나옵니다. 이 파일의 내용을 보면 실제 설치한 JDK의 `java`이 아닌 쉘 스크립트라는 것을 알수 있습니다.&lt;/p&gt;
+&lt;p&gt;jEnv를 다른 도구와 잘 어우러지게 사용하기 위해서는 동작 원리를 알아두는 것이 좋습니다.
+jEnv로 JDK 버전을 지정한 후 &lt;code&gt;which java&lt;/code&gt; 로 어느 디렉토리에 있는 &lt;code&gt;java&lt;/code&gt; 와 연결되는지 확인을 해보면
+&lt;code&gt;~/.jenv/shims/java&lt;/code&gt; 가 나옵니다. 이 파일의 내용을 보면 실제 설치한 JDK의 &lt;code&gt;java&lt;/code&gt; 가 아닌 쉘 스크립트라는 것을 알수 있습니다.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;title&quot;&gt;&lt;code&gt;cat ~/.jenv/shims/java&lt;/code&gt; 명령의 결과&lt;/div&gt;
