@@ -6,13 +6,13 @@
     <atom:link href="https://blog.benelog.net//feed.xml" rel="self" type="application/rss+xml" />
     <description>JBake Bootstrap Template</description>
     <language>en-gb</language>
-    <pubDate>Sun, 30 Jun 2019 23:30:38 +0000</pubDate>
-    <lastBuildDate>Sun, 30 Jun 2019 23:30:38 +0000</lastBuildDate>
+    <pubDate>Sun, 30 Jun 2019 23:32:43 +0000</pubDate>
+    <lastBuildDate>Sun, 30 Jun 2019 23:32:43 +0000</lastBuildDate>
 
     <item>
       <title>여러 개의 JDK를 설치하고 선택해서 사용하기</title>
       <link>https://blog.benelog.net//installing-jdk.html</link>
-      <pubDate>Fri, 14 Jun 2019 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 1 Jul 2019 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">installing-jdk.html</guid>
       	<description>
 	&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
