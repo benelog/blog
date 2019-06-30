@@ -133,6 +133,9 @@
                     <h3>Recent Posts</h3>
                 </header>
                     <li>
+                        <a href="../../installing-jdk.html"><p>여러 개의 JDK를 설치하고 선택해서 사용하기</p></a>
+                    </li>
+                    <li>
                         <a href="../../migration-to-static-site.html"><p>정적 사이트로 블로그 마이그레이션</p></a>
                     </li>
                     <li>
@@ -140,9 +143,6 @@
                     </li>
                     <li>
                         <a href="../../3134907.html"><p>'네이버를 만든 기술, 읽으면서 배운다 - 자바편' 출간</p></a>
-                    </li>
-                    <li>
-                        <a href="../../3120317.html"><p>시간대 DB에서 우리나라 시간의 오류</p></a>
                     </li>
             </ul>
         </section>
@@ -158,6 +158,289 @@
 </section>
 	
 	<div id="main">
+<article class="post">
+   <header>
+    <div class="title">
+                    <h2><a href="../2228221.html">Spring MVC 2.5을 활용한 파일업로드</a></h2>
+
+
+    </div>
+    <div class="meta">
+         <time class="published"
+            datetime='Feb 08, 2009'>
+            Feb 08, 2009</time>
+            <div class="published eta"></div>
+        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
+    </div>
+</header>
+
+    
+  
+         
+    <div id="content">
+       <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>간단한 파일 업로드 기능을 만들어야 할 일이 생겨서, Spring 2.5의 annotation을 이용한 Action에서 이를 처리하게 했습니다. 실무에서 썼던 것을 더 단순한 예제로 재구성해서 정리해봅니다.</p>
+</div>
+<div class="paragraph">
+<p>Maven의 pom.xml에 파일업로드 기능에서 참조하는 commons-fileupload 라이브러리에 대한 dependency를 추가합니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;dependency&gt;
+   &lt;groupId&gt;commons-fileupload&lt;/groupId&gt;
+   &lt;artifactId&gt;commons-fileupload&lt;/artifactId&gt;
+   &lt;version&gt;1.2.1&lt;/version&gt;
+
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>web.xml에는 applicationContext 파일의 위치를 지정하고, *.do를 스프링에서 처리하도록 설정합니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;servlet&gt;
+   &lt;servlet-name&gt;dispatcher&lt;/servlet-name&gt;
+   &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;
+   &lt;init-param&gt;
+     &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;
+     &lt;param-value&gt;classpath:applicationContext.xml&lt;/param-value&gt;
+   &lt;/init-param&gt;
+   &lt;/servlet&gt;
+   &lt;servlet-mapping&gt;
+     &lt;servlet-name&gt;dispatcher&lt;/servlet-name&gt;
+     &lt;url-pattern&gt;*.do&lt;/url-pattern&gt;
+   &lt;/servlet-mapping&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>업로드 기능을 간단히 테스트할 수 있는 jsp페이지를 만들어봅니다. 단순히 파일 1개를 "file"이라는 변수명으로 업로드 요청을 하는 페이지입니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-jsp" data-lang="jsp">&lt;%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%&gt;
+&lt;%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%&gt;
+&lt;%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;
+    &lt;title&gt;업로드 테스트&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;form action="/study/upload.do" method="post" enctype="multipart/form-data"&gt;
+&lt;p&gt;
+    &lt;label for="file"&gt;파일1 &lt;/label&gt;
+    &lt;input type="file" name="file"&gt;
+&lt;/p&gt;
+&lt;p&gt;
+    &lt;input type="submit" value="전송"/&gt;
+&lt;/p&gt;
+&lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>그리고 applicationContext파일을 아래와 같이 선언합니다. <code>DefaultAnnotationHandlerMapping</code> 을 이용해서 annotation을 이용한 Controller 설정을가능하게 합니다. <code>&lt;context:component-scan/&gt;</code> 태그를 사용해서, 설정을 scan할 패키지를지정합니다. 그리고, 파일이 저장될 디렉토리는 <code>${repository.path}</code> 속성으로 표시했습니다.
+Maven의 resource filter기능을 이용해서 실행환경에 따라 다른 값을 넣게 하면 편리합니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"&gt;
+
+    &lt;bean  class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"&gt;
+        &lt;property name="alwaysUseFullPath" value="true"/&gt;
+    &lt;/bean&gt;
+    &lt;bean id="multipartResolver"
+        class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/&gt;
+
+    &lt;bean id="respository" class="study.repository.FileRepository"&gt;
+        &lt;constructor-arg value="${repository.path}" /&gt;
+    &lt;/bean&gt;
+    &lt;context:component-scan    base-package="study.action"/&gt;
+&lt;/beans&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>실제적인 파일의 저장기능을 담당하는 클래스인 FileRepository에서는 간단하게 UIDD를 이용해서 키를 생성하고 path필드로 지정된 디렉토리에 저장을 해줍니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">package study.repository;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
+
+import org.springframework.web.multipart.MultipartFile;
+
+public class FileRepository {
+    private String path;
+    public FileRepository(String path) {
+        this.path = path;
+        File saveFolder = new File(path);
+        if(!saveFolder.exists() || saveFolder.isFile()){
+            saveFolder.mkdirs();
+        }
+    }
+
+    public String saveFile(MultipartFile sourcefile) throws IOException{
+        if ((sourcefile==null)||(sourcefile.isEmpty())) return null;
+        String key = UUID.randomUUID().toString();
+        String targetFilePath = path+"/"+ key;
+        sourcefile.transferTo(new File(targetFilePath));
+        return key;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>추가적으로 키값을 넣어주면 파일을 반환해주는 메소드나, 파일의 종류나 날짜에 따라서 하위 디렉토리를 구분해서 생성하는 기능도 넣을 수있을 것입니다. 그리고 더 확장한다면, 따로 주요 메서드를 선언한 Repository 라는 인터페이스를 정의하고, DB를저장소로 활용하는 DbRepository 와 같이 이름 붙인 구현 클래스도 만들어 볼 수 있겠습니다.</p>
+</div>
+<div class="paragraph">
+<p>그리고 @Controller , @RequestMapping, @RequestParam, @Autowired의 Anntation을활용해서 Controller 클래스를 작성합니다. 업로드 후 화면에 키값만 뿌도록 해서 java.io.Writer클래스를 화면출력을 위해 사용했습니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">package study.action;
+
+import java.io.IOException;
+import java.io.Writer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+
+import study.repository.FileRepository;
+
+@Controller
+public class FileAction {
+     private FileRepository respository;
+
+    @Autowired
+    public void setRespository(FileRepository respository) {
+        this.respository = respository;
+    }
+    @RequestMapping("/upload.do")
+    public void execute(@RequestParam("file") MultipartFile file,
+            Writer out) throws IOException{
+        String key = respository.saveFile(file);
+        out.write(key);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>MultipartFile 클래스를 파라미터로 받는 메서드는 <a href="http://static.springsource.org/spring/docs/3.0.0.M1/javadoc-api/org/springframework/mock/web/MockMultipartFile.html">MockMultiPartFile</a>를 이용해서 테스트하면 됩니다.</p>
+</div>
+<div class="paragraph">
+<p>참고로 <a href="http://chanwook.tistory.com/758">최근 로드존슨이 인터뷰에서 한 말</a>에 따르면 기존 Spring MVC의 Controller interface는 삭제될 것이라고 하네요.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="spring_mvc_2_5_관련_자료">Spring MVC 2.5 관련 자료</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://www.infoq.com/articles/spring-2.5-ii-spring-mvc" class="bare">http://www.infoq.com/articles/spring-2.5-ii-spring-mvc</a></p>
+</li>
+<li>
+<p><a href="http://chanwook.tistory.com/576">스프링 2.5 애노테이션 기반 MVC 예제</a></p>
+</li>
+<li>
+<p><a href="http://springtutorial.googlecode.com/svn/trunk/moimApp/src/spring/tutorial/web/MoimController.java">http://springtutorial.googlecode.com/svn/trunk/moimApp/src/spring/tutorial/web/MoimController.java</a></p>
+</li>
+<li>
+<p><a href="http://steelheart.kr/tc/173">Spring 2.5 Annotation기반 Controller 끄적거림</a></p>
+</li>
+<li>
+<p><a href="http://steelheart.kr/tc/entry/using-web-argument-resolver?category=0">Annotation기반 컨트롤러에 custom argument 적용하기 (WebArgumentResolver)</a></p>
+</li>
+<li>
+<p><a href="http://chanwook.tistory.com/548">Annotated Spring MVC Controller</a></p>
+</li>
+<li>
+<p><a href="http://corund.egloos.com/1815311">Spring Framework 2.5의 Annotation based Controller의 메서드 파라미터에서 주의점</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+    </div>
+	
+	<section id="social-share">
+        <ul class="icons">
+<!-- Social Share Button HTML -->
+
+<!-- Twitter -->
+<li><a href="//twitter.com/share?url=https://blog.benelog.net//2228221.html&text=Spring MVC 2.5을 활용한 파일업로드&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+</a></li>
+
+<!-- Google Plus -->
+<li><a href="//plus.google.com/share?url=https://blog.benelog.net//2228221.html" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+</a></li>
+
+<!-- Facebook -->
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//2228221.html" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+</a></li>
+
+<!-- Reddit (url, title) -->
+<li><a href="//reddit.com/submit?url=https://blog.benelog.net//2228221.html&title=Spring MVC 2.5을 활용한 파일업로드" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+</a></li>
+
+<!-- LinkedIn -->
+<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//2228221.html&title=Spring MVC 2.5을 활용한 파일업로드" target="_blank" class="share-btn linkedin">
+    <i class="fa fa-linkedin"></i>
+    <p>LinkedIn</p>
+</a></li>
+
+<!-- StumbleUpon (url, title) -->
+<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//2228221.html&title=Spring MVC 2.5을 활용한 파일업로드" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+</a></li>
+
+<!-- Email -->
+<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//2228221.html" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+</a></li>
+        </ul>
+    </section>
+     
+
+    <footer>
+	
+		<ul class="stats">
+    	    <!-- Display the categories associated with this post -->
+    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
+ 	        <li><a href='../tags/Spring.html'>Spring</a></li>
+ 	        <li><a href='../tags/Spring-MVC.html'>Spring-MVC</a></li>
+
+				<li><a class="icon fa-comment" href="../2228221.html#disqus_thread"> &nbsp;</a></li>
+ 		</ul>
+    	
+    </footer>
+</article>
 <article class="post">
    <header>
     <div class="title">
@@ -534,221 +817,6 @@ EMMA가 JVM의 종료 때도 기록을 하기 때문에 그렇다는군요. 다�
     	
     </footer>
 </article>
-<article class="post">
-   <header>
-    <div class="title">
-                    <h2><a href="../2204823.html">JavaNCSS + Maven2 + Hudson</a></h2>
-
-
-    </div>
-    <div class="meta">
-         <time class="published"
-            datetime='Jan 16, 2009'>
-            Jan 16, 2009</time>
-            <div class="published eta"></div>
-        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
-    </div>
-</header>
-
-    
-  
-         
-    <div id="content">
-       <div class="paragraph">
-<p>JavaNCSS를 Maven2을 통해 실행하고, Hudson을 통해 리포트를 확인하는 과정을 정리했습니다. <a href="http://www.kclee.de/clemens/java/javancss/">JavaNCSS</a>는 주석이 아닌 라인수(Non Commenting Source Statements,NCSS)와 순환복잡도 수 (Cyclomatic Comlexity Number, CCN) 등을 측정해 주는 도구입니다.</p>
-</div>
-<div class="paragraph">
-<p>JavanNCSS에 관한 eclipse 플러그인도 찾을 수는 있었지만(<a href="http://sourceforge.net/projects/jncss4eclipse/" class="bare">http://sourceforge.net/projects/jncss4eclipse/</a> ) 가장 최신버전이 2002년에 올라온 것이라서 적용하지 않기로 했습니다.</p>
-</div>
-<div class="paragraph">
-<p>그리고, JavaNCSS에 대한 Maven의 플러그인도  <a href="http://mojo.codehaus.org/javancss-maven-plugin/">javancss-maven-plugin</a>과 <a href="http://maven-plugins.sourceforge.net/maven-javancss-plugin/">maven-javancss-plugin</a>의 2가지가 존재했는데, <a href="http://mojo.codehaus.org/javancss-maven-plugin/">javancss-maven-plugin</a> 쪽이 보다 문서화가 잘 되어 있어서 그 쪽을 선택했습니다.</p>
-</div>
-<div class="paragraph">
-<p><code>pom.xml</code> 에 아래 선언을 추가합니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;reporting&gt;
-
-...
-
-   &lt;plugin&gt;
-
-     &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;
-     &lt;artifactId&gt;javancss-maven-plugin&lt;/artifactId&gt;
-     &lt;version&gt;2.0-beta-2&lt;/version&gt;
-      &lt;configuration&gt;
-      &lt;forceEncoding&gt;utf-8&lt;/forceEncoding&gt;
-       &lt;/configuration&gt;
-    &lt;/plugin&gt;
-  &lt;/plugins&gt;
-&lt;/reporting&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>그리고는 <code>mvn javancss:report javancss:check</code> 로 플러그인을 실행시켜 봅니다. 각각의 골에 대한 설명은 아래 페이지에서 보시면 됩니다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="http://mojo.codehaus.org/javancss-maven-plugin/report-mojo.html">javancss:report</a> : 리포트 생성</p>
-</li>
-<li>
-<p><a href="http://mojo.codehaus.org/javancss-maven-plugin/check-mojo.html">javancss:check</a> : CCN이나 NCSS 값이 너무 크면 빌드를 실패시킴</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>제외하거나 추가할 파일을 지정하려면 아래의 configuration 태그 아래에 includes, excludes 태그로 지정하면 됩니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;configuration&gt;
-
-.....
-  &lt;includes&gt;
-    &lt;include&gt;**/*foo.java&lt;/include&gt;
-  &lt;/includes&gt;
-  &lt;excludes&gt;
-    &lt;exclude&gt;**/bar.java&lt;/exclude&gt;
-  &lt;exclude&gt;**/foobar.java&lt;/exclude&gt;
-  &lt;/excludes&gt;
-&lt;/configuration&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>CCN이나 NCSS값의 한계 허용치는 아래와 같이 지정합니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;configuration&gt;
-....
-  &lt;failOnViolation&gt;true&lt;/failOnViolation&gt;
-  &lt;ccnLimit&gt;12&lt;/ccnLimit&gt;
-  &lt;ncssLimit&gt;90&lt;/ncssLimit&gt;
-&lt;/configuration&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>한가지 주의할 점은, 2.0-beta-2 버전을 실행할 경우, 메서드 내부에 annotation선언이 있다면 아래와 같은 에러메시지를 받게 됩니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code>Encountered "@ SuppressWarnings ( \"unused\" ) int notUsedVariable =" at line xxx, column yyy.</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>이 것은   <a href="http://mojo.codehaus.org/javancss-maven-plugin/">javancss-maven-plugin</a>  버전 2.0-beta-2가 이 의존하고 있는 JavaNCSS 버전 29.49 에서 가지고 있는 버그입니다. (<a href="http://jira.codehaus.org/browse/MJNCSS-16" class="bare">http://jira.codehaus.org/browse/MJNCSS-16</a> 참조) JavaNCSS 버전 29.50에서는 해결된 문제이고, 이 플러그인의 최신 버전인 <a href="http://mojo.codehaus.org/javancss-maven-plugin/">javancss-maven-plugin</a> 2.0-beta-3버전에서는 이런 문제가 발생하지 않는다고 합니다. 그런데, codehause의 Maven Repository를 뒤져보니 (<a href="http://repository.codehaus.org/org/codehaus/mojo/javancss-maven-plugin/" class="bare">http://repository.codehaus.org/org/codehaus/mojo/javancss-maven-plugin/</a>) 아직 2.0-beta-3버전은 올라와 있지 않습니다. snapshop 버전을 찾아서 쓸 수도 있겠지만, 그것보다는plugin 설정에서 dependency설정을 덥어쓰는 편이 더 간편하게 느껴졌습니다. <code>pom.xml</code> 의 build절에 아래와같이 추가하면 됩니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;build&gt;
-
-   &lt;plugin&gt;
-     &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;
-        &lt;artifactId&gt;javancss-maven-plugin&lt;/artifactId&gt;
-        &lt;version&gt;2.0-beta-2&lt;/version&gt;
-        &lt;dependencies&gt;
-          &lt;dependency&gt;
-            &lt;groupId&gt;javancss&lt;/groupId&gt;
-              &lt;artifactId&gt;javancss&lt;/artifactId&gt;
-              &lt;version&gt;29.50&lt;/version&gt;
-             &lt;/dependency&gt;
-         &lt;/dependencies&gt;
-     &lt;/plugin&gt;
-     &lt;/plugins&gt;
-  &lt;/build&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>생성된 리포트를 보기 위해서, Hudson에서는 프로젝트에서 Configure 설정에서 Publish Java NCSS report를 선택을 합니다.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="img/javancss/hudson-javancss-config.jpg" alt="hudson-javancss-config.jpg"></span></p>
-</div>
-<div class="paragraph">
-<p>그리고는 <a href="http://mojo.codehaus.org/javancss-maven-plugin/report-mojo.html">javancss:report</a>  Goal이 포함된 빌드를 실행시켰다면 프로젝트 홈 화면에서 Java NCSS Report라는 링크가 생기게 됩니다.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="img/javancss/hudson-javancss-menu.jpg" alt="hudson-javancss-menu.jpg"></span></p>
-</div>
-<div class="paragraph">
-<p>클릭을 하면 생성된 리포트를 볼 수가 있죠. (패키지명은 제가 지웠습니다.)</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="img/javancss/hudson-javancss-report.jpg" alt="hudson-javancss-report.jpg"></span></p>
-</div>
-<div class="paragraph">
-<p>Maven에서 mvn site명령으로 site 절(phrase)까지 들어갔다면 리포트를 모은 페이지를 따로 생성해 주기도합니다. Hudson의 프로젝트 메인화면에서 Maven-generated site 링크를 통해서 보실 수 있습니다.Hudson에서 생성해주는 페이지가 더 이쁘기는하지만, JavaNCSS의 보고서는 Maven-generated site가 더많은 정보를 제공합니다. 예를 들면 가장 주석을 제외한 라인수(NCSS)가 많은 30위까지의 클래스들, 메소드들 같은 순위등같은 것들을 확인할 수 있습니다.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="img/javancss/mvn-site-reports.jpg" alt="mvn-site-reports.jpg"></span></p>
-</div>
-    </div>
-	
-	<section id="social-share">
-        <ul class="icons">
-<!-- Social Share Button HTML -->
-
-<!-- Twitter -->
-<li><a href="//twitter.com/share?url=https://blog.benelog.net//2204823.html&text=JavaNCSS + Maven2 + Hudson&via=" target="_blank" class="share-btn twitter">
-    <i class="fa fa-twitter"></i>
-    <p>Twitter</p>
-</a></li>
-
-<!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=https://blog.benelog.net//2204823.html" target="_blank" class="share-btn google-plus">
-    <i class="fa fa-google-plus"></i>
-    <p>Google+</p>
-</a></li>
-
-<!-- Facebook -->
-<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//2204823.html" target="_blank" class="share-btn facebook">
-    <i class="fa fa-facebook"></i>
-    <p>Facebook</p>
-</a></li>
-
-<!-- Reddit (url, title) -->
-<li><a href="//reddit.com/submit?url=https://blog.benelog.net//2204823.html&title=JavaNCSS + Maven2 + Hudson" target="_blank" class="share-btn reddit">
-    <i class="fa fa-reddit-alien"></i>
-    <p>Reddit</p>
-</a></li>
-
-<!-- LinkedIn -->
-<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//2204823.html&title=JavaNCSS + Maven2 + Hudson" target="_blank" class="share-btn linkedin">
-    <i class="fa fa-linkedin"></i>
-    <p>LinkedIn</p>
-</a></li>
-
-<!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//2204823.html&title=JavaNCSS + Maven2 + Hudson" target="_blank" class="share-btn stumbleupon">
-    <i class="fa fa-stumbleupon"></i>
-    <p>StumbleUpon</p>
-</a></li>
-
-<!-- Email -->
-<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//2204823.html" target="_blank" class="share-btn email">
-    <i class="fa fa-envelope"></i>
-    <p>Email</p>
-</a></li>
-        </ul>
-    </section>
-     
-
-    <footer>
-	
-		<ul class="stats">
-    	    <!-- Display the categories associated with this post -->
-    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/Hudson.html'>Hudson</a></li>
- 	        <li><a href='../tags/Maven.html'>Maven</a></li>
- 	        <li><a href='../tags/정적분석.html'>정적분석</a></li>
-
-				<li><a class="icon fa-comment" href="../2204823.html#disqus_thread"> &nbsp;</a></li>
- 		</ul>
-    	
-    </footer>
-</article>
 		
 <ul class="actions pagination">
     <li><a href="../15/"
@@ -821,6 +889,17 @@ EMMA가 JVM의 종료 때도 기록을 하기 때문에 그렇다는군요. 다�
                     <li>
                         <article>
                             <header>
+                                <h3><a href="../installing-jdk.html">여러 개의 JDK를 설치하고 선택해서 사용하기</a></h3>
+                                 <time class="published"
+							            datetime='Jun 14, 2019'>
+							            Jun 14, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
                                 <h3><a href="../migration-to-static-site.html">정적 사이트로 블로그 마이그레이션</a></h3>
                                  <time class="published"
 							            datetime='May 06, 2019'>
@@ -847,17 +926,6 @@ EMMA가 JVM의 종료 때도 기록을 하기 때문에 그렇다는군요. 다�
                                  <time class="published"
 							            datetime='Feb 25, 2015'>
 							            Feb 25, 2015</time>
-                            </header>
-                        </article>
-                    </li>
-
-                    <li>
-                        <article>
-                            <header>
-                                <h3><a href="../3120317.html">시간대 DB에서 우리나라 시간의 오류</a></h3>
-                                 <time class="published"
-							            datetime='Nov 03, 2014'>
-							            Nov 03, 2014</time>
                             </header>
                         </article>
                     </li>
@@ -1040,7 +1108,7 @@ EMMA가 JVM의 종료 때도 기록을 하기 때문에 그렇다는군요. 다�
                             <header>
                                 <a href="../tags/java.html">java</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
+                                <span style="float:right;"> 2 </span>
                             </header>
                         </article>
                     </li>
@@ -1633,6 +1701,15 @@ EMMA가 JVM의 종료 때도 기록을 하기 때문에 그렇다는군요. 다�
                         <article>
                             <header>
                                 <a href="../tags/Spring-MVC.html">Spring-MVC</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="../tags/jdk.html">jdk</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>

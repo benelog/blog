@@ -133,6 +133,9 @@
                     <h3>Recent Posts</h3>
                 </header>
                     <li>
+                        <a href="../../installing-jdk.html"><p>여러 개의 JDK를 설치하고 선택해서 사용하기</p></a>
+                    </li>
+                    <li>
                         <a href="../../migration-to-static-site.html"><p>정적 사이트로 블로그 마이그레이션</p></a>
                     </li>
                     <li>
@@ -140,9 +143,6 @@
                     </li>
                     <li>
                         <a href="../../3134907.html"><p>'네이버를 만든 기술, 읽으면서 배운다 - 자바편' 출간</p></a>
-                    </li>
-                    <li>
-                        <a href="../../3120317.html"><p>시간대 DB에서 우리나라 시간의 오류</p></a>
                     </li>
             </ul>
         </section>
@@ -158,6 +158,224 @@
 </section>
 	
 	<div id="main">
+<article class="post">
+   <header>
+    <div class="title">
+                    <h2><a href="../901106.html">나선형 배열 출력 문제 Spiral Array</a></h2>
+
+
+    </div>
+    <div class="meta">
+         <time class="published"
+            datetime='Feb 07, 2007'>
+            Feb 07, 2007</time>
+            <div class="published eta"></div>
+        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
+    </div>
+</header>
+
+    
+  
+         
+    <div id="content">
+       <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>2007년 회사 워크샵 갔었을 때 풀었던 문제와 답</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="문제">문제</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><span class="image"><img src="img/quiz/spiral-array.gif" alt="image" width="480"></span></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="풀이">풀이</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>정상혁&amp;이상미 조의 풀이 답입니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class MatrixMain {
+    public static void main(String[] args) {
+       Matrix mp = new Matrix(5,5);
+       mp.locateNumbers();
+       mp.print();
+    }
+}
+
+public class Matrix {
+
+    public static final int RIGHT = 0;
+    public static final int DOWN = 1;
+    public static final int LEFT = 2;
+    public static final int UP  = 3;
+
+    private static final int INIT_VALUE = -1;
+
+    private int m = 0;
+    private int n = 0;
+    private int[][] matrix;
+
+    public Matrix(int m, int n){
+        this.m = m;
+        this.n = n;
+        matrix = new int[m][n];
+    }
+
+    public void print(){
+        for (int i=0;i&lt; m ;i++){
+            for (int j=0;j&lt;n;j++) System.out.print(matrix[i][j] + "\t");
+            System.out.println();
+       }
+    }
+
+    public void locateNumbers() {
+       init();
+       int[] startPosition = new int[]{0,0};
+       matrix[0][0]= 0;
+       int direction = RIGHT;
+       while(move(startPosition ,direction)) direction ++;
+    }
+
+    private void init() {
+        for (int i=0;i&lt; m ;i++){
+            for (int j=0;j&lt;n;j++) matrix[i][j] = INIT_VALUE;
+        }
+    }
+
+    private boolean move(int[] position, int direction){
+        int nowNumber = matrix[position[0]][position[1]];
+        boolean moved = false;
+        int[] nextPosition =getNextPosition(position,direction);
+        while(isMovable(nextPosition[0],nextPosition[1])){
+            moved = true;
+            nowNumber++;
+            position[0] = nextPosition[0];
+            position[1] = nextPosition[1];
+            matrix[position[0]][position[1]]= nowNumber;
+            nextPosition = getNextPosition(position,direction);
+        }
+        return moved;
+    }
+
+    private int[] getNextPosition(int[] position,int direction){
+        int x = position[0];
+        int y = position[1];
+        int nowDirection = direction%4;
+        if (nowDirection == RIGHT) y++;
+        else if (nowDirection == DOWN) x++;
+        else if (nowDirection == LEFT) y--;
+        else if (nowDirection == UP) x--;
+        return new int[]{x,y};
+    }
+
+    private boolean isMovable(int x, int y){
+        if (x&gt;=m) return false;
+        if (y&gt;=n) return false;
+        if (x&lt;0) return false;
+        if (y&lt;0) return false;
+        if (matrix[x][y]!= INIT_VALUE) return false;
+        return true;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="결과">결과</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>0   1   2   3   4
+
+15  16  17  18  5
+
+14  23  24  19  6
+
+13  22  21  20  7
+
+12  11  10  9   8</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>이동하는 좌표를 사이즈가 2인 int배열에다 담았는데, 이걸 따로 클래스로 빼서 만들까 하다가 클래스를 더 늘리기 싫어서 그만뒀습니다.
+소스에서 <code>position[0], position[1]</code> 이라고 표시된 부분이 좌표를 나타내는 부분입니다.</p>
+</div>
+<div class="paragraph">
+<p>main메서드에서  <code>Matrix mp = new Matrix(5,5);`</code> 부분이 5*5 행렬을 만든다는 의미입니다.
+사이즈를 바꿀려면 이 부분을 고치시거나, 사용자 입력에서 온 값을 연결시키면 됩니다.</p>
+</div>
+</div>
+</div>
+</div>
+    </div>
+	
+	<section id="social-share">
+        <ul class="icons">
+<!-- Social Share Button HTML -->
+
+<!-- Twitter -->
+<li><a href="//twitter.com/share?url=https://blog.benelog.net//901106.html&text=나선형 배열 출력 문제 Spiral Array&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+</a></li>
+
+<!-- Google Plus -->
+<li><a href="//plus.google.com/share?url=https://blog.benelog.net//901106.html" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+</a></li>
+
+<!-- Facebook -->
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//901106.html" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+</a></li>
+
+<!-- Reddit (url, title) -->
+<li><a href="//reddit.com/submit?url=https://blog.benelog.net//901106.html&title=나선형 배열 출력 문제 Spiral Array" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+</a></li>
+
+<!-- LinkedIn -->
+<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//901106.html&title=나선형 배열 출력 문제 Spiral Array" target="_blank" class="share-btn linkedin">
+    <i class="fa fa-linkedin"></i>
+    <p>LinkedIn</p>
+</a></li>
+
+<!-- StumbleUpon (url, title) -->
+<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//901106.html&title=나선형 배열 출력 문제 Spiral Array" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+</a></li>
+
+<!-- Email -->
+<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//901106.html" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+</a></li>
+        </ul>
+    </section>
+     
+
+    <footer>
+	
+		<ul class="stats">
+    	    <!-- Display the categories associated with this post -->
+    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
+ 	        <li><a href='../tags/spiral-array.html'>spiral-array</a></li>
+ 	        <li><a href='../tags/코딩연습.html'>코딩연습</a></li>
+
+				<li><a class="icon fa-comment" href="../901106.html#disqus_thread"> &nbsp;</a></li>
+ 		</ul>
+    	
+    </footer>
+</article>
 <article class="post">
    <header>
     <div class="title">
@@ -363,6 +581,17 @@
                     <li>
                         <article>
                             <header>
+                                <h3><a href="../installing-jdk.html">여러 개의 JDK를 설치하고 선택해서 사용하기</a></h3>
+                                 <time class="published"
+							            datetime='Jun 14, 2019'>
+							            Jun 14, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
                                 <h3><a href="../migration-to-static-site.html">정적 사이트로 블로그 마이그레이션</a></h3>
                                  <time class="published"
 							            datetime='May 06, 2019'>
@@ -389,17 +618,6 @@
                                  <time class="published"
 							            datetime='Feb 25, 2015'>
 							            Feb 25, 2015</time>
-                            </header>
-                        </article>
-                    </li>
-
-                    <li>
-                        <article>
-                            <header>
-                                <h3><a href="../3120317.html">시간대 DB에서 우리나라 시간의 오류</a></h3>
-                                 <time class="published"
-							            datetime='Nov 03, 2014'>
-							            Nov 03, 2014</time>
                             </header>
                         </article>
                     </li>
@@ -582,7 +800,7 @@
                             <header>
                                 <a href="../tags/java.html">java</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
+                                <span style="float:right;"> 2 </span>
                             </header>
                         </article>
                     </li>
@@ -1175,6 +1393,15 @@
                         <article>
                             <header>
                                 <a href="../tags/Spring-MVC.html">Spring-MVC</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="../tags/jdk.html">jdk</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>

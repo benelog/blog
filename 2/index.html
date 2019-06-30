@@ -133,6 +133,9 @@
                     <h3>Recent Posts</h3>
                 </header>
                     <li>
+                        <a href="../../installing-jdk.html"><p>여러 개의 JDK를 설치하고 선택해서 사용하기</p></a>
+                    </li>
+                    <li>
                         <a href="../../migration-to-static-site.html"><p>정적 사이트로 블로그 마이그레이션</p></a>
                     </li>
                     <li>
@@ -140,9 +143,6 @@
                     </li>
                     <li>
                         <a href="../../3134907.html"><p>'네이버를 만든 기술, 읽으면서 배운다 - 자바편' 출간</p></a>
-                    </li>
-                    <li>
-                        <a href="../../3120317.html"><p>시간대 DB에서 우리나라 시간의 오류</p></a>
                     </li>
             </ul>
         </section>
@@ -158,6 +158,215 @@
 </section>
 	
 	<div id="main">
+<article class="post">
+   <header>
+    <div class="title">
+                    <h2><a href="../3134907.html">'네이버를 만든 기술, 읽으면서 배운다 - 자바편' 출간</a></h2>
+
+
+    </div>
+    <div class="meta">
+         <time class="published"
+            datetime='Feb 25, 2015'>
+            Feb 25, 2015</time>
+            <div class="published eta"></div>
+        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
+    </div>
+</header>
+
+    
+  
+         
+    <div id="content">
+       <div id="preamble">
+<div class="sectionbody">
+<div class="imageblock">
+<div class="content">
+<img src="img/book-cover/naver-java.jpg" alt="cover">
+</div>
+</div>
+<div class="paragraph">
+<p>( 이미지 출처 : <a href="http://wikibook.co.kr/how-naver-works-java/" class="bare">http://wikibook.co.kr/how-naver-works-java/</a> )</p>
+</div>
+<div class="paragraph">
+<p>네이버의 개발자 블로그인 헬로월드 ( <a href="http://helloworld.naver.com" class="bare">http://helloworld.naver.com</a> )에 공개되었던 글을 중심으로 책이 출판됩니다. 자바의 핵심영역을 다룬 17개의 글을 묶었습니다. 출판을 위해 새로 쓰여진 글도 있고, 사내에서만 공유되었던 글들도 재발굴했고, 이미 공개된 글도 최신 내용을 반영해 다듬었습니다.</p>
+</div>
+<div class="paragraph">
+<p>자바개발의 A부터 Z까지 다 다루는 책은 아니지만, API를 설계할 때 고민해야할 요소, 반복해서 문제를 겪을 만한 부분, 장애 해결/분석 경험의 액기스를 담았습니다. 네이버의 주요 서비스를 개발한 담당자가 문제를 해결한 사례를 정리한 글도 있고, 플랫폼개발, 기술 지원조직인 웹플랫폼개발랩, 성능엔지어링랩, 생산성혁신랩의 개발자들이 반복해서 전파해야할 지식을 효율적으로 공유하기 위해 쓴 글도 있습니다.</p>
+</div>
+<div class="paragraph">
+<p>처음에는 <a href="http://www.yes24.com/24/goods/1941571?scode=032&amp;OzSrank=5">조엘이 엄선한 소프트웨어 블로그 베스트 29선</a>처럼, 온라인의 글을 오프라인으로 옮기는 성격의 책이 될것이라고 예상했었습니다. 그런데 생각보다 출판에 이르기까지는 많은 노력이 들어갔습니다. 글이 쓰여진 시점이 제 각각 이였기 때문에 현시점에 맞춰서 고칠 내용도 많았고, 사내에서만 공유되던 글은 서비스명, 담당자명, 부서명등이 들어간 문장은 바꿔야했습니다. 다양한 저자가 쓴 글이였지만 용어를 일관되게 맞추려고 노력했습니다. 기술문서팀의 담당자분께서 많은 수고를 해주셨습니다.</p>
+</div>
+<div class="paragraph">
+<p>오류가 있어도 바로 고치면 되는 인터넷 페이지가 아닌, 종이로 찍혀나오는 책에 들어갈 글을 쓰는 부담은 생각보다 컸습니다. 이미 공개된 글도 여러 번 더 신중하게 검토를 했습니다. 블로그에 올릴 때는 '아직 정확한 답은 찾지 못했다.' 정도로 대충 쓰고 넘어갔었던, 타임존데이터베이스에서 우리나라 시간대 정보가 역사적 사실과 맞지 않았던 문제를 더 깊이 파악한 것이 그 예입니다. 책을 쓰면서 IANA ( Internet Assigned Numbers Authority)에 이 오류를 수정한 패치를 전달해서 JDK에도 반영되었습니다.</p>
+</div>
+<div class="paragraph">
+<p>결국 종이로 찍혀나오게 되었으니, Helloworld의 글들을 좋아하셨던 많은 분들에게 소장할 가치가 있는 책으로 남았으면 좋겠습니다. 그 바램을 담아서 서문와 아래와 같이 적었습니다.</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>앞으로 자바 10, 자바 11이 나오고 시간이 흐르면 더 최신 정보를 담은 책이 나올 것이다. 그래도 이 시대의 자바 기술과 네이버에서 일한 개발자의 노력을 담은 타입캡슐이 돼 오랜 시간이 지난 후에도 누군가의 책장에 이 책이 꽂혀 있으면 좋겠다. 그것이 인터넷에 있던 글을 종이로 옮긴 가장 큰 의미가 아닐까 생각한다.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>이 책이 호응이 얻는다면, 바쁜 시간을 쪼개어서 글을 썼던 저자에게 응원이 되고, 예비 저자에게도 용기를 주어 앞으로 더 좋은 글을 외부로 공개하는데 힘을 보탤 것이라 믿습니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="목차">목차</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>글 하나하나가 독립적이기 때문에 관심있는 주제부터 읽으셔도 되지만, 가장 겉으로 들어난 영역인 API부터 시작해서 JVM내부, 분석도구, Garbarge Collection, DB연결까지 이어지는, 더 안쪽과 JVM 뒤쪽의 영역으로 흐름이 이어지도록 목차를 잡았습니다.</p>
+</div>
+<div class="sect2">
+<h3 id="1부_자바의_api_이해하기">1부 : 자바의 API 이해하기</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>01장: 자바의 날짜와 시간 API - 정상혁</p>
+</li>
+<li>
+<p>02장: 자바의 HashMap은 어떻게 작동하는가? - 송기선</p>
+</li>
+<li>
+<p>03장: 자바에서 외부 프로세스를 실행할 때 - 정상혁</p>
+</li>
+<li>
+<p>04장: 람다가 이끌어 갈 모던 자바 - 정상혁</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="2부_문제_분석과_사례">2부 : 문제 분석과 사례</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>05장: JVM 이해하기 - 박세훈</p>
+</li>
+<li>
+<p>06장: 스레드 덤프 분석하기 - 구태진</p>
+</li>
+<li>
+<p>07장: 자바 애플리케이션 분석을 위한 BTrace - 이상민, 정상혁</p>
+</li>
+<li>
+<p>08장: 하나의 메모리 누수를 잡기까지 - 김민수, 김택수</p>
+</li>
+<li>
+<p>09장: 고맙다 JVM, 사과해라 JVM 크래시 - 강경태</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="3부_가비지_컬렉션">3부 : 가비지 컬렉션</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>10장: 자바 가비지 컬렉션의 작동 과정 - 이상민</p>
+</li>
+<li>
+<p>11장: 가비지 컬렉션 모니터링 방법 - 이상민, 송기선</p>
+</li>
+<li>
+<p>12장: 가비지 컬렉션 튜닝 - 이상민</p>
+</li>
+<li>
+<p>13장: 자바의 Reference 클래스와 가비지 컬렉션 - 박세훈</p>
+</li>
+<li>
+<p>14장: 가비지 컬렉션과 Statement Pool - 최동순</p>
+</li>
+<li>
+<p>15장: 아파치 MaxClients와 톰캣의 Major GC - 최동순</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="4부_데이터베이스_연결_설정">4부 : 데이터베이스 연결 설정</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>16장: JDBC의 타임아웃 이해하기 - 강운덕</p>
+</li>
+<li>
+<p>17장: Commons DBCP 이해하기 - 최동순, 강운덕, 정상혁</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+    </div>
+	
+	<section id="social-share">
+        <ul class="icons">
+<!-- Social Share Button HTML -->
+
+<!-- Twitter -->
+<li><a href="//twitter.com/share?url=https://blog.benelog.net//3134907.html&text='네이버를 만든 기술, 읽으면서 배운다 - 자바편' 출간&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+</a></li>
+
+<!-- Google Plus -->
+<li><a href="//plus.google.com/share?url=https://blog.benelog.net//3134907.html" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+</a></li>
+
+<!-- Facebook -->
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//3134907.html" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+</a></li>
+
+<!-- Reddit (url, title) -->
+<li><a href="//reddit.com/submit?url=https://blog.benelog.net//3134907.html&title='네이버를 만든 기술, 읽으면서 배운다 - 자바편' 출간" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+</a></li>
+
+<!-- LinkedIn -->
+<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//3134907.html&title='네이버를 만든 기술, 읽으면서 배운다 - 자바편' 출간" target="_blank" class="share-btn linkedin">
+    <i class="fa fa-linkedin"></i>
+    <p>LinkedIn</p>
+</a></li>
+
+<!-- StumbleUpon (url, title) -->
+<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//3134907.html&title='네이버를 만든 기술, 읽으면서 배운다 - 자바편' 출간" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+</a></li>
+
+<!-- Email -->
+<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//3134907.html" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+</a></li>
+        </ul>
+    </section>
+     
+
+    <footer>
+	
+		<ul class="stats">
+    	    <!-- Display the categories associated with this post -->
+    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
+ 	        <li><a href='../tags/Java.html'>Java</a></li>
+ 	        <li><a href='../tags/Naver.html'>Naver</a></li>
+ 	        <li><a href='../tags/책.html'>책</a></li>
+
+				<li><a class="icon fa-comment" href="../3134907.html#disqus_thread"> &nbsp;</a></li>
+ 		</ul>
+    	
+    </footer>
+</article>
 <article class="post">
    <header>
     <div class="title">
@@ -700,293 +909,6 @@ public void shouldGetAfterOneHour() {
     	
     </footer>
 </article>
-<article class="post">
-   <header>
-    <div class="title">
-                    <h2><a href="../3017442.html">Android App과 TDD - 임유진 (Kakao), GDG Korea Android 컨퍼런스 중에서</a></h2>
-
-
-    </div>
-    <div class="meta">
-         <time class="published"
-            datetime='Apr 17, 2013'>
-            Apr 17, 2013</time>
-            <div class="published eta"></div>
-        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
-    </div>
-</header>
-
-    
-  
-         
-    <div id="content">
-       <div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>지난 2013/04/13일, 종로 페럼타회에서 열렸던 '구글 개발자와 함께하는 GDG Korea Android 컨퍼런스 '에서 공유된 내용입니다</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="발표_자료">발표 자료</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>발표 자료 : <a href="http://goo.gl/1WyAz" class="bare">http://goo.gl/1WyAz</a></p>
-</li>
-<li>
-<p>예제코드 : <a href="https://github.com/eugenelgm/AndroidForTest" class="bare">https://github.com/eugenelgm/AndroidForTest</a></p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="요약">요약</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>제가 핵심으로 기억하는 내용은 아래와 같습니다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>앱이 기능이 점점 추가되고 복잡해져 가면서 코드가 점점 누더기가 되어갔다. 수정에 대한 부작용을 파악하기기 어려워져 갔다. 그래서 테스트의 필요성이 느껴졌다.</p>
-</li>
-<li>
-<p>Android의 기본 Test Framework는 너무 느려서 포기했다. 한번 실행에 30~40초가 걸렸다.</p>
-</li>
-<li>
-<p>Robolectric도 검토했으나, 없는 기능이 많고 라이브러리 충돌 때문에 포기했다.</p>
-<div class="ulist">
-<ul>
-<li>
-<p>테스트가 실패할 때 Robolectric의 버그인지 앱의 버그인지 확인하기 어려워서 디버깅에 시간이 걸렸다.</p>
-</li>
-<li>
-<p>암호화 관련 라이브러리에서 충돌이 일어남</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>결국 UI쪽의 테스트보다는 UI를 벗어난 layer에서 핵심로직을 테스트하는데 집중했다.</p>
-</li>
-<li>
-<p>테스트 기법</p>
-<div class="ulist">
-<ul>
-<li>
-<p>android.util.Log를 호출하는 부분은 별도의 Wrapping 클래스로 작성. 테스트 프로젝트에서는 같은 패키지에 같은 클래스 이름으로 System.out으로 로그를 출력하는 클래스를 작성. class loader의 순서를 조정해서 테스트 코드에서는 테스트용 Logger클래스를 호출.</p>
-<div class="ulist">
-<ul>
-<li>
-<p>실환경용 Log 랩퍼 클래스 : <a href="https://github.com/eugenelgm/AndroidForTest/blob/master/src/com/example/test/util/Logger.java">Logger.java
-</a></p>
-</li>
-<li>
-<p>테스트용 Log 클래스  : <a href="https://github.com/eugenelgm/AndroidForTest/blob/master/tests/src/com/example/test/util/Logger.java">Logger.java</a></p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>Background Thread에 대한 테스트도 래핑 클래스를 이용. 테스트 환경에서는 테스트 코드와 같은 쓰레드에서 동기적으로 실행되도록 Runnable.run을 호출하는 래퍼클래스를 호출함.</p>
-<div class="ulist">
-<ul>
-<li>
-<p>실환경용 쓰레드 실행 클래스 : <a href="https://github.com/eugenelgm/AndroidForTest/blob/master/src/com/example/test/util/DatabaseJobQueue.java">DatabaseJobQueue.java</a></p>
-</li>
-<li>
-<p>테스트용 Log 클래스  : <a href="https://github.com/eugenelgm/AndroidForTest/blob/master/tests/src/com/example/test/util/DatabaseJobQueue.java">DatabaseJobQueue.java</a></p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>같은 interface를 구현한 테스트용 Mock객체를 작성하고, 주입은 별도의 setter 메소드를 사용.</p>
-</li>
-<li>
-<p>API에 대한 테스트는 정적파일을 통해서 함. 후임자가 API의 명세를 예시로 금방 확인할 수 있는 장점도 생김</p>
-</li>
-<li>
-<p>Context에 대한 참조 등 Android에 대한 의존성을 제거하기 어려운 부분은 PowerMock + Mockito로 해결</p>
-<div class="ulist">
-<ul>
-<li>
-<p>PowerMock + Mockto로 Context.getString(int)의 동작을 가로채는 예제 : <a href="https://github.com/eugenelgm/AndroidForTest/blob/master/tests/test/com/example/test/MainActivityTest.java">MainActivityTest.java</a></p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>테스트할 수 있는 Layer를 구분하다 보니 설계 개선을 이끔</p>
-</li>
-<li>
-<p>TDD에 대한 오해</p>
-<div class="ulist">
-<ul>
-<li>
-<p>꼭 Dalvik에서 테스트해야 의미가 있다.</p>
-</li>
-<li>
-<p>TDD로 모든 에러를 잡을 수 있다.</p>
-</li>
-<li>
-<p>개발 후에 만들어도 된다.</p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="질문">질문</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>좀 더 자세히 알고 싶은 점이 있어서 발표가 끝난 후에 아래 2가지를 질문했습니다.</p>
-</div>
-<div class="sect2">
-<h3 id="1_robolectric의_라이브러리_충돌의_구체적인_사례">1. Robolectric의 라이브러리 충돌의 구체적인 사례</h3>
-<div class="paragraph">
-<p>앞에서 정리한 암호화 라이브러리와의 충돌사례를 알려주셨고, Robolectric의 버그 때문에 디버깅이 어려웠다는 이야기도 구체적으로 해주셨습니다.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="2_depenency_injection_프레임워크를_고려">2. Depenency Injection 프레임워크를 고려</h3>
-<div class="paragraph">
-<p>검토는 했지만 쓰지는 않았고, 발표한 내용은 사례일 뿐이기 때문에 각자 생각하는 좋은 방법이 있으면 계속 시도해봤으면 좋겠다고 말씀해주셨습니다.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="의견">의견</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>추가로 제 의견을 덧붙이면, Roblectric에 빈틈이 많다는 단점은 저도 공감은 가지만 꼭 UI를 테스트하지 않더라도 Robolectric을 부분적으로 유용하게 쓸 수는 있다고 생각합니다. 예를 들면 android.util.Log 클래스를 쓰는 코드도 Robolectric을 쓰면 별도의 랩퍼 클래스가 없어도 편하게 테스트할 수 있습니다. ShadowLog라는 클래스를 사용하면  Console이나 특정 파일등 로그를 쓰는 위치도 좀 더 편하게 조정할 수 있습니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">ShadowLog.stream = System.out;
-Robolectric.bindShadowClass(ShadowLog.class);</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>그리고 멀티쓰레드에 대한 테스트를 할 때도 Robolectric의 RobolectricBackgroundExecutorService를 쓰면 편할 때가 있습니다. 이 클래스도 다른 쓰레드를 생성하지 않고 호출한 쪽과 같은 쓰레드에서 Runnable 클래스를 실행해 줍니다.</p>
-</div>
-<div class="paragraph">
-<p>Android-annotations를 쓰면 @Background가 붙은 메소드는 BackgroundExecutor라는 클래스를 통해서 실행되는데, 이 클래스에 있는 executor라는 멤버변수를 교체하면 쓰레드의 생성 정책을 조절 할 수 있습니다. 따라서 테스트를 할 때는 아래와 같이 테스트용 Executor를 넣으면 자연스럽게 같은 쓰레드에서 동기적으로 Runnable 클래스를 실행할 수 있습니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">BackgroundExecutor.setExecutor(new RobolectricBackgroundExecutorService());</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>참고로 구조적으로 Thread의 Executor를 바꿔치기 하기 힘든 경우에는 <a href="https://code.google.com/p/awaitility/">Awaitility</a>라는 라이브러리도를 사용해볼만도 합니다.</p>
-</div>
-<div class="paragraph">
-<p>그리고 SDK버전에 따라서 다르게 돌아가는 코드가 있다면 Robolectric에서 아래와 같이 조작을 할 수 있습니다. (물론 PowerMock을 써도 같은 일을 할 수 있기는 합니다.)</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">Robolectric.Reflection.setFinalStaticField(Build.VERSION.class, "SDK_INT", Build.VERSION_CODES.JELLY_BEAN);</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>암튼 Robolectric에 빈틈이 많기에 큰 기대를 하지 말고 UI 레이어의 테스트에는 많은 욕심을 부리지 말자고 생각하지만 그래도 몇가지 매력적인 기능이 있어서 Robolectric을 아예 외면을 할 수는 없었습니다.</p>
-</div>
-<div class="paragraph">
-<p>Mockito + Powermock의 조합은 강력하지만, 구조를 고치기 어려운 레가시 코드에만 한정해서 썼으면 한다는 의견입니다. 가능하다면 Powermock이 없어도 테스트할 수 있도록 구조를 개선하는 것이 더 클래스의 역할이 명확해지고, 앞으로 기능을 추가하거나 읽기에도 좋은 코드가 되기 때문입니다. 그렇게 구조개선을 하는데는 DI 프레임워크가 많은 도움이 되기도 합니다.  DI 프레임워크를 쓰면 Context에 대한 직접 의존이나 안드로이드 기본 프레임워크의 final 메소드의 동작을 가로채야할 일이 적어져서  훨씬 테스트하기 편해집니다.</p>
-</div>
-<div class="paragraph">
-<p>Helloworld에 올라온  <a href="http://helloworld.naver.com/helloworld/342818">Android에서 @Inject, @Test</a> 에서 이에 대해 자세히 적었습니다.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="소감">소감</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>개인적으로 많은 고민을 했던 주제였고, 발표자께서 내리신 결론이 저와 거의 비슷했기에 무척 반가웠습니다. 저도 Android의 기본 테스트 클래스를 쓰면서 느꼈던 좌절감에 결국 JVM에서 테스트를 해야 TDD로서 의미가 있다고 느꼈습니다. UI에 대한 테스트보다는 안드로이드와 독립적인 Layer를 테스트하는 것이 ROI가 높고, 좋은 설계를 이끈다는 점도 공감이 갔습니다. 로그호출 부분이나 멀티쓰레드에 대한 테스트 등 제가 했던 고민도 보편적인 문제였다는 것도 확인했습니다. API의 호출결과를 정적 파일로 저장해두고 테스트 코드에서 파싱부터 검증하는 기법은 저도 Server to Server API클라이언트 모듈 테스트 때 많이 썼던 방법이였습니다</p>
-</div>
-<div class="paragraph">
-<p>제가 편향된 생각을 가졌을지 늘 걱정이 되었는데, 같은 의견을 가지신 분이 구체적인 사례까지 공유해주셔서 많은 도움이 되었습니다.  앞으로  다른 분께도 안드로이드에서 TDD를 자신있게 권장해드릴 용기를 얻었습니다.</p>
-</div>
-</div>
-</div>
-    </div>
-	
-	<section id="social-share">
-        <ul class="icons">
-<!-- Social Share Button HTML -->
-
-<!-- Twitter -->
-<li><a href="//twitter.com/share?url=https://blog.benelog.net//3017442.html&text=Android App과 TDD - 임유진 (Kakao), GDG Korea Android 컨퍼런스 중에서&via=" target="_blank" class="share-btn twitter">
-    <i class="fa fa-twitter"></i>
-    <p>Twitter</p>
-</a></li>
-
-<!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=https://blog.benelog.net//3017442.html" target="_blank" class="share-btn google-plus">
-    <i class="fa fa-google-plus"></i>
-    <p>Google+</p>
-</a></li>
-
-<!-- Facebook -->
-<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//3017442.html" target="_blank" class="share-btn facebook">
-    <i class="fa fa-facebook"></i>
-    <p>Facebook</p>
-</a></li>
-
-<!-- Reddit (url, title) -->
-<li><a href="//reddit.com/submit?url=https://blog.benelog.net//3017442.html&title=Android App과 TDD - 임유진 (Kakao), GDG Korea Android 컨퍼런스 중에서" target="_blank" class="share-btn reddit">
-    <i class="fa fa-reddit-alien"></i>
-    <p>Reddit</p>
-</a></li>
-
-<!-- LinkedIn -->
-<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//3017442.html&title=Android App과 TDD - 임유진 (Kakao), GDG Korea Android 컨퍼런스 중에서" target="_blank" class="share-btn linkedin">
-    <i class="fa fa-linkedin"></i>
-    <p>LinkedIn</p>
-</a></li>
-
-<!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//3017442.html&title=Android App과 TDD - 임유진 (Kakao), GDG Korea Android 컨퍼런스 중에서" target="_blank" class="share-btn stumbleupon">
-    <i class="fa fa-stumbleupon"></i>
-    <p>StumbleUpon</p>
-</a></li>
-
-<!-- Email -->
-<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//3017442.html" target="_blank" class="share-btn email">
-    <i class="fa fa-envelope"></i>
-    <p>Email</p>
-</a></li>
-        </ul>
-    </section>
-     
-
-    <footer>
-	
-		<ul class="stats">
-    	    <!-- Display the categories associated with this post -->
-    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/Android.html'>Android</a></li>
- 	        <li><a href='../tags/Robolectric.html'>Robolectric</a></li>
- 	        <li><a href='../tags/Test.html'>Test</a></li>
- 	        <li><a href='../tags/행사후기.html'>행사후기</a></li>
-
-				<li><a class="icon fa-comment" href="../3017442.html#disqus_thread"> &nbsp;</a></li>
- 		</ul>
-    	
-    </footer>
-</article>
 		
 <ul class="actions pagination">
     <li><a href="../"
@@ -1059,6 +981,17 @@ Robolectric.bindShadowClass(ShadowLog.class);</code></pre>
                     <li>
                         <article>
                             <header>
+                                <h3><a href="../installing-jdk.html">여러 개의 JDK를 설치하고 선택해서 사용하기</a></h3>
+                                 <time class="published"
+							            datetime='Jun 14, 2019'>
+							            Jun 14, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
                                 <h3><a href="../migration-to-static-site.html">정적 사이트로 블로그 마이그레이션</a></h3>
                                  <time class="published"
 							            datetime='May 06, 2019'>
@@ -1085,17 +1018,6 @@ Robolectric.bindShadowClass(ShadowLog.class);</code></pre>
                                  <time class="published"
 							            datetime='Feb 25, 2015'>
 							            Feb 25, 2015</time>
-                            </header>
-                        </article>
-                    </li>
-
-                    <li>
-                        <article>
-                            <header>
-                                <h3><a href="../3120317.html">시간대 DB에서 우리나라 시간의 오류</a></h3>
-                                 <time class="published"
-							            datetime='Nov 03, 2014'>
-							            Nov 03, 2014</time>
                             </header>
                         </article>
                     </li>
@@ -1278,7 +1200,7 @@ Robolectric.bindShadowClass(ShadowLog.class);</code></pre>
                             <header>
                                 <a href="../tags/java.html">java</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
+                                <span style="float:right;"> 2 </span>
                             </header>
                         </article>
                     </li>
@@ -1871,6 +1793,15 @@ Robolectric.bindShadowClass(ShadowLog.class);</code></pre>
                         <article>
                             <header>
                                 <a href="../tags/Spring-MVC.html">Spring-MVC</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="../tags/jdk.html">jdk</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>

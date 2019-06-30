@@ -133,6 +133,9 @@
                     <h3>Recent Posts</h3>
                 </header>
                     <li>
+                        <a href="../../installing-jdk.html"><p>여러 개의 JDK를 설치하고 선택해서 사용하기</p></a>
+                    </li>
+                    <li>
                         <a href="../../migration-to-static-site.html"><p>정적 사이트로 블로그 마이그레이션</p></a>
                     </li>
                     <li>
@@ -140,9 +143,6 @@
                     </li>
                     <li>
                         <a href="../../3134907.html"><p>'네이버를 만든 기술, 읽으면서 배운다 - 자바편' 출간</p></a>
-                    </li>
-                    <li>
-                        <a href="../../3120317.html"><p>시간대 DB에서 우리나라 시간의 오류</p></a>
                     </li>
             </ul>
         </section>
@@ -158,6 +158,119 @@
 </section>
 	
 	<div id="main">
+<article class="post">
+   <header>
+    <div class="title">
+                    <h2><a href="../2421450.html">Customer tag library에 대한 테스트 코드 작성</a></h2>
+
+
+    </div>
+    <div class="meta">
+         <time class="published"
+            datetime='Sep 08, 2009'>
+            Sep 08, 2009</time>
+            <div class="published eta"></div>
+        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
+    </div>
+</header>
+
+    
+  
+         
+    <div id="content">
+       <div class="paragraph">
+<p>JSP의 커스텀 태그 라이브러리는 그 실행결과를 확인하는 것이 많이 번거롭습니다. 따로 테스트 코드를 짜지 않는다면, Web Application 를 띄우고 커스템 태그를 사용하는 JSP를 직접 실행한 다음에 나오는 텍스트값을 확인해서 눈으로 값이 제대로 찍히는지 검증하고, 틀리면 다시 코드를 고치는 방식을 반복하는 경우도 많습니다. 그리고 보통 커스텀태그에서는 setter로 지정된 속성에 따라서 조건분기도 많이 들어가기 때문에 더욱 디버깅이 까다롭습니다. 이 때 위와 같이 JSP를 거치지 않고 바로 출력될 값을 찎어주고, 검증로직을 추가할 수 있는 테스트 코드를 짠다면 개발할 때 많은 시간이 절약될 것입니다.</p>
+</div>
+<div class="paragraph">
+<p><a href="http://www.docjar.org/docs/api/javax/servlet/jsp/tagext/TagSupport.html">javax.servlet.jsp.tagext.TagSupport</a>를 상속한 클래스라면, TagSupport.setPageContext 메소드를 활용해서 mock같은 테스트용 객체들을 삽입하면 됩니다. 이 메소드를 통해서 PageContext와 PageContext.getOut으로 돌려주는 javax.servlet.jsp.JspWriter객체를 모두 mock으로 지정할 수도 있습니다.</p>
+</div>
+<div class="paragraph">
+<p>Spring에서는 이를 더욱 간편하게 할 수 있는 <a href="http://static.springsource.org/spring/docs/2.5.6/api/org/springframework/mock/web/MockPageContext.html">MockPageContext</a>라는 객체를 제공합니다.</p>
+</div>
+<div class="paragraph">
+<p>이를 활용한 Custom 태그 테스트 코드는 아래와 같이 만들 수 있습니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">ButtonTag tag = new ButtonTag();
+tag.setFunctionName("alert");
+tag.setType("basic");
+
+PageContext pageContext = new MockPageContext();
+tag.setPageContext(pageContext);
+
+assertEquals(TagSupport.EVAL_BODY_INCLUDE, tag.doStartTag());
+assertEquals(TagSupport.EVAL_PAGE, tag.doEndTag());
+String output = ((MockHttpServletResponse) pageContext.getResponse()).getContentAsString();
+System.out.println(output);
+assertTrue(output.contains("&lt;span class='r'&gt;"));
+//출력된 결과에 대한 추가  검증</code></pre>
+</div>
+</div>
+    </div>
+	
+	<section id="social-share">
+        <ul class="icons">
+<!-- Social Share Button HTML -->
+
+<!-- Twitter -->
+<li><a href="//twitter.com/share?url=https://blog.benelog.net//2421450.html&text=Customer tag library에 대한 테스트 코드 작성&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+</a></li>
+
+<!-- Google Plus -->
+<li><a href="//plus.google.com/share?url=https://blog.benelog.net//2421450.html" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+</a></li>
+
+<!-- Facebook -->
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//2421450.html" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+</a></li>
+
+<!-- Reddit (url, title) -->
+<li><a href="//reddit.com/submit?url=https://blog.benelog.net//2421450.html&title=Customer tag library에 대한 테스트 코드 작성" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+</a></li>
+
+<!-- LinkedIn -->
+<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//2421450.html&title=Customer tag library에 대한 테스트 코드 작성" target="_blank" class="share-btn linkedin">
+    <i class="fa fa-linkedin"></i>
+    <p>LinkedIn</p>
+</a></li>
+
+<!-- StumbleUpon (url, title) -->
+<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//2421450.html&title=Customer tag library에 대한 테스트 코드 작성" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+</a></li>
+
+<!-- Email -->
+<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//2421450.html" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+</a></li>
+        </ul>
+    </section>
+     
+
+    <footer>
+	
+		<ul class="stats">
+    	    <!-- Display the categories associated with this post -->
+    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
+ 	        <li><a href='../tags/Spring-Test.html'>Spring-Test</a></li>
+ 	        <li><a href='../tags/test.html'>test</a></li>
+
+				<li><a class="icon fa-comment" href="../2421450.html#disqus_thread"> &nbsp;</a></li>
+ 		</ul>
+    	
+    </footer>
+</article>
 <article class="post">
    <header>
     <div class="title">
@@ -634,289 +747,6 @@ for(long i = 0L; i &lt; 0x7fffffffL; i++)  sum = Long.valueOf(sum.longValue() + 
     	
     </footer>
 </article>
-<article class="post">
-   <header>
-    <div class="title">
-                    <h2><a href="../2228221.html">Spring MVC 2.5을 활용한 파일업로드</a></h2>
-
-
-    </div>
-    <div class="meta">
-         <time class="published"
-            datetime='Feb 08, 2009'>
-            Feb 08, 2009</time>
-            <div class="published eta"></div>
-        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
-    </div>
-</header>
-
-    
-  
-         
-    <div id="content">
-       <div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>간단한 파일 업로드 기능을 만들어야 할 일이 생겨서, Spring 2.5의 annotation을 이용한 Action에서 이를 처리하게 했습니다. 실무에서 썼던 것을 더 단순한 예제로 재구성해서 정리해봅니다.</p>
-</div>
-<div class="paragraph">
-<p>Maven의 pom.xml에 파일업로드 기능에서 참조하는 commons-fileupload 라이브러리에 대한 dependency를 추가합니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;dependency&gt;
-   &lt;groupId&gt;commons-fileupload&lt;/groupId&gt;
-   &lt;artifactId&gt;commons-fileupload&lt;/artifactId&gt;
-   &lt;version&gt;1.2.1&lt;/version&gt;
-
-&lt;/dependency&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>web.xml에는 applicationContext 파일의 위치를 지정하고, *.do를 스프링에서 처리하도록 설정합니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;servlet&gt;
-   &lt;servlet-name&gt;dispatcher&lt;/servlet-name&gt;
-   &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;
-   &lt;init-param&gt;
-     &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;
-     &lt;param-value&gt;classpath:applicationContext.xml&lt;/param-value&gt;
-   &lt;/init-param&gt;
-   &lt;/servlet&gt;
-   &lt;servlet-mapping&gt;
-     &lt;servlet-name&gt;dispatcher&lt;/servlet-name&gt;
-     &lt;url-pattern&gt;*.do&lt;/url-pattern&gt;
-   &lt;/servlet-mapping&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>업로드 기능을 간단히 테스트할 수 있는 jsp페이지를 만들어봅니다. 단순히 파일 1개를 "file"이라는 변수명으로 업로드 요청을 하는 페이지입니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-jsp" data-lang="jsp">&lt;%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%&gt;
-&lt;%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%&gt;
-&lt;%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%&gt;
-&lt;html&gt;
-&lt;head&gt;
-    &lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;
-    &lt;title&gt;업로드 테스트&lt;/title&gt;
-&lt;/head&gt;
-&lt;body&gt;
-&lt;form action="/study/upload.do" method="post" enctype="multipart/form-data"&gt;
-&lt;p&gt;
-    &lt;label for="file"&gt;파일1 &lt;/label&gt;
-    &lt;input type="file" name="file"&gt;
-&lt;/p&gt;
-&lt;p&gt;
-    &lt;input type="submit" value="전송"/&gt;
-&lt;/p&gt;
-&lt;/form&gt;
-&lt;/body&gt;
-&lt;/html&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>그리고 applicationContext파일을 아래와 같이 선언합니다. <code>DefaultAnnotationHandlerMapping</code> 을 이용해서 annotation을 이용한 Controller 설정을가능하게 합니다. <code>&lt;context:component-scan/&gt;</code> 태그를 사용해서, 설정을 scan할 패키지를지정합니다. 그리고, 파일이 저장될 디렉토리는 <code>${repository.path}</code> 속성으로 표시했습니다.
-Maven의 resource filter기능을 이용해서 실행환경에 따라 다른 값을 넣게 하면 편리합니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:context="http://www.springframework.org/schema/context"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"&gt;
-
-    &lt;bean  class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"&gt;
-        &lt;property name="alwaysUseFullPath" value="true"/&gt;
-    &lt;/bean&gt;
-    &lt;bean id="multipartResolver"
-        class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/&gt;
-
-    &lt;bean id="respository" class="study.repository.FileRepository"&gt;
-        &lt;constructor-arg value="${repository.path}" /&gt;
-    &lt;/bean&gt;
-    &lt;context:component-scan    base-package="study.action"/&gt;
-&lt;/beans&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>실제적인 파일의 저장기능을 담당하는 클래스인 FileRepository에서는 간단하게 UIDD를 이용해서 키를 생성하고 path필드로 지정된 디렉토리에 저장을 해줍니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">package study.repository;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.UUID;
-
-import org.springframework.web.multipart.MultipartFile;
-
-public class FileRepository {
-    private String path;
-    public FileRepository(String path) {
-        this.path = path;
-        File saveFolder = new File(path);
-        if(!saveFolder.exists() || saveFolder.isFile()){
-            saveFolder.mkdirs();
-        }
-    }
-
-    public String saveFile(MultipartFile sourcefile) throws IOException{
-        if ((sourcefile==null)||(sourcefile.isEmpty())) return null;
-        String key = UUID.randomUUID().toString();
-        String targetFilePath = path+"/"+ key;
-        sourcefile.transferTo(new File(targetFilePath));
-        return key;
-    }
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>추가적으로 키값을 넣어주면 파일을 반환해주는 메소드나, 파일의 종류나 날짜에 따라서 하위 디렉토리를 구분해서 생성하는 기능도 넣을 수있을 것입니다. 그리고 더 확장한다면, 따로 주요 메서드를 선언한 Repository 라는 인터페이스를 정의하고, DB를저장소로 활용하는 DbRepository 와 같이 이름 붙인 구현 클래스도 만들어 볼 수 있겠습니다.</p>
-</div>
-<div class="paragraph">
-<p>그리고 @Controller , @RequestMapping, @RequestParam, @Autowired의 Anntation을활용해서 Controller 클래스를 작성합니다. 업로드 후 화면에 키값만 뿌도록 해서 java.io.Writer클래스를 화면출력을 위해 사용했습니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">package study.action;
-
-import java.io.IOException;
-import java.io.Writer;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
-
-import study.repository.FileRepository;
-
-@Controller
-public class FileAction {
-     private FileRepository respository;
-
-    @Autowired
-    public void setRespository(FileRepository respository) {
-        this.respository = respository;
-    }
-    @RequestMapping("/upload.do")
-    public void execute(@RequestParam("file") MultipartFile file,
-            Writer out) throws IOException{
-        String key = respository.saveFile(file);
-        out.write(key);
-    }
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>MultipartFile 클래스를 파라미터로 받는 메서드는 <a href="http://static.springsource.org/spring/docs/3.0.0.M1/javadoc-api/org/springframework/mock/web/MockMultipartFile.html">MockMultiPartFile</a>를 이용해서 테스트하면 됩니다.</p>
-</div>
-<div class="paragraph">
-<p>참고로 <a href="http://chanwook.tistory.com/758">최근 로드존슨이 인터뷰에서 한 말</a>에 따르면 기존 Spring MVC의 Controller interface는 삭제될 것이라고 하네요.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="spring_mvc_2_5_관련_자료">Spring MVC 2.5 관련 자료</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><a href="http://www.infoq.com/articles/spring-2.5-ii-spring-mvc" class="bare">http://www.infoq.com/articles/spring-2.5-ii-spring-mvc</a></p>
-</li>
-<li>
-<p><a href="http://chanwook.tistory.com/576">스프링 2.5 애노테이션 기반 MVC 예제</a></p>
-</li>
-<li>
-<p><a href="http://springtutorial.googlecode.com/svn/trunk/moimApp/src/spring/tutorial/web/MoimController.java">http://springtutorial.googlecode.com/svn/trunk/moimApp/src/spring/tutorial/web/MoimController.java</a></p>
-</li>
-<li>
-<p><a href="http://steelheart.kr/tc/173">Spring 2.5 Annotation기반 Controller 끄적거림</a></p>
-</li>
-<li>
-<p><a href="http://steelheart.kr/tc/entry/using-web-argument-resolver?category=0">Annotation기반 컨트롤러에 custom argument 적용하기 (WebArgumentResolver)</a></p>
-</li>
-<li>
-<p><a href="http://chanwook.tistory.com/548">Annotated Spring MVC Controller</a></p>
-</li>
-<li>
-<p><a href="http://corund.egloos.com/1815311">Spring Framework 2.5의 Annotation based Controller의 메서드 파라미터에서 주의점</a></p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-    </div>
-	
-	<section id="social-share">
-        <ul class="icons">
-<!-- Social Share Button HTML -->
-
-<!-- Twitter -->
-<li><a href="//twitter.com/share?url=https://blog.benelog.net//2228221.html&text=Spring MVC 2.5을 활용한 파일업로드&via=" target="_blank" class="share-btn twitter">
-    <i class="fa fa-twitter"></i>
-    <p>Twitter</p>
-</a></li>
-
-<!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=https://blog.benelog.net//2228221.html" target="_blank" class="share-btn google-plus">
-    <i class="fa fa-google-plus"></i>
-    <p>Google+</p>
-</a></li>
-
-<!-- Facebook -->
-<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//2228221.html" target="_blank" class="share-btn facebook">
-    <i class="fa fa-facebook"></i>
-    <p>Facebook</p>
-</a></li>
-
-<!-- Reddit (url, title) -->
-<li><a href="//reddit.com/submit?url=https://blog.benelog.net//2228221.html&title=Spring MVC 2.5을 활용한 파일업로드" target="_blank" class="share-btn reddit">
-    <i class="fa fa-reddit-alien"></i>
-    <p>Reddit</p>
-</a></li>
-
-<!-- LinkedIn -->
-<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//2228221.html&title=Spring MVC 2.5을 활용한 파일업로드" target="_blank" class="share-btn linkedin">
-    <i class="fa fa-linkedin"></i>
-    <p>LinkedIn</p>
-</a></li>
-
-<!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//2228221.html&title=Spring MVC 2.5을 활용한 파일업로드" target="_blank" class="share-btn stumbleupon">
-    <i class="fa fa-stumbleupon"></i>
-    <p>StumbleUpon</p>
-</a></li>
-
-<!-- Email -->
-<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//2228221.html" target="_blank" class="share-btn email">
-    <i class="fa fa-envelope"></i>
-    <p>Email</p>
-</a></li>
-        </ul>
-    </section>
-     
-
-    <footer>
-	
-		<ul class="stats">
-    	    <!-- Display the categories associated with this post -->
-    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/Spring.html'>Spring</a></li>
- 	        <li><a href='../tags/Spring-MVC.html'>Spring-MVC</a></li>
-
-				<li><a class="icon fa-comment" href="../2228221.html#disqus_thread"> &nbsp;</a></li>
- 		</ul>
-    	
-    </footer>
-</article>
 		
 <ul class="actions pagination">
     <li><a href="../14/"
@@ -989,6 +819,17 @@ public class FileAction {
                     <li>
                         <article>
                             <header>
+                                <h3><a href="../installing-jdk.html">여러 개의 JDK를 설치하고 선택해서 사용하기</a></h3>
+                                 <time class="published"
+							            datetime='Jun 14, 2019'>
+							            Jun 14, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
                                 <h3><a href="../migration-to-static-site.html">정적 사이트로 블로그 마이그레이션</a></h3>
                                  <time class="published"
 							            datetime='May 06, 2019'>
@@ -1015,17 +856,6 @@ public class FileAction {
                                  <time class="published"
 							            datetime='Feb 25, 2015'>
 							            Feb 25, 2015</time>
-                            </header>
-                        </article>
-                    </li>
-
-                    <li>
-                        <article>
-                            <header>
-                                <h3><a href="../3120317.html">시간대 DB에서 우리나라 시간의 오류</a></h3>
-                                 <time class="published"
-							            datetime='Nov 03, 2014'>
-							            Nov 03, 2014</time>
                             </header>
                         </article>
                     </li>
@@ -1208,7 +1038,7 @@ public class FileAction {
                             <header>
                                 <a href="../tags/java.html">java</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
+                                <span style="float:right;"> 2 </span>
                             </header>
                         </article>
                     </li>
@@ -1801,6 +1631,15 @@ public class FileAction {
                         <article>
                             <header>
                                 <a href="../tags/Spring-MVC.html">Spring-MVC</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="../tags/jdk.html">jdk</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>

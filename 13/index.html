@@ -133,6 +133,9 @@
                     <h3>Recent Posts</h3>
                 </header>
                     <li>
+                        <a href="../../installing-jdk.html"><p>여러 개의 JDK를 설치하고 선택해서 사용하기</p></a>
+                    </li>
+                    <li>
                         <a href="../../migration-to-static-site.html"><p>정적 사이트로 블로그 마이그레이션</p></a>
                     </li>
                     <li>
@@ -140,9 +143,6 @@
                     </li>
                     <li>
                         <a href="../../3134907.html"><p>'네이버를 만든 기술, 읽으면서 배운다 - 자바편' 출간</p></a>
-                    </li>
-                    <li>
-                        <a href="../../3120317.html"><p>시간대 DB에서 우리나라 시간의 오류</p></a>
                     </li>
             </ul>
         </section>
@@ -158,6 +158,403 @@
 </section>
 	
 	<div id="main">
+<article class="post">
+   <header>
+    <div class="title">
+                    <h2><a href="../2700328.html">SpringOne2GX 2010 (2) Spring 3.0 &#8594; 3.1 &#8594; 3.2 Themes &amp; Trends</a></h2>
+
+
+    </div>
+    <div class="meta">
+         <time class="published"
+            datetime='Oct 23, 2010'>
+            Oct 23, 2010</time>
+            <div class="published eta"></div>
+        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
+    </div>
+</header>
+
+    
+  
+         
+    <div id="content">
+       <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>스프링 프레임웍의 핵심 개발자 유겐할러는 "Spring 3.0 &#8594; 3.1 &#8594; 3.2 Themes &amp; Trends"라는 제목으로 두번째 날 첫시간에  발표를 했습니다. 로드존슨은 <a href="http://www.yes24.com/24/goods/3691866">어느 인터뷰</a>에서 지금까지 만났던 가장 뛰어난 개발자는 생각할 것도 없이 유겐할러라고 말한 적이 있었고, 그렇게 전적인 신임을 받고 있어서 인지 유겐할러는 스프링 core 모듈의 대부분의 코드를 만들었다고 합니다. 그래서 유겐할러는 스프링 커뮤니티에서 로드존슨에 버금가는 유명인인데, 예상대로 이 날 발표 장소에는 사람들이 꽉 차게 몰려왔습니다.</p>
+</div>
+<div class="paragraph">
+<p>발표에 들어가기 전에, 스프링 3.0 버전을 쓰는 사람과, 그중 실제 3.0에 들어간 기능을 쓰는 사람들은 손을 들어봐라고 유겐할러가 이야기했는데, 절반 정도의 사람들이 손을 들었던 것 같습니다. 컨퍼런스에 와서 그 발표를 들은 사람을 대상으로 한 질문이라서 당연한 것일수도 있지만 3.0버전의 기능이 커뮤니티에서는 호응이 괜찮다는 느낌이 들었습니다.</p>
+</div>
+<div class="paragraph">
+<p>유겐할러는 자신이 맡은 책임 중 핵심적인 것은 클라우드, 분산 캐쉬와 같은 최신의 경향(modern day trends)에 맞추어 스프링 Core에 어떤 것이 들어갈지를 결정하는 것이라고 했습니다. 뒤에서 설명된 3.1의 캐쉬 Abstraction, 3.2의 fork-join pool 지원 등이 그런 트렌드을 쫓아가기위한 대표적인 예였습니다.</p>
+</div>
+<div class="paragraph">
+<p>3.1과 3.2는 3.0의 자연스러운 다음버전이라고 합니다. 큰 구조변화보다는 기능이 추가되는 성격의 버전이라는 의미라고 생각되었습니다.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/spring-one/spring-3-0-to-3-2.jpg" alt="spring-3-0-to-3-2.jpg"></span></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="릴리즈_일정">릴리즈 일정</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>발표 중간 중간에 이야기한 향후 스프링버전의 릴리즈 일정은 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>3.0.5 : 2010년 10월에, 곧. 3.05 이후로 바로 3.1은 위한 마일스톤 버전으로 넘어간다고 했습니다.</p>
+</li>
+<li>
+<p>3.1 M1: 2010년 11월 말</p>
+</li>
+<li>
+<p>3.1 M2: 2011년 1월 초?</p>
+</li>
+<li>
+<p>3.1 RC1 : 2011년 2월말?</p>
+</li>
+<li>
+<p>3.1 GA  : 2011년 3월말?</p>
+</li>
+<li>
+<p>3.2 :  2011년 말 경</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>뒤로 갈수록 물음표(?)가 들어가 있고, 지금까지 일정을 정확히 지킨 적이 없었던 것으로 보아 실제로 저 일정에 나올 가능성은 적다고 예상됩니다. Spring 3.0도 2008년에 이야기할 때는 2009년 초에 나올 것이라고 말한 적이 있는데, 실제로 3.0.GA 버전이 릴리즈된 것은 2009년 12월이였습니다. (<a href="http://toby.epril.com/?p=459">스프링 이슈트래커로 본 Spring 3.0의 전망</a>, <a href="https://jira.springframework.org/browse/SPR#selectedTab=com.atlassian.jira.plugin.system.project%3Aversions-panel">Spring Jira의 실제 release 날짜</a> 참조)</p>
+</div>
+<div class="paragraph">
+<p>일정관리를 엄격하게 안 하나 하는 생각도 들었는데, 공개 API의 모음인 프레임웍이라는 특성 때문에 일정보다는 완성도를 중요시 할 수 밖에 없을 것도 같았습니다. 두번째 날의 밤에 'Birds of a feather session&#8217;라고, 컨퍼런스의 트랙별로 발표자나 핵심개발자들과 이야기를 할 수 있는 자리를 마련해줬는데, 거기서 내부적으로 어떤 개발방법론을 쓰는지에 대한 질문이 나왔었습니다. 거기에서 스크럼 같은 일반적인 애자일 프랙티스를 따르기는 하는데, 프레임웍은 배포 한 후에 수정을 하는 것이 어렵기 떄문에 원래의 스크럼 방식과는 잘 맞지 않는 부분도 있다는 말이 답변 중에 나왔었습니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="a_review_3_0">A review : 3.0</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>3.0에 추가된 기능들을 되돌아 봤는데, 이미 널리 알려진 기능들이라서 자세히 옮기지는 않겠습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Annotated component model.(JSR 330, JSR 303, JavaConfig등)</p>
+</li>
+<li>
+<p>Rest Support</p>
+</li>
+<li>
+<p>Portlet 2.0 지원</p>
+</li>
+<li>
+<p>스케쥴과 태스크 실행 개선</p>
+</li>
+<li>
+<p>Java EE6 지원</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>(자세히 아시고 싶으신 분들은 <a href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/new-in-3.html" class="bare">http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/new-in-3.html</a> 를 참조하시기 바랍니다.)</p>
+</div>
+<div class="paragraph">
+<p>이중 JavaEE6에 대한 내용은 세번째 날 역시 유겐할러가 발표한 'Spring and JavaEE 6&#8217;라는 세션에서 자세하게 설명 되었습니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="a_preview_3_1">A preview : 3.1</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>3.1에 추가되는 주요 테마들은 다음과 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Environment profiles for bean</p>
+</li>
+<li>
+<p>Java-based applicaion configuration</p>
+</li>
+<li>
+<p>Cache abstraction</p>
+</li>
+<li>
+<p>Conversation Managment</p>
+</li>
+<li>
+<p>Servlet 3.0, JSF 2.0, Groovy</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="environment_profiles_for_bean">Environment profiles for bean</h3>
+<div class="paragraph">
+<p>이 기능은 bean 설정들을 환경별로 묶는 것을 지원합니다. 즉, 개발환경, 테스트환경, 운영환경에 맞는 bean 선언들을 그룹화해서 지정할 수 있게 하는 것이죠.
+Bean 선언이나 Annotation선언에 Profile을 이름을 지정하는 방식이 될 것이라고 합니다.</p>
+</div>
+<div class="paragraph">
+<p>XML선언에는 다음과 같이 profile속성이 추가됩니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;beans .... profile="dev"&gt;
+
+  &lt;bean&gt;...&lt;/bean&gt;
+
+  &lt;bean&gt;...&lt;/bean&gt;
+
+&lt;/beans&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Annotation으로는 @Profile 을 지정하게 됩니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Service
+
+@Profile("dev")
+
+class UserService\{
+
+.....
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>그리고 Inject 가능한 API 형식으로 환경에 대한 추상화도 지원할 것이라고 합니다.</p>
+</div>
+<div class="paragraph">
+<p>보통 database의 URL 같은 속성들은 별도의 property 파일로 배서 관리하는 placeholders라는 기능을 쓰는데, 이 기능도 실제 환경에 의존적으로 placeholder를 나름대로 지정할 수 있는 기능이 나온다고 합니다.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="java_based_applicaion_configuration">Java-based applicaion configuration</h3>
+<div class="paragraph">
+<p>이미 3.0에 JavaConfig 기능이 포함되어서 @Configuration, @Bean 등의 Annotation이 추가되었는데, 어떤 기능들이 더 추가되는 것일지 궁금했었습니다. 3.1에 들어가는 Java-based configuration은 tx나, aop 같은 custom name-space와 같은 선언들이 Java파일로도 가능하게 하는 것이였습니다. Spring Batch나 Security, Integration에서도 이러한 custom name-space들을 많이 쓰는데, 그런 설정들이 xml로 bean 선언을 할 때는 설정을 간편하게 하지만, JavaConfig로 옮기기에는 불편해서 아쉬웠던 점이 있습니다. Spring Batch에서 ItemReader, ItemWriter 선언을 JavaConfig로 옮겨보니 훨씬 코드가 짧아지고 Compile time의 validation 범위도 넓어져서 만족했었는데, Job과 Step의 선언은 custom namespace로 하는 것이 더 간편해서, XML에 남겨두었었습니다. 그리고 유사하게</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>http://www.amazon.com/Enterprise-Integration-Patterns-Designing-Deploying/dp/0321200683/ref=sr_1_1?ie=UTF8&amp;qid=1287800130&amp;sr=8-1[Enterpise Interation Patterns]를 구현한 Apache Camel는 Java로 된 DSL을 지원하는데 반해서 Spring Integration은 간결한 선정을 하려면 Xml의 Custom name space를 사용해야 되어서 아쉬웠던 적이 있었습니다.(http://java.dzone.com/articles/spring-integration-and-apache 참조)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>3.1에서 그렇게 javaConfig로도 추상화정도를 높인 선언을 할 수 있는 기능이 추가된다면, 스프링포트 폴리오의 다른  프로젝트에서도 많은 개선이 이루어질 것이라고 기대됩니다.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="cache_abstraction">Cache Abstraction</h3>
+<div class="paragraph">
+<p>현재도 스프링에 org.springframework.cache라는 패키지는 존재합니다. 그런데 아직까지는 EhCache에 대한 지원클래스만 있습니다. 3.1에서는 이 패키지를 채워넣을 것이고, 분산캐쉬를 기술과 연결되는 구현체도 포함될 것이라고 합니다. 기본적으로 EhCache, GemFire, Coherence를 지원한다고 밝혔습니다. 물론 인터페이스에 맞춰서 직접 구현하는 것도 가능하고, ConcurrentHashMap을 이용한 간단한 기본 구현체도 제공합니다.</p>
+</div>
+<div class="paragraph">
+<p>발표가 끝난 뒤에 저와 같이 간 일행인 김훈민 대리가 직접 유겐할러에게 찾아가서 Memcached에 대한 지원 계획을 물어봤는데, out-of-box로 바로 쓸 수 있는 Adaptor는 아직까지는 계획에 없다고 했습니다. 여러 가지 라이센스 문제 등에 부딪힐 수 있어서 협의가 필요한데, 원한다면 이슈 등록을 하고 투표를 하라고 이야기했습니다.  개인적으로 Simple Spring Memecached( <a href="http://code.google.com/p/simple-spring-memcached/" class="bare">http://code.google.com/p/simple-spring-memcached/</a>) 프로젝트와 유사한 Memcached 지원이 Spring Core에 들어갔으면 했는데, 다소 아쉬운 부분이였습니다.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>많은 곳에서 이미 Annotation과 AOP를 활용해서 Cache를 활용해서 이미 예상을 했었는데, Spring 3.1에는 아래와 같이 Cache 지원을 위한 `@Cacheable`, `@CacheEvict` 라는 Annotation이 추가됩니다.</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Cacheable
+public Owner loadOwner(int id) \{
+
+....
+
+}
+
+@Cacheable(condition="name.length&lt;10")
+public Owner loadOwner(String name)\{
+
+....
+
+}
+
+@CacheEvict
+public void deleteOwner(int id)\{
+
+....
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Annotation이 붙은 메소드의 signature와 파라미터로 캐쉬에 넣을 key로 인식하게 됩니다. 유겐할러는 이런 방식의 처리가 Cache의 전형적인 사용의 80% 유형정도를 차지할 것이라고 말했습니다. Cache Abstraction은 Cache의 모든 기능을 통합해서 같은 API로 묶는 것이라기보다는, 주요 쓰임새를 더 짧은 코드로 편하게 쓸 수 있게 하는데 초점이 맞춰진 것으로 보입니다. 정교한 캐쉬처리나 각각의 캐쉬 특성에 맞는 API사용 등은 직접 특정 Cache의 API를 당연히 사용해야겠죠.
+그리고 transaction처리에 쓰는 PlatformTransactionManager와 비슷하게 CachedManager라는 SPI가 들어가고, tx namespace처럼 cache에 대한 namespace도 추가된다고 합니다. &lt;cache:annotation-driven /&gt;과 같은 선언은 기존에 스프링을 쓰던 사람에게는 익숙하게 보입니다.</p>
+</div>
+<div class="paragraph">
+<p>이미 EhCache를 Spring에서 활요할 때 쓰는 @Cacheable annotation이 있는데, 이 모델이 좀 더 확장될 것으로 보입니다. 아래 자료에 현재에도 사용가능한 방식이 나와 있습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://code.google.com/p/ehcache-spring-annotations/wiki/UsingCacheable" class="bare">http://code.google.com/p/ehcache-spring-annotations/wiki/UsingCacheable</a>http://code.google.com/p/ehcache-spring-annotations/wiki/UsingCacheable</p>
+</li>
+<li>
+<p><a href="http://whiteship.tistory.com/1256" class="bare">http://whiteship.tistory.com/1256</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="converstion_management">Converstion management</h3>
+<div class="paragraph">
+<p>Conversation session에 대한 추상화 계층을 추가될 예정이라고 합니다. 기본적으로 HttpSession을 포함하여 더욱 유연한 생존주기와 저장소를 제공한다고 했습니다.</p>
+</div>
+<div class="paragraph">
+<p>보통 웹어플리케이션에서 여러 페이지간의 상태를 공유해야하는 Conversation 범위가 생길 수가 있는데, 보통 Session을 쓰는 것이 일반적이지만, 같은 윈도우에 있는 다른 탭이라도 같은 Session의 id가 먹는 상황이 있고, 수동적으로 이런 경계를 관리해야 할 때가 있습니다. 새로운 기능은 이런 것들을 위임할 수 있는 공통적인 기반을 제공한다고 합니다.</p>
+</div>
+<div class="paragraph">
+<p>이 기능은 Spring Webflow의 3.0에도 바탕이 될 것이고 MVC나 JSF에도 공통적으로 쓰일 수 있다고 했습니다.</p>
+</div>
+<div class="paragraph">
+<p>그리고 웹어플리케이션 뿐만이 아니라 메시징 환경에서 메시지 헤더 안에 conversation id를 포함시키는 쓰임새에도 적용가능하도록  Conversation을 위한 인터페이스는 범용적인 목적의 API가 될 것이라고 합니다.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="support_for_servlet_3_0">Support for Servlet 3.0</h3>
+<div class="paragraph">
+<p>Tomcat 7, GlassFish 3 등에서 Servlet 3.0 스펙을 지원하는 Container에 대한 지원이 포함됩니다.</p>
+</div>
+<div class="paragraph">
+<p>web.xml에 명시적으로 프레임웍에 대한 Listener 선언을 하지 않고도  자동으로 deployment되는 옵션을 지원하고, 표준적인 파일업로드에 대한 지원이 된다고 합니다. 스프링의 MultipartResolver interface도 그 안에 포함될 것 같습니다.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="enchance_groovy_support">Enchance Groovy Support</h3>
+<div class="paragraph">
+<p><code>&lt;lang:groovy&gt;</code> 로 xml 파일안에 Groovy를 쓸 수 있는 지원이 강화됩니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>base script classes</p>
+</li>
+<li>
+<p>custom bidings</p>
+</li>
+<li>
+<p>스프링 빈들을 이름으로 암묵적으로 접근</p>
+</li>
+<li>
+<p>Velocity나 Freemarker 대신 쓰일 수 있는 Groovy 바탕의 Template 파일. Email 템플릿 같은 것에 사용할 수 있다고 하네요</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="cnamespace"><code>c:namespace</code></h3>
+<div class="paragraph">
+<p>XML로 Bean 선언을 할 때 p namespace과 같은 역할을 하는 c namespace가 추가됩니다. p가 &lt;property name.. &gt; 에 대한 짧은 표현였다면, c는 &lt;constructor-arg&gt;를 간결하게 표현할 수 있게 줍니다.</p>
+</div>
+<div class="paragraph">
+<p>아래와 코드와 같이 거의 p namespace와 사용법이 똑같아 보입니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;bean class="..." c:age="10/&gt;
+
+&lt;bean class="..." c:family-ref="myFamily/&gt;</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="a_sneak_preview_3_2">A sneak preview : 3.2</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>3.2에는 JDK 7을 바탕으로 추가될 수 있는 기능들을 계획하고 있었습니다. JDK 7은 2011년 7월에 release 예정이라서 3.2에 대한 Release도 당연히 그 뒤가 되겠습니다.</p>
+</div>
+<div class="paragraph">
+<p>그리고 당연히 java 5, 6 user를 위한 기능도 있을 것이고, 그런 기능들은 Spring 3.1이 GA로 간 다음에 사용자들의 요청에 따라서 결정될 것이라고 합니다.</p>
+</div>
+<div class="sect2">
+<h3 id="java_se_7_support">Java SE 7 Support</h3>
+<div class="paragraph">
+<p>Spring 3.2의 초점은 JRE 7 을 가장 잘 쓰는 사용법이라고 했습니다. JDBC 4.1에 대한 지원과 Java concurrent 패지지에서 개선되는 fork-join 프레임웍에 대한 지원계획이 있었습니다.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="멀티코어의_concurrent_프로그래밍에_초점">멀티코어의 Concurrent 프로그래밍에 초점</h3>
+<div class="paragraph">
+<p>동시 요청보다 Core수가 더 많은 시나리오에 초점을 맞추어서 API제공을 계획하고 있다고 합니다. 예를 들면 Spring Batch에서 큰 Xml파일을 처리할 때와 같이, 처리 요청은 하나이기 때문에 요청 건별로 병렬처리르 하기가 힘들지만 자원소모가 커서 병렬처리를 했을 때의 이득이 큰 경우를 염두에 둔 것이였습니다. 그런 곳에 사용할 수 있는 특화된 ForkJoinPool이 Application context안에 들어갈 것이라고 했습니다.</p>
+</div>
+</div>
+</div>
+</div>
+    </div>
+	
+	<section id="social-share">
+        <ul class="icons">
+<!-- Social Share Button HTML -->
+
+<!-- Twitter -->
+<li><a href="//twitter.com/share?url=https://blog.benelog.net//2700328.html&text=SpringOne2GX 2010 (2) Spring 3.0 &#8594; 3.1 &#8594; 3.2 Themes &amp; Trends&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+</a></li>
+
+<!-- Google Plus -->
+<li><a href="//plus.google.com/share?url=https://blog.benelog.net//2700328.html" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+</a></li>
+
+<!-- Facebook -->
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//2700328.html" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+</a></li>
+
+<!-- Reddit (url, title) -->
+<li><a href="//reddit.com/submit?url=https://blog.benelog.net//2700328.html&title=SpringOne2GX 2010 (2) Spring 3.0 &#8594; 3.1 &#8594; 3.2 Themes &amp; Trends" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+</a></li>
+
+<!-- LinkedIn -->
+<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//2700328.html&title=SpringOne2GX 2010 (2) Spring 3.0 &#8594; 3.1 &#8594; 3.2 Themes &amp; Trends" target="_blank" class="share-btn linkedin">
+    <i class="fa fa-linkedin"></i>
+    <p>LinkedIn</p>
+</a></li>
+
+<!-- StumbleUpon (url, title) -->
+<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//2700328.html&title=SpringOne2GX 2010 (2) Spring 3.0 &#8594; 3.1 &#8594; 3.2 Themes &amp; Trends" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+</a></li>
+
+<!-- Email -->
+<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//2700328.html" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+</a></li>
+        </ul>
+    </section>
+     
+
+    <footer>
+	
+		<ul class="stats">
+    	    <!-- Display the categories associated with this post -->
+    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
+ 	        <li><a href='../tags/Spring.html'>Spring</a></li>
+ 	        <li><a href='../tags/Spring-One.html'>Spring-One</a></li>
+ 	        <li><a href='../tags/행사후기.html'>행사후기</a></li>
+
+				<li><a class="icon fa-comment" href="../2700328.html#disqus_thread"> &nbsp;</a></li>
+ 		</ul>
+    	
+    </footer>
+</article>
 <article class="post">
    <header>
     <div class="title">
@@ -769,217 +1166,6 @@ ti라는 이름으로 지정해서 쓰고 있다.
     	
     </footer>
 </article>
-<article class="post">
-   <header>
-    <div class="title">
-                    <h2><a href="../2685835.html">private 메소드를 어떻게 테스트해야 할까요?</a></h2>
-
-
-    </div>
-    <div class="meta">
-         <time class="published"
-            datetime='Sep 27, 2010'>
-            Sep 27, 2010</time>
-            <div class="published eta"></div>
-        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
-    </div>
-</header>
-
-    
-  
-         
-    <div id="content">
-       <div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>private 메소드를 어떻게 테스트해야 할지에 대한 질문은 테스트 코드 작성에 대한 자주 나오는 질문 중에 하나입니다. 이에 대한 답변을 간단히 정리해봅니다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>많은 경우에 private method는 public 메소드에서 extract method 되어서 나온 것이므로 public을 통해서 간접적으로 테스트를 하는 것이 자연스럽습니다.</p>
-</li>
-<li>
-<p>그래도 private 영역만 따로 테스트를 해야지 더욱 다양한 테스트 케이스를 편하게 작성할 수 있다거나 디버깅이 쉬워진다면,해당 메소드를 package private(default 접근자)나 protected로 바꾸어서 테스트해볼 수도 있습니다. 일반적으로 테스트를 위해서 production 코드의 접근 범위를 넓히는 것은 클래스의 노출 범위를 커지게 하므로 바람직하지 않을 수도 있습니다. 하지만 private method를 public에서 간접적으로 테스트하는 것만으로 충분하지 않고 따로 테스트를 해봐야할 정도가 된다는 것도 설계 개선의 신호일 수 있습니다.  private 메소드가 하는 일이 크다는 신호일 수도 있고, 그렇다면 별도의 클래스로 분리하거나, 향후 하위 클래스에서 상속을 해서 대체할 수 있는 가능성을 고려해서 protected로 해두는 것도 고려해 볼만합니다.</p>
-</li>
-<li>
-<p>Reflection을 이용하면 강제적으로 private 메소드를 호출할 수 있습니다. 다만 이렇게 하면 메소드이름 부분이 String값으로 넘겨지게 되므로, compile time에 메소드명의 오타가 검증되지 못하고, refactoring으로 메소드명을 바꾸어도 자동으로 String으로 적힌 부분은 바뀌지 않는 단점이 있습니다. 위의 모든 경우를 다 고려해보고 그대로 필요하다고 생각되는 경우에만 제한적으로 사용하기를 권장드립니다.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="1_powermock에서_whitebox_invokemethod_메소드를_이용해서도_테스트를_할_수_있습니다">(1) PowerMock에서 Whitebox.invokeMethod(..) 메소드를 이용해서도 테스트를 할 수 있습니다.</h3>
-<div class="paragraph">
-<p>( <a href="http://code.google.com/p/powermock/wiki/BypassEncapsulation" class="bare">http://code.google.com/p/powermock/wiki/BypassEncapsulation</a>  참조)</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="2_junit_addons에_포함된_privateaccessor를_이용하면_테스트_할_수_있습니다">(2) JUnit Addons에 포함된 PrivateAccessor를 이용하면 테스트 할 수 있습니다.</h3>
-<div class="ulist">
-<ul>
-<li>
-<p>프로젝트홈 : <a href="http://sourceforge.net/projects/junit-addons" class="bare">http://sourceforge.net/projects/junit-addons</a></p>
-</li>
-<li>
-<p>API 문서 : <a href="http://junit-addons.sourceforge.net/junitx/util/PrivateAccessor.html" class="bare">http://junit-addons.sourceforge.net/junitx/util/PrivateAccessor.html</a></p>
-</li>
-<li>
-<p>샘플코드 : <a href="http://entireboy.egloos.com/4030723" class="bare">http://entireboy.egloos.com/4030723</a></p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="3_아래와_같이_직접_간단한_코드를_만들어서도_비슷한_역할을_할_수_있습니다">(3) 아래와 같이 직접 간단한 코드를 만들어서도 비슷한 역할을 할 수 있습니다.</h3>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">package edu.tdd;
-
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
-import org.junit.Test;
-
-public class ReflectionCallUtilsTest {
-
-    @Test
-    public void testCallPrivate() throws SecurityException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        UnderTest ut = new UnderTest();
-        String name = "jsh";
-        String address = "서울시 마포구";
-        invoke(ut, "print",name, address);
-        assertThat(ut.isCalled(),is(true));
-    }
-
-    @Test
-    public void testCallWithPrimitiveType() throws SecurityException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        UnderTest ut = new UnderTest();
-        String name = "jsh";
-        int age = 35;
-        boolean printed = (Boolean)invoke(ut, "print", new Class&lt;?&gt;[]\{String.class, int.class}, name,age);
-        assertThat(printed,is(true));
-        assertThat(ut.isCalled(),is(true));
-    }
-    private Object invoke(Object ut, String methodName, Class&lt;?&gt;[] argTypes, Object ... args) throws SecurityException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Method method = ut.getClass().getDeclaredMethod(methodName, argTypes);
-        method.setAccessible(true);
-        return method.invoke(ut, args);
-    }
-
-    private Object invoke(Object ut, String methodName, Object ... args) throws SecurityException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        int argSize = args.length;
-        Class&lt;?&gt;[] argTypes = new Class&lt;?&gt;[argSize];
-        for(int i=0;i&lt; argSize;i++){
-            argTypes[i] = args[i].getClass();
-        }
-        return invoke(ut,methodName, argTypes, args);
-    }
-
-    static class UnderTest {
-        private boolean called = false;
-        public boolean isCalled(){
-            return called;
-        }
-        private void print(String name, String address) {
-            System.out.println(name);
-            System.out.println(address);
-            called = true;
-        }
-        private boolean print(String name, int age){
-            System.out.println(name);
-            System.out.println(age);
-            called = true;
-            return true;
-        }
-    }
-}
-____
-
-
-필요하다면 test 코드 안에서 쓰이고 있는 invoke메소드를 따로 Util 클래스로 분리할 수도 있습니다.
-
-위의 코드에서 Object .. args 넘어가는 부분이 primitive type이 포함되면 Object[]로 바뀌는 과정에서 Wrapper class로 바뀌는  auto-boxing이 발생하게 됩니다. 그래서 매개변수에 primitive type이 있을 때는 invoke(Object ut, String methodName, Object ... args) 사용하면 NoSuchMethodException이 발생하게 됩니다. 그럴 때는 type을 정확히 명시해 주는 invoke(Object ut, String methodName, Class&lt;?&gt;[] argTypes, Object ... args)을 사용하면 됩니다.
-
-== 참고자료
-* http://www.artima.com/suiterunner/private.html[Testing Private Methods with JUnit and SuiteRunner] : 위의 글과 비슷하게 아래 4가지 방법을 제시하고 있습니다.
-**  Don't test private methods.
-**  Give the methods package access.
-**  Use a nested test class.
-** Use reflection.
-* http://www.yes24.com/24/goods/3908398[채수원 저 테스트 주도개발] 441페이지 : public을 테스트함으로서 간접적으로 테스트하는 방식을 권장하고 굳이 한다면 Reflection을 사용할 수 있다는 점을 언급하고 있으나 부서지기 쉬운 테스트 코드가 되기 쉬움을 경고 하고 있습니다.
-* http://xper.org/wiki/xp/TestingPrivateInterfaces : Xper에서 논의된 내용</code></pre>
-</div>
-</div>
-</div>
-    </div>
-	
-	<section id="social-share">
-        <ul class="icons">
-<!-- Social Share Button HTML -->
-
-<!-- Twitter -->
-<li><a href="//twitter.com/share?url=https://blog.benelog.net//2685835.html&text=private 메소드를 어떻게 테스트해야 할까요?&via=" target="_blank" class="share-btn twitter">
-    <i class="fa fa-twitter"></i>
-    <p>Twitter</p>
-</a></li>
-
-<!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=https://blog.benelog.net//2685835.html" target="_blank" class="share-btn google-plus">
-    <i class="fa fa-google-plus"></i>
-    <p>Google+</p>
-</a></li>
-
-<!-- Facebook -->
-<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//2685835.html" target="_blank" class="share-btn facebook">
-    <i class="fa fa-facebook"></i>
-    <p>Facebook</p>
-</a></li>
-
-<!-- Reddit (url, title) -->
-<li><a href="//reddit.com/submit?url=https://blog.benelog.net//2685835.html&title=private 메소드를 어떻게 테스트해야 할까요?" target="_blank" class="share-btn reddit">
-    <i class="fa fa-reddit-alien"></i>
-    <p>Reddit</p>
-</a></li>
-
-<!-- LinkedIn -->
-<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//2685835.html&title=private 메소드를 어떻게 테스트해야 할까요?" target="_blank" class="share-btn linkedin">
-    <i class="fa fa-linkedin"></i>
-    <p>LinkedIn</p>
-</a></li>
-
-<!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//2685835.html&title=private 메소드를 어떻게 테스트해야 할까요?" target="_blank" class="share-btn stumbleupon">
-    <i class="fa fa-stumbleupon"></i>
-    <p>StumbleUpon</p>
-</a></li>
-
-<!-- Email -->
-<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//2685835.html" target="_blank" class="share-btn email">
-    <i class="fa fa-envelope"></i>
-    <p>Email</p>
-</a></li>
-        </ul>
-    </section>
-     
-
-    <footer>
-	
-		<ul class="stats">
-    	    <!-- Display the categories associated with this post -->
-    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/JUnit.html'>JUnit</a></li>
- 	        <li><a href='../tags/Test.html'>Test</a></li>
- 	        <li><a href='../tags/PowerMock.html'>PowerMock</a></li>
-
-				<li><a class="icon fa-comment" href="../2685835.html#disqus_thread"> &nbsp;</a></li>
- 		</ul>
-    	
-    </footer>
-</article>
 		
 <ul class="actions pagination">
     <li><a href="../12/"
@@ -1052,6 +1238,17 @@ ____
                     <li>
                         <article>
                             <header>
+                                <h3><a href="../installing-jdk.html">여러 개의 JDK를 설치하고 선택해서 사용하기</a></h3>
+                                 <time class="published"
+							            datetime='Jun 14, 2019'>
+							            Jun 14, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
                                 <h3><a href="../migration-to-static-site.html">정적 사이트로 블로그 마이그레이션</a></h3>
                                  <time class="published"
 							            datetime='May 06, 2019'>
@@ -1078,17 +1275,6 @@ ____
                                  <time class="published"
 							            datetime='Feb 25, 2015'>
 							            Feb 25, 2015</time>
-                            </header>
-                        </article>
-                    </li>
-
-                    <li>
-                        <article>
-                            <header>
-                                <h3><a href="../3120317.html">시간대 DB에서 우리나라 시간의 오류</a></h3>
-                                 <time class="published"
-							            datetime='Nov 03, 2014'>
-							            Nov 03, 2014</time>
                             </header>
                         </article>
                     </li>
@@ -1271,7 +1457,7 @@ ____
                             <header>
                                 <a href="../tags/java.html">java</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
+                                <span style="float:right;"> 2 </span>
                             </header>
                         </article>
                     </li>
@@ -1864,6 +2050,15 @@ ____
                         <article>
                             <header>
                                 <a href="../tags/Spring-MVC.html">Spring-MVC</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="../tags/jdk.html">jdk</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>

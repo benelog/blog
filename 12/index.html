@@ -133,6 +133,9 @@
                     <h3>Recent Posts</h3>
                 </header>
                     <li>
+                        <a href="../../installing-jdk.html"><p>여러 개의 JDK를 설치하고 선택해서 사용하기</p></a>
+                    </li>
+                    <li>
                         <a href="../../migration-to-static-site.html"><p>정적 사이트로 블로그 마이그레이션</p></a>
                     </li>
                     <li>
@@ -140,9 +143,6 @@
                     </li>
                     <li>
                         <a href="../../3134907.html"><p>'네이버를 만든 기술, 읽으면서 배운다 - 자바편' 출간</p></a>
-                    </li>
-                    <li>
-                        <a href="../../3120317.html"><p>시간대 DB에서 우리나라 시간의 오류</p></a>
                     </li>
             </ul>
         </section>
@@ -158,6 +158,415 @@
 </section>
 	
 	<div id="main">
+<article class="post">
+   <header>
+    <div class="title">
+                    <h2><a href="../2708621.html">Java에서 XML없이 SQL개발하기</a></h2>
+
+
+    </div>
+    <div class="meta">
+         <time class="published"
+            datetime='Nov 08, 2010'>
+            Nov 08, 2010</time>
+            <div class="published eta"></div>
+        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
+    </div>
+</header>
+
+    
+  
+         
+    <div id="content">
+       <div id="preamble">
+<div class="sectionbody">
+<div class="ulist">
+<div class="title">변경 이력</div>
+<ul>
+<li>
+<p>2015/01/21 :  Eclipse에서 Groovy를 쓰기위한  plugin과 Maven 선언 부분을 현행화</p>
+</li>
+<li>
+<p>2013/01/25 : <a href="http://www.dpriver.com/pp/sqlformat.htm" class="bare">http://www.dpriver.com/pp/sqlformat.htm</a> 의 캡쳐화면 추가 등</p>
+</li>
+<li>
+<p>2012/11/06 :  Eclipse에서 Groovy를 쓰기위한  plugin과 Maven 선언 부분을 더 편한 방식으로 수정</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>요약하면, Java의 여러 프레임웍은  XML안에 SQL을 넣는 방식을 지원하는데, 줄바꿈이 있는 문자열을 편하게 쓰게 해주는 따옴표 세 개문법 (""")만 Java에 추가된다면 XML을 사용하는 목적을 충족시키면서도 XML로 인한 여러 단점들을 겪지 않아도 된다는 것입니다. 따옴표 세개는 Java에서 추가될 예정이지만, Groovy등에서는 이미 지원합니다. 지금이라도 SQL관리에만 Groovy를 쓰면 쿼리편집이 조금 더 편리해질만도 합니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="xml로_sql을_관리할_수_있는_java_framework">XML로 SQL을 관리할 수 있는 Java framework</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>많은 Java 프레임웍들이 SQL구문들을 XML파일 안에서 코딩하게 되어 있습니다.
+가장 대표적인 것이 iBatis입니다. 아래와 같이 SQL 구문, 파라미터를 운반하는 클래스,  쿼리의 결과가 담길 클래스를 XML안에 선언합니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">    &lt;select id="findByIsbn13" parameterClass="string" resultClass="book"&gt;
+    SELECT  title,    author,     isbn13,     isbn10,     pages, content, imageUrl
+    FROM book
+    WHERE isbn13 = #isbn13#
+    &lt;/select&gt;
+    &lt;select id="findByTitle" parameterClass="string" resultClass="book"&gt;
+    SELECT  title,    author,     isbn13,     isbn10,     pages, content, imageUrl
+    FROM book
+    WHERE title = #title#
+    &lt;/select&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>그리고 Hibernate와 JPA에서도 "named query"라는 개념으로, SQL을 따로 XML파일로도 뺄 수 있습니다. 아래는 Hibernate에서 SQL을 XML 파일안에 설정한 예입니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;sql-query name="findBookByIsbn13"&gt;
+    &lt;return alias="book" class="tdd.edu.domain.Book"/&gt;
+   SELECT  title,    author,     isbn13,     isbn10,     pages, content,  imageUrl
+   FROM book
+    WHERE isbn13 = :isbn13
+ &lt;/sql-query&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Navie SQL과 Hibernate가 쓰는 HQL을 모두 .xml파일 안에 선언하는 것이 가능합니다. JPA를 사용해도 마찬가지로 JPA-QL, Native SQL을 Java에서 String으로 선언할 수도 있지만, XML 파일 안에 넣어도 됩니다.</p>
+</div>
+<div class="paragraph">
+<p>Spring JDBC에서는 Jdbctemplate.execute 등의 메소드에서 SQL내용을 직접 문자열로 넘기게 되어있지만, Applicaton context 안에 쿼리를 저장해두고, 이를 사용하는 쪽에서 <code>java.util.Properties</code> 같은 객체를 Dependency Injection 받아서 사용하면 iBatis처럼 XML로 쿼리가 관리됩니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;util:properties id="bookSqls"&gt;
+    &lt;prop key="findByIsbn13"&gt;
+   SELECT  title,    author,     isbn13,     isbn10,     pages, content,  imageUrl
+   FROM book
+    WHERE isbn13 = :isbn13
+    &lt;/prop&gt;
+&lt;/util:properties&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>그런데, Spring-jdbc나 Hibernate, JPA에서는 XML에 SQL을 저장하는 방식이 선택일 뿐이지만, iBatis 2.x에서는 반드시 XML안에 쿼리를 넣어야합니다.  myBatis라고 이제 이름이 갈라진 iBatis 3.x에서는 Annotation으로 쿼리를 지정할 수 있어서, .java파일 안에 문자열로 SQL에 넣어도 되기는 합니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">final String PERSIST_INFO =
+“INSERT INTO simple_information(info_id, info_content) VALUES (#\{infoId}, #\{infoContent})”;
+
+@Insert(PERSIST_INFO)
+public int persistInformation(SimpleInformationEntity simpleInfo) throws Exception;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>(예제는 <a href="http://java.dzone.com/articles/mybatis-formerly-called-ibatis" class="bare">http://java.dzone.com/articles/mybatis-formerly-called-ibatis</a>http://java.dzone.com/articles/mybatis-formerly-called-ibatis 에서)</p>
+</div>
+<div class="paragraph">
+<p>그런데, 이런식으로 쿼리까지 Annotation으로 지정하는 것에 대해서는 의견이 분분할 것 같고, 개인적인 생각으로는 Spring jdbc나 Hibernate처럼 필요하면 직접 메소드 시그니처에 직접 SQL을 문자열로 넘기는 방식이 훨씬 더 자연스럽다고 보여집니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="문제점은">문제점은?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>iBatis에서는 파라미터에 따라서 SQL이 다르게 구성되는 다이나믹 쿼리를 아래와 같이 선언합니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;isEqual property="writerSelected" compareValue="false"&gt;
+  &lt;isNotNull property="writerList"&gt;
+    &lt;iterate prepend=" AND writer in" property="writerList"
+       open="(" close=")" conjunction=","&gt;#writerList[]#
+    &lt;/iterate&gt;
+  &lt;/isNotNull&gt;
+&lt;/isEqual&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>if, for문 처럼 조건,반복문들이 XML로 표현되어 있습니다. 이는 절차적 프로그래밍을 SQL로 하게 되어서 아래와 같은 단점이 있습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>조건, 반복문에 해당하는 태그 문법을 별도로 배워야함</p>
+</li>
+<li>
+<p>괄호"\{}"대신 열고 닫는 태그가 단락을 구분하기 때문에, 같은 조건,만복문을 코딩해도 Java 같은 범용언어에서보다 긴 코드가 나오게됨</p>
+</li>
+<li>
+<p>Compile time의 validation범위가 더 줄어들게 됨.  getter, setter로 참조하게 될 속성명에 오타가 있어도 직접 실행해봐야지 오타를 알 수 있음.</p>
+</li>
+<li>
+<p>Java파일 밖이므로, Emma와 같은 Coverage 확인 툴로 실제 해당 절이 실행되었는지 확인할 수도 없음.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="왜_sql이_xml에_들어가게_되었을까">왜 SQL이 XML에 들어가게 되었을까?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>직접 JDBC를 쓰면 Connection 관리와 Exception처리 등이 불편합니다.
+그리고 JDBC의 Prepared Statement에서는 파라미터를 "?"를 표시하기 때문에 거기에 넘어가는 변수를 위치의 순서로 파악을 해야 합니다.
+":id"와 같이 named parameter를 넣을 수 있다면 훨씬 쿼리의 가독성이 높아집니다.
+그래서 그러한 Jdbc의 미흡한 점들을 보완해주는 프레임웍들이 각광을 받았습니다.</p>
+</div>
+<div class="paragraph">
+<p>그런데, Connection이나 Excpetion처리의 편의성, named parameter의 활용하고 싶다고 해서 반드시 XML로 SQL를 관리해야 하는 것은 아닙니다.
+XML을 안 써도 되는 Spring의 JdbcTemplate에서도 그런 기능은 다 제공을 합니다.</p>
+</div>
+<div class="paragraph">
+<p>SQL이 한 파일에 모여있지 않으면  DBA한테 쿼리 검수를 맡기거나, 여러 SQL을 한번에 수정할 일이 있을 때 불편해 지기도 합니다.
+그러나 그런 점도 SQL 내용을 상수로 선언하는  .Java 파일을 따로 분리하면 해결할 수 잇습니다.
+SQL을 보관하는 .java파일에 *SqlMap.java와 같은 명명규칙을 부여하고,  SQL 검수를 맡길 때 그 파일만 넘기면 됩니다.</p>
+</div>
+<div class="paragraph">
+<p>또, 과거에는  .java파일 밖에 SQL이 있으면 SQL만을 수정을 했을 때는 다시 컴파일을 안 해도 된다는 장점이 강조되었습니다.
+그러나, 요즘은 개발 PC에서는 Eclipse로, 서버에 배포할 때는 Ant나 Maven으로 빌드과정이 간편해졌고, 설정파일을 수정해도 파일의 복사를 위해 그런 배포과정을 똑같이 거쳐야 하므로, 컴파일이 필요없다는 것도 더이상 장점이 되지 못합니다.</p>
+</div>
+<div class="paragraph">
+<p>XML에 SQL을 썼던 가장 핵심적인 이유는 .java파일에서는 줄 바꿈이 들어간 문자열을 편집을 하는 것이 불편했기 때문입니다.
+Java 파일에서는 문자열이 한 줄이 넘어가면 아래와 같이 <code>+</code> 기호를 이용해서 이를 연결해주는 방법 밖에 없습니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public static final String SELECT_BY_ISBN13 =
+    "SELECT name , id "
+    + "FROM user "
+    + "WHERE isbn13 = :isbn13 ";</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>보통 Toad와 같은 DB client 도구에서 SQL을 작성해서 프로그램에 붙여넣기도 하고, 디버깅 중에는 프로그램 내에 있는 SQL을 반대로 DB client 툴에 붙여넣어서 실행해보기도 하는데, 그 때마다 저렇게 줄바꿈마다 "+"가 있다면 쿼리 편집이 많이 번거로워집니다. 그래서 XML파일 안에 SQL이 있으면 줄바꿈이 있는 긴 문자열도 똑같이 붙여넣을 수 있기 때문에, SQL을 개발하는 작업이 훨씬 편해집니다.  이렇게 SQL이 XML안에 들어가다보니 동적쿼리를 만들기 위한 조건,반복문과 각종 파라미터 매핑 클래스등까지 다 XML에 포함되어 버렸고, 앞에서 말한 부작용들이 점점 드러나기시작했습니다.</p>
+</div>
+<div class="paragraph">
+<p>물론 Eclipse의 설정으로 .java 파일에 붙여넣기를 할 때는 "+"를 넣는 것과 같이 줄을 바꿀 때 필요한 작업들을 자동으로 할 수도 있습니다.</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Windows-Preference-Java-Editor-Typing란의 "Escape text When pasting into a string literal"을 선택하고, 큰 따옴표 하나를 연 채 여러줄을 붙여넣으면, 알아서 줄이 바뀔 때는 " + " 기호를 넣어줍니다.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/sql-without-xml/typing.png" alt="typing.png"></span></p>
+</div>
+<div class="paragraph">
+<p>그리고 반대로 이런 여러줄의 String을 DB 접속 툴에 붙여 넣을 때도 <a href="http://squirrel-sql.sourceforge.net/">Sql-Squirrel</a>이나 Toad 같은 툴에서는 그런 "+"와 같은 기호를 제거해 주는 기능이 있기도 합니다.  그리고 웹으로 이런 변환을 해주는 사이트도 있습니다.  <a href="http://www.dpriver.com/pp/sqlformat.htm는" class="bare">http://www.dpriver.com/pp/sqlformat.htm는</a>  여러줄로 된 SQL문장을 Java, C#, Delphi, PHP등 다양한 언어의 문자열 선언으로 변환해줍니다.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/sql-without-xml/sql-formatter.png" alt="sql-formatter.png"></span></p>
+</div>
+<div class="paragraph">
+<p>이렇게 편집을 도와주는 설정이나 도구들을 쓰더라도  중간 변환과정에서 몇번의 키 입력과 클릭이 필요해서 아예 그런 과정이 없는 것보다는 번거롭게 느껴집니다. 그래서 문자열 전체를 중간 변환과정없이 편집할 수 있는 XML에 SQL을 선언하기 시작했다고 생각합니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="대안으로_groovy로_따옴표_3개_문법을_이용해서_sql_관리하기">대안으로 Groovy로 따옴표 3개 문법을 이용해서 SQL 관리하기</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Python, Groovy, Scala, Ruby에서 이미 지원하고 있는 '따옴표  3개짜리 문자열 선언&#8217;이 Java에도 포함된다면 여러줄의 문자열을 따로 편집하는 불편함을 겪지 않아도 됩니다. 아래와 같이 중간에 줄바꿈이 있어도 전체 SQL 내용이 끊어지지 않고 들어갑니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml"> public static final String SELECT_BY_ISBN13 =    """
+
+  SELECT  title,    author,     isbn13,     isbn10,     pages, content,  imageUrl
+   FROM book
+   WHERE isbn13 = :isbn13
+
+""";</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>이 따옴표 3개는 이미 JDK7에 포함되는 것이 제안된 상태인데, JDK에 포함될 실험적인 내용을 구현해보는 "Kijaro"라는 프로젝트에서는 <a href="https://docs.google.com/View?docid=d36kv8n_32g9zj7pdd">Enhanced String Handling for Java</a>라는 이름으로 이 명세를 다루고 있습니다. 그러나, 내년 중반기 쯤에 JDK7에 포함되어 발표될 예정인, java의 문법 개선내용을 주로 담고 있는 <a href="http://openjdk.java.net/projects/coin/">project coin</a>에서는 아직 이를 찾아볼 수 없어서, 언제 Java에 반영될지는 아직 미지수입니다.</p>
+</div>
+<div class="paragraph">
+<p>그렇다면 Java에서 따옴표 3개를 지원해주기 전까지는 계속 XML의 불편함을 감수해야 할까요? 저는 이미 이 문법을 지원하는 Groovy를 SQL관리 용도로 사용해볼만 하다고 생각합니다.</p>
+</div>
+<div class="paragraph">
+<p>Groovy를 사용하기 위해서는 Eclipse와 Maven에 아래 설정만 해주면 됩니다.</p>
+</div>
+<div class="paragraph">
+<p>1.Eclipse에서 Groovy plugin 설치</p>
+</div>
+<div class="paragraph">
+<p>Update site:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>4.2 (Juno) : <a href="http://dist.springsource.org/release/GRECLIPSE/e4.2/" class="bare">http://dist.springsource.org/release/GRECLIPSE/e4.2/</a></p>
+</li>
+<li>
+<p>3.7 (Indigo) : <a href="http://dist.springsource.org/release/GRECLIPSE/e3.7/" class="bare">http://dist.springsource.org/release/GRECLIPSE/e3.7/</a></p>
+</li>
+<li>
+<p>3.6 (Helios) : <a href="http://dist.springsource.org/release/GRECLIPSE/e3.6/" class="bare">http://dist.springsource.org/release/GRECLIPSE/e3.6/</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Groovy-Eclipse Configurator for M2Eclipse도  설치가 필요한데, 2번 과정에서 pom.xml에 빨간 줄이 뜨면 Ctrl +1 을 눌러서도 설치할수 있습니다.</p>
+</div>
+<div class="paragraph">
+<p>2.pom.xml에 Groovy를 compile할 수 있는 plugin과 runtime dependency 추가</p>
+</div>
+<div class="paragraph">
+<p>Groovy를 Compile하는 Maven plugin은  <a href="http://docs.codehaus.org/display/GMAVEN/Home">Gmaven</a> 과 <a href="http://groovy.codehaus.org/Groovy-Eclipse+compiler+plugin+for+Maven">Groovy-Eclipse Compiler Plugin For Maven</a>이 있습니다. 후자가 Eclipse 최신버전의 me2와 더 나은 궁합을 보여줘서 컴파일을 할 때는 후자를 선택했습니다.</p>
+</div>
+<div class="paragraph">
+<p>(1)Dependencies에 선언 추가</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.codehaus.groovy&lt;/groupId&gt;
+    &lt;artifactId&gt;groovy-all&lt;/artifactId&gt;
+    &lt;version&gt;2.4.5&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>(2)build-plugins 에 아래 내용 추가</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">               &lt;plugin&gt;
+                &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+                &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+                &lt;version&gt;2.3.2&lt;/version&gt;
+                &lt;configuration&gt;
+                    &lt;compilerId&gt;groovy-eclipse-compiler&lt;/compilerId&gt;
+                    &lt;meminitial&gt;128m&lt;/meminitial&gt;
+                    &lt;maxmem&gt;512m&lt;/maxmem&gt;
+                    &lt;source&gt;1.8&lt;/source&gt;
+                    &lt;target&gt;1.8&lt;/target&gt;
+                    &lt;encoding&gt;utf-8&lt;/encoding&gt;
+                &lt;/configuration&gt;
+                &lt;dependencies&gt;
+                    &lt;dependency&gt;
+                        &lt;groupId&gt;org.codehaus.groovy&lt;/groupId&gt;
+                        &lt;artifactId&gt;groovy-eclipse-compiler&lt;/artifactId&gt;
+                        &lt;version&gt;2.7.0-01&lt;/version&gt;
+                    &lt;/dependency&gt;
+                &lt;/dependencies&gt;
+            &lt;/plugin&gt;
+
+&lt;plugin&gt;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>3.Groovy 사용</p>
+</div>
+<div class="paragraph">
+<p>그리고 New&#8594; groovy class를 선택하여서 java 파일 작성하듯이 클래스를 만듭니다.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/sql-without-xml/new-groovy-class.png" alt="new-groovy-class.png" title="new_groovy_class.png"></span></p>
+</div>
+<div class="paragraph">
+<p>Java 문법을 그대로 쓸 수 있으니 따옴표 3개를 쓸 수 있다는 점만 다르다고 생각해도 됩니다. 아래와 같이 .groovy 파일 안에 들어간 SQL이 색깔도 다르게 표시되어 비교적 가독성이 높게 표시되는 것을 확인할 수 있습니다.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/sql-without-xml/groovy-sqls.png" alt="roovy-sqls.png"></span></p>
+</div>
+<div class="paragraph">
+<p>그런 다음 DAO 등 SQL을 호출하는 쪽에서는 이 상수 문자열을 바로 참조합니다. 상수 선언이 되어 있으니 아래와 같이 오타를 쳐도 미리 알려주고, Ctrl + Space를 치면 자동완성도 됩니다.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/sql-without-xml/typing-error.png" alt="typing-error.png"></span></p>
+</div>
+<div class="paragraph">
+<p>Dynamic SQL의 경우에도 직접 Java안에서 if문으로 써서 적어주면 됩니다. 아래와 같이 EclEmma 같은 도구로 coverage를 측정하면, 실제 실행되지 않은 조건분기도 눈으로 보입니다.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/sql-without-xml/coverage.png" alt="image"></span></p>
+</div>
+<div class="paragraph">
+<p>위의 코드를 Spring-JDBC를 사용했는데, 필요하다면 Hibernate나 <a href="http://commons.apache.org/dbutils/apidocs/index.html">apache commons DBUtils</a>에서도 적용 가능한 방법입니다. 다만 Hibernate에서는 Criteria 같은 것을 이용하면 문자열로 길게 쓰는 쿼리가 많이 나오지는 않을 것으로 예상합니다. 그리고 myBatis(iBatis 3.0)의 Annotation으로 지정하는 쿼리 문자열에서도 똑같이 참조할  수 있습니다. static final String으로 선언된 문자열 상수만 쓰는 것이기 때문에 Groovy의 성능문제도 걱정할 필요가 없습니다.</p>
+</div>
+<div class="paragraph">
+<p>단점과 꺼림직함도 물론 있습니다. 별도의 Eclipse plugin을 설치해야 하기 때문에, 이미 많은 수의 Plugin을 설치해서 Eclipse가 무겁다고 느껴지는 개발환경에서는 다소 부담이 될지 모른다는 점입니다. Groovy가 거의 java와 같은 문법을 지원하기는하지만, 이 문법 하나 때문에 새로운 언어를 도입하는 것이 과하다고 느끼시는 분들도 계실 것입니다. 이 문법을 위해서 Groovy의 다른 부분은 쓰지 않는데도 Runtime에 Groovy의 라이브러리를 올리는 것이 부담스러울 수도 있습니다. (따옴표 3개와 같은 Groovy만의 문법을 바이트코드로 변환하는 작업은 Compile time에 이루어지지만, Groovy로 선언한 객체는 groovy.lang.GroovyObject를 상속해야 하기 때문에, 다른 기능을 쓰지 않더라도 Runtime에서 추가 라이브러리가 필요합니다.) 그런 분들은 언제가 될지는 몰라도 Java에서 따옴표 3개를 지원하는 때까지 기다리는 것이 좋으실듯합니다.</p>
+</div>
+<div class="paragraph">
+<p>SQL을 XML에 쓰는 것이 전혀 불편하지 않다고 느끼신다면 계속 하던대로 개발을 하면 되겠지만, 저는 위의 시도가 조금이라도 더 편한 개발환경을 만든다고 생각합니다.</p>
+</div>
+</div>
+</div>
+    </div>
+	
+	<section id="social-share">
+        <ul class="icons">
+<!-- Social Share Button HTML -->
+
+<!-- Twitter -->
+<li><a href="//twitter.com/share?url=https://blog.benelog.net//2708621.html&text=Java에서 XML없이 SQL개발하기&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+</a></li>
+
+<!-- Google Plus -->
+<li><a href="//plus.google.com/share?url=https://blog.benelog.net//2708621.html" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+</a></li>
+
+<!-- Facebook -->
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//2708621.html" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+</a></li>
+
+<!-- Reddit (url, title) -->
+<li><a href="//reddit.com/submit?url=https://blog.benelog.net//2708621.html&title=Java에서 XML없이 SQL개발하기" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+</a></li>
+
+<!-- LinkedIn -->
+<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//2708621.html&title=Java에서 XML없이 SQL개발하기" target="_blank" class="share-btn linkedin">
+    <i class="fa fa-linkedin"></i>
+    <p>LinkedIn</p>
+</a></li>
+
+<!-- StumbleUpon (url, title) -->
+<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//2708621.html&title=Java에서 XML없이 SQL개발하기" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+</a></li>
+
+<!-- Email -->
+<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//2708621.html" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+</a></li>
+        </ul>
+    </section>
+     
+
+    <footer>
+	
+		<ul class="stats">
+    	    <!-- Display the categories associated with this post -->
+    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
+ 	        <li><a href='../tags/Java.html'>Java</a></li>
+ 	        <li><a href='../tags/SQL.html'>SQL</a></li>
+ 	        <li><a href='../tags/XML.html'>XML</a></li>
+ 	        <li><a href='../tags/MyBatis.html'>MyBatis</a></li>
+ 	        <li><a href='../tags/Spring-JDBC.html'>Spring-JDBC</a></li>
+
+				<li><a class="icon fa-comment" href="../2708621.html#disqus_thread"> &nbsp;</a></li>
+ 		</ul>
+    	
+    </footer>
+</article>
 <article class="post">
    <header>
     <div class="title">
@@ -800,403 +1209,6 @@ EmptyInitializer<br></p></td>
     	
     </footer>
 </article>
-<article class="post">
-   <header>
-    <div class="title">
-                    <h2><a href="../2700328.html">SpringOne2GX 2010 (2) Spring 3.0 &#8594; 3.1 &#8594; 3.2 Themes &amp; Trends</a></h2>
-
-
-    </div>
-    <div class="meta">
-         <time class="published"
-            datetime='Oct 23, 2010'>
-            Oct 23, 2010</time>
-            <div class="published eta"></div>
-        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jsh.jpeg" alt="정상혁" /></span>
-    </div>
-</header>
-
-    
-  
-         
-    <div id="content">
-       <div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>스프링 프레임웍의 핵심 개발자 유겐할러는 "Spring 3.0 &#8594; 3.1 &#8594; 3.2 Themes &amp; Trends"라는 제목으로 두번째 날 첫시간에  발표를 했습니다. 로드존슨은 <a href="http://www.yes24.com/24/goods/3691866">어느 인터뷰</a>에서 지금까지 만났던 가장 뛰어난 개발자는 생각할 것도 없이 유겐할러라고 말한 적이 있었고, 그렇게 전적인 신임을 받고 있어서 인지 유겐할러는 스프링 core 모듈의 대부분의 코드를 만들었다고 합니다. 그래서 유겐할러는 스프링 커뮤니티에서 로드존슨에 버금가는 유명인인데, 예상대로 이 날 발표 장소에는 사람들이 꽉 차게 몰려왔습니다.</p>
-</div>
-<div class="paragraph">
-<p>발표에 들어가기 전에, 스프링 3.0 버전을 쓰는 사람과, 그중 실제 3.0에 들어간 기능을 쓰는 사람들은 손을 들어봐라고 유겐할러가 이야기했는데, 절반 정도의 사람들이 손을 들었던 것 같습니다. 컨퍼런스에 와서 그 발표를 들은 사람을 대상으로 한 질문이라서 당연한 것일수도 있지만 3.0버전의 기능이 커뮤니티에서는 호응이 괜찮다는 느낌이 들었습니다.</p>
-</div>
-<div class="paragraph">
-<p>유겐할러는 자신이 맡은 책임 중 핵심적인 것은 클라우드, 분산 캐쉬와 같은 최신의 경향(modern day trends)에 맞추어 스프링 Core에 어떤 것이 들어갈지를 결정하는 것이라고 했습니다. 뒤에서 설명된 3.1의 캐쉬 Abstraction, 3.2의 fork-join pool 지원 등이 그런 트렌드을 쫓아가기위한 대표적인 예였습니다.</p>
-</div>
-<div class="paragraph">
-<p>3.1과 3.2는 3.0의 자연스러운 다음버전이라고 합니다. 큰 구조변화보다는 기능이 추가되는 성격의 버전이라는 의미라고 생각되었습니다.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="img/spring-one/spring-3-0-to-3-2.jpg" alt="spring-3-0-to-3-2.jpg"></span></p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="릴리즈_일정">릴리즈 일정</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>발표 중간 중간에 이야기한 향후 스프링버전의 릴리즈 일정은 아래와 같습니다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>3.0.5 : 2010년 10월에, 곧. 3.05 이후로 바로 3.1은 위한 마일스톤 버전으로 넘어간다고 했습니다.</p>
-</li>
-<li>
-<p>3.1 M1: 2010년 11월 말</p>
-</li>
-<li>
-<p>3.1 M2: 2011년 1월 초?</p>
-</li>
-<li>
-<p>3.1 RC1 : 2011년 2월말?</p>
-</li>
-<li>
-<p>3.1 GA  : 2011년 3월말?</p>
-</li>
-<li>
-<p>3.2 :  2011년 말 경</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>뒤로 갈수록 물음표(?)가 들어가 있고, 지금까지 일정을 정확히 지킨 적이 없었던 것으로 보아 실제로 저 일정에 나올 가능성은 적다고 예상됩니다. Spring 3.0도 2008년에 이야기할 때는 2009년 초에 나올 것이라고 말한 적이 있는데, 실제로 3.0.GA 버전이 릴리즈된 것은 2009년 12월이였습니다. (<a href="http://toby.epril.com/?p=459">스프링 이슈트래커로 본 Spring 3.0의 전망</a>, <a href="https://jira.springframework.org/browse/SPR#selectedTab=com.atlassian.jira.plugin.system.project%3Aversions-panel">Spring Jira의 실제 release 날짜</a> 참조)</p>
-</div>
-<div class="paragraph">
-<p>일정관리를 엄격하게 안 하나 하는 생각도 들었는데, 공개 API의 모음인 프레임웍이라는 특성 때문에 일정보다는 완성도를 중요시 할 수 밖에 없을 것도 같았습니다. 두번째 날의 밤에 'Birds of a feather session&#8217;라고, 컨퍼런스의 트랙별로 발표자나 핵심개발자들과 이야기를 할 수 있는 자리를 마련해줬는데, 거기서 내부적으로 어떤 개발방법론을 쓰는지에 대한 질문이 나왔었습니다. 거기에서 스크럼 같은 일반적인 애자일 프랙티스를 따르기는 하는데, 프레임웍은 배포 한 후에 수정을 하는 것이 어렵기 떄문에 원래의 스크럼 방식과는 잘 맞지 않는 부분도 있다는 말이 답변 중에 나왔었습니다.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="a_review_3_0">A review : 3.0</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>3.0에 추가된 기능들을 되돌아 봤는데, 이미 널리 알려진 기능들이라서 자세히 옮기지는 않겠습니다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Annotated component model.(JSR 330, JSR 303, JavaConfig등)</p>
-</li>
-<li>
-<p>Rest Support</p>
-</li>
-<li>
-<p>Portlet 2.0 지원</p>
-</li>
-<li>
-<p>스케쥴과 태스크 실행 개선</p>
-</li>
-<li>
-<p>Java EE6 지원</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>(자세히 아시고 싶으신 분들은 <a href="http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/new-in-3.html" class="bare">http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/new-in-3.html</a> 를 참조하시기 바랍니다.)</p>
-</div>
-<div class="paragraph">
-<p>이중 JavaEE6에 대한 내용은 세번째 날 역시 유겐할러가 발표한 'Spring and JavaEE 6&#8217;라는 세션에서 자세하게 설명 되었습니다.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="a_preview_3_1">A preview : 3.1</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>3.1에 추가되는 주요 테마들은 다음과 같습니다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Environment profiles for bean</p>
-</li>
-<li>
-<p>Java-based applicaion configuration</p>
-</li>
-<li>
-<p>Cache abstraction</p>
-</li>
-<li>
-<p>Conversation Managment</p>
-</li>
-<li>
-<p>Servlet 3.0, JSF 2.0, Groovy</p>
-</li>
-</ul>
-</div>
-<div class="sect2">
-<h3 id="environment_profiles_for_bean">Environment profiles for bean</h3>
-<div class="paragraph">
-<p>이 기능은 bean 설정들을 환경별로 묶는 것을 지원합니다. 즉, 개발환경, 테스트환경, 운영환경에 맞는 bean 선언들을 그룹화해서 지정할 수 있게 하는 것이죠.
-Bean 선언이나 Annotation선언에 Profile을 이름을 지정하는 방식이 될 것이라고 합니다.</p>
-</div>
-<div class="paragraph">
-<p>XML선언에는 다음과 같이 profile속성이 추가됩니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;beans .... profile="dev"&gt;
-
-  &lt;bean&gt;...&lt;/bean&gt;
-
-  &lt;bean&gt;...&lt;/bean&gt;
-
-&lt;/beans&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Annotation으로는 @Profile 을 지정하게 됩니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Service
-
-@Profile("dev")
-
-class UserService\{
-
-.....
-
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>그리고 Inject 가능한 API 형식으로 환경에 대한 추상화도 지원할 것이라고 합니다.</p>
-</div>
-<div class="paragraph">
-<p>보통 database의 URL 같은 속성들은 별도의 property 파일로 배서 관리하는 placeholders라는 기능을 쓰는데, 이 기능도 실제 환경에 의존적으로 placeholder를 나름대로 지정할 수 있는 기능이 나온다고 합니다.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="java_based_applicaion_configuration">Java-based applicaion configuration</h3>
-<div class="paragraph">
-<p>이미 3.0에 JavaConfig 기능이 포함되어서 @Configuration, @Bean 등의 Annotation이 추가되었는데, 어떤 기능들이 더 추가되는 것일지 궁금했었습니다. 3.1에 들어가는 Java-based configuration은 tx나, aop 같은 custom name-space와 같은 선언들이 Java파일로도 가능하게 하는 것이였습니다. Spring Batch나 Security, Integration에서도 이러한 custom name-space들을 많이 쓰는데, 그런 설정들이 xml로 bean 선언을 할 때는 설정을 간편하게 하지만, JavaConfig로 옮기기에는 불편해서 아쉬웠던 점이 있습니다. Spring Batch에서 ItemReader, ItemWriter 선언을 JavaConfig로 옮겨보니 훨씬 코드가 짧아지고 Compile time의 validation 범위도 넓어져서 만족했었는데, Job과 Step의 선언은 custom namespace로 하는 것이 더 간편해서, XML에 남겨두었었습니다. 그리고 유사하게</p>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>http://www.amazon.com/Enterprise-Integration-Patterns-Designing-Deploying/dp/0321200683/ref=sr_1_1?ie=UTF8&amp;qid=1287800130&amp;sr=8-1[Enterpise Interation Patterns]를 구현한 Apache Camel는 Java로 된 DSL을 지원하는데 반해서 Spring Integration은 간결한 선정을 하려면 Xml의 Custom name space를 사용해야 되어서 아쉬웠던 적이 있었습니다.(http://java.dzone.com/articles/spring-integration-and-apache 참조)</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>3.1에서 그렇게 javaConfig로도 추상화정도를 높인 선언을 할 수 있는 기능이 추가된다면, 스프링포트 폴리오의 다른  프로젝트에서도 많은 개선이 이루어질 것이라고 기대됩니다.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="cache_abstraction">Cache Abstraction</h3>
-<div class="paragraph">
-<p>현재도 스프링에 org.springframework.cache라는 패키지는 존재합니다. 그런데 아직까지는 EhCache에 대한 지원클래스만 있습니다. 3.1에서는 이 패키지를 채워넣을 것이고, 분산캐쉬를 기술과 연결되는 구현체도 포함될 것이라고 합니다. 기본적으로 EhCache, GemFire, Coherence를 지원한다고 밝혔습니다. 물론 인터페이스에 맞춰서 직접 구현하는 것도 가능하고, ConcurrentHashMap을 이용한 간단한 기본 구현체도 제공합니다.</p>
-</div>
-<div class="paragraph">
-<p>발표가 끝난 뒤에 저와 같이 간 일행인 김훈민 대리가 직접 유겐할러에게 찾아가서 Memcached에 대한 지원 계획을 물어봤는데, out-of-box로 바로 쓸 수 있는 Adaptor는 아직까지는 계획에 없다고 했습니다. 여러 가지 라이센스 문제 등에 부딪힐 수 있어서 협의가 필요한데, 원한다면 이슈 등록을 하고 투표를 하라고 이야기했습니다.  개인적으로 Simple Spring Memecached( <a href="http://code.google.com/p/simple-spring-memcached/" class="bare">http://code.google.com/p/simple-spring-memcached/</a>) 프로젝트와 유사한 Memcached 지원이 Spring Core에 들어갔으면 했는데, 다소 아쉬운 부분이였습니다.</p>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>많은 곳에서 이미 Annotation과 AOP를 활용해서 Cache를 활용해서 이미 예상을 했었는데, Spring 3.1에는 아래와 같이 Cache 지원을 위한 `@Cacheable`, `@CacheEvict` 라는 Annotation이 추가됩니다.</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Cacheable
-public Owner loadOwner(int id) \{
-
-....
-
-}
-
-@Cacheable(condition="name.length&lt;10")
-public Owner loadOwner(String name)\{
-
-....
-
-}
-
-@CacheEvict
-public void deleteOwner(int id)\{
-
-....
-
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Annotation이 붙은 메소드의 signature와 파라미터로 캐쉬에 넣을 key로 인식하게 됩니다. 유겐할러는 이런 방식의 처리가 Cache의 전형적인 사용의 80% 유형정도를 차지할 것이라고 말했습니다. Cache Abstraction은 Cache의 모든 기능을 통합해서 같은 API로 묶는 것이라기보다는, 주요 쓰임새를 더 짧은 코드로 편하게 쓸 수 있게 하는데 초점이 맞춰진 것으로 보입니다. 정교한 캐쉬처리나 각각의 캐쉬 특성에 맞는 API사용 등은 직접 특정 Cache의 API를 당연히 사용해야겠죠.
-그리고 transaction처리에 쓰는 PlatformTransactionManager와 비슷하게 CachedManager라는 SPI가 들어가고, tx namespace처럼 cache에 대한 namespace도 추가된다고 합니다. &lt;cache:annotation-driven /&gt;과 같은 선언은 기존에 스프링을 쓰던 사람에게는 익숙하게 보입니다.</p>
-</div>
-<div class="paragraph">
-<p>이미 EhCache를 Spring에서 활요할 때 쓰는 @Cacheable annotation이 있는데, 이 모델이 좀 더 확장될 것으로 보입니다. 아래 자료에 현재에도 사용가능한 방식이 나와 있습니다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="http://code.google.com/p/ehcache-spring-annotations/wiki/UsingCacheable" class="bare">http://code.google.com/p/ehcache-spring-annotations/wiki/UsingCacheable</a>http://code.google.com/p/ehcache-spring-annotations/wiki/UsingCacheable</p>
-</li>
-<li>
-<p><a href="http://whiteship.tistory.com/1256" class="bare">http://whiteship.tistory.com/1256</a></p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="converstion_management">Converstion management</h3>
-<div class="paragraph">
-<p>Conversation session에 대한 추상화 계층을 추가될 예정이라고 합니다. 기본적으로 HttpSession을 포함하여 더욱 유연한 생존주기와 저장소를 제공한다고 했습니다.</p>
-</div>
-<div class="paragraph">
-<p>보통 웹어플리케이션에서 여러 페이지간의 상태를 공유해야하는 Conversation 범위가 생길 수가 있는데, 보통 Session을 쓰는 것이 일반적이지만, 같은 윈도우에 있는 다른 탭이라도 같은 Session의 id가 먹는 상황이 있고, 수동적으로 이런 경계를 관리해야 할 때가 있습니다. 새로운 기능은 이런 것들을 위임할 수 있는 공통적인 기반을 제공한다고 합니다.</p>
-</div>
-<div class="paragraph">
-<p>이 기능은 Spring Webflow의 3.0에도 바탕이 될 것이고 MVC나 JSF에도 공통적으로 쓰일 수 있다고 했습니다.</p>
-</div>
-<div class="paragraph">
-<p>그리고 웹어플리케이션 뿐만이 아니라 메시징 환경에서 메시지 헤더 안에 conversation id를 포함시키는 쓰임새에도 적용가능하도록  Conversation을 위한 인터페이스는 범용적인 목적의 API가 될 것이라고 합니다.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="support_for_servlet_3_0">Support for Servlet 3.0</h3>
-<div class="paragraph">
-<p>Tomcat 7, GlassFish 3 등에서 Servlet 3.0 스펙을 지원하는 Container에 대한 지원이 포함됩니다.</p>
-</div>
-<div class="paragraph">
-<p>web.xml에 명시적으로 프레임웍에 대한 Listener 선언을 하지 않고도  자동으로 deployment되는 옵션을 지원하고, 표준적인 파일업로드에 대한 지원이 된다고 합니다. 스프링의 MultipartResolver interface도 그 안에 포함될 것 같습니다.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="enchance_groovy_support">Enchance Groovy Support</h3>
-<div class="paragraph">
-<p><code>&lt;lang:groovy&gt;</code> 로 xml 파일안에 Groovy를 쓸 수 있는 지원이 강화됩니다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>base script classes</p>
-</li>
-<li>
-<p>custom bidings</p>
-</li>
-<li>
-<p>스프링 빈들을 이름으로 암묵적으로 접근</p>
-</li>
-<li>
-<p>Velocity나 Freemarker 대신 쓰일 수 있는 Groovy 바탕의 Template 파일. Email 템플릿 같은 것에 사용할 수 있다고 하네요</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="cnamespace"><code>c:namespace</code></h3>
-<div class="paragraph">
-<p>XML로 Bean 선언을 할 때 p namespace과 같은 역할을 하는 c namespace가 추가됩니다. p가 &lt;property name.. &gt; 에 대한 짧은 표현였다면, c는 &lt;constructor-arg&gt;를 간결하게 표현할 수 있게 줍니다.</p>
-</div>
-<div class="paragraph">
-<p>아래와 코드와 같이 거의 p namespace와 사용법이 똑같아 보입니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;bean class="..." c:age="10/&gt;
-
-&lt;bean class="..." c:family-ref="myFamily/&gt;</code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="a_sneak_preview_3_2">A sneak preview : 3.2</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>3.2에는 JDK 7을 바탕으로 추가될 수 있는 기능들을 계획하고 있었습니다. JDK 7은 2011년 7월에 release 예정이라서 3.2에 대한 Release도 당연히 그 뒤가 되겠습니다.</p>
-</div>
-<div class="paragraph">
-<p>그리고 당연히 java 5, 6 user를 위한 기능도 있을 것이고, 그런 기능들은 Spring 3.1이 GA로 간 다음에 사용자들의 요청에 따라서 결정될 것이라고 합니다.</p>
-</div>
-<div class="sect2">
-<h3 id="java_se_7_support">Java SE 7 Support</h3>
-<div class="paragraph">
-<p>Spring 3.2의 초점은 JRE 7 을 가장 잘 쓰는 사용법이라고 했습니다. JDBC 4.1에 대한 지원과 Java concurrent 패지지에서 개선되는 fork-join 프레임웍에 대한 지원계획이 있었습니다.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="멀티코어의_concurrent_프로그래밍에_초점">멀티코어의 Concurrent 프로그래밍에 초점</h3>
-<div class="paragraph">
-<p>동시 요청보다 Core수가 더 많은 시나리오에 초점을 맞추어서 API제공을 계획하고 있다고 합니다. 예를 들면 Spring Batch에서 큰 Xml파일을 처리할 때와 같이, 처리 요청은 하나이기 때문에 요청 건별로 병렬처리르 하기가 힘들지만 자원소모가 커서 병렬처리를 했을 때의 이득이 큰 경우를 염두에 둔 것이였습니다. 그런 곳에 사용할 수 있는 특화된 ForkJoinPool이 Application context안에 들어갈 것이라고 했습니다.</p>
-</div>
-</div>
-</div>
-</div>
-    </div>
-	
-	<section id="social-share">
-        <ul class="icons">
-<!-- Social Share Button HTML -->
-
-<!-- Twitter -->
-<li><a href="//twitter.com/share?url=https://blog.benelog.net//2700328.html&text=SpringOne2GX 2010 (2) Spring 3.0 &#8594; 3.1 &#8594; 3.2 Themes &amp; Trends&via=" target="_blank" class="share-btn twitter">
-    <i class="fa fa-twitter"></i>
-    <p>Twitter</p>
-</a></li>
-
-<!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=https://blog.benelog.net//2700328.html" target="_blank" class="share-btn google-plus">
-    <i class="fa fa-google-plus"></i>
-    <p>Google+</p>
-</a></li>
-
-<!-- Facebook -->
-<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//2700328.html" target="_blank" class="share-btn facebook">
-    <i class="fa fa-facebook"></i>
-    <p>Facebook</p>
-</a></li>
-
-<!-- Reddit (url, title) -->
-<li><a href="//reddit.com/submit?url=https://blog.benelog.net//2700328.html&title=SpringOne2GX 2010 (2) Spring 3.0 &#8594; 3.1 &#8594; 3.2 Themes &amp; Trends" target="_blank" class="share-btn reddit">
-    <i class="fa fa-reddit-alien"></i>
-    <p>Reddit</p>
-</a></li>
-
-<!-- LinkedIn -->
-<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//2700328.html&title=SpringOne2GX 2010 (2) Spring 3.0 &#8594; 3.1 &#8594; 3.2 Themes &amp; Trends" target="_blank" class="share-btn linkedin">
-    <i class="fa fa-linkedin"></i>
-    <p>LinkedIn</p>
-</a></li>
-
-<!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//2700328.html&title=SpringOne2GX 2010 (2) Spring 3.0 &#8594; 3.1 &#8594; 3.2 Themes &amp; Trends" target="_blank" class="share-btn stumbleupon">
-    <i class="fa fa-stumbleupon"></i>
-    <p>StumbleUpon</p>
-</a></li>
-
-<!-- Email -->
-<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//2700328.html" target="_blank" class="share-btn email">
-    <i class="fa fa-envelope"></i>
-    <p>Email</p>
-</a></li>
-        </ul>
-    </section>
-     
-
-    <footer>
-	
-		<ul class="stats">
-    	    <!-- Display the categories associated with this post -->
-    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/Spring.html'>Spring</a></li>
- 	        <li><a href='../tags/Spring-One.html'>Spring-One</a></li>
- 	        <li><a href='../tags/행사후기.html'>행사후기</a></li>
-
-				<li><a class="icon fa-comment" href="../2700328.html#disqus_thread"> &nbsp;</a></li>
- 		</ul>
-    	
-    </footer>
-</article>
 		
 <ul class="actions pagination">
     <li><a href="../11/"
@@ -1269,6 +1281,17 @@ public void deleteOwner(int id)\{
                     <li>
                         <article>
                             <header>
+                                <h3><a href="../installing-jdk.html">여러 개의 JDK를 설치하고 선택해서 사용하기</a></h3>
+                                 <time class="published"
+							            datetime='Jun 14, 2019'>
+							            Jun 14, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
                                 <h3><a href="../migration-to-static-site.html">정적 사이트로 블로그 마이그레이션</a></h3>
                                  <time class="published"
 							            datetime='May 06, 2019'>
@@ -1295,17 +1318,6 @@ public void deleteOwner(int id)\{
                                  <time class="published"
 							            datetime='Feb 25, 2015'>
 							            Feb 25, 2015</time>
-                            </header>
-                        </article>
-                    </li>
-
-                    <li>
-                        <article>
-                            <header>
-                                <h3><a href="../3120317.html">시간대 DB에서 우리나라 시간의 오류</a></h3>
-                                 <time class="published"
-							            datetime='Nov 03, 2014'>
-							            Nov 03, 2014</time>
                             </header>
                         </article>
                     </li>
@@ -1488,7 +1500,7 @@ public void deleteOwner(int id)\{
                             <header>
                                 <a href="../tags/java.html">java</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
+                                <span style="float:right;"> 2 </span>
                             </header>
                         </article>
                     </li>
@@ -2081,6 +2093,15 @@ public void deleteOwner(int id)\{
                         <article>
                             <header>
                                 <a href="../tags/Spring-MVC.html">Spring-MVC</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="../tags/jdk.html">jdk</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>
