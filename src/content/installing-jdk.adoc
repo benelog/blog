@@ -12,6 +12,11 @@
 
 다양한 배포판과 버전의 JDK를 명령어 한 줄로 설치하고 OS의 쉘에서 사용할 JDK를 쉽게 지정할 수 있게 해주는 도구들을 소개합니다.
 
+.주요 변경이력
+* 2019.07.03
+** Homebrew에 대한 소개를 별도의 단락으로 분리
+** Chocolatey에 대한 설명 보강
+
 == 특별한 도구를 안 쓸 때의 JDK 설치 & 버전 선택
 === JDK 설치
 JDK를 수동으로 설치하는 절차는 아래와 같습니다.
@@ -59,6 +64,10 @@ JDK의 설치와 OS의 명령행에서 사용할 버전을 지정할 때는 아�
 |update-alternatives/alternatives
 |범용 패키지 버전 선택 도구
 |Linux
+
+|Homebrew
+|범용 패키지 관리 도구
+|macOS
 
 |https://chocolatey.org/[Chocolatey]
 |범용 패키지 관리 도구
@@ -196,6 +205,19 @@ SDKMAN, Jabba 등을 함께 사용한다면 이 점을 유의해야 합니다.
 * 단점
 ** 심블릭 링크로 쉘에서 사용할 디폴트 버전을 지정하는 기능만 있습니다.
 
+=== Homebrew
+macOS에서 많이 쓰는 범용 패키지 관리 프로그램입니다.
+
+Homebrew로 AdoptOpen JDK배포판은 아래와 같이 설치할 수 있습니다.
+
+[source]
+----
+brew tap AdoptOpenJDK/openjdk
+brew cask install adoptopenjdk11
+----
+
+제가 macOS를 써본적이 없어서 Homebrew로 설치하는 방법에 대해서는 https://findstar.pe.kr/2019/01/20/install-openjdk-by-homebrew/[homebrew로 opendjk 설치하기] 글을 참조했습니다.
+
 === Chocolatey
 Chocolatey는 Windows OS를 위한 패키지 관리자입니다.
 Linux에는 APT/YUM, macOS에는 Homebrew가 있다면 Windows에는 Chocolatey가 대표적인 패키지 관리자입니다.
@@ -205,17 +227,61 @@ Chocolatey로 설치가능한 JDK 패키지는 https://chocolatey.org/packages?q
 
 :image:img/jdk/chocolatey-jdk.jpg[chocolatey-jdk.jpg, title="Chocolatey 패키지 중에서 JDK로 검색한 결과"]
 
-Adopt OpenJDK 배포판은 아래와 같이 설치할 수 있습니다.
+Oracle의 OpenJDK 빌드나 Adopt OpenJDK 배포판 등을 아래와 같이 설치할 수 있습니다.
+
 
 [source]
+.Oracle의 OpenJDK 빌드 최신 버전 설치
+----
+choco install openjdk
+----
+
+[source]
+.AdoptOpenJDK 최신 버전 설치
 ----
 choco install adoptopenjdk
 ----
+
+[source]
+.Corretto 11 버전 설치
+----
+choco install corretto11jdk
+----
+
+[source]
+.zulu 최신 버전 설치
+----
+choco install zulu
+----
+
+`--version` 옵션을 붙이면
+
+[source]
+.Oracle의 OpenJDK 빌드 11.0.2 버전 설치
+----
+choco install openjdk --version 11.0.2
+----
+
+위의 명령이 수행되고 나면 `\Program Files\` 디렉토리 아래에 JDK 들이 위치하게 됩니다.
+
+* Oracle의 OpenJDK 빌드 : `\Program Files\OpenJDK`
+* Adopt OpenJDK : `\Program Files\AdoptOpenJDK`
+* Corretto : `\Program Files\Coretto`
+* Zulu : `\Program Files\zulu`
+
+그런대 Chocolatey는 여러 JDK 버전을 동시에 쓰는 쓰임새가 우선적으로 고려되지는 않았습니다.
+JDK 12.0.1을 설치후에 11.0.2을 뒤에 설치하려고하면, 다운그레이드가 된다는 경고 메시지가 나옵니다.
+이럴 때에는 '-sidebyside' 혹은 `--force` 등의 옵션을 붙여줘야합니다.
+`JAVA_HOME` 도 마지막으로 설치한 JDK의 위치로 지정됩니다.
+`echo %java_home%` 명령으로 이를 확인해 볼 수 있습니다.
+여러 배포판을 설치할 경우 `PATH` 환경 변수의 값도 새로 설치한 배포판의 `%JAVA_HOME%\bin` 디렉토리가 뒤 쪽에 계속 추가만 됩니다.
 
 * 장점
 ** JDK 외에도 Maven, Gradle의 설치에도 활용할 수 있는 범용적인 패키지 관리 도구입니다.
 * 단점
 ** SDKMAN/ Jabba에 비하면 다양한 JDK 배포판을 제공하지는 않습니다.
+** 여러 버전을 동시에 설치할 수 있는 동작이 디폴트가 아닙니다.
+*** OS 명령행에서 여러 JDK 버전을 함께 사용하려면 direnv등 별도의 프로그램과 함께 쓰는 것이 좋습니다.
 
 === direnv
 https://direnv.net/[direnv] 는 특정 디렉토리와 그 하위 디렉토리에서만 사용할 환경 변수를  지정할 수 있는 도구입니다.
@@ -519,14 +585,9 @@ direnv나 jEnv를 쓸 때처럼 디렉토리에 들어가면 자동으로 환경
 * Windows : Chocolatey + direnv
 * Linux : APT/YUM + update-alternatives + jEnv (또는 direnv)
 * macOS : Homebrew + jEnv(또는 direnv)
+** [Mac에 Java 여러 버전 설치] 글에서는 Homebrew로 Oracle JDK를 설치하고 jEnv와 함께 사용하는 사례가 정리되어 있습니다.
 
-제가 macOS를 써본적이 없어서 Homebrew로 설치하는 방법에 대해서는 이 글에서는 다루지 않았습니다.
-macOS를 쓰시는 분들은 아래 글을 참조하실만 합니다.
-
-* https://findstar.pe.kr/2019/01/20/install-openjdk-by-homebrew/[homebrew로 opendjk 설치하기]
-* https://jojoldu.tistory.com/329[Mac에 Java 여러 버전 설치]
-
-GraalVM 등 다양한 배포판의 여러버전을 설치해보고 싶다면 SDKMAN이나 jabba를 함꼐 쓰는 것을 추천합니다.
+Amazon Corretto, GraalVM 등 다양한 배포판의 여러버전을 설치해보고 싶다면 SDKMAN이나 jabba를 함꼐 쓰는 것을 추천합니다.
 각 도구들이 지원하는 배포판은 아래와 같습니다. (2019년 7월1일 기준)
 
 .JDK 설치 도구들이 지원하는 배포판
@@ -538,6 +599,12 @@ GraalVM 등 다양한 배포판의 여러버전을 설치해보고 싶다면 SDK
 |YUM/APT
 |OS 배포판별 OpenJDK *(*1)* +
 AdoptOpen JDK
+
+
+|Homebrew
+|Oracle JDK +
+Adopt OpenJDK +
+
 |https://chocolatey.org/[Chocolatey]
 |Oracle JDK +
 Oracle의 OpenJDK 빌드 *(*2)* +
@@ -546,26 +613,26 @@ Amazon Corretto +
 Zulu OpenJDK
 
 |https://sdkman.io/[SDKMAN]
-|Adopt OpenJDK +
+|Oracle의 OpenJDK 빌드 *(*2)* +
+Adopt OpenJDK +
+Amazon Corretto
+GraalVM CE +
 Zulu OpenJDK +
 Zulu OpenJDK + OpenJFX +
 SapMachine +
-GraalVM CE +
-Oracle의 OpenJDK 빌드 *(*2)* +
 Liberica JDK +
-Amazon Corretto
 
 |https://github.com/shyiko/jabba[jabba]
 |Oracle JDK +
+Oracle의 OpenJDK 빌드 *(*2)* +
 Adopt OpenJDK +
+Amazon Corretto +
+GraalVM CE +
 Zulu OpenJDK +
 IBM SDK +
-GraalVM CE +
-Oracle의 OpenJDK 빌드 *(*2)* +
 OpenJDK 참조 구현체 +
 OpenJDK + Shenandoah GC +
 Liberica JDK +
-Amazon Corretto +
 
 |====
 * *(*1)* : 해당 OS 배포판을 위해 빌드된 OpenJDK 배포판입니다. OS의 배포판을 관리하는 업체/커뮤니티에서 관리합니다.
@@ -574,12 +641,12 @@ Amazon Corretto +
 위에 정리한 것처럼 SDKMAN과 jabba가 많은 JDK 배포판을 지원합니다.
 둘다 Adopt OpenJDK, Amazon Corretto, GraalVM CE, Zulu 등 주목받는 주요 배포판은 모두 포함하고 있습니다.
 
-SDKMAN에서는 제공하는데 jabba에는 없는 배포판은 아래와 같습니다.
+SDKMAN에서는 제공하는 반면  jabba에는 없는 배포판은 아래와 같습니다.
 
 * Zulu OpenJDK + OpenJFX
 * SapMachine
 
-jabba에서는 제공하는데 SDKMAN에는 없는 배포판은 아래와 같습니다.
+jabba에서는 제공하는 반면 SDKMAN에는 없는 배포판은 아래와 같습니다.
 
 * IBM SDK
 * OpenJDK 참조 구현체
@@ -629,7 +696,7 @@ alternatives
 
 따라서 SDKMAN이나 jabba는 다른 도구와 조합해서 사용하면 더욱 편리하게 쓸 수 있습니다.
 그런데 앞서 언급했듯이 jEnv는 SDKMAN이나 jabba와 함께 쓰기에는 적합하지 않습니다.
-`$PATH` 환경 변수에 지정된 경로의 순수에 따라서 여러 도구의 버전 지정 결과가 의도하지 않게 덮어 써질수 있습니다.
+`$PATH` 환경 변수에 지정된 경로의 순서에 따라서 여러 도구의 버전 지정 결과가 의도하지 않게 덮어 써질수 있습니다.
 즉 SDKMAN에 지정한 경로가 앞에 있으면 jEnv에서 지정한 JDK 버전이 인식되지 않는 것처럼 보일수도 있습니다.
 그리고 jabba로는 여러 배포판의 JDK 11.0.3 을 설치할 수 있지만 jEnv에서는 'jenv add' 로 같은 버전(11.0.3)의 다른 배포판을 추가할 수 없습니다.
 
