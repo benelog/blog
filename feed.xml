@@ -6,8 +6,8 @@
     <atom:link href="https://blog.benelog.net//feed.xml" rel="self" type="application/rss+xml" />
     <description>JBake Bootstrap Template</description>
     <language>en-gb</language>
-    <pubDate>Sun, 30 Jun 2019 23:55:10 +0000</pubDate>
-    <lastBuildDate>Sun, 30 Jun 2019 23:55:10 +0000</lastBuildDate>
+    <pubDate>Tue, 2 Jul 2019 23:52:58 +0000</pubDate>
+    <lastBuildDate>Tue, 2 Jul 2019 23:52:58 +0000</lastBuildDate>
 
     <item>
       <title>여러 개의 JDK를 설치하고 선택해서 사용하기</title>
@@ -28,11 +28,12 @@
 &lt;ul class=&quot;sectlevel2&quot;&gt;
 &lt;li&gt;&lt;a href=&quot;#aptyum&quot;&gt;2.1. APT/YUM&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;#update_alternatives_alternatives&quot;&gt;2.2. update-alternatives / alternatives&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#chocolatey&quot;&gt;2.3. Chocolatey&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#direnv&quot;&gt;2.4. direnv&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#jenv&quot;&gt;2.5. jEnv&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#sdkman&quot;&gt;2.6. SDKMAN&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#jabba&quot;&gt;2.7. jabba&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#homebrew&quot;&gt;2.3. Homebrew&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#chocolatey&quot;&gt;2.4. Chocolatey&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#direnv&quot;&gt;2.5. direnv&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#jenv&quot;&gt;2.6. jEnv&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#sdkman&quot;&gt;2.7. SDKMAN&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#jabba&quot;&gt;2.8. jabba&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;&lt;a href=&quot;#무엇을_어떻게_사용할_것인가&quot;&gt;3. 무엇을 어떻게 사용할 것인가?&lt;/a&gt;&lt;/li&gt;
@@ -42,6 +43,24 @@
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;다양한 배포판과 버전의 JDK를 명령어 한 줄로 설치하고 OS의 쉘에서 사용할 JDK를 쉽게 지정할 수 있게 해주는 도구들을 소개합니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;주요 변경이력&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;2019.07.03&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Homebrew에 대한 소개를 별도의 단락으로 분리&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Chocolatey에 대한 설명 보강&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -161,6 +180,11 @@ IntelliJ에서는 &lt;code&gt;File&lt;/code&gt; &amp;gt; &lt;code&gt;Project Str
 &lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;update-alternatives/alternatives&lt;/p&gt;&lt;/td&gt;
 &lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;범용 패키지 버전 선택 도구&lt;/p&gt;&lt;/td&gt;
 &lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Linux&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Homebrew&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;범용 패키지 관리 도구&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;macOS&lt;/p&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://chocolatey.org/&quot;&gt;Chocolatey&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
@@ -362,7 +386,25 @@ SDKMAN, Jabba 등을 함께 사용한다면 이 점을 유의해야 합니다.
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;chocolatey&quot;&gt;2.3. Chocolatey&lt;/h3&gt;
+&lt;h3 id=&quot;homebrew&quot;&gt;2.3. Homebrew&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;macOS에서 많이 쓰는 범용 패키지 관리 프로그램입니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Homebrew로 AdoptOpen JDK배포판은 아래와 같이 설치할 수 있습니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code&gt;brew tap AdoptOpenJDK/openjdk
+brew cask install adoptopenjdk11&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;제가 macOS를 써본적이 없어서 Homebrew로 설치하는 방법에 대해서는 &lt;a href=&quot;https://findstar.pe.kr/2019/01/20/install-openjdk-by-homebrew/&quot;&gt;homebrew로 opendjk 설치하기&lt;/a&gt; 글을 참조했습니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;chocolatey&quot;&gt;2.4. Chocolatey&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Chocolatey는 Windows OS를 위한 패키지 관리자입니다.
 Linux에는 APT/YUM, macOS에는 Homebrew가 있다면 Windows에는 Chocolatey가 대표적인 패키지 관리자입니다.
@@ -375,12 +417,67 @@ Linux에는 APT/YUM, macOS에는 Homebrew가 있다면 Windows에는 Chocolatey�
 &lt;p&gt;:&lt;span class=&quot;image&quot;&gt;&lt;img src=&quot;img/jdk/chocolatey-jdk.jpg&quot; alt=&quot;chocolatey-jdk.jpg&quot; title=&quot;Chocolatey 패키지 중에서 JDK로 검색한 결과&quot;&gt;&lt;/span&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Adopt OpenJDK 배포판은 아래와 같이 설치할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;Oracle의 OpenJDK 빌드나 Adopt OpenJDK 배포판 등을 아래와 같이 설치할 수 있습니다.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Oracle의 OpenJDK 빌드 최신 버전 설치&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code&gt;choco install openjdk&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;AdoptOpenJDK 최신 버전 설치&lt;/div&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code&gt;choco install adoptopenjdk&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Corretto 11 버전 설치&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code&gt;choco install corretto11jdk&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;zulu 최신 버전 설치&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code&gt;choco install zulu&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;code&gt;--version&lt;/code&gt; 옵션을 붙이면&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Oracle의 OpenJDK 빌드 11.0.2 버전 설치&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code&gt;choco install openjdk --version 11.0.2&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;위의 명령이 수행되고 나면 &lt;code&gt;\Program Files\&lt;/code&gt; 디렉토리 아래에 JDK 들이 위치하게 됩니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Oracle의 OpenJDK 빌드 : &lt;code&gt;\Program Files\OpenJDK&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Adopt OpenJDK : &lt;code&gt;\Program Files\AdoptOpenJDK&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Corretto : &lt;code&gt;\Program Files\Coretto&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Zulu : &lt;code&gt;\Program Files\zulu&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;그런대 Chocolatey는 여러 JDK 버전을 동시에 쓰는 쓰임새가 우선적으로 고려되지는 않았습니다.
+JDK 12.0.1을 설치후에 11.0.2을 뒤에 설치하려고하면, 다운그레이드가 된다는 경고 메시지가 나옵니다.
+이럴 때에는 &apos;-sidebyside&apos; 혹은 &lt;code&gt;--force&lt;/code&gt; 등의 옵션을 붙여줘야합니다.
+&lt;code&gt;JAVA_HOME&lt;/code&gt; 도 마지막으로 설치한 JDK의 위치로 지정됩니다.
+&lt;code&gt;echo %java_home%&lt;/code&gt; 명령으로 이를 확인해 볼 수 있습니다.
+여러 배포판을 설치할 경우 &lt;code&gt;PATH&lt;/code&gt; 환경 변수의 값도 새로 설치한 배포판의 &lt;code&gt;%JAVA_HOME%\bin&lt;/code&gt; 디렉토리가 뒤 쪽에 계속 추가만 됩니다.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
@@ -401,6 +498,16 @@ Linux에는 APT/YUM, macOS에는 Homebrew가 있다면 Windows에는 Chocolatey�
 &lt;li&gt;
 &lt;p&gt;SDKMAN/ Jabba에 비하면 다양한 JDK 배포판을 제공하지는 않습니다.&lt;/p&gt;
 &lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;여러 버전을 동시에 설치할 수 있는 동작이 디폴트가 아닙니다.&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;OS 명령행에서 여러 JDK 버전을 함께 사용하려면 direnv등 별도의 프로그램과 함께 쓰는 것이 좋습니다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;/li&gt;
@@ -408,7 +515,7 @@ Linux에는 APT/YUM, macOS에는 Homebrew가 있다면 Windows에는 Chocolatey�
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;direnv&quot;&gt;2.4. direnv&lt;/h3&gt;
+&lt;h3 id=&quot;direnv&quot;&gt;2.5. direnv&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;&lt;a href=&quot;https://direnv.net/&quot;&gt;direnv&lt;/a&gt; 는 특정 디렉토리와 그 하위 디렉토리에서만 사용할 환경 변수를  지정할 수 있는 도구입니다.
 Linux와 macOS에서 사용할 수 있습니다. 설치 방법은 &lt;a href=&quot;https://direnv.net/&quot; class=&quot;bare&quot;&gt;https://direnv.net/&lt;/a&gt; 을 참조합니다.&lt;/p&gt;
@@ -467,7 +574,7 @@ direnv: export ~JAVA_HOME ~PATH&lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;jenv&quot;&gt;2.5. jEnv&lt;/h3&gt;
+&lt;h3 id=&quot;jenv&quot;&gt;2.6. jEnv&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;&lt;a href=&quot;https://www.jenv.be/&quot;&gt;jEnv&lt;/a&gt; 는 JDK 버전관리만을 위한 전용 도구입니다.&lt;/p&gt;
 &lt;/div&gt;
@@ -632,7 +739,7 @@ AdoptOpenJDK 11을 추가하면 아래와 같이 이미 존재하는 버전이�
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;sdkman&quot;&gt;2.6. SDKMAN&lt;/h3&gt;
+&lt;h3 id=&quot;sdkman&quot;&gt;2.7. SDKMAN&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;SDKMAN(The Software Development Kit Manager)은 여러 개발도구를 설치할 수 있는 도구입니다.
 JDK 뿐만 아니라 Maven, Gradle, Ant, AsciidoctorJ 등 JVM 세계의 다양한 도구들을 설치할 수 있습니다.&lt;/p&gt;
@@ -752,7 +859,7 @@ Use the Identifier for installation:
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;jabba&quot;&gt;2.7. jabba&lt;/h3&gt;
+&lt;h3 id=&quot;jabba&quot;&gt;2.8. jabba&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;jabba는 JDK의 설치/버전 관리만을 위한 도구입니다.&lt;/p&gt;
 &lt;/div&gt;
@@ -850,25 +957,18 @@ direnv나 jEnv를 쓸 때처럼 디렉토리에 들어가면 자동으로 환경
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;macOS : Homebrew + jEnv(또는 direnv)&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-&lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;제가 macOS를 써본적이 없어서 Homebrew로 설치하는 방법에 대해서는 이 글에서는 다루지 않았습니다.
-macOS를 쓰시는 분들은 아래 글을 참조하실만 합니다.&lt;/p&gt;
-&lt;/div&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
-&lt;p&gt;&lt;a href=&quot;https://findstar.pe.kr/2019/01/20/install-openjdk-by-homebrew/&quot;&gt;homebrew로 opendjk 설치하기&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;[Mac에 Java 여러 버전 설치] 글에서는 Homebrew로 Oracle JDK를 설치하고 jEnv와 함께 사용하는 사례가 정리되어 있습니다.&lt;/p&gt;
 &lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;a href=&quot;https://jojoldu.tistory.com/329&quot;&gt;Mac에 Java 여러 버전 설치&lt;/a&gt;&lt;/p&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;GraalVM 등 다양한 배포판의 여러버전을 설치해보고 싶다면 SDKMAN이나 jabba를 함꼐 쓰는 것을 추천합니다.
+&lt;p&gt;Amazon Corretto, GraalVM 등 다양한 배포판의 여러버전을 설치해보고 싶다면 SDKMAN이나 jabba를 함꼐 쓰는 것을 추천합니다.
 각 도구들이 지원하는 배포판은 아래와 같습니다. (2019년 7월1일 기준)&lt;/p&gt;
 &lt;/div&gt;
 &lt;table class=&quot;tableblock frame-topbot grid-all stretch&quot;&gt;
@@ -890,6 +990,11 @@ macOS를 쓰시는 분들은 아래 글을 참조하실만 합니다.&lt;/p&gt;
 AdoptOpen JDK&lt;/p&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Homebrew&lt;/p&gt;&lt;/td&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Oracle JDK&lt;br&gt;
+Adopt OpenJDK&lt;br&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
 &lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://chocolatey.org/&quot;&gt;Chocolatey&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
 &lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Oracle JDK&lt;br&gt;
 Oracle의 OpenJDK 빌드 &lt;strong&gt;(*2)&lt;/strong&gt;&lt;br&gt;
@@ -899,27 +1004,27 @@ Zulu OpenJDK&lt;/p&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://sdkman.io/&quot;&gt;SDKMAN&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Adopt OpenJDK&lt;br&gt;
+&lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Oracle의 OpenJDK 빌드 &lt;strong&gt;(*2)&lt;/strong&gt;&lt;br&gt;
+Adopt OpenJDK&lt;br&gt;
+Amazon Corretto
+GraalVM CE&lt;br&gt;
 Zulu OpenJDK&lt;br&gt;
 Zulu OpenJDK + OpenJFX&lt;br&gt;
 SapMachine&lt;br&gt;
-GraalVM CE&lt;br&gt;
-Oracle의 OpenJDK 빌드 &lt;strong&gt;(*2)&lt;/strong&gt;&lt;br&gt;
-Liberica JDK&lt;br&gt;
-Amazon Corretto&lt;/p&gt;&lt;/td&gt;
+Liberica JDK&lt;br&gt;&lt;/p&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;&lt;a href=&quot;https://github.com/shyiko/jabba&quot;&gt;jabba&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
 &lt;td class=&quot;tableblock halign-left valign-top&quot;&gt;&lt;p class=&quot;tableblock&quot;&gt;Oracle JDK&lt;br&gt;
+Oracle의 OpenJDK 빌드 &lt;strong&gt;(*2)&lt;/strong&gt;&lt;br&gt;
 Adopt OpenJDK&lt;br&gt;
+Amazon Corretto&lt;br&gt;
+GraalVM CE&lt;br&gt;
 Zulu OpenJDK&lt;br&gt;
 IBM SDK&lt;br&gt;
-GraalVM CE&lt;br&gt;
-Oracle의 OpenJDK 빌드 &lt;strong&gt;(*2)&lt;/strong&gt;&lt;br&gt;
 OpenJDK 참조 구현체&lt;br&gt;
 OpenJDK + Shenandoah GC&lt;br&gt;
-Liberica JDK&lt;br&gt;
-Amazon Corretto&lt;br&gt;&lt;/p&gt;&lt;/td&gt;
+Liberica JDK&lt;br&gt;&lt;/p&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -938,7 +1043,7 @@ Amazon Corretto&lt;br&gt;&lt;/p&gt;&lt;/td&gt;
 둘다 Adopt OpenJDK, Amazon Corretto, GraalVM CE, Zulu 등 주목받는 주요 배포판은 모두 포함하고 있습니다.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;SDKMAN에서는 제공하는데 jabba에는 없는 배포판은 아래와 같습니다.&lt;/p&gt;
+&lt;p&gt;SDKMAN에서는 제공하는 반면  jabba에는 없는 배포판은 아래와 같습니다.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
@@ -951,7 +1056,7 @@ Amazon Corretto&lt;br&gt;&lt;/p&gt;&lt;/td&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;jabba에서는 제공하는데 SDKMAN에는 없는 배포판은 아래와 같습니다.&lt;/p&gt;
+&lt;p&gt;jabba에서는 제공하는 반면 SDKMAN에는 없는 배포판은 아래와 같습니다.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
@@ -1037,7 +1142,7 @@ alternatives&lt;/p&gt;&lt;/td&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;따라서 SDKMAN이나 jabba는 다른 도구와 조합해서 사용하면 더욱 편리하게 쓸 수 있습니다.
 그런데 앞서 언급했듯이 jEnv는 SDKMAN이나 jabba와 함께 쓰기에는 적합하지 않습니다.
-&lt;code&gt;$PATH&lt;/code&gt; 환경 변수에 지정된 경로의 순수에 따라서 여러 도구의 버전 지정 결과가 의도하지 않게 덮어 써질수 있습니다.
+&lt;code&gt;$PATH&lt;/code&gt; 환경 변수에 지정된 경로의 순서에 따라서 여러 도구의 버전 지정 결과가 의도하지 않게 덮어 써질수 있습니다.
 즉 SDKMAN에 지정한 경로가 앞에 있으면 jEnv에서 지정한 JDK 버전이 인식되지 않는 것처럼 보일수도 있습니다.
 그리고 jabba로는 여러 배포판의 JDK 11.0.3 을 설치할 수 있지만 jEnv에서는 &apos;jenv add&apos; 로 같은 버전(11.0.3)의 다른 배포판을 추가할 수 없습니다.&lt;/p&gt;
 &lt;/div&gt;
