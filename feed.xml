@@ -6,8 +6,8 @@
     <atom:link href="https://blog.benelog.net//feed.xml" rel="self" type="application/rss+xml" />
     <description>JBake Bootstrap Template</description>
     <language>en-gb</language>
-    <pubDate>Tue, 2 Jul 2019 23:52:58 +0000</pubDate>
-    <lastBuildDate>Tue, 2 Jul 2019 23:52:58 +0000</lastBuildDate>
+    <pubDate>Sat, 20 Jul 2019 08:02:48 +0000</pubDate>
+    <lastBuildDate>Sat, 20 Jul 2019 08:02:48 +0000</lastBuildDate>
 
     <item>
       <title>여러 개의 JDK를 설치하고 선택해서 사용하기</title>
@@ -1590,13 +1590,13 @@ $asciiDoc
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;그리고 프로그램을 부분적으로 실행하고 검증해보기 위해서 Spring Batch를 썼습니다.
-원래 Spring Batch는 대용량 데이터를 메모리에 다 올리지 않고 처리할 떄 적합한 프레임워크입니다.
+원래 Spring Batch는 대용량 데이터를 메모리에 다 올리지 않고 처리할 때 적합한 프레임워크입니다.
 제 블로그의 포스트는 100개 정도로 작은 데이터인데 여기에 Spring Batch를 쓰는 것은 어울리지 않을 수도 있습니다.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;그런데, Spring Batch의 ItemReader, ItemProcessor, ItemWriter 구조에 맞춰서 프로그램을 만들고
 이 기능 단위로 테스트를 해보면 것이 마이그레이션 프로그램을 만드는 효율적인 방법이라고 판단했습니다.
-pring Batch를 쓰지 않았어도 비슷한 기능 단위로 쪼갯을 것 같았기에 이미 익숙한 프레임워크의 인터페이스를 활용했습니다.&lt;/p&gt;
+Spring Batch를 쓰지 않았어도 비슷한 기능 단위로 프로그램을 쪼갯을 것 같았기에 이미 익숙한 프레임워크의 인터페이스를 활용했습니다.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;부분적인 기능의 테스트들은 &lt;a href=&quot;https://github.com/benelog/egloos-migration/tree/master/src/test/kotlin/net/benelog/blog/migration/etl&quot; class=&quot;bare&quot;&gt;https://github.com/benelog/egloos-migration/tree/master/src/test/kotlin/net/benelog/blog/migration/etl&lt;/a&gt; 을 참조하실 수 있습니다.&lt;/p&gt;

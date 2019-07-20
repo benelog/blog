@@ -552,13 +552,13 @@ $asciiDoc
 </div>
 <div class="paragraph">
 <p>그리고 프로그램을 부분적으로 실행하고 검증해보기 위해서 Spring Batch를 썼습니다.
-원래 Spring Batch는 대용량 데이터를 메모리에 다 올리지 않고 처리할 떄 적합한 프레임워크입니다.
+원래 Spring Batch는 대용량 데이터를 메모리에 다 올리지 않고 처리할 때 적합한 프레임워크입니다.
 제 블로그의 포스트는 100개 정도로 작은 데이터인데 여기에 Spring Batch를 쓰는 것은 어울리지 않을 수도 있습니다.</p>
 </div>
 <div class="paragraph">
 <p>그런데, Spring Batch의 ItemReader, ItemProcessor, ItemWriter 구조에 맞춰서 프로그램을 만들고
 이 기능 단위로 테스트를 해보면 것이 마이그레이션 프로그램을 만드는 효율적인 방법이라고 판단했습니다.
-pring Batch를 쓰지 않았어도 비슷한 기능 단위로 쪼갯을 것 같았기에 이미 익숙한 프레임워크의 인터페이스를 활용했습니다.</p>
+Spring Batch를 쓰지 않았어도 비슷한 기능 단위로 프로그램을 쪼갯을 것 같았기에 이미 익숙한 프레임워크의 인터페이스를 활용했습니다.</p>
 </div>
 <div class="paragraph">
 <p>부분적인 기능의 테스트들은 <a href="https://github.com/benelog/egloos-migration/tree/master/src/test/kotlin/net/benelog/blog/migration/etl" class="bare">https://github.com/benelog/egloos-migration/tree/master/src/test/kotlin/net/benelog/blog/migration/etl</a> 을 참조하실 수 있습니다.</p>
