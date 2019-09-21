@@ -2,16 +2,16 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>JBake</title>
-    <link>https://blog.benelog.net/</link>
-    <atom:link href="https://blog.benelog.net//feed.xml" rel="self" type="application/rss+xml" />
+    <link>https://anew0m.netlify.com/</link>
+    <atom:link href="https://anew0m.netlify.com//feed.xml" rel="self" type="application/rss+xml" />
     <description>JBake Bootstrap Template</description>
     <language>en-gb</language>
-    <pubDate>Sat, 20 Jul 2019 08:02:48 +0000</pubDate>
-    <lastBuildDate>Sat, 20 Jul 2019 08:02:48 +0000</lastBuildDate>
+    <pubDate>Sat, 21 Sep 2019 08:12:39 +0000</pubDate>
+    <lastBuildDate>Sat, 21 Sep 2019 08:12:39 +0000</lastBuildDate>
 
     <item>
       <title>여러 개의 JDK를 설치하고 선택해서 사용하기</title>
-      <link>https://blog.benelog.net//installing-jdk.html</link>
+      <link>https://anew0m.netlify.com//installing-jdk.html</link>
       <pubDate>Mon, 1 Jul 2019 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">installing-jdk.html</guid>
       	<description>
@@ -1211,7 +1211,7 @@ alternatives&lt;/p&gt;&lt;/td&gt;
     </item>
     <item>
       <title>정적 사이트로 블로그 마이그레이션</title>
-      <link>https://blog.benelog.net//migration-to-static-site.html</link>
+      <link>https://anew0m.netlify.com//migration-to-static-site.html</link>
       <pubDate>Mon, 6 May 2019 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">migration-to-static-site.html</guid>
       	<description>
@@ -1619,7 +1619,7 @@ Spring Batch를 쓰지 않았어도 비슷한 기능 단위로 프로그램을 �
     </item>
     <item>
       <title>Robolectric을 활용한 안드로이드 쾌속 테스팅</title>
-      <link>https://blog.benelog.net//robolectric.html</link>
+      <link>https://anew0m.netlify.com//robolectric.html</link>
       <pubDate>Mon, 10 Oct 2016 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">robolectric.html</guid>
       	<description>
@@ -1993,7 +1993,7 @@ public void shouldBeTrueWhenThisContextIsForeground(){
     </item>
     <item>
       <title>&apos;네이버를 만든 기술, 읽으면서 배운다 - 자바편&apos; 출간</title>
-      <link>https://blog.benelog.net//3134907.html</link>
+      <link>https://anew0m.netlify.com//3134907.html</link>
       <pubDate>Wed, 25 Feb 2015 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">3134907.html</guid>
       	<description>
@@ -2125,7 +2125,7 @@ public void shouldBeTrueWhenThisContextIsForeground(){
     </item>
     <item>
       <title>시간대 DB에서 우리나라 시간의 오류</title>
-      <link>https://blog.benelog.net//3120317.html</link>
+      <link>https://anew0m.netlify.com//3120317.html</link>
       <pubDate>Mon, 3 Nov 2014 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">3120317.html</guid>
       	<description>
@@ -2496,7 +2496,7 @@ public void shouldGetAfterOneHour() {
     </item>
     <item>
       <title>Android에서 @Inject, @Test</title>
-      <link>https://blog.benelog.net//3017438.html</link>
+      <link>https://anew0m.netlify.com//3017438.html</link>
       <pubDate>Wed, 17 Apr 2013 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">3017438.html</guid>
       	<description>
@@ -2513,7 +2513,7 @@ public void shouldGetAfterOneHour() {
     </item>
     <item>
       <title>Android App과 TDD - 임유진 (Kakao), GDG Korea Android 컨퍼런스 중에서</title>
-      <link>https://blog.benelog.net//3017442.html</link>
+      <link>https://anew0m.netlify.com//3017442.html</link>
       <pubDate>Wed, 17 Apr 2013 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">3017442.html</guid>
       	<description>
@@ -2722,7 +2722,7 @@ Robolectric.bindShadowClass(ShadowLog.class);&lt;/code&gt;&lt;/pre&gt;
     </item>
     <item>
       <title>10 things you need to know about Android and Google Play - Tony Chan (Google), GDG Korea Android 컨퍼런</title>
-      <link>https://blog.benelog.net//3017439.html</link>
+      <link>https://anew0m.netlify.com//3017439.html</link>
       <pubDate>Wed, 17 Apr 2013 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">3017439.html</guid>
       	<description>
@@ -3027,7 +3027,7 @@ Robolectric.bindShadowClass(ShadowLog.class);&lt;/code&gt;&lt;/pre&gt;
     </item>
     <item>
       <title>Spring tag library +  Tomcat7.x 또는 Glassfish 2.2.x의 EL Injection 위험</title>
-      <link>https://blog.benelog.net//3007743.html</link>
+      <link>https://anew0m.netlify.com//3007743.html</link>
       <pubDate>Tue, 5 Mar 2013 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">3007743.html</guid>
       	<description>
@@ -3080,7 +3080,7 @@ Robolectric.bindShadowClass(ShadowLog.class);&lt;/code&gt;&lt;/pre&gt;
     </item>
     <item>
       <title>Markdown + Dropbox</title>
-      <link>https://blog.benelog.net//3007746.html</link>
+      <link>https://anew0m.netlify.com//3007746.html</link>
       <pubDate>Tue, 5 Mar 2013 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">3007746.html</guid>
       	<description>
@@ -3236,7 +3236,7 @@ Markdown을 지원하는 서비스나 도구들은 앞으로 계속 나올 듯�
     </item>
     <item>
       <title>Java에서 여러줄에 걸친 문자열 선언을 편하게 하는 @Multiline</title>
-      <link>https://blog.benelog.net//2999108.html</link>
+      <link>https://anew0m.netlify.com//2999108.html</link>
       <pubDate>Tue, 29 Jan 2013 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2999108.html</guid>
       	<description>
@@ -3279,7 +3279,7 @@ Markdown을 지원하는 서비스나 도구들은 앞으로 계속 나올 듯�
     </item>
     <item>
       <title>코딩 인터뷰 완전 분석 210쪽 17.3 변형 문제 풀이</title>
-      <link>https://blog.benelog.net//2962391.html</link>
+      <link>https://anew0m.netlify.com//2962391.html</link>
       <pubDate>Sat, 8 Sep 2012 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2962391.html</guid>
       	<description>
@@ -3507,7 +3507,7 @@ output: 2499 8&lt;/code&gt;&lt;/pre&gt;
     </item>
     <item>
       <title>문제로 풀어보는 알고리즘 0.3 생각해보기 풀이</title>
-      <link>https://blog.benelog.net//2960128.html</link>
+      <link>https://anew0m.netlify.com//2960128.html</link>
       <pubDate>Fri, 31 Aug 2012 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2960128.html</guid>
       	<description>
@@ -3655,7 +3655,7 @@ Collections.rotate(range, k);&lt;/pre&gt;
     </item>
     <item>
       <title>버전 관리 시스템 유랑기, 그리고 Git 적응기</title>
-      <link>https://blog.benelog.net//2937766.html</link>
+      <link>https://anew0m.netlify.com//2937766.html</link>
       <pubDate>Tue, 12 Jun 2012 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2937766.html</guid>
       	<description>
@@ -4003,7 +4003,7 @@ Collections.rotate(range, k);&lt;/pre&gt;
     </item>
     <item>
       <title>스레드 안정성의 문서화와 JCIP 애노테이션</title>
-      <link>https://blog.benelog.net//2933965.html</link>
+      <link>https://anew0m.netlify.com//2933965.html</link>
       <pubDate>Wed, 30 May 2012 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2933965.html</guid>
       	<description>
@@ -4304,7 +4304,7 @@ public class Memo {
     </item>
     <item>
       <title>초간단한 FTP server, One-FTPServer</title>
-      <link>https://blog.benelog.net//2930401.html</link>
+      <link>https://anew0m.netlify.com//2930401.html</link>
       <pubDate>Thu, 17 May 2012 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2930401.html</guid>
       	<description>
@@ -4483,7 +4483,7 @@ public void loginFail() throws Exception {
     </item>
     <item>
       <title>최상위권 n등의 점수 구하기</title>
-      <link>https://blog.benelog.net//2907090.html</link>
+      <link>https://anew0m.netlify.com//2907090.html</link>
       <pubDate>Wed, 29 Feb 2012 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2907090.html</guid>
       	<description>
@@ -4583,7 +4583,7 @@ private &amp;lt;T&amp;gt; void addAll(List&amp;lt;T&amp;gt; rawData, RankFinder&
     </item>
     <item>
       <title>Spring 3.1을 활용한 AspectJ 표현식  테스트</title>
-      <link>https://blog.benelog.net//2893630.html</link>
+      <link>https://anew0m.netlify.com//2893630.html</link>
       <pubDate>Wed, 18 Jan 2012 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2893630.html</guid>
       	<description>
@@ -4785,7 +4785,7 @@ public class LogAspectTest {
     </item>
     <item>
       <title>Local 개발환경에서 WAS를 띄우는 여러가지 방법</title>
-      <link>https://blog.benelog.net//2879657.html</link>
+      <link>https://anew0m.netlify.com//2879657.html</link>
       <pubDate>Tue, 6 Dec 2011 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2879657.html</guid>
       	<description>
@@ -4976,7 +4976,7 @@ WTP에서 &apos;Serve modules without publishing &apos; 옵션을 써서 이를 
     </item>
     <item>
       <title>Winstone, 경량 Servlet container</title>
-      <link>https://blog.benelog.net//2875999.html</link>
+      <link>https://anew0m.netlify.com//2875999.html</link>
       <pubDate>Fri, 25 Nov 2011 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2875999.html</guid>
       	<description>
@@ -5143,7 +5143,7 @@ WTP에서 &apos;Serve modules without publishing &apos; 옵션을 써서 이를 
     </item>
     <item>
       <title>Java Stack dump 다운로드를 편하게</title>
-      <link>https://blog.benelog.net//2874354.html</link>
+      <link>https://anew0m.netlify.com//2874354.html</link>
       <pubDate>Sun, 20 Nov 2011 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2874354.html</guid>
       	<description>
@@ -5265,7 +5265,7 @@ com.sun.tools.attach.AttachNotSupportedException: no providers installed
     </item>
     <item>
       <title>간단하게 서버에  파일을 올리기 + MockMultipartFile을 이용한 테스트</title>
-      <link>https://blog.benelog.net//2864739.html</link>
+      <link>https://anew0m.netlify.com//2864739.html</link>
       <pubDate>Sun, 23 Oct 2011 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2864739.html</guid>
       	<description>
@@ -5315,7 +5315,7 @@ java -jar uploader.jar --httpPort=2010 (포트지정)&lt;/code&gt;&lt;/pre&gt;
     </item>
     <item>
       <title>Btrace로 DBCP의 connection정보를 모니터링 하기</title>
-      <link>https://blog.benelog.net//2855201.html</link>
+      <link>https://anew0m.netlify.com//2855201.html</link>
       <pubDate>Wed, 28 Sep 2011 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2855201.html</guid>
       	<description>
@@ -5446,7 +5446,7 @@ gDataSource@be8958, logWriter=java.io.PrintWriter@12b1ff9, abandonedConfig=null,
     </item>
     <item>
       <title>Kent Beck과의 인터뷰 중에서..</title>
-      <link>https://blog.benelog.net//2815291.html</link>
+      <link>https://anew0m.netlify.com//2815291.html</link>
       <pubDate>Tue, 21 Jun 2011 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2815291.html</guid>
       	<description>
@@ -5524,7 +5524,7 @@ gDataSource@be8958, logWriter=java.io.PrintWriter@12b1ff9, abandonedConfig=null,
     </item>
     <item>
       <title>Spring AOP의 Aspect에서 order 값에 따른 적용순서 확인해보기</title>
-      <link>https://blog.benelog.net//2805903.html</link>
+      <link>https://anew0m.netlify.com//2805903.html</link>
       <pubDate>Mon, 30 May 2011 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2805903.html</guid>
       	<description>
@@ -5684,7 +5684,7 @@ target executed&lt;/p&gt;
     </item>
     <item>
       <title>Spring의 @Scheduled annotation으로 설정된 cron expression을 테스트하기</title>
-      <link>https://blog.benelog.net//2802946.html</link>
+      <link>https://anew0m.netlify.com//2802946.html</link>
       <pubDate>Mon, 23 May 2011 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2802946.html</guid>
       	<description>
@@ -5845,7 +5845,7 @@ public class SpringCronExpressionTestUtils {
     </item>
     <item>
       <title>Quartz 설정을 읽어서 CronExpression 테스트</title>
-      <link>https://blog.benelog.net//2802943.html</link>
+      <link>https://anew0m.netlify.com//2802943.html</link>
       <pubDate>Mon, 23 May 2011 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2802943.html</guid>
       	<description>
@@ -6102,7 +6102,7 @@ public class QuartzCronExpressionTestUtils {
     </item>
     <item>
       <title>SpringSource Tool Suite의 Java Agent based reloading 사용해 보기</title>
-      <link>https://blog.benelog.net//2796964.html</link>
+      <link>https://anew0m.netlify.com//2796964.html</link>
       <pubDate>Mon, 9 May 2011 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2796964.html</guid>
       	<description>
@@ -6288,7 +6288,7 @@ public class QuartzCronExpressionTestUtils {
     </item>
     <item>
       <title>java.net.InetAddress + SpEL로 서버이름을 Bean 설정에서 바로 얻어오기</title>
-      <link>https://blog.benelog.net//2795888.html</link>
+      <link>https://anew0m.netlify.com//2795888.html</link>
       <pubDate>Fri, 6 May 2011 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2795888.html</guid>
       	<description>
@@ -6378,7 +6378,7 @@ public class HostNameTest {
     </item>
     <item>
       <title>파일 업로드를 하는 Servlet을 MockHttpServletRequest로 테스트하기</title>
-      <link>https://blog.benelog.net//2790336.html</link>
+      <link>https://anew0m.netlify.com//2790336.html</link>
       <pubDate>Sun, 24 Apr 2011 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2790336.html</guid>
       	<description>
@@ -6466,7 +6466,7 @@ public class HostNameTest {
     </item>
     <item>
       <title>내가 생각하는 TDD</title>
-      <link>https://blog.benelog.net//2766714.html</link>
+      <link>https://anew0m.netlify.com//2766714.html</link>
       <pubDate>Sun, 6 Mar 2011 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2766714.html</guid>
       	<description>
@@ -6502,7 +6502,7 @@ public class HostNameTest {
     </item>
     <item>
       <title>스프링과 클라우드가 무슨 상관이 있을까?</title>
-      <link>https://blog.benelog.net//2765024.html</link>
+      <link>https://anew0m.netlify.com//2765024.html</link>
       <pubDate>Thu, 3 Mar 2011 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2765024.html</guid>
       	<description>
@@ -6814,7 +6814,7 @@ API는 Application Programming Interface이니 포털의 User interface가 최�
     </item>
     <item>
       <title>SpringOne2GX 2010 (4) Spring Roo 관련 발표들</title>
-      <link>https://blog.benelog.net//2710123.html</link>
+      <link>https://anew0m.netlify.com//2710123.html</link>
       <pubDate>Thu, 11 Nov 2010 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2710123.html</guid>
       	<description>
@@ -6889,7 +6889,7 @@ API는 Application Programming Interface이니 포털의 User interface가 최�
     </item>
     <item>
       <title>Java에서 XML없이 SQL개발하기</title>
-      <link>https://blog.benelog.net//2708621.html</link>
+      <link>https://anew0m.netlify.com//2708621.html</link>
       <pubDate>Mon, 8 Nov 2010 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2708621.html</guid>
       	<description>
@@ -7219,7 +7219,7 @@ Java 파일에서는 문자열이 한 줄이 넘어가면 아래와 같이 &lt;c
     </item>
     <item>
       <title>SpringOne2GX 2010 (3) Spring and Java EE 6,Synergy or Competition?</title>
-      <link>https://blog.benelog.net//2703581.html</link>
+      <link>https://anew0m.netlify.com//2703581.html</link>
       <pubDate>Fri, 29 Oct 2010 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2703581.html</guid>
       	<description>
@@ -7464,7 +7464,7 @@ public class SharedService {
     </item>
     <item>
       <title>PMD ruleset 검토 의견 사례</title>
-      <link>https://blog.benelog.net//2702876.html</link>
+      <link>https://anew0m.netlify.com//2702876.html</link>
       <pubDate>Thu, 28 Oct 2010 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2702876.html</guid>
       	<description>
@@ -7708,7 +7708,7 @@ EmptyInitializer&lt;br&gt;&lt;/p&gt;&lt;/td&gt;
     </item>
     <item>
       <title>SpringOne2GX 2010 (2) Spring 3.0 &amp;#8594; 3.1 &amp;#8594; 3.2 Themes &amp;amp; Trends</title>
-      <link>https://blog.benelog.net//2700328.html</link>
+      <link>https://anew0m.netlify.com//2700328.html</link>
       <pubDate>Sat, 23 Oct 2010 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2700328.html</guid>
       	<description>
@@ -8028,7 +8028,7 @@ public void deleteOwner(int id)\{
     </item>
     <item>
       <title>SpringOne2GX 2010 (1) 키노트</title>
-      <link>https://blog.benelog.net//2698818.html</link>
+      <link>https://anew0m.netlify.com//2698818.html</link>
       <pubDate>Wed, 20 Oct 2010 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2698818.html</guid>
       	<description>
@@ -8180,7 +8180,7 @@ public void deleteOwner(int id)\{
     </item>
     <item>
       <title>Eclipse에서 테스트 코드 작성을 편하게 하는 설정</title>
-      <link>https://blog.benelog.net//2688165.html</link>
+      <link>https://anew0m.netlify.com//2688165.html</link>
       <pubDate>Fri, 1 Oct 2010 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2688165.html</guid>
       	<description>
@@ -8486,7 +8486,7 @@ ti라는 이름으로 지정해서 쓰고 있다.
     </item>
     <item>
       <title>private 메소드를 어떻게 테스트해야 할까요?</title>
-      <link>https://blog.benelog.net//2685835.html</link>
+      <link>https://anew0m.netlify.com//2685835.html</link>
       <pubDate>Mon, 27 Sep 2010 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2685835.html</guid>
       	<description>
@@ -8620,7 +8620,7 @@ ____
     </item>
     <item>
       <title>로또 번호 생성기 파이썬으로 만들어보기</title>
-      <link>https://blog.benelog.net//2669675.html</link>
+      <link>https://anew0m.netlify.com//2669675.html</link>
       <pubDate>Sat, 28 Aug 2010 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2669675.html</guid>
       	<description>
@@ -8666,7 +8666,7 @@ print sorted(balls[0:6])&lt;/code&gt;&lt;/pre&gt;
     </item>
     <item>
       <title>BeanUtils 성능비교 - Apache commons, Opensymphony, Spring</title>
-      <link>https://blog.benelog.net//2626007.html</link>
+      <link>https://anew0m.netlify.com//2626007.html</link>
       <pubDate>Thu, 17 Jun 2010 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2626007.html</guid>
       	<description>
@@ -9140,7 +9140,7 @@ private List&amp;lt;Map&amp;lt;String, Object&amp;gt;&amp;gt; createMapListForTe
     </item>
     <item>
       <title>Customer tag library에 대한 테스트 코드 작성</title>
-      <link>https://blog.benelog.net//2421450.html</link>
+      <link>https://anew0m.netlify.com//2421450.html</link>
       <pubDate>Tue, 8 Sep 2009 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2421450.html</guid>
       	<description>
@@ -9177,7 +9177,7 @@ assertTrue(output.contains(&quot;&amp;lt;span class=&apos;r&apos;&amp;gt;&quot;)
     </item>
     <item>
       <title>Oracle을 사용해 입출력하는 Map-Reduce</title>
-      <link>https://blog.benelog.net//2271302.html</link>
+      <link>https://anew0m.netlify.com//2271302.html</link>
       <pubDate>Wed, 25 Mar 2009 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2271302.html</guid>
       	<description>
@@ -9387,7 +9387,7 @@ public class OracleOutputFormat&amp;lt;K  extends DBWritable, V&amp;gt; extends 
     </item>
     <item>
       <title>Java의 auto boxing과 unbox은 어떻게 컴파일될까?</title>
-      <link>https://blog.benelog.net//2229687.html</link>
+      <link>https://anew0m.netlify.com//2229687.html</link>
       <pubDate>Tue, 10 Feb 2009 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2229687.html</guid>
       	<description>
@@ -9501,7 +9501,7 @@ for(long i = 0L; i &amp;lt; 0x7fffffffL; i++)  sum = Long.valueOf(sum.longValue(
     </item>
     <item>
       <title>Spring MVC 2.5을 활용한 파일업로드</title>
-      <link>https://blog.benelog.net//2228221.html</link>
+      <link>https://anew0m.netlify.com//2228221.html</link>
       <pubDate>Sun, 8 Feb 2009 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2228221.html</guid>
       	<description>
@@ -9708,7 +9708,7 @@ public class FileAction {
     </item>
     <item>
       <title>EMMA + Eclipse + Maven2 + Hudson</title>
-      <link>https://blog.benelog.net//2212119.html</link>
+      <link>https://anew0m.netlify.com//2212119.html</link>
       <pubDate>Fri, 23 Jan 2009 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2212119.html</guid>
       	<description>
@@ -9803,7 +9803,7 @@ EMMA가 JVM의 종료 때도 기록을 하기 때문에 그렇다는군요. 다�
     </item>
     <item>
       <title>JDepend + Eclipse + Maven2</title>
-      <link>https://blog.benelog.net//2208368.html</link>
+      <link>https://anew0m.netlify.com//2208368.html</link>
       <pubDate>Mon, 19 Jan 2009 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2208368.html</guid>
       	<description>
@@ -9929,7 +9929,7 @@ EMMA가 JVM의 종료 때도 기록을 하기 때문에 그렇다는군요. 다�
     </item>
     <item>
       <title>JavaNCSS + Maven2 + Hudson</title>
-      <link>https://blog.benelog.net//2204823.html</link>
+      <link>https://anew0m.netlify.com//2204823.html</link>
       <pubDate>Fri, 16 Jan 2009 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2204823.html</guid>
       	<description>
@@ -10067,7 +10067,7 @@ EMMA가 JVM의 종료 때도 기록을 하기 때문에 그렇다는군요. 다�
     </item>
     <item>
       <title>PMD + Eclipse + Maven2 + Hudson</title>
-      <link>https://blog.benelog.net//2176171.html</link>
+      <link>https://anew0m.netlify.com//2176171.html</link>
       <pubDate>Fri, 19 Dec 2008 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2176171.html</guid>
       	<description>
@@ -10189,7 +10189,7 @@ EMMA가 JVM의 종료 때도 기록을 하기 때문에 그렇다는군요. 다�
     </item>
     <item>
       <title>Effective &amp;amp; Agile Java Generics</title>
-      <link>https://blog.benelog.net//2173103.html</link>
+      <link>https://anew0m.netlify.com//2173103.html</link>
       <pubDate>Tue, 16 Dec 2008 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2173103.html</guid>
       	<description>
@@ -10645,7 +10645,7 @@ JavaEE6 버전의 JavaDoc&lt;/a&gt;을 보니 이제는 &lt;code&gt;request.getP
     </item>
     <item>
       <title>스프링 프레임웍의 최근 소식들 모음 등</title>
-      <link>https://blog.benelog.net//2166348.html</link>
+      <link>https://anew0m.netlify.com//2166348.html</link>
       <pubDate>Wed, 10 Dec 2008 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2166348.html</guid>
       	<description>
@@ -10699,7 +10699,7 @@ JavaEE6 버전의 JavaDoc&lt;/a&gt;을 보니 이제는 &lt;code&gt;request.getP
     </item>
     <item>
       <title>FindBugs + Eclipse + Maven2 + Hudson</title>
-      <link>https://blog.benelog.net//2079841.html</link>
+      <link>https://anew0m.netlify.com//2079841.html</link>
       <pubDate>Tue, 30 Sep 2008 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2079841.html</guid>
       	<description>
@@ -10868,7 +10868,7 @@ JavaEE6 버전의 JavaDoc&lt;/a&gt;을 보니 이제는 &lt;code&gt;request.getP
     </item>
     <item>
       <title>Cubrid에서 commit시에 Statement가 닫히는 현상</title>
-      <link>https://blog.benelog.net//2073073.html</link>
+      <link>https://anew0m.netlify.com//2073073.html</link>
       <pubDate>Thu, 25 Sep 2008 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2073073.html</guid>
       	<description>
@@ -10973,7 +10973,7 @@ public class JDBCTest {
     </item>
     <item>
       <title>Spring batch 국내 자료링크, 그리고 KSUG 연재</title>
-      <link>https://blog.benelog.net//2005178.html</link>
+      <link>https://anew0m.netlify.com//2005178.html</link>
       <pubDate>Mon, 4 Aug 2008 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">2005178.html</guid>
       	<description>
@@ -11002,7 +11002,7 @@ public class JDBCTest {
     </item>
     <item>
       <title>Apache commons DbUtils 활용하기</title>
-      <link>https://blog.benelog.net//1978345.html</link>
+      <link>https://anew0m.netlify.com//1978345.html</link>
       <pubDate>Tue, 15 Jul 2008 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1978345.html</guid>
       	<description>
@@ -11116,7 +11116,7 @@ public class JDBCTest {
     </item>
     <item>
       <title>이미 35개 이상의 Accenture 고객사에 Spring batch가 적용되고 있다</title>
-      <link>https://blog.benelog.net//1970645.html</link>
+      <link>https://anew0m.netlify.com//1970645.html</link>
       <pubDate>Thu, 10 Jul 2008 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1970645.html</guid>
       	<description>
@@ -11153,7 +11153,7 @@ public class JDBCTest {
     </item>
     <item>
       <title>Spring 3.0에 대한 소식</title>
-      <link>https://blog.benelog.net//1937831.html</link>
+      <link>https://anew0m.netlify.com//1937831.html</link>
       <pubDate>Tue, 17 Jun 2008 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1937831.html</guid>
       	<description>
@@ -11177,7 +11177,7 @@ public class JDBCTest {
     </item>
     <item>
       <title>Spring batch와 Spring integration의 만남</title>
-      <link>https://blog.benelog.net//1935914.html</link>
+      <link>https://anew0m.netlify.com//1935914.html</link>
       <pubDate>Mon, 16 Jun 2008 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1935914.html</guid>
       	<description>
@@ -11236,7 +11236,7 @@ public class JDBCTest {
     </item>
     <item>
       <title>Q33N의 비밀 - 뉴욕의 프로그래머 중</title>
-      <link>https://blog.benelog.net//1936267.html</link>
+      <link>https://anew0m.netlify.com//1936267.html</link>
       <pubDate>Mon, 16 Jun 2008 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1936267.html</guid>
       	<description>
@@ -11292,7 +11292,7 @@ public class JDBCTest {
     </item>
     <item>
       <title>Effective Java 2nd Edition</title>
-      <link>https://blog.benelog.net//1912122.html</link>
+      <link>https://anew0m.netlify.com//1912122.html</link>
       <pubDate>Fri, 30 May 2008 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1912122.html</guid>
       	<description>
@@ -11345,7 +11345,7 @@ public class JDBCTest {
     </item>
     <item>
       <title>Java에서 Checked Exception은 언제 써야 하는가?</title>
-      <link>https://blog.benelog.net//1901121.html</link>
+      <link>https://anew0m.netlify.com//1901121.html</link>
       <pubDate>Fri, 23 May 2008 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1901121.html</guid>
       	<description>
@@ -11646,7 +11646,7 @@ public class JDBCTest {
     </item>
     <item>
       <title>JDBC에서 Connection, Statement,ResultSet의 close</title>
-      <link>https://blog.benelog.net//1898928.html</link>
+      <link>https://anew0m.netlify.com//1898928.html</link>
       <pubDate>Wed, 21 May 2008 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1898928.html</guid>
       	<description>
@@ -11778,7 +11778,7 @@ public class JDBCTest {
     </item>
     <item>
       <title>Digester를 이용한 Naver Open API Java Client 모듈</title>
-      <link>https://blog.benelog.net//1891482.html</link>
+      <link>https://anew0m.netlify.com//1891482.html</link>
       <pubDate>Fri, 16 May 2008 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1891482.html</guid>
       	<description>
@@ -11962,7 +11962,7 @@ public class RequestParameter {
     </item>
     <item>
       <title>Batch job에서의 바람직한 트랜잭션 처리 방식</title>
-      <link>https://blog.benelog.net//1889589.html</link>
+      <link>https://anew0m.netlify.com//1889589.html</link>
       <pubDate>Thu, 15 May 2008 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1889589.html</guid>
       	<description>
@@ -12068,7 +12068,7 @@ Spring batch에서는 SimpleStepFactoryBean 클래스에서 commitInterval이라
     </item>
     <item>
       <title>매쉬업(Mashup) 도구들</title>
-      <link>https://blog.benelog.net//1857319.html</link>
+      <link>https://anew0m.netlify.com//1857319.html</link>
       <pubDate>Wed, 23 Apr 2008 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1857319.html</guid>
       	<description>
@@ -12194,7 +12194,7 @@ Spring batch에서는 SimpleStepFactoryBean 클래스에서 commitInterval이라
     </item>
     <item>
       <title>Effective Java에 대한 서평에 재미있는 댓글</title>
-      <link>https://blog.benelog.net//1847991.html</link>
+      <link>https://anew0m.netlify.com//1847991.html</link>
       <pubDate>Thu, 17 Apr 2008 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1847991.html</guid>
       	<description>
@@ -12221,7 +12221,7 @@ Spring batch에서는 SimpleStepFactoryBean 클래스에서 commitInterval이라
     </item>
     <item>
       <title>마인드맵(mind map) 그리기 도구들</title>
-      <link>https://blog.benelog.net//1846356.html</link>
+      <link>https://anew0m.netlify.com//1846356.html</link>
       <pubDate>Wed, 16 Apr 2008 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1846356.html</guid>
       	<description>
@@ -12356,7 +12356,7 @@ Spring batch에서는 SimpleStepFactoryBean 클래스에서 commitInterval이라
     </item>
     <item>
       <title>Java Coding Convention 관련 문서들</title>
-      <link>https://blog.benelog.net//1823165.html</link>
+      <link>https://anew0m.netlify.com//1823165.html</link>
       <pubDate>Tue, 1 Apr 2008 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1823165.html</guid>
       	<description>
@@ -12430,7 +12430,7 @@ Spring batch에서는 SimpleStepFactoryBean 클래스에서 commitInterval이라
     </item>
     <item>
       <title>shuffle을 이용한 로또생성기</title>
-      <link>https://blog.benelog.net//1646013.html</link>
+      <link>https://anew0m.netlify.com//1646013.html</link>
       <pubDate>Fri, 14 Dec 2007 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1646013.html</guid>
       	<description>
@@ -12468,7 +12468,7 @@ public class LottoMachine \{
     </item>
     <item>
       <title>로또생성기 java로 만들어보기</title>
-      <link>https://blog.benelog.net//1642193.html</link>
+      <link>https://anew0m.netlify.com//1642193.html</link>
       <pubDate>Wed, 12 Dec 2007 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1642193.html</guid>
       	<description>
@@ -12527,7 +12527,7 @@ public class LottoMachine1 {
     </item>
     <item>
       <title>무엇인가를 만들고 싶다는 것</title>
-      <link>https://blog.benelog.net//1617365.html</link>
+      <link>https://anew0m.netlify.com//1617365.html</link>
       <pubDate>Thu, 29 Nov 2007 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1617365.html</guid>
       	<description>
@@ -12592,7 +12592,7 @@ public class LottoMachine1 {
     </item>
     <item>
       <title>Ship it! 성공적인 소프트웨어 개발 프로젝트를 위한 실용 가이드</title>
-      <link>https://blog.benelog.net//1546671.html</link>
+      <link>https://anew0m.netlify.com//1546671.html</link>
       <pubDate>Mon, 22 Oct 2007 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1546671.html</guid>
       	<description>
@@ -12687,7 +12687,7 @@ public class LottoMachine1 {
     </item>
     <item>
       <title>일본서점 컴퓨터 책 코너 탐방기</title>
-      <link>https://blog.benelog.net//1486908.html</link>
+      <link>https://anew0m.netlify.com//1486908.html</link>
       <pubDate>Fri, 21 Sep 2007 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1486908.html</guid>
       	<description>
@@ -12835,7 +12835,7 @@ SEM/SEO는 아직 국내에서는 책 제목으로 붙일 정도로 보편화된
     </item>
     <item>
       <title>확장된 나선형 배열 출력 문제(Spiral Array)</title>
-      <link>https://blog.benelog.net//1483053.html</link>
+      <link>https://anew0m.netlify.com//1483053.html</link>
       <pubDate>Wed, 19 Sep 2007 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1483053.html</guid>
       	<description>
@@ -13053,7 +13053,7 @@ public class ExtMatrix {
     </item>
     <item>
       <title>JavaScript, JSUnit으로 풀어본 뉴질랜드 화폐 문제</title>
-      <link>https://blog.benelog.net//1483100.html</link>
+      <link>https://anew0m.netlify.com//1483100.html</link>
       <pubDate>Wed, 19 Sep 2007 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1483100.html</guid>
       	<description>
@@ -13142,7 +13142,7 @@ Java로 이걸 짠다면 BigDecimal을 쓰거나 별도의 클래스를 정의�
     </item>
     <item>
       <title>Sybase 날짜형(datetime)의 문자열 변환시 style number</title>
-      <link>https://blog.benelog.net//1478801.html</link>
+      <link>https://anew0m.netlify.com//1478801.html</link>
       <pubDate>Mon, 17 Sep 2007 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1478801.html</guid>
       	<description>
@@ -13313,7 +13313,7 @@ Java로 이걸 짠다면 BigDecimal을 쓰거나 별도의 클래스를 정의�
     </item>
     <item>
       <title>CSS 선택자 정리</title>
-      <link>https://blog.benelog.net//1456715.html</link>
+      <link>https://anew0m.netlify.com//1456715.html</link>
       <pubDate>Thu, 6 Sep 2007 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1456715.html</guid>
       	<description>
@@ -13439,7 +13439,7 @@ div#greentea &amp;gt; blockquote p:first-line /* 그 &amp;lt;p/&amp;gt;의 첫 �
     </item>
     <item>
       <title>java의 List와 반복문(loop), 그리고 변수 선언 위치에 대해서</title>
-      <link>https://blog.benelog.net//1382604.html</link>
+      <link>https://anew0m.netlify.com//1382604.html</link>
       <pubDate>Fri, 3 Aug 2007 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1382604.html</guid>
       	<description>
@@ -14037,7 +14037,7 @@ ng/Object;
     </item>
     <item>
       <title>구글 검색 기록과 스위칭 코스트</title>
-      <link>https://blog.benelog.net//1375660.html</link>
+      <link>https://anew0m.netlify.com//1375660.html</link>
       <pubDate>Tue, 31 Jul 2007 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1375660.html</guid>
       	<description>
@@ -14079,7 +14079,7 @@ ng/Object;
     </item>
     <item>
       <title>AOP 관련 용어 정리</title>
-      <link>https://blog.benelog.net//1348296.html</link>
+      <link>https://anew0m.netlify.com//1348296.html</link>
       <pubDate>Thu, 19 Jul 2007 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1348296.html</guid>
       	<description>
@@ -14157,7 +14157,7 @@ ng/Object;
     </item>
     <item>
       <title>로그인별 process 숫자를 집계하는 sybase 쿼리</title>
-      <link>https://blog.benelog.net//1328079.html</link>
+      <link>https://anew0m.netlify.com//1328079.html</link>
       <pubDate>Tue, 10 Jul 2007 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1328079.html</guid>
       	<description>
@@ -14188,7 +14188,7 @@ group by s.hostname, s.ipaddr ,s.suid ) p&lt;/code&gt;&lt;/pre&gt;
     </item>
     <item>
       <title>HTML &amp;amp; CSS 정리해본 예</title>
-      <link>https://blog.benelog.net//1314658.html</link>
+      <link>https://anew0m.netlify.com//1314658.html</link>
       <pubDate>Wed, 4 Jul 2007 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1314658.html</guid>
       	<description>
@@ -14336,7 +14336,7 @@ h2 {
     </item>
     <item>
       <title>코드와 예술</title>
-      <link>https://blog.benelog.net//1230312.html</link>
+      <link>https://anew0m.netlify.com//1230312.html</link>
       <pubDate>Fri, 1 Jun 2007 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1230312.html</guid>
       	<description>
@@ -14418,7 +14418,7 @@ ACM 강연의 원문, PDF 파일&lt;/p&gt;
     </item>
     <item>
       <title>Code can be an art 행사 참석 후기</title>
-      <link>https://blog.benelog.net//1231656.html</link>
+      <link>https://anew0m.netlify.com//1231656.html</link>
       <pubDate>Fri, 1 Jun 2007 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1231656.html</guid>
       	<description>
@@ -14508,7 +14508,7 @@ ACM 강연의 원문, PDF 파일&lt;/p&gt;
     </item>
     <item>
       <title>QB로 만든 Code can be an art 출력</title>
-      <link>https://blog.benelog.net//1230429.html</link>
+      <link>https://anew0m.netlify.com//1230429.html</link>
       <pubDate>Fri, 1 Jun 2007 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">1230429.html</guid>
       	<description>
@@ -14620,7 +14620,7 @@ END SUB&lt;/code&gt;&lt;/pre&gt;
     </item>
     <item>
       <title>방명록</title>
-      <link>https://blog.benelog.net//904735.html</link>
+      <link>https://anew0m.netlify.com//904735.html</link>
       <pubDate>Thu, 8 Feb 2007 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">904735.html</guid>
       	<description>
@@ -14631,7 +14631,7 @@ END SUB&lt;/code&gt;&lt;/pre&gt;
     </item>
     <item>
       <title>나선형 배열 출력 문제 Spiral Array</title>
-      <link>https://blog.benelog.net//901106.html</link>
+      <link>https://anew0m.netlify.com//901106.html</link>
       <pubDate>Wed, 7 Feb 2007 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">901106.html</guid>
       	<description>
@@ -14773,7 +14773,7 @@ public class Matrix {
     </item>
     <item>
       <title>더골(THE GOAL)</title>
-      <link>https://blog.benelog.net//900996.html</link>
+      <link>https://anew0m.netlify.com//900996.html</link>
       <pubDate>Wed, 7 Feb 2007 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">900996.html</guid>
       	<description>
