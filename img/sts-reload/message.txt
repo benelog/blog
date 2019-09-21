@@ -1,5 +1,0 @@
-Agent based reloading is active
-
-Reloading: Loading new version of org.test.sample.HomeController [MxA0kmo]
-
-
