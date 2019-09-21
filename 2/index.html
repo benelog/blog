@@ -133,6 +133,9 @@
                     <h3>Recent Posts</h3>
                 </header>
                     <li>
+                        <a href="../../hello-world.html"><p>내집마련 해커톤을 통한 개인 블로그 제작</p></a>
+                    </li>
+                    <li>
                         <a href="../../installing-jdk.html"><p>여러 개의 JDK를 설치하고 선택해서 사용하기</p></a>
                     </li>
                     <li>
@@ -140,9 +143,6 @@
                     </li>
                     <li>
                         <a href="../../robolectric.html"><p>Robolectric을 활용한 안드로이드 쾌속 테스팅</p></a>
-                    </li>
-                    <li>
-                        <a href="../../3134907.html"><p>'네이버를 만든 기술, 읽으면서 배운다 - 자바편' 출간</p></a>
                     </li>
             </ul>
         </section>
@@ -161,14 +161,15 @@
 <article class="post">
    <header>
     <div class="title">
-                    <h2><a href="../3134907.html">'네이버를 만든 기술, 읽으면서 배운다 - 자바편' 출간</a></h2>
+                    <h2><a href="../robolectric.html">Robolectric을 활용한 안드로이드 쾌속 테스팅</a></h2>
 
 
+            <p>Android 테스팅 프레임워크 Robolectric에 대한 소개</p>
     </div>
     <div class="meta">
          <time class="published"
-            datetime='Feb 25, 2015'>
-            Feb 25, 2015</time>
+            datetime='Oct 10, 2016'>
+            Oct 10, 2016</time>
             <div class="published eta"></div>
         <span class="author"/><span class="name">정상혁</span><img src="../img/main/jmh.jpg" alt="정상혁" /></span>
     </div>
@@ -180,574 +181,368 @@
     <div id="content">
        <div id="preamble">
 <div class="sectionbody">
-<div class="imageblock">
-<div class="content">
-<img src="img/book-cover/naver-java.jpg" alt="cover">
-</div>
-</div>
-<div class="paragraph">
-<p>( 이미지 출처 : <a href="http://wikibook.co.kr/how-naver-works-java/" class="bare">http://wikibook.co.kr/how-naver-works-java/</a> )</p>
-</div>
-<div class="paragraph">
-<p>네이버의 개발자 블로그인 헬로월드 ( <a href="http://helloworld.naver.com" class="bare">http://helloworld.naver.com</a> )에 공개되었던 글을 중심으로 책이 출판됩니다. 자바의 핵심영역을 다룬 17개의 글을 묶었습니다. 출판을 위해 새로 쓰여진 글도 있고, 사내에서만 공유되었던 글들도 재발굴했고, 이미 공개된 글도 최신 내용을 반영해 다듬었습니다.</p>
-</div>
-<div class="paragraph">
-<p>자바개발의 A부터 Z까지 다 다루는 책은 아니지만, API를 설계할 때 고민해야할 요소, 반복해서 문제를 겪을 만한 부분, 장애 해결/분석 경험의 액기스를 담았습니다. 네이버의 주요 서비스를 개발한 담당자가 문제를 해결한 사례를 정리한 글도 있고, 플랫폼개발, 기술 지원조직인 웹플랫폼개발랩, 성능엔지어링랩, 생산성혁신랩의 개발자들이 반복해서 전파해야할 지식을 효율적으로 공유하기 위해 쓴 글도 있습니다.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>2014년 8월1일 <a href="http://d2.naver.com/helloworld/870369">제9회 오픈 세미나 in 대구</a> 행사에서 한 발표입니다.</p>
+</li>
+<li>
+<p>예제 코드들은 당시의 Rolbectric의 최신 버전을 기준으로 한 것이라 현재의 최신 버전에서는 그대로 실행되지 않을 수 있습니다.</p>
+</li>
+</ul>
 </div>
 <div class="paragraph">
-<p>처음에는 <a href="http://www.yes24.com/24/goods/1941571?scode=032&amp;OzSrank=5">조엘이 엄선한 소프트웨어 블로그 베스트 29선</a>처럼, 온라인의 글을 오프라인으로 옮기는 성격의 책이 될것이라고 예상했었습니다. 그런데 생각보다 출판에 이르기까지는 많은 노력이 들어갔습니다. 글이 쓰여진 시점이 제 각각 이였기 때문에 현시점에 맞춰서 고칠 내용도 많았고, 사내에서만 공유되던 글은 서비스명, 담당자명, 부서명등이 들어간 문장은 바꿔야했습니다. 다양한 저자가 쓴 글이였지만 용어를 일관되게 맞추려고 노력했습니다. 기술문서팀의 담당자분께서 많은 수고를 해주셨습니다.</p>
+<p>오늘 발표에서는 테스트 프레임워크인 Robolectric을 사용하면서 실무에서 얻었던 경험을 공유하고자합니다.</p>
 </div>
 <div class="paragraph">
-<p>오류가 있어도 바로 고치면 되는 인터넷 페이지가 아닌, 종이로 찍혀나오는 책에 들어갈 글을 쓰는 부담은 생각보다 컸습니다. 이미 공개된 글도 여러 번 더 신중하게 검토를 했습니다. 블로그에 올릴 때는 '아직 정확한 답은 찾지 못했다.' 정도로 대충 쓰고 넘어갔었던, 타임존데이터베이스에서 우리나라 시간대 정보가 역사적 사실과 맞지 않았던 문제를 더 깊이 파악한 것이 그 예입니다. 책을 쓰면서 IANA ( Internet Assigned Numbers Authority)에 이 오류를 수정한 패치를 전달해서 JDK에도 반영되었습니다.</p>
-</div>
-<div class="paragraph">
-<p>결국 종이로 찍혀나오게 되었으니, Helloworld의 글들을 좋아하셨던 많은 분들에게 소장할 가치가 있는 책으로 남았으면 좋겠습니다. 그 바램을 담아서 서문와 아래와 같이 적었습니다.</p>
-</div>
-<div class="quoteblock">
-<blockquote>
-<div class="paragraph">
-<p>앞으로 자바 10, 자바 11이 나오고 시간이 흐르면 더 최신 정보를 담은 책이 나올 것이다. 그래도 이 시대의 자바 기술과 네이버에서 일한 개발자의 노력을 담은 타입캡슐이 돼 오랜 시간이 지난 후에도 누군가의 책장에 이 책이 꽂혀 있으면 좋겠다. 그것이 인터넷에 있던 글을 종이로 옮긴 가장 큰 의미가 아닐까 생각한다.</p>
-</div>
-</blockquote>
-</div>
-<div class="paragraph">
-<p>이 책이 호응이 얻는다면, 바쁜 시간을 쪼개어서 글을 썼던 저자에게 응원이 되고, 예비 저자에게도 용기를 주어 앞으로 더 좋은 글을 외부로 공개하는데 힘을 보탤 것이라 믿습니다.</p>
+<p>먼저 테스트코드란 무엇인지와 안드로이드에서 테스트 작성을 어렵게 하는 난관등을 말씀드리고 Robolectric을 활용하는 방법을 소개하겠습니다.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="목차">목차</h2>
+<h2 id="테스트_코드란">테스트 코드란?</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>글 하나하나가 독립적이기 때문에 관심있는 주제부터 읽으셔도 되지만, 가장 겉으로 들어난 영역인 API부터 시작해서 JVM내부, 분석도구, Garbarge Collection, DB연결까지 이어지는, 더 안쪽과 JVM 뒤쪽의 영역으로 흐름이 이어지도록 목차를 잡았습니다.</p>
-</div>
-<div class="sect2">
-<h3 id="1부_자바의_api_이해하기">1부 : 자바의 API 이해하기</h3>
-<div class="ulist">
-<ul>
-<li>
-<p>01장: 자바의 날짜와 시간 API - 정상혁</p>
-</li>
-<li>
-<p>02장: 자바의 HashMap은 어떻게 작동하는가? - 송기선</p>
-</li>
-<li>
-<p>03장: 자바에서 외부 프로세스를 실행할 때 - 정상혁</p>
-</li>
-<li>
-<p>04장: 람다가 이끌어 갈 모던 자바 - 정상혁</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="2부_문제_분석과_사례">2부 : 문제 분석과 사례</h3>
-<div class="ulist">
-<ul>
-<li>
-<p>05장: JVM 이해하기 - 박세훈</p>
-</li>
-<li>
-<p>06장: 스레드 덤프 분석하기 - 구태진</p>
-</li>
-<li>
-<p>07장: 자바 애플리케이션 분석을 위한 BTrace - 이상민, 정상혁</p>
-</li>
-<li>
-<p>08장: 하나의 메모리 누수를 잡기까지 - 김민수, 김택수</p>
-</li>
-<li>
-<p>09장: 고맙다 JVM, 사과해라 JVM 크래시 - 강경태</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="3부_가비지_컬렉션">3부 : 가비지 컬렉션</h3>
-<div class="ulist">
-<ul>
-<li>
-<p>10장: 자바 가비지 컬렉션의 작동 과정 - 이상민</p>
-</li>
-<li>
-<p>11장: 가비지 컬렉션 모니터링 방법 - 이상민, 송기선</p>
-</li>
-<li>
-<p>12장: 가비지 컬렉션 튜닝 - 이상민</p>
-</li>
-<li>
-<p>13장: 자바의 Reference 클래스와 가비지 컬렉션 - 박세훈</p>
-</li>
-<li>
-<p>14장: 가비지 컬렉션과 Statement Pool - 최동순</p>
-</li>
-<li>
-<p>15장: 아파치 MaxClients와 톰캣의 Major GC - 최동순</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="4부_데이터베이스_연결_설정">4부 : 데이터베이스 연결 설정</h3>
-<div class="ulist">
-<ul>
-<li>
-<p>16장: JDBC의 타임아웃 이해하기 - 강운덕</p>
-</li>
-<li>
-<p>17장: Commons DBCP 이해하기 - 최동순, 강운덕, 정상혁</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-    </div>
-	
-	<section id="social-share">
-        <ul class="icons">
-<!-- Social Share Button HTML -->
-
-<!-- Twitter -->
-<li><a href="//twitter.com/share?url=https://anew0m.netlify.com//3134907.html&text='네이버를 만든 기술, 읽으면서 배운다 - 자바편' 출간&via=" target="_blank" class="share-btn twitter">
-    <i class="fa fa-twitter"></i>
-    <p>Twitter</p>
-</a></li>
-
-<!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=https://anew0m.netlify.com//3134907.html" target="_blank" class="share-btn google-plus">
-    <i class="fa fa-google-plus"></i>
-    <p>Google+</p>
-</a></li>
-
-<!-- Facebook -->
-<li><a href="//www.facebook.com/sharer/sharer.php?u=https://anew0m.netlify.com//3134907.html" target="_blank" class="share-btn facebook">
-    <i class="fa fa-facebook"></i>
-    <p>Facebook</p>
-</a></li>
-
-<!-- Reddit (url, title) -->
-<li><a href="//reddit.com/submit?url=https://anew0m.netlify.com//3134907.html&title='네이버를 만든 기술, 읽으면서 배운다 - 자바편' 출간" target="_blank" class="share-btn reddit">
-    <i class="fa fa-reddit-alien"></i>
-    <p>Reddit</p>
-</a></li>
-
-<!-- LinkedIn -->
-<li><a href="//www.linkedin.com/shareArticle?url=https://anew0m.netlify.com//3134907.html&title='네이버를 만든 기술, 읽으면서 배운다 - 자바편' 출간" target="_blank" class="share-btn linkedin">
-    <i class="fa fa-linkedin"></i>
-    <p>LinkedIn</p>
-</a></li>
-
-<!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=https://anew0m.netlify.com//3134907.html&title='네이버를 만든 기술, 읽으면서 배운다 - 자바편' 출간" target="_blank" class="share-btn stumbleupon">
-    <i class="fa fa-stumbleupon"></i>
-    <p>StumbleUpon</p>
-</a></li>
-
-<!-- Email -->
-<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://anew0m.netlify.com//3134907.html" target="_blank" class="share-btn email">
-    <i class="fa fa-envelope"></i>
-    <p>Email</p>
-</a></li>
-        </ul>
-    </section>
-     
-
-    <footer>
-	
-		<ul class="stats">
-    	    <!-- Display the categories associated with this post -->
-    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/Java.html'>Java</a></li>
- 	        <li><a href='../tags/Naver.html'>Naver</a></li>
- 	        <li><a href='../tags/책.html'>책</a></li>
-
-				<li><a class="icon fa-comment" href="../3134907.html#disqus_thread"> &nbsp;</a></li>
- 		</ul>
-    	
-    </footer>
-</article>
-<article class="post">
-   <header>
-    <div class="title">
-                    <h2><a href="../3120317.html">시간대 DB에서 우리나라 시간의 오류</a></h2>
-
-
-    </div>
-    <div class="meta">
-         <time class="published"
-            datetime='Nov 03, 2014'>
-            Nov 03, 2014</time>
-            <div class="published eta"></div>
-        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jmh.jpg" alt="정상혁" /></span>
-    </div>
-</header>
-
-    
-  
-         
-    <div id="content">
-       <div id="preamble">
-<div class="sectionbody">
-<div class="paragraph">
-<p>변경이력</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>2015/02/13</p>
-<div class="ulist">
-<ul>
-<li>
-<p>tzdata2014j에 반영 사실 갱신</p>
-</li>
-<li>
-<p>북한의 시간대에 대한 진행 상황 설명</p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
+<p>참석하신 분 중에서 JUnit(제이유닛)에 대해서 한번이라도 들어보신 분은 손을 들어보시겠습니까? 이중에 Junit을 실제로 써보신분은 얼마나 되시나요? Android에서 JUnit으로 테스트를 시도해보신 분은 계신가요? 경험을 하신 정도가 다양하기 때문에 우선 오늘 다룰 테스트 코드란 무엇인지를 한번 정리하고 시작을 하겠습니다.</p>
 </div>
 <div class="paragraph">
-<p>2014년 2월, 회사의 기술블로그인 <a href="http://helloworld.naver.com에" class="bare">http://helloworld.naver.com에</a> <a href="http://helloworld.naver.com/helloworld/64560">Java의 날짜와 시간 API</a>이라는 글을 기고한 적이 있습니다. 그 글을 쓰던 도중에 우리나라의 타임존 데이터에 대한 몇가지 의문을 가지게 되었지만 완벽히 해결하지는 못했었습니다.</p>
-</div>
-<div class="paragraph">
-<p>얼마 전에 이 문제를 좀 더 깊이 파악을 해보았고, 원천 데이터인 IANA Timezone 데이터베이스에 패치를 전달해서 반영되었습니다. 조사과정에서 1920년대부터 1999년까지의 과거 뉴스를 조회하는 네이버의 뉴스라이브러리 서비스 ( <a href="http://newslibrary.naver.com/" class="bare">http://newslibrary.naver.com/</a>) 가 큰 도움이 되었습니다.</p>
-</div>
-<div class="paragraph">
-<p>이 오류는 tzdata2014j에 반영되고, 이를 참조하는 Java, Android, FreeBSD에서도 2014년 11월경에 반영되었습니다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="http://permalink.gmane.org/gmane.comp.time.tz/9111">tzdata2014j의 릴리즈노트</a></p>
-</li>
-<li>
-<p><a href="https://bugs.openjdk.java.net/browse/JDK-8064560">JDK-8064560</a> : Open JDK의 반영. TZUpdater 1.4.10가 오류가 수정된 이 데이터를 참조하고, JDK 8u40, JDK
-7u80, JDK 7u75등 여러 버전에 백포트 패치</p>
-</li>
-<li>
-<p><a href="https://android.googlesource.com/platform/bionic.git/+/b11d8e057c86c3926128af9d07180d9328e144c6">Android에 반영 Commit</a></p>
-</li>
-<li>
-<p><a href="http://lists.freebsd.org/pipermail/svn-src-stable-10/2014-November/003831.html">FreeBSD에 반영 Commit</a></p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>플랫폼별로 반영시점은 다르겠지만, 다른 OS에서 이를 반영할 것으로 예상합니다.</p>
-</div>
-<div class="paragraph">
-<p>현시점에서는 드물것 같지만, 혹시 우리나라의 1912 ~ 1980년대의 섬머타임과 시간대 변경에 영향받은 프로그램을 만드셨던 분이 있다면 참고로 알아둘만 합니다.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="섬머타임의_오류_발견">섬머타임의 오류 발견</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>처음 발견한 오류는 1988년의 섬머타임이 시작된 시간이였습니다. 아래 자료에 따르면 이 해의 섬머타임은 5월 8일 새벽 2시부터 시작되었습니다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>'한국 표준시', 위키백과, <a href="http://ko.wikipedia.org/wiki/한국_표준시" class="bare">http://ko.wikipedia.org/wiki/한국_표준시</a></p>
-</li>
-<li>
-<p><a href="http://newslibrary.naver.com/viewer/index.nhn?articleId=1988050700099215012&amp;editNo=1&amp;printCount=1&amp;publishDate=1988-05-07&amp;officeId=00009&amp;pageNo=15&amp;printNo=6822&amp;publishType=00020">'내일부터 서머타임&#8230;&#8203; 새벽2시를 3시로'</a>, 매일경제, 1988. 5. 7.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>그러나 Java프로그램으로는 1988년 5월 7일 23시의 1시간 후가 5월8일 1시인것으로 나와서 00시를 기점으로 섬머타임이 적용되어 있습니다. 아래 테스트는 아직 오류수정이 정식 릴리즈되지 않은 지금 시점에서는 통과합니다.</p>
+<p>단순히 말해서 테스트 코드는 '검증&#8217;을 위한 코드입니다. 다음은 이미지로딩 라이브러리인 Universal ImageLoader의 소스 중 테스트 코드입니다. github에서 전체소스를 확인하실 수 있습니다.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Test
-public void shouldGetAfterOneHour() {
-    TimeZone seoul = TimeZone.getTimeZone("Asia/Seoul");
-    Calendar calendar = Calendar.getInstance(seoul);
-    calendar.set(1988, Calendar.MAY , 7, 23, 0);
-    String pattern = "yyyy.MM.dd HH:mm";
-    String theTime = toString(calendar, pattern, seoul);
-    assertThat(theTime).isEqualTo("1988.05.07 23:00");
-    calendar.add(Calendar.HOUR_OF_DAY, 1);
-    String after1Hour = toString(calendar, pattern, seoul);
-    assertThat(after1Hour).isEqualTo("1988.05.08 01:00");}</code></pre>
+public void testSchemeFile() throws Exception {
+    String uri = "file://path/on/the/device/1.png";
+    Scheme result = Scheme.ofUri(uri);
+    Scheme expected = Scheme.FILE;
+    assertThat(result).isEqualTo(expected);
+}
+
+@Test
+public void testSchemeUnknown() throws Exception {
+    String uri = "other://image.com/1.png";
+    Scheme result = Scheme.ofUri(uri);
+    Scheme expected = Scheme.UNKNOWN;
+    assertThat(result).isEqualTo(expected);
+}</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>(자세한 설명은 <a href="http://helloworld.naver.com/helloworld/645609">Java의 날짜와 시간 API</a>,전체 소스는 <a href="https://github.com/benelog/java-date-time/blob/master/jdk7-date-time/src/test/java/com/nbp/weblab/date/OldJdkDateTest.java">OldJdkDateTest.java)</a> 참조)</p>
+<p>( Android Universal Image Loader의 <a href="https://github.com/nostra13/Android-Universal-Image-Loader/blob/master/library/test/com/nostra13/universalimageloader/core/download/BaseImageDownloaderTest.java">BaseImageDownloaderTest</a> )</p>
 </div>
 <div class="paragraph">
-<p>시간대 변경에 대한 정보는 윈도우즈, 안드로이드, OSX, 리눅스, Java, 오라클 등 거의 모든 플랫폼에서 Internet Assigned Numbers Authority (IANA)라는 조직에서 관리하는 시간대 데이터베이스를 원천으로 참조합니다. 처음에는 이 타임존 데이터베이스의 오류일지 아니면 다른 이유가 있을지 확신을 하지 못했습니다.</p>
+<p>골뱅이 Test가 붙은 애노테이션으로 실행될 코드를 지정하고 assert 구문으로 기대하는 결과를 명시합니다. 이 코드는 uri를 파싱해서 Scheme (스킴)이라는 Enum(이늄)클래스를 만든 결과가 기대대로 FILE이나 UNKNOWN인지를 확인하고 있습니다. 이 코드는 오늘 이야기할 Robolectric으로 만들어졌습니다.</p>
+</div>
+<div class="paragraph">
+<p>테스트를 도와주는 프레임워크도 굉장히 많습니다. 앞에서도 언급드렷듯이, 테스트를 실행하는데는 JUnit이 가장 많이 쓰입니다. 안드로이드 SDK에서도 이를 바탕으로 한 테스트 프레임워크를 제공하고 있습니다. 그리고 테스트에 쓰이는 가짜 객체를 흔히 목(Mock)이라고 부르는데, Mockito, JMock, PowerMOck과 같은 라이브러리들이 있습니다. 안드로이드를 위한 테스트 프레임워크에도 오늘 다룰 Robolectric을 비롯해 Robotium, Spoon, Robospock 등이 존재합니다.</p>
+</div>
+<div class="paragraph">
+<p>오늘 설명을 이어가는데 혼동을 줄이기 위해 유의해야할 개념을 몇가지 말씀드리겠습니다.</p>
+</div>
+<div class="paragraph">
+<p>첫째, JUnit으로 하는 테스트라고 전부 유닛테스트는 아니라는 것입니다. JUnit에 유닛(Unit)이라는 이름이 들어가서 생기는 혼동입니다. 테스트 Functional 테스트 (혹은 시스템 테스트)도 JUnit으로 작성하는 경우도 많습니다. 오늘 발표에서는 이를 엄밀히 구분하지는 않고 폭넓게 '테스트 코드&#8217;라는 말로만 칭하겠습니다.</p>
+</div>
+<div class="paragraph">
+<p>둘째, 테스트 코드를 작성하는 작업을 'TDD를 한다&#8217;라고 한마디로 말하기는 어렵다는 것입니다. TDD는 테스트를 작성하는 하나의 방식입니다. TDD 기법은 테스트를 먼저 작성하고, 테스트를 통과시키는 코드를 구현한 후 리팩토링을 하는 절차를 거칩니다. 오늘 발표에서는 TDD 같은 절차와 상관없이 테스트를 작성하는 라이브러리 활용법에 대해서 주로 말씀드리겠습니다.</p>
+</div>
+<div class="paragraph">
+<p>왜 이런 테스트를 만드는지에 대한 의문을 가지실분도 있을 듯합니다. 간단히 설명드리면, 그 이유는 다음과 같습니다.</p>
+</div>
+<div class="paragraph">
+<p>첫째, 디버깅 편의성을 위해서입니다. 테스트 코드 작성에 능숙해지면 실제 어플리케이션을 실행하고 수동으로 반복 테스트하는것보다 훨씬 빠르고 정교하게 내가 짠 코드의 동작을 확인하고 오류를 수정할 수 있습니다.</p>
+</div>
+<div class="paragraph">
+<p>둘째, 설계를 개선하기 위해서입니다. 테스트 하기에 쉬운 구조의 코드는 역할과 책임이 잘 나누어진 코드입니다. 그런 코드는 재활용하고 기능을 추가하거나 버그를 발견하기에도 편합니다. 테스트를 의식하면서 개발을 하면 그런 구조의 코드를 작성하는데 도움이 됩니다.</p>
+</div>
+<div class="paragraph">
+<p>셋째, 테스트 자체가 동작하는 예제이자 명세가 됩니다. 다른 사람이 어플리케이션이나 라이브러리의 전체를 실행시키지 않아도 코드가 실행된 결과를 이해할 수 있습니다.</p>
+</div>
+<div class="paragraph">
+<p>넷째, 반복적으로 수행할 회귀테스트를 자동화합니다. 앞으로 기능을 추가하거나 코드를 개선할 때 든든한 버팀목이 되고 시간을 아껴줍니다.</p>
+</div>
+<div class="paragraph">
+<p>다섯째, 개발 작업에 더 집중하게 해줍니다. 테스트를 통과한다는 명확한 목표가 있고, 이를 빠른 시점에 명확하고 신호로 알려주고 작업의 난이도와 간격은 스스로 적당하게 조절할수 있습니다. 심리학에서 말하는 몰입경험의 조건과 일치합니다.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="오류의_역사">오류의 역사</h2>
+<h2 id="안드로이드_테스트의_장벽">안드로이드 테스트의 장벽</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Helloworld에 글이 나간 후에 이응준님께서 알려주셔서 우리나라의 섬머타임을 기록한 사람이 누구인지 알게 되었습니다. Github에 올라간 <a href="https://github.com/eggert/tz의" class="bare">https://github.com/eggert/tz의</a> 커밋로그를 바탕으로 이를 자세히 분석해봤습니다.</p>
+<p>그렇다면 이런 테스트의 장점을 안드로이드에서도 행복하게 누릴수가 있을까요? 불행히도 많은 장벽이 있다는 것을 경험했습니다. 그 이유를 몇가지 나누어서 말씀드리겠습니다.</p>
 </div>
 <div class="paragraph">
-<p>우리나라의 섬머타임에 대한 기록은 'Arthur David Olson&#8217;의 <a href="https://github.com/eggert/tz/commit/79373b10463c3b59a1b2af49491dc308efbad09d">1988년 1월 3일의 커밋</a>에 아래와 같이 처음으로 등장합니다.</p>
+<p>첫째, Mock을 쓰기 어려운 기본 프레임워크 구조입니다. 안드로이드에서 굉장히 많이쓰이 getViewById, getSystemService 같은 코드는 상위클래스에 있는 메서드를 호출하는 구조입니다. 이런 형태는 가짜 클래스인 Mock을 주입하기가 어렵습니다.</p>
+</div>
+<div class="paragraph">
+<p>둘째, 빈약한 기본 Mock클래스입니다. android.test.mock 패캐지 아래에는 MockContext, MockApplication, MockResource 등의 많은 클래스들이 있지만, 이들은 UnsupportedOperationException을 던지는 껍데기일 뿐입니다. 필요한 동작은 다음과 같이 직접 override해서 구현해야 합니다.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code># Republic of Korea. According to someone at the Korean Times in San Francisco,# Daylight Savings Time was not observed until 1987. He did not know# at what time of day DST starts or ends.# Rule NAME FROM TO TYPE IN ON AT SAVE LETTER/SRule ROK 1987 max - May Sun&lt;=14 2:00 1:00 DRule ROK 1987 max - Oct Sun&lt;=14 3:00 0 S</code></pre>
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">static public class MockServiceContext extends MockContext {
+    @Overrride
+    public getSystemService(String name){
+        ……
+    }
+}</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>주석을 봐서는 섬머타임의 시작시기도 정확히 몰랐던 사람의 증언을 참고로 한 듯합니다. 그리고 1987년 이전에는 우리나라에 섬머타임이 없었다는 이야기도 사실과 다릅니다.</p>
+<p>셋째, 기본적으로 제공되는 Instrumentation Test를 쓰는것도 배우기가 쉽지않습니다. 예를 들면 Activity를 테스트할때 ActivityTestCase, ActivityUnitTestCase, ActivityInstrumentationTestCase2의 세 가지 클래스 중 어느것을 써야할까를 하려면 많은 것을 알고 있어야합니다. 그리고 ActivityUnitTestCase에서 Dialog생성 등에 Event가 전달되면 BadToken Exception이 발생한다거나, ActivityInstrumentationTestCase2에서 Dialog 객체를 생성 후 dismiss() 메서드를 호출하지 않으면 leak window Exception이 발생하는등 부딛히는 예외상황도 많습니다.</p>
 </div>
 <div class="paragraph">
-<p>위의 코드로는 1987년부터 섬머타임이 계속되고 있다고 정의되었습니다. 1987,1988년에 우리나라에서 섬머타임이 실행되었으니 commit시점에서는 적어도 이 년도에 대해서는 맞는 데이터였습니다.</p>
+<p>넷째, UI 테스트 본연의 어려움이 있습니다. 안드로이드 코드는 역할상 UI 생성과 이벤트를 다루는 코드의 비중이 높습니다. 이는 웹어플리케이션 등 다른 플랫폼에서도 테스트하기 어려운 분야입니다. UI 객체의 속성은 자주 바뀌고 익명 클래스 등을 통해서 처리되는 이벤트는 Mock 객체로 바꾸고 추적하기가 어렵습니다.</p>
 </div>
 <div class="paragraph">
-<p>그러나 1988년 이후로도 우리나라에서는 섬머타임이 계속되어 있는것처럼 한동안 유지가 됩니다. 1993년에 이르러서야 이 데이터는 정정됩니다.</p>
-</div>
-<div class="paragraph">
-<p><a href="https://github.com/eggert/tz/commit/61315cadc3d0e8b4ef559539502a606cf58fc0f7">1993년 11월23일의 커밋</a>으로 다음의 날짜가 다시 반영됩니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code>Rule ROK 1960 only - May 15 0:00 1:00 DRule ROK 1960 only - Sep 13 0:00 0 SRule ROK 1987 1988 - May Sun&lt;=14 0:00 1:00 DRule ROK 1987 1988 - Oct Sun&lt;=14 0:00 0 S</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>이 commit은 아래 2가지 오류를 담고 있습니다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>1987~1988년도의 섬머타임은 시작시간 2시부터인데 0시부터로 표기되었습니다.</p>
-</li>
-<li>
-<p>새로 추가한 1960년의 섬머타임은 실제로는 5월1일부터 9월18일까지였습니다. 위키페디아와 옛날신문의 자료가 일치합니다.</p>
-</li>
-<li>
-<p><a href="http://newslibrary.naver.com/viewer/index.nhn?articleId=1960050100209103019&amp;editNo=2&amp;printCount=1&amp;publishDate=1960-05-01&amp;officeId=00020&amp;pageNo=3&amp;printNo=11713&amp;publishType=00010">썸머타임 1일부터</a>, 동아일보, 1960.05.01</p>
-</li>
-<li>
-<p><a href="http://newslibrary.naver.com/viewer/index.nhn?articleId=1960091800209103010&amp;editNo=2&amp;printCount=1&amp;publishDate=1960-09-18&amp;officeId=00020&amp;pageNo=3&amp;printNo=11853&amp;publishType=00010">없어지는 섬머타임</a>, 동아일보, 1960.09.18</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>이외에도 이 Commit은 우리나라 시간대 변경에 대한 많은 오류를 포함하고 있습니다. 섬머타임 외의 오류는 나중에 다시 살펴보도록 하겠습니다.</p>
-</div>
-<div class="paragraph">
-<p>주석으로 볼때 위의 <a href="https://github.com/eggert/tz/commit/61315cadc3d0e8b4ef559539502a606cf58fc0f7">1993년 11월23일의 커밋</a>은 <a href="http://en.wikipedia.org/wiki/Thomas_G._Shanks">Thomas G. Shanks</a>의 The International Atlas의 제3판에 있는 내용을 반영한것을 보입니다. 주석에도 아래와 같이 미국이외의 타임존 정보는 별다른 명시가 없다면 이 책을 참고로 했다고 나옵니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code># A good source for time zone historical data outside the U.S. is# Thomas G. Shanks, The International Atlas (3rd edition),# San Diego: ACS Publications, Inc. (1991).# Except where otherwise noted, it is the source for the data below.</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>지금 이 책은 <a href="http://www.amazon.com/International-Atlas-6th-Thomas-Shanks/dp/0935127887/">6판</a>까지 나와있고, 이후의 commit에서도 5판,6판을 따라서 수정한 내용이 보입니다.</p>
-</div>
-<div class="paragraph">
-<p>그 이후 <a href="https://github.com/eggert/tz/commit/da23b4d3897fd8a9e302ca0e85b25ce921f95ec7">2012년 7월 18일의 커밋</a>이 한번더 섬머타임 데이터를 수정했습니다. 1987년, 1988년의 표현규칙을 바꾼것으로 근본적인 오류가 수정되지는 않았습니다.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="prettyprint highlight"><code>Rule ROK 1987 1988 - May Sun&gt;=8    0:00 1:00 DRule ROK 1987 1988 - Oct Sun&gt;=8    0:00 0 S</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>1960년 이전의 데이터까지 포함한다면, IANA 데이터베이스에서 우리나라의 섬머타임이 제대로 반영된 적은 한번도 없었던 것입니다.</p>
+<p>다섯째, 느린 테스트 실행 속도입니다. 단 한줄을 고쳐도 패키징 &#8594; 설치 &#8594; 실행 싸이클을 거칩니다. 이 부분이 테스트의 장점을 다 말아먹는 가장 치명적인 단점입니다. 요즘 PC나 단말이 많이 빨라졌고 Genymotion같은 빠른 에뮬레이터도 활용할 수 있어서 많이 나아졌지만, 그래도 실행싸이클의 특성상 개선에 한계가 있습니다.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="패치_전달와_반영">패치 전달와 반영</h2>
+<h2 id="robolectric_활용법">Robolectric 활용법</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>조사결과 섬머타임의 오류를 확신하고, 이를 수정하는 패치파일을 직접 만들어서 시간대데이터를 관리하는 IANA에 메일(<a href="mailto:tz@iana.org">tz@iana.org</a> )로 보냈습니다. 여러 옛날 신문들을 많이 찾아본결과 <a href="http://ko.wikipedia.org/wiki/한국_표준시">위키페이디아의 '한국표준시&#8217;페이지</a>의 정보가 신뢰할만하다고 판단했습니다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>1948.06.01. 00:00 ~ 1948.09.13. 00:00</p>
-</li>
-<li>
-<p>1949.04.03. 00:00 ~ 1949.09.11. 00:00</p>
-</li>
-<li>
-<p>1950.04.01. 00:00 ~ 1950.09.10. 00:00</p>
-</li>
-<li>
-<p>1951.05.06. 00:00 ~ 1951.09.09. 00:00</p>
-</li>
-<li>
-<p>1955.05.05. 00:00 ~ 1955.09.09. 00:00</p>
-</li>
-<li>
-<p>1956.05.20. 00:00 ~ 1956.09.30. 00:00</p>
-</li>
-<li>
-<p>1957.05.05. 00:00 ~ 1957.09.22. 00:00</p>
-</li>
-<li>
-<p>1958.05.04. 00:00 ~ 1958.09.21. 00:00</p>
-</li>
-<li>
-<p>1959.05.03. 00:00 ~ 1959.09.20. 00:00</p>
-</li>
-<li>
-<p>1960.05.01. 00:00 ~ 1960.09.18. 00:00</p>
-</li>
-<li>
-<p>1987.05.10. 02:00 ~ 1987.10.11. 03:00</p>
-</li>
-<li>
-<p>1988.05.08. 02:00 ~ 1988.10.09. 03:00</p>
-</li>
-</ul>
+<p>저도 Android의 기본 Instrutation테스트를 시도해보다 앞에서 말씀드린 이유로 많은 좌절을 느꼈습니다. 그래서 이를 개선하는 기술로 Robolecric을 시도해봤고, 어느정도 노하우를 쌓았습니다.</p>
 </div>
 <div class="paragraph">
-<p>예를 들면 1948년의 정보는 <a href="http://newslibrary.naver.com/viewer/index.nhn?articleId=1948060100209202008&amp;editNo=1&amp;printCount=1&amp;publishDate=1948-06-01&amp;officeId=00020&amp;pageNo=2&amp;printNo=7607&amp;publishType=00020">1948년 6월1일자 동아일보 기사</a>에서 확인할수 있습니다.</p>
+<p>Robolectric은 배포, 설치가 필요없도록 PC의 JVM에서 안드로이드 코드를 실행해줍니다. 아마 한두번쯤을 만나셨을 메시지일듯한데, 이클랩스 같은 IDE안에서 안드로이드 코드를 바로 돌리면 'java.lang.RuntimeException: Stub!?' 에러가 발생합니다. Robolectric은 Android SDK가 제공하는 클래스에를 가로채어서 서 JVM에서 ANdroid 코드를 실행해도 저런 에러가 나지 않는 가짜코드를 시랭합니다.</p>
 </div>
 <div class="paragraph">
-<p>패치절차는 시간대데이터베이스의 소스에 있는 <a href="https://github.com/eggert/tz/blob/master/CONTRIBUTING">CONTRIBUTING</a>파일에 잘 설명되어 있습니다. 정식절차와는 별도로 github에도 올려봤습니다. ( <a href="https://github.com/eggert/tz/pull/9" class="bare">https://github.com/eggert/tz/pull/9</a> )</p>
+<p>이 프로젝트는 Github에서 활발하게 개발되고 있습니다. ActionbarSherlock으로 유명한 JakeWharton도 주요 커미터입니다. 174명의 기여자가 참여했고, 저도 그 174명 중의 한명이기도 합니다.</p>
 </div>
 <div class="paragraph">
-<p>얼마 후 제가 보낸 패치를 포함하는 <a href="https://github.com/eggert/tz/commit/929c14a3d8ce505a9b8fb7099bee3a03ccf7e8e4">2014년 10월30일의 Commit</a>이 올라왔습니다. 'Unreleased, experimental changes&#8217;라는 문구가 포함되었지만, 이를 뒤집는 증거가 발견되지 않는한 정식릴리즈에 포함될 것으로 예상합니다.</p>
+<p>릴리즈 노트를 보시면 아시겠지만, 이 프레임워크는 꾸준히 발전하고 있습니다. 최근에는 KitKat에 추가된 API를 지원하는 작업도 진행되고 있습니다.</p>
 </div>
 <div class="paragraph">
-<p>IANA쪽에서 이 수정을 받아준 Paul Eggert은 제가 섬머타임 변경의 근거로 보낸 <a href="http://ko.wikipedia.org/wiki/한국_표준시">위키페이디아의 '한국표준시&#8217;페이지</a>를 보고 우리나라의 시간대 변경시점에 대한 오류도 추가로 수정을 했습니다.</p>
+<p>그리고 Android를 만든 구글에서도 Robolectric의 1점대의 버전을 자체 포크해서 쓴 흔적이 Android 코드저장소에 남아있습니다. 이렇게 포크로 그치지 않고 구글에서도 같이 Robolectric 2점대 버전의 개발에 참여했으면 더 좋지 않을까 하는 아쉬움이 남습니다.</p>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="시간대_변경시점의_오류">시간대 변경시점의 오류</h2>
-<div class="sectionbody">
 <div class="paragraph">
-<p>처음에 보낸 패치에는 포함되지 못했지만 섬머타임 외에도 우리나라 시간대 변경에 대한 의문도 있었습니다. "yyyy.MM.dd HH:mm (Z)"을 포멧으로 해서, 1954년, 1961년, 1968년의 특정시간과 그 때와 UTC와의 차이를 출력해보면, 아래와 같이 나옵니다. (소스는 <a href="https://github.com/benelog/java-date-time/blob/master/jdk7-date-time/src/main/java/com/nbp/weblab/date/TimeZoneChangePoint.java">TimeZoneChangePoint.java</a> 참조 )</p>
+<p>물론 Dalvik이나 Art같은 Android 본연의 환경이 아닌 JVM에서 실행되다는 점 때문에 이 라이브러리의 한계는 있습니다. 그리고 Android SDK의 모든 영역을 SDK 출시 즉시에 제공하지도 못합니다. 그렇지만 Robolectric의 한계를 잘 인식하고 효율적으로 테스트할수 있는 부분에 집중을 한다면 앱이나 라이브러리를 개발하는데 많은 도움이 됩니다.</p>
+</div>
+<div class="paragraph">
+<p>몇가지 대표적인 사용사례를 들어보겠습니다.</p>
+</div>
+<div class="sect2">
+<h3 id="로그를_system_out으로_출력하기">로그를 System.out으로 출력하기</h3>
+<div class="paragraph">
+<p>우선 LogCat으로 출력되는 로그를 Log를 System.out으로 출력하려면 아래와 같이 구현을 하면 됩니다.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="prettyprint highlight"><code>1954.03.20 22:59 (+0900)1954.03.20 23:00 (+0800)1961.08.09 23:59 (+0800)1961.08.10 00:30 (+0830)1968.09.30 23:59 (+0830)1968.10.01 00:30 (+0900)</code></pre>
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@RunWith(RobolectricTestRunner.class)
+@Config(manifest = Config.NONE)
+public class SystemUtilsTest {
+    @Before
+    public void setUp() {
+        ShadowLog.stream = System.out;
+    }</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>이 소스의 결과는 <a href="https://github.com/eggert/tz/commit/61315cadc3d0e8b4ef559539502a606cf58fc0f7">1993년 11월23일의 수정</a> 때 반영된 타임존DB의 정보에 의지합니다. 위의 결과라면 우리나라의 시간대 변경시점은 아래와 같습니다.</p>
+<p>android.util.Log를 이용한 클래스를 JVM에서 바로 실행가능합니다. java.lang, java.util등 기본 JDK에도 동일한 이름으로 존재하는 클래스를 주로 쓰는 유틸리티 클래스를 만덜어도 Log를 찍는 코드가 중간에 들어가있으면 이를 Dalvik에서만 실행해야했습니다. Robolect은 그런 코드도 JVM에서 실행되도록 하며 위와 같이 ShawdowLog클래스에 stream속성을 System.out으로 지정하면 System.out.println으로 찍는것과 유사하게 PC의 표준출력에서 로그메시지를 확인할수 있습니다.</p>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p>1954년 : UTC+0900 &#8594; UTC+0800</p>
-</li>
-<li>
-<p>1961년 : UTC+0800 &#8594; UTC+0830</p>
-</li>
-<li>
-<p>1968년 : UTC+0830 &#8594; UTC+090</p>
-</li>
-</ul>
+</div>
+<div class="sect2">
+<h3 id="단말기의_정보_변경">단말기의 정보 변경</h3>
+<div class="paragraph">
+<p>종종 Build.VERSION.SDK_INT 변수의 값을 참조해서 SDK의 버전별로 분기처리를 해야하는 코드가 있습니다. Robolectric에서는 이런 상수값도 아래와 같이 조작을 할 수 있습니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>	Robolectric.Reflection.setFinalStaticField(Build.VERSION.class, "SDK_INT", Build.VERSION_CODES.JELLY_BEAN);</pre>
+</div>
 </div>
 <div class="paragraph">
-<p>그러나 과거 신문에서 확인한 역사적 사실은 아래와 같습니다. 위키페디아의 내용과도 일치합니다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>1954년 : UTC+0900 &#8594; UTC+0830</p>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="http://newslibrary.naver.com/viewer/index.nhn?articleId=1954032100209203002&amp;editNo=1&amp;printCount=1&amp;publishDate=1954-03-21&amp;officeId=00020&amp;pageNo=3&amp;printNo=9522&amp;publishType=00020">'오늘은 춘분 시간도 광복'</a>, 동아일보, 1954.03.21</p>
-</li>
-<li>
-<p><a href="http://newslibrary.naver.com/viewer/index.nhn?articleId=1954032100329203006&amp;editNo=1&amp;printCount=1&amp;publishDate=1954-03-21&amp;officeId=00032&amp;pageNo=3&amp;printNo=2462&amp;publishType=00020">'입일일은 춘분, 표준시간광복의 날'</a>. 경향신문, 1954.03.21</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>1961년 : UTC+0830 &#8594; UTC+0900</p>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="http://newslibrary.naver.com/viewer/index.nhn?articleId=1961080900329203009&amp;editNo=2&amp;printCount=1&amp;publishDate=1961-08-09&amp;officeId=00032&amp;pageNo=3&amp;printNo=4796&amp;publishType=00020">'구일밤 통금 싸이렌 불면 시계 바늘을 12시반으로</a>, 경향신문, 1961.8.09</p>
-</li>
-<li>
-<p><a href="http://newslibrary.naver.com/viewer/index.nhn?articleId=1961081000209204005&amp;editNo=2&amp;printCount=1&amp;publishDate=1961-08-10&amp;officeId=00020&amp;pageNo=4&amp;printNo=12179&amp;publishType=00020">'새 표준자오선이란?'</a>, 동아일보, 1961.08.10</p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
+<p>이런 기법은 Http호출을 하는 클라이언트에서 userAgent에 단말의 정보를 조합해서 넣어하는 경우를 테스트하는 경우에 유용하게 썼습니다.</p>
 </div>
 <div class="paragraph">
-<p>즉 현재의 시간대데이터로는 1961~1968년사이는 아예 우리나라의 시간대가 잘못 계산되어 나온다는 것입니다.</p>
+<p>Activity 클래스는 ActivityController라는 클래스를 통해 생성할 수 있습니다. 아래 코드는 스크린밝기를 지정하는 유틸리티는 테스트하는 코드입니다. 이 소스코드는 github에서 전체를 확인해보실수 있습니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Test
+public void shouldChangeScreenBrightness() {
+    TestActivity activity = createActivity(TestActivity.class);
+    float brightness = 0.5f;
+    ScreenUtils.setScreenBrightness(activity, brightness);
+
+    LayoutParams lp = activity.getWindow().getAttributes();
+
+    assertThat(lp.screenBrightness, is(brightness));
+}
+
+private &lt;T extends Activity&gt; T createActivity(Class&lt;T&gt; activityClass) {
+        ActivityController&lt;T&gt; controller = Robolectric.buildActivity(activityClass);
+        controller.create();
+        return controller.get();
+}</code></pre>
+</div>
 </div>
 <div class="paragraph">
-<p>이 부분은 섬머타임이 반영되는 것을 보고 조금 더 조사를 한 후에 추가 패치를 하려고 생각했었습니다. 기존 데이터가 그렇게까지 다 틀렸다는 것이 믿기가 어려웠고, 우리나라의 시간대 정보에 대한 거의 모든것을 한번에 고치기가 조심스러웠기 때문입니다. 그런데 Paul Eggert가 먼저 적극적으로 반영해주었습니다.</p>
+<p>( <a href="https://github.com/naver/android-utilset/blob/master/UtilSet/test/com/navercorp/utilset/ui/ScreenUtilsTest.java">ScreenUtilsTest</a> )</p>
 </div>
 <div class="paragraph">
-<p>Paul Eggert는 이와 더불어 <a href="http://ko.wikipedia.org/wiki/한국_표준시">위키페이디아의 '한국표준시&#8217;페이지</a>에 따르면 1912년에 UTC+0900로 변경이 있었는데, 1910년에도 같은 변경이 있었던것으로 기록된 부분이 혼동된다며 이를 명확히 확인해주었다면 좋겠다고 했습니다. 위키페디아에서 1910년도 변경의 근거로 든 '여적 표준시 변경, 경향신문, 2000-08-14.'라는 자료는 현재 인터넷으로 찾을 수 없어서 대신 여러 기록을 확인해보았습니다. 많은 자료가 1912년에 변경되었다는것으로 일치했고, 1910년도의 변경기록은 누군가가 한일합방 연도와 혼동한것이 아닐까하는 의견을 답장으로 보냈습니다.</p>
+<p>DisplayMetricsDensity 속성은 직접 <a href="https://github.com/robolectric/robolectric/blob/master/src/main/java/org/robolectric/Robolectric.java">org.robolectric.Robolectric</a>의 set메서드로 지정할 수 있습니다. 아래는 DP와 Pixel을 전환하는 코드를 예제로 들어봤습니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@RunWith(RobolectricTestRunner.class)
+@Config(manifest = Config.NONE)
+public class PixelUtilsTest {
+    private Context context;
+
+    @Before
+    public void setUp() {
+        ShadowLog.stream = System.out;
+        this.context = Robolectric.application;
+    }
+
+    @Test
+    public void shouldGetDpFromPixel(){
+        Robolectric.setDisplayMetricsDensity(1.5f);
+        int dp = PixelUtils.getDpFromPixel(context, 50);
+        assertThat(dp, is(33));
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>( <a href="https://github.com/naver/android-utilset/blob/master/UtilSet/test/com/navercorp/utilset/ui/PixelUtilsTest.java">PixelUtilsTest</a> )</p>
+</div>
+<div class="paragraph">
+<p>이 클래스의 Setter 메소드를 살펴보면 그밖에도 다양하게 테스트를 위한 가짜 객체를 설정하는 기능을 찾으실 수 있습니다.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="단말의_sdk_정보를_원하는_값으로">단말의 SDK 정보를 원하는 값으로</h3>
+
+</div>
+<div class="sect2">
+<h3 id="system_서비스의_결과를_원하는_값으로">System 서비스의 결과를 원하는 값으로</h3>
+<hr>
+<div class="paragraph">
+<p>몇가지 예를 들었는데, Robolectric을 결국 어떻게 활용할 것이 좋을까요? JVM에서 테스트해도 동일한 결과를 보장하는 문자열, 날짜 처리, 프로토콜 파싱 영역에서 이득이 많습니다. 주로java.lang, java.util , java.io 패키지가 다루는 영역에 우선 집중하기는 것이 좋습니다. 처음부터 Activity, Fragment같은 UI영역까지 포함한 통합 테스트에 너무 많은 기대를 걸면 오히려 어려울 수 있습니다. Utility 클래스부터 우선 적용해보면서 점점 영역을 넓혀가시기를 권장드립니다.</p>
+</div>
+<div class="paragraph">
+<p>Robolectric의 버전 2.3부터는 실제 Sqlite 구현체를 이용하기 시작했습니다. 이 버전부터는 DB관련 테스트도 JVM에서 시도해볼만합니다.</p>
+</div>
+<div class="paragraph">
+<p>당연히 Robolectric으로 테스트를 포기할 영역도 많습니다. 노하우가 쌓이면 이를 의식해서 테스트의 이득이 높은 영역을 분리해서 설계할 수 있습니다. 이는 재활용/기능 추가/버그 발견에도 좋은 구조가 될것입니다.</p>
+</div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="북한의_타임존_데이터">북한의 타임존 데이터</h2>
+<h2 id="코드_기여">코드 기여</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>또하나 의문이였던 점은 <a href="https://github.com/eggert/tz/commit/61315cadc3d0e8b4ef559539502a606cf58fc0f7">1993년 11월23일의 커밋</a>으로 북한의 시간대가 1961년에 UTC+0900으로 변경되었다는 내용입니다. 그때 남한 쪽에서 시간대 변경이 있었는데, 당시 신문을 다 찾아봐도 남북한이 동시에 추진을 했다는 내용은 없었습니다.</p>
+<p>계속 발전하고 있는 프레임워크이기 때문에 Robolectric에는 미비한 기능도 많습니다. 테스트 대상인 ANdroid 자체가 계속 변화하고 있어서 더욱 그렇기도 합니다. Robolectric은 Github에 올라간 오픈소스 프로젝트이기 때문에 누구나 코드 기여를 할 수 있습니다. 저도 3번 정도 Pull request를 날렸는데 그 경험을 공유해보겠습니다.</p>
 </div>
 <div class="paragraph">
-<p>Paul Eggert도 이를 이상하게 여겨 일단은 북한쪽은 1940년대 이후로 변화가 없는것으로 가정했다고 합니다.</p>
-</div>
-<div class="quoteblock">
-<blockquote>
-<div class="paragraph">
-<p>While we&#8217;re in the neighborhood, it&#8217;s completely implausible that Pyongyang faithfully mimicked Seoul time during and after the Korean war (which is what Shanks says), so let&#8217;s remove that obviously-bogus guess.</p>
-</div>
-</blockquote>
+<p>처음에는 Javadoc의 오타부터 수정해봤습니다. <a href="https://github.com/robolectric/robolectric/pull/804">Pull request 번호 804번</a>에서는 ShadowCookieManager의 javadoc에서 TelephonyManager로 작힌 단어를 CookieManager 로 수정했습니다. 주석을 한번이라도 본 사람이면 할 수 있는 아주 단순한 수정이였습니다.</p>
 </div>
 <div class="paragraph">
-<p>저도 답장으로 북한쪽의 변경에 대한 의미있는 기록을 찾지 못했고, Paul Eggert의 가정에 동의한다는 내용을 보냈습니다.</p>
+<p>한번 해보고나니 조금 더 어려운 기여를 해보고 싶어였습니다. 프로젝트를 진행하다가 Robolectric의 ShawdowCookieManager가 실제 android의 CookieManager의 동작과는 많이 다르다는 것을 발견했습니다. Robolectric 2.2까지는 단순히 HashMap에 key,value를 저장하는 수준이였습니다. Expires같은 속성이 들어가면 실제 SDK와 다르게 동작함. 아래 코드는 테스트가 실패합니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">	cookieManager.setCookie(httpUrl, "name=value; Expires=Wed, 11 Jul 2035 08:12:26 GMT");
+	assertThat(cookieManager.getCookie(httpUrl)).isEqualTo("name=value");</code></pre>
+</div>
 </div>
 <div class="paragraph">
-<p>tzdata2014j버전대로라면 1954년과 1961년 사이 서울과 평양사이에는 30분의 시차가 존재합니다. 이 것이 역사적 사실과 부합하는지 알아내려고 계속 알아보고 있는 중입니다. 현재 한국표준과학연구원과 통일부, 국정원에 문의를 했지만, 의미있는 답변은 받지 못했습니다. 특히 친절히 전화까지 해주신 통일부 직원분께 감사드립니다.</p>
+<p>Pull request 번호 853번에서는 이를 실제와 비슷하게 재구현했습니다.</p>
 </div>
 <div class="paragraph">
-<p>1954년과 1961년 사이에 남파/북파 간첩활동을 한 분이 있다면, 그 사실을 정확히 알고 있을 것 같기도 합니다. 그런데 과거 간첩사건을 조사해보니 생각보다 간첩들의 나이가 많아서 지금까지 생존한 분이 계실 가능성은 별로 없어보입니다.</p>
+<p>이 과정이 흥미로웠기 때문에 잠시 설명드리면, 먼저 실제 단말에서의 동작을 AndroidTestCase로 확인했습니다. ( <a href="https://gist.github.com/benelog/7655764">https://gist.github.com/benelog/7655764</a> )</p>
+</div>
+<div class="paragraph">
+<p>예를 들면 아래와 같이 removeExpireCookie를 호출했을 때 Expires값이 지나간 쿠키값은 삭제하는 동작을 확인해봤습니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">CookieManager cookieManager;
+
+public void setUp() {
+    Context context = getContext();
+    CookieSyncManager.createInstance(context);
+    cookieManager = CookieManager.getInstance();
+    cookieManager.removeAllCookie();
+}
+
+public void testRemoveExpiredCookie() {
+    cookieManager.setCookie(url, "name=value; Expires=Wed, 11 Jul 2035 10:18:14 GMT");
+    cookieManager.setCookie(url, "name2=value2; Expires=Wed, 13 Jul 2011 10:18:14 GMT");
+    cookieManager.removeExpiredCookie();
+    assertEquals("name=value", cookieManager.getCookie(url));
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>그리고 유사한 테스트 케이스를 Robolectric으로 작성했습니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">CookieManager cookieManager = Robolectric.newInstanceOf(CookieManager.class);
+
+@Test
+public void shouldRemoveExpiredCookie() {
+    cookieManager.setCookie(url, "name=value; Expires=Wed, 11 Jul 2035 10:18:14 GMT");
+    cookieManager.setCookie(url, "name2=value2; Expires=Wed, 13 Jul 2011 10:18:14 GMT");
+    cookieManager.removeExpiredCookie();
+    assertThat(cookieManager.getCookie(url)).isEqualTo("name=value");
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>위의 테스트를 통과시키는 ShadowCookieManager를 구현하여 Pull request를 날렸습니다. Robolectric에 들어갈 코드를 Robolecric으로 검증한 셈입니다.</p>
+</div>
+<div class="paragraph">
+<p>마지막으로 ShawdowProcess 구현한 코드입니다. 이 클래스로 android.os.Process.myPid()에서 나오는 값을 가짜로 지정할 수 있습니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Test
+public void shouldBeTrueWhenThisContextIsForeground(){
+    int pid = 3;
+    ShadowProcess.setPid(pid);
+    createRunningAppProcessInfo(pid);
+    boolean foreground = ActivityUtils.isContextForeground(context);
+    assertThat(foreground, is(true));
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>구글의 Android 소스 저장소의 Robolectric fork판에도 유사한 클래스가 있습니다.</p>
+</div>
+<div class="paragraph">
+<p>이 클래스는 <a href="https://github.com/robolectric/robolectric/pull/861/">Pull request 861번</a> 으로 던져서 반영되었습니다. 중간에 이 클래스가 없으면 어떻게 되냐고 물어보길래 자세히 설명하려고 노력했던 과정이 재미있었습니다.</p>
+</div>
+<div class="paragraph">
+<p>코드 기여에 유의할 점도 있습니다. Merge를 받아줄 주요 커미터들이 작업하기 편하게 Pull request를 하는 브랜치는 계속 master의 최신 commit으로 맞춰서 rebase를 해줘야합니다. 제가 한 요청들도 다른 요청에 밀려서 merge가 안 되고 있었는데, 계속적으로 rebase를 하고 있으니 그 정성을 봐서도 merge를 해준것 같기도합니다.</p>
+</div>
+<div class="paragraph">
+<p>그외에는 컨티리뷰션 가이드를 참조하시면 됩니다. 대표적인 내용을 소개드리면, Indent에는 탭대신 공백 2칸을 쓰는등 컨벤션을 맞춰야하고, 적절한 테스트 코드를 같이 commit을 해야합니다. 앞에서 나온 CookieManager 사례를 참고하셔도 좋습니다.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="마치며">마치며</h2>
+<h2 id="정리">정리</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>재미있게도 위의 오류를 신고한지 얼마뒤인 2014년 11월 1일에 'https://github.com/eggert/tz/commit/bee436b03e28bd5ea984534fcc5e4f3a4d18b47a[Be less enthusiastic about Shanks and clarify UT vs UTC.] '라는 제목으로 commit이 올라왔습니다. 우리나라 시간대에 대한 잘못된 정보의 출처였던 Shanks의 저서에 많은 오류가 있음을 지적하는 주석이 들어갔습니다. 아시아, 아프리카, 오스트랄라시아, 유럽 등 지역별 정보를 기록하는 모든 파일에 'A good source for time zone historical data outside the U.S. is..'라는 내용이 삭제되고, 'unfortunately this book contains many errors and cites no sources.'라는 문장이 추가되었습니다.</p>
+<p>정리하자면 다음과 같습니다. Android 테스트는 난관이 많습니다. 특히 느린 실행속도가 치명적입니다. 여기서 Robolectric이 도움이 됩니다. 우선은 문자열, API 파싱. 유틸리티등 테스트하기 쉬운 영역부터 시도해볼만하고, 궁극적으로는 설계개선을 고민하는 것이 좋습니다. 코드 기여도 어렵지 않은, 기여자에게 관대한 프로젝트입니다.</p>
 </div>
 <div class="paragraph">
-<p>저의 신고가 영향을 준것인지는 알 수 없지만, 이 주석을 기점으로 기존의 데이터를 조금 더 의심하는 계기가 될 것으로 기대합니다.</p>
+<p>오늘 발표와 관련해서 helloworld 블로그에 게시된 <a href="http://helloworld.naver.com/helloworld/342818">Android에서 @Inject, @Test</a>글도 참고하실만합니다.</p>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="발표자료">발표자료</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>비록 오래전 과거데이터라서 지금 시점의 영향성은 적지만, 믿음직한 표준데이터라고 생각했던 IANA Timezone DB에 이렇게 오류가 많았다는 점, 특히 우리나라 관련한 데이터에는 제대로 된 것이 거의 없었다는 사실은 놀랍습니다. 우리나라의 과거 자료와는 별도로, 국제화관련 개발을 하는 사람이라면 내 컴퓨터/내 담당서버에 들어와있는 타임존데이터베이스가 언제 시점인지, 업데이트는 잘 되어 있는지도 잘 확인해봐야겠습니다.</p>
+<p><a href="https://www.slideshare.net/deview/5robolectric">https://www.slideshare.net/deview/5robolectric</a></p>
 </div>
-<div class="paragraph">
-<p>지금까지의 내용과 관련된 메일스레드는 아래와 같습니다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>2014년 10월 30일 00:07:24 (UTC) From 정상혁, To <a href="mailto:tz@iana.org">tz@iana.org</a> : 최초 패치를 보낸 메일 <a href="http://mm.icann.org/pipermail/tz/2014-October/021830.html" class="bare">http://mm.icann.org/pipermail/tz/2014-October/021830.html</a></p>
-</li>
-<li>
-<p>2014년 10월 30일 06:53:09 (UTC) From Paul Eggert, To 정상혁 : 답장과 1910년 시간대 변경에 대한 문의 <a href="http://mm.icann.org/pipermail/tz/2014-October/021831.html" class="bare">http://mm.icann.org/pipermail/tz/2014-October/021831.html</a></p>
-</li>
-<li>
-<p>2014년 10월 30일 09:18:57 (UTC) From 정상혁, To Paul Eggert : 1910년의 시간대 변경과 북한시간대에 대한 의견 : <a href="http://mm.icann.org/pipermail/tz/2014-October/021833.html" class="bare">http://mm.icann.org/pipermail/tz/2014-October/021833.html</a></p>
-</li>
-</ul>
-</div>
+<iframe src="//www.slideshare.net/slideshow/embed_code/key/hzukqnu9TZiiOJ" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/deview/5robolectric" title="[D2 오픈세미나]5.robolectric 안드로이드 테스팅" target="_blank">[D2 오픈세미나]5.robolectric 안드로이드 테스팅</a> </strong> from <strong><a href="https://www.slideshare.net/deview" target="_blank">NAVER D2</a></strong> </div>
 </div>
 </div>
     </div>
@@ -757,43 +552,43 @@ public void shouldGetAfterOneHour() {
 <!-- Social Share Button HTML -->
 
 <!-- Twitter -->
-<li><a href="//twitter.com/share?url=https://anew0m.netlify.com//3120317.html&text=시간대 DB에서 우리나라 시간의 오류&via=" target="_blank" class="share-btn twitter">
+<li><a href="//twitter.com/share?url=https://anew0m.netlify.com//robolectric.html&text=Robolectric을 활용한 안드로이드 쾌속 테스팅&via=" target="_blank" class="share-btn twitter">
     <i class="fa fa-twitter"></i>
     <p>Twitter</p>
 </a></li>
 
 <!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=https://anew0m.netlify.com//3120317.html" target="_blank" class="share-btn google-plus">
+<li><a href="//plus.google.com/share?url=https://anew0m.netlify.com//robolectric.html" target="_blank" class="share-btn google-plus">
     <i class="fa fa-google-plus"></i>
     <p>Google+</p>
 </a></li>
 
 <!-- Facebook -->
-<li><a href="//www.facebook.com/sharer/sharer.php?u=https://anew0m.netlify.com//3120317.html" target="_blank" class="share-btn facebook">
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://anew0m.netlify.com//robolectric.html" target="_blank" class="share-btn facebook">
     <i class="fa fa-facebook"></i>
     <p>Facebook</p>
 </a></li>
 
 <!-- Reddit (url, title) -->
-<li><a href="//reddit.com/submit?url=https://anew0m.netlify.com//3120317.html&title=시간대 DB에서 우리나라 시간의 오류" target="_blank" class="share-btn reddit">
+<li><a href="//reddit.com/submit?url=https://anew0m.netlify.com//robolectric.html&title=Robolectric을 활용한 안드로이드 쾌속 테스팅" target="_blank" class="share-btn reddit">
     <i class="fa fa-reddit-alien"></i>
     <p>Reddit</p>
 </a></li>
 
 <!-- LinkedIn -->
-<li><a href="//www.linkedin.com/shareArticle?url=https://anew0m.netlify.com//3120317.html&title=시간대 DB에서 우리나라 시간의 오류" target="_blank" class="share-btn linkedin">
+<li><a href="//www.linkedin.com/shareArticle?url=https://anew0m.netlify.com//robolectric.html&title=Robolectric을 활용한 안드로이드 쾌속 테스팅" target="_blank" class="share-btn linkedin">
     <i class="fa fa-linkedin"></i>
     <p>LinkedIn</p>
 </a></li>
 
 <!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=https://anew0m.netlify.com//3120317.html&title=시간대 DB에서 우리나라 시간의 오류" target="_blank" class="share-btn stumbleupon">
+<li><a href="//www.stumbleupon.com/submit?url=https://anew0m.netlify.com//robolectric.html&title=Robolectric을 활용한 안드로이드 쾌속 테스팅" target="_blank" class="share-btn stumbleupon">
     <i class="fa fa-stumbleupon"></i>
     <p>StumbleUpon</p>
 </a></li>
 
 <!-- Email -->
-<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://anew0m.netlify.com//3120317.html" target="_blank" class="share-btn email">
+<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://anew0m.netlify.com//robolectric.html" target="_blank" class="share-btn email">
     <i class="fa fa-envelope"></i>
     <p>Email</p>
 </a></li>
@@ -806,105 +601,10 @@ public void shouldGetAfterOneHour() {
 		<ul class="stats">
     	    <!-- Display the categories associated with this post -->
     	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/timezone.html'>timezone</a></li>
- 	        <li><a href='../tags/시간대.html'>시간대</a></li>
- 	        <li><a href='../tags/날짜.html'>날짜</a></li>
+ 	        <li><a href='../tags/testing.html'>testing</a></li>
+ 	        <li><a href='../tags/android.html'>android</a></li>
 
-				<li><a class="icon fa-comment" href="../3120317.html#disqus_thread"> &nbsp;</a></li>
- 		</ul>
-    	
-    </footer>
-</article>
-<article class="post">
-   <header>
-    <div class="title">
-                    <h2><a href="../3017438.html">Android에서 @Inject, @Test</a></h2>
-
-
-    </div>
-    <div class="meta">
-         <time class="published"
-            datetime='Apr 17, 2013'>
-            Apr 17, 2013</time>
-            <div class="published eta"></div>
-        <span class="author"/><span class="name">정상혁</span><img src="../img/main/jmh.jpg" alt="정상혁" /></span>
-    </div>
-</header>
-
-    
-  
-         
-    <div id="content">
-       <div class="paragraph">
-<p>제가 지난달에 썼던 글이 네이버의 기술블로그인 <a href="http://helloworld.naver.com/">http://helloworld.naver.com</a>에 공개되었습니다.</p>
-</div>
-<div class="paragraph">
-<p><a href="http://helloworld.naver.com/helloworld/342818">Android에서 @Inject, @Test</a></p>
-</div>
-<div class="paragraph">
-<p>Android에서 DI + Test 스타일로 개발을 하는데 겪는 어려움과 이를 극복하는데 도움을 주는 Android annotations와 Robolectric 등의 오픈소스 프레임워크를 비교하고 소개했습니다.</p>
-</div>
-    </div>
-	
-	<section id="social-share">
-        <ul class="icons">
-<!-- Social Share Button HTML -->
-
-<!-- Twitter -->
-<li><a href="//twitter.com/share?url=https://anew0m.netlify.com//3017438.html&text=Android에서 @Inject, @Test&via=" target="_blank" class="share-btn twitter">
-    <i class="fa fa-twitter"></i>
-    <p>Twitter</p>
-</a></li>
-
-<!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=https://anew0m.netlify.com//3017438.html" target="_blank" class="share-btn google-plus">
-    <i class="fa fa-google-plus"></i>
-    <p>Google+</p>
-</a></li>
-
-<!-- Facebook -->
-<li><a href="//www.facebook.com/sharer/sharer.php?u=https://anew0m.netlify.com//3017438.html" target="_blank" class="share-btn facebook">
-    <i class="fa fa-facebook"></i>
-    <p>Facebook</p>
-</a></li>
-
-<!-- Reddit (url, title) -->
-<li><a href="//reddit.com/submit?url=https://anew0m.netlify.com//3017438.html&title=Android에서 @Inject, @Test" target="_blank" class="share-btn reddit">
-    <i class="fa fa-reddit-alien"></i>
-    <p>Reddit</p>
-</a></li>
-
-<!-- LinkedIn -->
-<li><a href="//www.linkedin.com/shareArticle?url=https://anew0m.netlify.com//3017438.html&title=Android에서 @Inject, @Test" target="_blank" class="share-btn linkedin">
-    <i class="fa fa-linkedin"></i>
-    <p>LinkedIn</p>
-</a></li>
-
-<!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=https://anew0m.netlify.com//3017438.html&title=Android에서 @Inject, @Test" target="_blank" class="share-btn stumbleupon">
-    <i class="fa fa-stumbleupon"></i>
-    <p>StumbleUpon</p>
-</a></li>
-
-<!-- Email -->
-<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://anew0m.netlify.com//3017438.html" target="_blank" class="share-btn email">
-    <i class="fa fa-envelope"></i>
-    <p>Email</p>
-</a></li>
-        </ul>
-    </section>
-     
-
-    <footer>
-	
-		<ul class="stats">
-    	    <!-- Display the categories associated with this post -->
-    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/Android.html'>Android</a></li>
- 	        <li><a href='../tags/Test.html'>Test</a></li>
- 	        <li><a href='../tags/DependencyInjection.html'>DependencyInjection</a></li>
-
-				<li><a class="icon fa-comment" href="../3017438.html#disqus_thread"> &nbsp;</a></li>
+				<li><a class="icon fa-comment" href="../robolectric.html#disqus_thread"> &nbsp;</a></li>
  		</ul>
     	
     </footer>
@@ -915,10 +615,10 @@ public void shouldGetAfterOneHour() {
             class=" button big previous">PREVIOUS</a></li>
 
     <li><span
-            class="button big"> 2 of 30 </span></li>
+            class="button big"> 2 of 2 </span></li>
 
-    <li><a href="../3/"
-            class=" button big next">NEXT</a></li>
+    <li><a href="../#"
+            class="disabled  button big next">NEXT</a></li>
 </ul>
 	 </div>
 	
@@ -979,6 +679,17 @@ public void shouldGetAfterOneHour() {
                     <li>
                         <article>
                             <header>
+                                <h3><a href="../hello-world.html">내집마련 해커톤을 통한 개인 블로그 제작</a></h3>
+                                 <time class="published"
+							            datetime='Sep 21, 2019'>
+							            Sep 21, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
                                 <h3><a href="../installing-jdk.html">여러 개의 JDK를 설치하고 선택해서 사용하기</a></h3>
                                  <time class="published"
 							            datetime='Jul 01, 2019'>
@@ -1009,18 +720,6 @@ public void shouldGetAfterOneHour() {
                         </article>
                     </li>
 
-                    <li>
-                        <article>
-                            <header>
-                                <h3><a href="../3134907.html">'네이버를 만든 기술, 읽으면서 배운다 - 자바편' 출간</a></h3>
-                                 <time class="published"
-							            datetime='Feb 25, 2015'>
-							            Feb 25, 2015</time>
-                            </header>
-                        </article>
-                    </li>
-
-
             </ul>
         </section>
 
@@ -1034,162 +733,9 @@ public void shouldGetAfterOneHour() {
                     <li>
                         <article>
                             <header>
-                                <a href="../tags/.html"></a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 2 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/exception.html">exception</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 2 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/양병규.html">양병규</a>
+                                <a href="../tags/jdk.html">jdk</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Maven.html">Maven</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 6 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Multiline.html">Multiline</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Eclipse.html">Eclipse</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 7 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Naver.html">Naver</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 2 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/HTML.html">HTML</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/String.html">String</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/mashup도구.html">mashup도구</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/성능.html">성능</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Cubrid.html">Cubrid</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Cron.html">Cron</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 2 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Lotto.html">Lotto</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 3 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/행사후기.html">행사후기</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 9 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/cloud.html">cloud</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/BeanUtils.html">BeanUtils</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Spring-Batch.html">Spring-Batch</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 4 </span>
                             </header>
                         </article>
                     </li>
@@ -1198,15 +744,6 @@ public void shouldGetAfterOneHour() {
                             <header>
                                 <a href="../tags/java.html">java</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 2 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/generics.html">generics</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>
                         </article>
@@ -1214,151 +751,7 @@ public void shouldGetAfterOneHour() {
                     <li>
                         <article>
                             <header>
-                                <a href="../tags/개발.html">개발</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Test.html">Test</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 7 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Concurrency.html">Concurrency</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/MyBatis.html">MyBatis</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/coding-convention.html">coding-convention</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/EMMA.html">EMMA</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Winstone.html">Winstone</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Python.html">Python</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Google.html">Google</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/반복문.html">반복문</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/JSTL.html">JSTL</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/autoboxing.html">autoboxing</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/test.html">test</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 8 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/코딩연습.html">코딩연습</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 10 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/뉴스.html">뉴스</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 5 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Hudson.html">Hudson</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 4 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Hadoop.html">Hadoop</a>
+                                <a href="../tags/log.html">log</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>
@@ -1376,177 +769,6 @@ public void shouldGetAfterOneHour() {
                     <li>
                         <article>
                             <header>
-                                <a href="../tags/batch.html">batch</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/시간대.html">시간대</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/날짜.html">날짜</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 2 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Spring.html">Spring</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 18 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Sybase.html">Sybase</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 2 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/open-API.html">open-API</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/FindBugs.html">FindBugs</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/SQL.html">SQL</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Android.html">Android</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 3 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Spring-Integration.html">Spring-Integration</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/dropbox.html">dropbox</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/effective-Java.html">effective-Java</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Spring-Test.html">Spring-Test</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 8 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/spiral-array.html">spiral-array</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 2 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/PowerMock.html">PowerMock</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/FTP.html">FTP</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/보안.html">보안</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/책.html">책</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 5 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/timezone.html">timezone</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
                                 <a href="../tags/android.html">android</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
@@ -1556,304 +778,7 @@ public void shouldGetAfterOneHour() {
                     <li>
                         <article>
                             <header>
-                                <a href="../tags/꿈.html">꿈</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/mashup.html">mashup</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/WAS.html">WAS</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Spring-One.html">Spring-One</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 5 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/DependencyInjection.html">DependencyInjection</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
                                 <a href="../tags/static-site.html">static-site</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Effective-java.html">Effective-java</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/reload.html">reload</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/자작도구.html">자작도구</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 4 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/git.html">git</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/JUnit.html">JUnit</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/markdown.html">markdown</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/JDBC.html">JDBC</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 4 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Servlet.html">Servlet</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/검색.html">검색</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Oracle.html">Oracle</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Monitoring.html">Monitoring</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/정적분석.html">정적분석</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 5 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Java.html">Java</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 14 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/CSS.html">CSS</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 2 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/AOP.html">AOP</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 3 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/PMD.html">PMD</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 2 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/생산성-도구.html">생산성-도구</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/svn.html">svn</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Robolectric.html">Robolectric</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/매쉬업.html">매쉬업</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Spring-MVC.html">Spring-MVC</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/jdk.html">jdk</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Spring-JDBC.html">Spring-JDBC</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Btrace.html">Btrace</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/변수범위.html">변수범위</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/XML.html">XML</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 2 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/Jetty.html">Jetty</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/발명.html">발명</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>
