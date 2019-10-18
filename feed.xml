@@ -6,8 +6,8 @@
     <atom:link href="https://anew0m.netlify.com//feed.xml" rel="self" type="application/rss+xml" />
     <description>JBake Bootstrap Template</description>
     <language>en-gb</language>
-    <pubDate>Fri, 18 Oct 2019 15:29:43 +0000</pubDate>
-    <lastBuildDate>Fri, 18 Oct 2019 15:29:43 +0000</lastBuildDate>
+    <pubDate>Fri, 18 Oct 2019 15:38:45 +0000</pubDate>
+    <lastBuildDate>Fri, 18 Oct 2019 15:38:45 +0000</lastBuildDate>
 
     <item>
       <title>관계형 데이터 모델링 노트 2장</title>
@@ -18,32 +18,33 @@
 	&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
 &lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
 &lt;ul class=&quot;sectlevel1&quot;&gt;
-&lt;li&gt;&lt;a href=&quot;#정규화_이야기&quot;&gt;1. 정규화 이야기&lt;/a&gt;
+&lt;li&gt;&lt;a href=&quot;#엔터티_이야기&quot;&gt;1. 엔터티 이야기&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#정규화_이야기&quot;&gt;2. 정규화 이야기&lt;/a&gt;
 &lt;ul class=&quot;sectlevel2&quot;&gt;
-&lt;li&gt;&lt;a href=&quot;#정규화에_대한_서설&quot;&gt;1.1. 정규화에 대한 서설&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#정규화normalization란&quot;&gt;1.2. 정규화(Normalization)란&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#함수_종속fdfunction_dependency이란&quot;&gt;1.3. 함수 종속(FD;Function Dependency)이란?&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#결정자와_종속자&quot;&gt;1.4. 결정자와 종속자&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#함수_종속과_폐포&quot;&gt;1.5. 함수 종속과 폐포&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#함수_종속과_정규화&quot;&gt;1.6. 함수 종속과 정규화&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#그냥_릴레이션과_비정규형_릴레이션&quot;&gt;1.7. 그냥 릴레이션과 비정규형 릴레이션&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#등산과_정규화&quot;&gt;1.8. 등산과 정규화&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#정규화를_하면_좋아지는_게_무엇인가&quot;&gt;1.9. 정규화를 하면 좋아지는 게 무엇인가?&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#아노말리anomaly란&quot;&gt;1.10. 아노말리(Anomaly)란?&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#정규형의_종류&quot;&gt;1.11. 정규형의 종류&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#1정규화와_원자_값&quot;&gt;1.12. 1정규화와 원자 값&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#1정규화의_대상&quot;&gt;1.13. 1정규화의 대상&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#1정규형과_비정규형&quot;&gt;1.14. 1정규형과 비정규형&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#반복_속성으로_인한_1정규형_위반_사례&quot;&gt;1.15. 반복 속성으로 인한 1정규형 위반 사례&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#2정규형&quot;&gt;1.16. 2정규형&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#2정규형_위반인가&quot;&gt;1.17. 2정규형 위반인가?&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#3정규형&quot;&gt;1.18. 3정규형&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#bc정규형boyce_codd_normal_form&quot;&gt;1.19. BC정규형(Boyce-Codd Normal Form)&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#4정규형&quot;&gt;1.20. 4정규형&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#5정규형&quot;&gt;1.21. 5정규형&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#정규화_요약&quot;&gt;1.22. 정규화 요약&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#3정규화까지만_수행하면_된다&quot;&gt;1.23. 3정규화까지만 수행하면 된다?&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&quot;#정규형과_성능&quot;&gt;1.24. 정규형과 성능&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#정규화에_대한_서설&quot;&gt;2.1. 정규화에 대한 서설&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#정규화normalization란&quot;&gt;2.2. 정규화(Normalization)란&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#함수_종속fdfunction_dependency이란&quot;&gt;2.3. 함수 종속(FD;Function Dependency)이란?&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#결정자와_종속자&quot;&gt;2.4. 결정자와 종속자&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#함수_종속과_폐포&quot;&gt;2.5. 함수 종속과 폐포&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#함수_종속과_정규화&quot;&gt;2.6. 함수 종속과 정규화&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#그냥_릴레이션과_비정규형_릴레이션&quot;&gt;2.7. 그냥 릴레이션과 비정규형 릴레이션&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#등산과_정규화&quot;&gt;2.8. 등산과 정규화&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#정규화를_하면_좋아지는_게_무엇인가&quot;&gt;2.9. 정규화를 하면 좋아지는 게 무엇인가?&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#아노말리anomaly란&quot;&gt;2.10. 아노말리(Anomaly)란?&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#정규형의_종류&quot;&gt;2.11. 정규형의 종류&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#1정규화와_원자_값&quot;&gt;2.12. 1정규화와 원자 값&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#1정규화의_대상&quot;&gt;2.13. 1정규화의 대상&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#1정규형과_비정규형&quot;&gt;2.14. 1정규형과 비정규형&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#반복_속성으로_인한_1정규형_위반_사례&quot;&gt;2.15. 반복 속성으로 인한 1정규형 위반 사례&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#2정규형&quot;&gt;2.16. 2정규형&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#2정규형_위반인가&quot;&gt;2.17. 2정규형 위반인가?&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#3정규형&quot;&gt;2.18. 3정규형&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#bc정규형boyce_codd_normal_form&quot;&gt;2.19. BC정규형(Boyce-Codd Normal Form)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#4정규형&quot;&gt;2.20. 4정규형&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#5정규형&quot;&gt;2.21. 5정규형&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#정규화_요약&quot;&gt;2.22. 정규화 요약&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#3정규화까지만_수행하면_된다&quot;&gt;2.23. 3정규화까지만 수행하면 된다?&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#정규형과_성능&quot;&gt;2.24. 정규형과 성능&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
@@ -54,7 +55,13 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect1&quot;&gt;
-&lt;h2 id=&quot;정규화_이야기&quot;&gt;1. 정규화 이야기&lt;/h2&gt;
+&lt;h2 id=&quot;엔터티_이야기&quot;&gt;1. 엔터티 이야기&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;정규화_이야기&quot;&gt;2. 정규화 이야기&lt;/h2&gt;
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;hr&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
@@ -811,7 +818,7 @@
 &lt;/div&gt;
 &lt;hr&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;정규화에_대한_서설&quot;&gt;1.1. 정규화에 대한 서설&lt;/h3&gt;
+&lt;h3 id=&quot;정규화에_대한_서설&quot;&gt;2.1. 정규화에 대한 서설&lt;/h3&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;div class=&quot;ulist&quot;&gt;
@@ -827,7 +834,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;정규화_설계_개요&quot;&gt;1.1.1. 정규화 설계 개요&lt;/h4&gt;
+&lt;h4 id=&quot;정규화_설계_개요&quot;&gt;2.1.1. 정규화 설계 개요&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -846,7 +853,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;정규화_설계_방법&quot;&gt;1.1.2. 정규화 설계 방법&lt;/h4&gt;
+&lt;h4 id=&quot;정규화_설계_방법&quot;&gt;2.1.2. 정규화 설계 방법&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -861,7 +868,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;정규화normalization란&quot;&gt;1.2. 정규화(Normalization)란&lt;/h3&gt;
+&lt;h3 id=&quot;정규화normalization란&quot;&gt;2.2. 정규화(Normalization)란&lt;/h3&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;div class=&quot;ulist&quot;&gt;
@@ -877,7 +884,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;정규화_개요&quot;&gt;1.2.1. 정규화 개요&lt;/h4&gt;
+&lt;h4 id=&quot;정규화_개요&quot;&gt;2.2.1. 정규화 개요&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -904,7 +911,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;함수_종속fdfunction_dependency이란&quot;&gt;1.3. 함수 종속(FD;Function Dependency)이란?&lt;/h3&gt;
+&lt;h3 id=&quot;함수_종속fdfunction_dependency이란&quot;&gt;2.3. 함수 종속(FD;Function Dependency)이란?&lt;/h3&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;div class=&quot;ulist&quot;&gt;
@@ -923,7 +930,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;함수_종속_개요&quot;&gt;1.3.1. 함수 종속 개요&lt;/h4&gt;
+&lt;h4 id=&quot;함수_종속_개요&quot;&gt;2.3.1. 함수 종속 개요&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -947,7 +954,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;결정자와_종속자&quot;&gt;1.4. 결정자와 종속자&lt;/h3&gt;
+&lt;h3 id=&quot;결정자와_종속자&quot;&gt;2.4. 결정자와 종속자&lt;/h3&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;div class=&quot;ulist&quot;&gt;
@@ -963,7 +970,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;결정자determinant와_종속자dependent_개요&quot;&gt;1.4.1. 결정자(Determinant)와 종속자(Dependent) 개요&lt;/h4&gt;
+&lt;h4 id=&quot;결정자determinant와_종속자dependent_개요&quot;&gt;2.4.1. 결정자(Determinant)와 종속자(Dependent) 개요&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -982,7 +989,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;결정자determinant란&quot;&gt;1.4.2. 결정자(Determinant)란?&lt;/h4&gt;
+&lt;h4 id=&quot;결정자determinant란&quot;&gt;2.4.2. 결정자(Determinant)란?&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -995,7 +1002,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;종속자dependent란&quot;&gt;1.4.3. 종속자(Dependent)란?&lt;/h4&gt;
+&lt;h4 id=&quot;종속자dependent란&quot;&gt;2.4.3. 종속자(Dependent)란?&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -1007,7 +1014,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;함수_종속과_폐포&quot;&gt;1.5. 함수 종속과 폐포&lt;/h3&gt;
+&lt;h3 id=&quot;함수_종속과_폐포&quot;&gt;2.5. 함수 종속과 폐포&lt;/h3&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;div class=&quot;ulist&quot;&gt;
@@ -1023,7 +1030,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;폐포closure란&quot;&gt;1.5.1. 폐포(Closure)란&lt;/h4&gt;
+&lt;h4 id=&quot;폐포closure란&quot;&gt;2.5.1. 폐포(Closure)란&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -1039,7 +1046,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;종속성_추론_규칙&quot;&gt;1.5.2. 종속성 추론 규칙&lt;/h4&gt;
+&lt;h4 id=&quot;종속성_추론_규칙&quot;&gt;2.5.2. 종속성 추론 규칙&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -1066,7 +1073,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;함수_종속과_정규화&quot;&gt;1.6. 함수 종속과 정규화&lt;/h3&gt;
+&lt;h3 id=&quot;함수_종속과_정규화&quot;&gt;2.6. 함수 종속과 정규화&lt;/h3&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;div class=&quot;ulist&quot;&gt;
@@ -1082,7 +1089,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;정규화_수행_방법&quot;&gt;1.6.1. 정규화 수행 방법&lt;/h4&gt;
+&lt;h4 id=&quot;정규화_수행_방법&quot;&gt;2.6.1. 정규화 수행 방법&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -1103,7 +1110,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;그냥_릴레이션과_비정규형_릴레이션&quot;&gt;1.7. 그냥 릴레이션과 비정규형 릴레이션&lt;/h3&gt;
+&lt;h3 id=&quot;그냥_릴레이션과_비정규형_릴레이션&quot;&gt;2.7. 그냥 릴레이션과 비정규형 릴레이션&lt;/h3&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;div class=&quot;ulist&quot;&gt;
@@ -1116,7 +1123,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;그냥_릴레이션nfnf_non_first_normal_form_nf란&quot;&gt;1.7.1. 그냥 릴레이션(NFNF; Non First Normal Form, NF)란&lt;/h4&gt;
+&lt;h4 id=&quot;그냥_릴레이션nfnf_non_first_normal_form_nf란&quot;&gt;2.7.1. 그냥 릴레이션(NFNF; Non First Normal Form, NF)란&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -1132,7 +1139,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;비정규형denormalization_릴레이션&quot;&gt;1.7.2. 비정규형(Denormalization) 릴레이션&lt;/h4&gt;
+&lt;h4 id=&quot;비정규형denormalization_릴레이션&quot;&gt;2.7.2. 비정규형(Denormalization) 릴레이션&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -1144,7 +1151,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;등산과_정규화&quot;&gt;1.8. 등산과 정규화&lt;/h3&gt;
+&lt;h3 id=&quot;등산과_정규화&quot;&gt;2.8. 등산과 정규화&lt;/h3&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;div class=&quot;ulist&quot;&gt;
@@ -1169,7 +1176,7 @@
 &lt;hr&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;정규화를_하면_좋아지는_게_무엇인가&quot;&gt;1.9. 정규화를 하면 좋아지는 게 무엇인가?&lt;/h3&gt;
+&lt;h3 id=&quot;정규화를_하면_좋아지는_게_무엇인가&quot;&gt;2.9. 정규화를 하면 좋아지는 게 무엇인가?&lt;/h3&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;div class=&quot;ulist&quot;&gt;
@@ -1188,7 +1195,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;완전성completeness&quot;&gt;1.9.1. 완전성(Completeness)&lt;/h4&gt;
+&lt;h4 id=&quot;완전성completeness&quot;&gt;2.9.1. 완전성(Completeness)&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -1210,7 +1217,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;확장성flexibility&quot;&gt;1.9.2. 확장성(Flexibility)&lt;/h4&gt;
+&lt;h4 id=&quot;확장성flexibility&quot;&gt;2.9.2. 확장성(Flexibility)&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -1234,7 +1241,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;아노말리anomaly란&quot;&gt;1.10. 아노말리(Anomaly)란?&lt;/h3&gt;
+&lt;h3 id=&quot;아노말리anomaly란&quot;&gt;2.10. 아노말리(Anomaly)란?&lt;/h3&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;div class=&quot;ulist&quot;&gt;
@@ -1250,7 +1257,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;아노말리_개요&quot;&gt;1.10.1. 아노말리 개요&lt;/h4&gt;
+&lt;h4 id=&quot;아노말리_개요&quot;&gt;2.10.1. 아노말리 개요&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -1275,7 +1282,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;아노말리_종류&quot;&gt;1.10.2. 아노말리 종류&lt;/h4&gt;
+&lt;h4 id=&quot;아노말리_종류&quot;&gt;2.10.2. 아노말리 종류&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -1314,7 +1321,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;정규형의_종류&quot;&gt;1.11. 정규형의 종류&lt;/h3&gt;
+&lt;h3 id=&quot;정규형의_종류&quot;&gt;2.11. 정규형의 종류&lt;/h3&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;div class=&quot;ulist&quot;&gt;
@@ -1330,7 +1337,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;정규형의_종류_2&quot;&gt;1.11.1. 정규형의 종류&lt;/h4&gt;
+&lt;h4 id=&quot;정규형의_종류_2&quot;&gt;2.11.1. 정규형의 종류&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -1394,7 +1401,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;1정규화와_원자_값&quot;&gt;1.12. 1정규화와 원자 값&lt;/h3&gt;
+&lt;h3 id=&quot;1정규화와_원자_값&quot;&gt;2.12. 1정규화와 원자 값&lt;/h3&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;div class=&quot;ulist&quot;&gt;
@@ -1410,7 +1417,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;원자atom_값이란&quot;&gt;1.12.1. 원자(ATOM) 값이란&lt;/h4&gt;
+&lt;h4 id=&quot;원자atom_값이란&quot;&gt;2.12.1. 원자(ATOM) 값이란&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -1420,7 +1427,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;여러_값을_가지는_속성&quot;&gt;1.12.2. 여러 값을 가지는 속성&lt;/h4&gt;
+&lt;h4 id=&quot;여러_값을_가지는_속성&quot;&gt;2.12.2. 여러 값을 가지는 속성&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -1464,7 +1471,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;1정규화의_대상&quot;&gt;1.13. 1정규화의 대상&lt;/h3&gt;
+&lt;h3 id=&quot;1정규화의_대상&quot;&gt;2.13. 1정규화의 대상&lt;/h3&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;div class=&quot;ulist&quot;&gt;
@@ -1480,7 +1487,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;1정규화_대상&quot;&gt;1.13.1. 1정규화 대상&lt;/h4&gt;
+&lt;h4 id=&quot;1정규화_대상&quot;&gt;2.13.1. 1정규화 대상&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -1761,7 +1768,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;1정규형과_비정규형&quot;&gt;1.14. 1정규형과 비정규형&lt;/h3&gt;
+&lt;h3 id=&quot;1정규형과_비정규형&quot;&gt;2.14. 1정규형과 비정규형&lt;/h3&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;div class=&quot;ulist&quot;&gt;
@@ -1777,7 +1784,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;정규형과_비정규형_특징&quot;&gt;1.14.1. 정규형과 비정규형 특징&lt;/h4&gt;
+&lt;h4 id=&quot;정규형과_비정규형_특징&quot;&gt;2.14.1. 정규형과 비정규형 특징&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -1822,7 +1829,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;비정규형_사용_조건&quot;&gt;1.14.2. 비정규형 사용 조건&lt;/h4&gt;
+&lt;h4 id=&quot;비정규형_사용_조건&quot;&gt;2.14.2. 비정규형 사용 조건&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -1840,7 +1847,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;반복_속성으로_인한_1정규형_위반_사례&quot;&gt;1.15. 반복 속성으로 인한 1정규형 위반 사례&lt;/h3&gt;
+&lt;h3 id=&quot;반복_속성으로_인한_1정규형_위반_사례&quot;&gt;2.15. 반복 속성으로 인한 1정규형 위반 사례&lt;/h3&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;div class=&quot;ulist&quot;&gt;
@@ -1859,7 +1866,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;속성_명_뒤에_숫자가_붙을_때&quot;&gt;1.15.1. 속성 명 뒤에 숫자가 붙을 때&lt;/h4&gt;
+&lt;h4 id=&quot;속성_명_뒤에_숫자가_붙을_때&quot;&gt;2.15.1. 속성 명 뒤에 숫자가 붙을 때&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -1911,7 +1918,7 @@
 &lt;/table&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;속성의_성격상_반복이_원천적으로_고정된_경우&quot;&gt;1.15.2. 속성의 성격상 반복이 원천적으로 고정된 경우&lt;/h4&gt;
+&lt;h4 id=&quot;속성의_성격상_반복이_원천적으로_고정된_경우&quot;&gt;2.15.2. 속성의 성격상 반복이 원천적으로 고정된 경우&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -1946,7 +1953,7 @@
 &lt;/table&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;하나의_속성이_반복되지만_속성_성격상_반복이_고정돼_있지_않은_경우&quot;&gt;1.15.3. 하나의 속성이 반복되지만, 속성 성격상 반복이 고정돼 있지 않은 경우&lt;/h4&gt;
+&lt;h4 id=&quot;하나의_속성이_반복되지만_속성_성격상_반복이_고정돼_있지_않은_경우&quot;&gt;2.15.3. 하나의 속성이 반복되지만, 속성 성격상 반복이 고정돼 있지 않은 경우&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -1961,7 +1968,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;2정규형&quot;&gt;1.16. 2정규형&lt;/h3&gt;
+&lt;h3 id=&quot;2정규형&quot;&gt;2.16. 2정규형&lt;/h3&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;div class=&quot;ulist&quot;&gt;
@@ -1977,7 +1984,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;2정규형_개요&quot;&gt;1.16.1. 2정규형 개요&lt;/h4&gt;
+&lt;h4 id=&quot;2정규형_개요&quot;&gt;2.16.1. 2정규형 개요&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -2001,7 +2008,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;2정규형_위반인가&quot;&gt;1.17. 2정규형 위반인가?&lt;/h3&gt;
+&lt;h3 id=&quot;2정규형_위반인가&quot;&gt;2.17. 2정규형 위반인가?&lt;/h3&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;div class=&quot;ulist&quot;&gt;
@@ -2014,7 +2021,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;2정규화에_대한_판단&quot;&gt;1.17.1. 2정규화에 대한 판단&lt;/h4&gt;
+&lt;h4 id=&quot;2정규화에_대한_판단&quot;&gt;2.17.1. 2정규화에 대한 판단&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -2035,7 +2042,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;3정규형&quot;&gt;1.18. 3정규형&lt;/h3&gt;
+&lt;h3 id=&quot;3정규형&quot;&gt;2.18. 3정규형&lt;/h3&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;div class=&quot;ulist&quot;&gt;
@@ -2054,7 +2061,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;3정규형_개요&quot;&gt;1.18.1. 3정규형 개요&lt;/h4&gt;
+&lt;h4 id=&quot;3정규형_개요&quot;&gt;2.18.1. 3정규형 개요&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -2070,7 +2077,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;3정규형_예&quot;&gt;1.18.2. 3정규형 예&lt;/h4&gt;
+&lt;h4 id=&quot;3정규형_예&quot;&gt;2.18.2. 3정규형 예&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -2091,7 +2098,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;bc정규형boyce_codd_normal_form&quot;&gt;1.19. BC정규형(Boyce-Codd Normal Form)&lt;/h3&gt;
+&lt;h3 id=&quot;bc정규형boyce_codd_normal_form&quot;&gt;2.19. BC정규형(Boyce-Codd Normal Form)&lt;/h3&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;div class=&quot;ulist&quot;&gt;
@@ -2110,7 +2117,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;bc정규형_개요&quot;&gt;1.19.1. BC정규형 개요&lt;/h4&gt;
+&lt;h4 id=&quot;bc정규형_개요&quot;&gt;2.19.1. BC정규형 개요&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -2126,7 +2133,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;bc정규형_구분&quot;&gt;1.19.2. BC정규형 구분&lt;/h4&gt;
+&lt;h4 id=&quot;bc정규형_구분&quot;&gt;2.19.2. BC정규형 구분&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -2142,7 +2149,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;bc정규형_예&quot;&gt;1.19.3. BC정규형 예&lt;/h4&gt;
+&lt;h4 id=&quot;bc정규형_예&quot;&gt;2.19.3. BC정규형 예&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -2160,7 +2167,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;4정규형&quot;&gt;1.20. 4정규형&lt;/h3&gt;
+&lt;h3 id=&quot;4정규형&quot;&gt;2.20. 4정규형&lt;/h3&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;div class=&quot;ulist&quot;&gt;
@@ -2179,7 +2186,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;4정규형_개요&quot;&gt;1.20.1. 4정규형 개요&lt;/h4&gt;
+&lt;h4 id=&quot;4정규형_개요&quot;&gt;2.20.1. 4정규형 개요&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -2201,7 +2208,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;4정규형_발생_조건&quot;&gt;1.20.2. 4정규형 발생 조건&lt;/h4&gt;
+&lt;h4 id=&quot;4정규형_발생_조건&quot;&gt;2.20.2. 4정규형 발생 조건&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -2214,7 +2221,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;다가_종속_예&quot;&gt;1.20.3. 다가 종속 예&lt;/h4&gt;
+&lt;h4 id=&quot;다가_종속_예&quot;&gt;2.20.3. 다가 종속 예&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -2293,7 +2300,7 @@
 &lt;/table&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;다가_종속_해소_예&quot;&gt;1.20.4. 다가 종속 해소 예&lt;/h4&gt;
+&lt;h4 id=&quot;다가_종속_해소_예&quot;&gt;2.20.4. 다가 종속 해소 예&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -2363,7 +2370,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;5정규형&quot;&gt;1.21. 5정규형&lt;/h3&gt;
+&lt;h3 id=&quot;5정규형&quot;&gt;2.21. 5정규형&lt;/h3&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;div class=&quot;ulist&quot;&gt;
@@ -2379,7 +2386,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;5정규형_개요&quot;&gt;1.21.1. 5정규형 개요&lt;/h4&gt;
+&lt;h4 id=&quot;5정규형_개요&quot;&gt;2.21.1. 5정규형 개요&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -2404,7 +2411,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;무손실_조인lossless_join과_비부가적_조인nonadditive_join&quot;&gt;1.21.2. 무손실 조인(Lossless Join)과 비부가적 조인(Nonadditive Join)&lt;/h4&gt;
+&lt;h4 id=&quot;무손실_조인lossless_join과_비부가적_조인nonadditive_join&quot;&gt;2.21.2. 무손실 조인(Lossless Join)과 비부가적 조인(Nonadditive Join)&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -2422,7 +2429,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;정규화_요약&quot;&gt;1.22. 정규화 요약&lt;/h3&gt;
+&lt;h3 id=&quot;정규화_요약&quot;&gt;2.22. 정규화 요약&lt;/h3&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;div class=&quot;ulist&quot;&gt;
@@ -2441,7 +2448,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;정규화_요약_2&quot;&gt;1.22.1. 정규화 요약&lt;/h4&gt;
+&lt;h4 id=&quot;정규화_요약_2&quot;&gt;2.22.1. 정규화 요약&lt;/h4&gt;
 &lt;table class=&quot;tableblock frame-all grid-all stretch&quot;&gt;
 &lt;colgroup&gt;
 &lt;col style=&quot;width: 12.5%;&quot;&gt;
@@ -2490,7 +2497,7 @@
 &lt;/table&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;1정규화_요약&quot;&gt;1.22.2. 1정규화 요약&lt;/h4&gt;
+&lt;h4 id=&quot;1정규화_요약&quot;&gt;2.22.2. 1정규화 요약&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -2523,7 +2530,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;2정규화_요약&quot;&gt;1.22.3. 2정규화 요약&lt;/h4&gt;
+&lt;h4 id=&quot;2정규화_요약&quot;&gt;2.22.3. 2정규화 요약&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -2559,7 +2566,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;3정규화_요약&quot;&gt;1.22.4. 3정규화 요약&lt;/h4&gt;
+&lt;h4 id=&quot;3정규화_요약&quot;&gt;2.22.4. 3정규화 요약&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -2595,7 +2602,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;bc정규화_요약&quot;&gt;1.22.5. BC정규화 요약&lt;/h4&gt;
+&lt;h4 id=&quot;bc정규화_요약&quot;&gt;2.22.5. BC정규화 요약&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -2628,7 +2635,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;4정규화_요약&quot;&gt;1.22.6. 4정규화 요약&lt;/h4&gt;
+&lt;h4 id=&quot;4정규화_요약&quot;&gt;2.22.6. 4정규화 요약&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -2661,7 +2668,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;5정규화_요약&quot;&gt;1.22.7. 5정규화 요약&lt;/h4&gt;
+&lt;h4 id=&quot;5정규화_요약&quot;&gt;2.22.7. 5정규화 요약&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -2690,7 +2697,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;3정규화까지만_수행하면_된다&quot;&gt;1.23. 3정규화까지만 수행하면 된다?&lt;/h3&gt;
+&lt;h3 id=&quot;3정규화까지만_수행하면_된다&quot;&gt;2.23. 3정규화까지만 수행하면 된다?&lt;/h3&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;div class=&quot;ulist&quot;&gt;
@@ -2703,7 +2710,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;3정규화까지_수행에_대한_고찰&quot;&gt;1.23.1. 3정규화까지 수행에 대한 고찰&lt;/h4&gt;
+&lt;h4 id=&quot;3정규화까지_수행에_대한_고찰&quot;&gt;2.23.1. 3정규화까지 수행에 대한 고찰&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -2719,7 +2726,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;정규화에_대한_고찰&quot;&gt;1.23.2. 정규화에 대한 고찰&lt;/h4&gt;
+&lt;h4 id=&quot;정규화에_대한_고찰&quot;&gt;2.23.2. 정규화에 대한 고찰&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -2737,7 +2744,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect2&quot;&gt;
-&lt;h3 id=&quot;정규형과_성능&quot;&gt;1.24. 정규형과 성능&lt;/h3&gt;
+&lt;h3 id=&quot;정규형과_성능&quot;&gt;2.24. 정규형과 성능&lt;/h3&gt;
 &lt;div class=&quot;sidebarblock&quot;&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;div class=&quot;ulist&quot;&gt;
@@ -2753,7 +2760,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;정규화에_따른_조회_성능_저하에_대한_오해&quot;&gt;1.24.1. 정규화에 따른 조회 성능 저하에 대한 오해&lt;/h4&gt;
+&lt;h4 id=&quot;정규화에_따른_조회_성능_저하에_대한_오해&quot;&gt;2.24.1. 정규화에 따른 조회 성능 저하에 대한 오해&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
@@ -2778,7 +2785,7 @@
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;sect3&quot;&gt;
-&lt;h4 id=&quot;정규화에_따른_쓰기_성능_향상&quot;&gt;1.24.2. 정규화에 따른 쓰기 성능 향상&lt;/h4&gt;
+&lt;h4 id=&quot;정규화에_따른_쓰기_성능_향상&quot;&gt;2.24.2. 정규화에 따른 쓰기 성능 향상&lt;/h4&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
