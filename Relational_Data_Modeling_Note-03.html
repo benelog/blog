@@ -7,23 +7,23 @@
 <html lang="en">
   <head>
     <meta charset="utf-8"/>
-    <title> - 정민호의 블로그</title>
+    <title>관계형 데이터 모델링 노트 3장 - 정민호의 블로그</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
+    <meta name="description" content="'데이터모델링 도서인 `관계형 데이터 모델링 노트 개정판` 책의 `3장 데이터 통합과 서브타입 이야기` 요약 및 정리">
     <meta name="author" content="정민호">
-    <meta name="keywords" content="">
+    <meta name="keywords" content="데이터모델링, 책정리">
     <meta name="generator" content="JBake">
-	<meta property="og:image" content="https://anew0m.netlify.com/img/main/intro.jpg"/>
+	<meta property="og:image" content="https://anew0m.netlify.com/img/jdk/duke.jpg"/>
 
-    <link rel="stylesheet" href="../css/google-font.css" />
-    <link rel="stylesheet" href="../css/font-awesome.min.css" />
-    <link rel="stylesheet" href="../css/main.css" />
-    <link rel="stylesheet" href="../css/add-on.css" />
-    <link rel="stylesheet" href="../css/monokai-sublime.css">
+    <link rel="stylesheet" href="css/google-font.css" />
+    <link rel="stylesheet" href="css/font-awesome.min.css" />
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/add-on.css" />
+    <link rel="stylesheet" href="css/monokai-sublime.css">
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
-      <script src="../js/html5shiv.min.js"></script>
+      <script src="js/html5shiv.min.js"></script>
     <![endif]-->
 
     <!-- Fav and touch icons -->
@@ -31,12 +31,12 @@
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
     <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">-->
-    <link rel="shortcut icon" href="../img/favicon/favicon.png">
+    <link rel="shortcut icon" href="img/favicon/favicon.png">
   </head>
   <body>
      <!-- Wrapper -->
         <div id="wrapper">
-	
+
 <!-- Header -->
 <header id="header">
             <h2><a href="https://anew0m.netlify.com/">정민호의 블로그</a></h2>
@@ -44,7 +44,7 @@
     <nav class="links">
         <ul>
         			<li>
-	                    <a href=" ../archive.html">
+	                    <a href=" archive.html">
 	                       
 	                            <i class="fa fa-archive">&nbsp;</i>Archive
 	                        
@@ -53,7 +53,7 @@
         		
         		 
         			<li>
-	                    <a href=" ../about.html">
+	                    <a href=" about.html">
 	                       
 	                            <i class="fa fa-user">&nbsp;</i>About
 	                        
@@ -62,7 +62,7 @@
         		
         		 
         			<li>
-	                    <a href=" ../feed.xml">
+	                    <a href=" feed.xml">
 	                       
 	                            <i class="fa fa-rss">&nbsp;</i>Subscribe
 	                        
@@ -103,21 +103,21 @@
         <section>
             <ul class="links">
         		 <li>
-                    <a href=" ../archive.html">
+                    <a href=" archive.html">
                        
                             <i class="fa fa-archive">&nbsp;</i>Archive
                         
                     </a>
                 </li>
         		 <li>
-                    <a href=" ../about.html">
+                    <a href=" about.html">
                        
                             <i class="fa fa-user">&nbsp;</i>About
                         
                     </a>
                 </li>
         		 <li>
-                    <a href=" ../feed.xml">
+                    <a href=" feed.xml">
                        
                             <i class="fa fa-rss">&nbsp;</i>Subscribe
                         
@@ -133,16 +133,16 @@
                     <h3>Recent Posts</h3>
                 </header>
                     <li>
-                        <a href="../../Relational_Data_Modeling_Note-01.html"><p>관계형 데이터 모델링 노트 1장</p></a>
+                        <a href="Relational_Data_Modeling_Note-01.html"><p>관계형 데이터 모델링 노트 1장</p></a>
                     </li>
                     <li>
-                        <a href="../../Relational_Data_Modeling_Note-03.html"><p>관계형 데이터 모델링 노트 3장</p></a>
+                        <a href="Relational_Data_Modeling_Note-03.html"><p>관계형 데이터 모델링 노트 3장</p></a>
                     </li>
                     <li>
-                        <a href="../../Relational_Data_Modeling_Note-02.html"><p>관계형 데이터 모델링 노트 2장</p></a>
+                        <a href="Relational_Data_Modeling_Note-02.html"><p>관계형 데이터 모델링 노트 2장</p></a>
                     </li>
                     <li>
-                        <a href="../../Relational_Data_Modeling_Note.html"><p>관계형 데이터 모델링 노트 소개</p></a>
+                        <a href="Relational_Data_Modeling_Note.html"><p>관계형 데이터 모델링 노트 소개</p></a>
                     </li>
             </ul>
         </section>
@@ -156,13 +156,11 @@
         </section>
         -->
 </section>
-	
 	<div id="main">
 <article class="post">
    <header>
     <div class="title">
-                    <h2><a href="../Relational_Data_Modeling_Note-03.html">관계형 데이터 모델링 노트 3장</a></h2>
-
+                    <h1><a href="Relational_Data_Modeling_Note-03.html">관계형 데이터 모델링 노트 3장</a></h1>
 
             <p>'데이터모델링 도서인 `관계형 데이터 모델링 노트 개정판` 책의 `3장 데이터 통합과 서브타입 이야기` 요약 및 정리</p>
     </div>
@@ -171,7 +169,7 @@
             datetime='Oct 04, 2019'>
             Oct 04, 2019</time>
             <div class="published eta"></div>
-        <span class="author"/><span class="name">정민호</span><img src="../img/main/jmh.jpg" alt="정민호" /></span>
+        <span class="author"/><span class="name">정민호</span><img src="img/main/jmh.jpg" alt="정민호" /></span>
     </div>
 </header>
 
@@ -2131,375 +2129,50 @@
 		<ul class="stats">
     	    <!-- Display the categories associated with this post -->
     	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/데이터모델링.html'>데이터모델링</a></li>
- 	        <li><a href='../tags/책정리.html'>책정리</a></li>
+ 	        <li><a href='tags/데이터모델링.html'>데이터모델링</a></li>
+ 	        <li><a href='tags/책정리.html'>책정리</a></li>
 
-				<li><a class="icon fa-comment" href="../Relational_Data_Modeling_Note-03.html#disqus_thread"> &nbsp;</a></li>
- 		</ul>
-    	
-    </footer>
-</article>
-<article class="post">
-   <header>
-    <div class="title">
-                    <h2><a href="../hackerton_myhome.html">내집마련 해커톤 참여 후기</a></h2>
-
-
-            <p>'내집마련 해커톤'을 통한 개인 블로그 제작 과정 소개</p>
-    </div>
-    <div class="meta">
-         <time class="published"
-            datetime='Sep 21, 2019'>
-            Sep 21, 2019</time>
-            <div class="published eta"></div>
-        <span class="author"/><span class="name">정민호</span><img src="../img/main/jmh.jpg" alt="정민호" /></span>
-    </div>
-</header>
-
-    
-  
-         
-    <div id="content">
-       <div id="toc" class="toc">
-<div id="toctitle">Table of Contents</div>
-<ul class="sectlevel1">
-<li><a href="#해커톤">1. <strong>해커톤</strong></a>
-<ul class="sectlevel3">
-<li><a href="#해커톤_소개">1.1. <strong>해커톤 소개</strong></a></li>
-<li><a href="#해커톤_참여_계기">1.2. <strong>해커톤 참여 계기</strong></a></li>
-<li><a href="#개인_블로그_제작_목적">1.3. <strong>개인 블로그 제작 목적</strong></a></li>
-<li><a href="#해커톤_참여_소감">1.4. <strong>해커톤 참여 소감</strong></a></li>
-</ul>
-</li>
-<li><a href="#내_집_마련_과정">2. 내 집 마련 과정</a>
-<ul class="sectlevel2">
-<li><a href="#서비스_환경">2.1. 서비스 환경</a></li>
-<li><a href="#구축_순서">2.2. 구축 순서</a></li>
-<li><a href="#구축간_특이사항">2.3. 구축간 특이사항</a></li>
-</ul>
-</li>
-</ul>
-</div>
-<div class="sect1">
-<h2 id="해커톤">1. <strong>해커톤</strong></h2>
-<div class="sectionbody">
-<div class="sect3">
-<h4 id="해커톤_소개">1.1. <strong>해커톤 소개</strong></h4>
-<div class="ulist">
-<ul>
-<li>
-<p>목적</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p><a href="https://www.notion.so/be735a45ff444a48bd4a23a0a299e2e5">내집마련 해커톤</a>은 기존 블로깅 플랫폼(<a href="https://section.blog.naver.com/BlogHome.nhn/">네이버 블로그</a>, <a href="https://www.tistory.com/">티스토리</a>, <a href="http://www.egloos.com">이글루</a> 등)에서 벗어나, 개인이 홈페이지를 구축하고 서비스 할 수 있는 내 집(블로그)를 구축 및 개선하는 해커톤이다.</p>
-</div>
-<div class="paragraph">
-<p>따라서 팀을 구성해도 되고 기존에 자신이 운영하시는 개인 블로그가 있는 참가자들은 기존 블로그를 개선하거나 블로그 플러그인, CMS 등을 개발해도 무관하였다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>장소 및 일시</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>내집마련 해커톤은 2019년 09월 21일 토요일 10:30 ~ 20:00 까지 삼성동 아셈타워의 <a href="https://hyperconnect.com/">하이퍼커넥트</a>에서 진행되었다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>주최</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>&#8201;&#8212;&#8201;<a href="https://github.com/godori">GODORI</a> from <a href="https://github.com/post-a-week/blog">post-a-week</a></p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="img/hackerton_myhome/lounge_01.jpg" alt="lounge01">
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="해커톤_참여_계기">1.2. <strong>해커톤 참여 계기</strong></h4>
-<div class="paragraph">
-<p>해커톤 참여 계기는 당연하겠지만 내 집(이하 블로그)을 만들기 위해서 참여하게 되었다.</p>
-</div>
-<div class="paragraph">
-<p>본 해커톤에서 블로그를 만들기 이전에 <a href="https://jekyllrb-ko.github.io/">지킬</a>과 <a href="https://github.com/">Github</a>로 구성된 블로그 사이트를 구축하여 보았었다. 하지만 항상 마감에 쫒기는 프로젝트들과 자격증 공부와 병행하여 <a href="https://www.ruby-lang.org/">Ruby</a> 언어를 익히고, 지킬 구조를 파악하기엔 조금 버거웠다.</p>
-</div>
-<div class="paragraph">
-<p>그래서 Ruby가 아닌 JAVA 기반으로 구축된 플랫폼을 찾아보기 시작했고, 그 중 눈에 띈것은 <a href="http://gatsbyjs.org/">Gatsby</a>와 <a href="https://vuepress.vuejs.org/">Vuepress</a>이였다. 그러던 와중에 <a href="https://asciidoctor.org/">AsciiDoc</a> 이라는 마크업(Markup languages)를 발견했고, AsciiDoc의 파일 변환시 docx, PDF 등 여러 형식을 지원하는 장점에 이끌렸다.</p>
-</div>
-<div class="paragraph">
-<p>AsciiDoc을 지원하는 여러 템플릿 엔진을 찾던 중 관련된 블로그 구축 글<em>(<a href="https://blog.benelog.net/migration-to-static-site.html">정적 사이트로 블로그 마이그레이션 - 정상혁</a>)</em>을 발견하였고, 이 글에서 사용한 <a href="https://jbake.org/">JBake</a>를 최종으로 체택하였다.</p>
-</div>
-<div class="dlist">
-<dl>
-<dt class="hdlist1">AsciiDoc 관련 링크 </dt>
-<dd>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="https://narusas.github.io/2018/03/21/Asciidoc-basic.html">Asciidoc 기본 사용법</a><br></p>
-</li>
-<li>
-<p><a href="http://honeymon.io/tech/2018/02/27/asiidoc-book-template.html">아스키독(Asciidoc) 기반으로 책쓰기 템플릿</a><br></p>
-</li>
-</ul>
-</div>
-</dd>
-</dl>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="img/hackerton_myhome/lounge_02.jpg" alt="lounge02">
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="개인_블로그_제작_목적">1.3. <strong>개인 블로그 제작 목적</strong></h4>
-<div class="paragraph">
-<p>내가 블로그를 개설하는 이유는 크게 3가지 이다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>공부내용 정리</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>기존에 공부를 해도 어딘가에 기록해 놓지 않아서, 학습할 당시에는 기억에 잘 남지만 조금만 시간이 지나도 잘 잊어버렸다. 그래서 공부했던 내용을 정리해둠으로써 복습을 함과 더불어 시간이 흐른뒤에도 내용을 보고 조금이나마 빨리 공부했었던 내용을 떠올리기 위함이다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>포트폴리오 정리</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>내가 했었던 프로젝트나 공부를 시간이 흐른뒤 특정 시점에 내가 무엇을 했는지 알기란 쉽지않았다. 그래서 본 블로그에 관련된 내용을 기록해 둠으로써 내가 언제 무엇을 해왔었는지 알기 위함이다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>글쓰기 연습</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>석사과정을 다닐 때 글 쓰는 능력이 많이 부족하다고 느꼈다. 내가 생각하는 것을 다른 사람에서 글로써 전달하는 것과 글을 논리적으로 풀어 나가야하는데 이 부부이 어렵게 느껴진다. 만약이지만 언젠가 내가 책을 집필한다던지, 박사과정을 밟는 등의 기회가 왔을 때 글을 잘 작성할 수 있다면, 막연하지만 그 기회를 잘 살릴 수 있지 않을까 생각한다.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="img/hackerton_myhome/lounge_03.jpg" alt="lounge03">
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="해커톤_참여_소감">1.4. <strong>해커톤 참여 소감</strong></h4>
-<div class="paragraph">
-<p>그 동안 바쁘다는 핑계로 미뤄왔던 개인 블로그 제작을 본 해커톤을 통해 완성을하여 기쁘다.</p>
-</div>
-<div class="paragraph">
-<p>토요일 너무 이르지 않은 오전 10:30 부터 시작하여 너무 늦지 않은 오후 20:00 까지 진행된 해커톤으로 바쁜 직장인에게도 무리가 가지 않는 해커톤이었다고 생각한다.</p>
-</div>
-<div class="paragraph">
-<p>언제가 될지는 모르겠지만 내집마련 해커톤 2차가 열리면, 해커톤에 다시 참가하여 본 블로그에서 개선하고 싶었던 부분을 보수하는 작업을 하고 싶다.</p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="img/hackerton_myhome/lounge_04.jpg" alt="lounge04">
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="내_집_마련_과정">2. 내 집 마련 과정</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>본 블로그는 <a href="https://blog.benelog.net/migration-to-static-site.html">개발 수양록 블로그의 정상혁님이 작성하신 글</a>을 그대로 따라서 진행하였다.</p>
-</div>
-<div class="sect2">
-<h3 id="서비스_환경">2.1. 서비스 환경</h3>
-<div class="hdlist">
-<table>
-<tr>
-<td class="hdlist1">
-정적 사이트 생성 플랫폼
-</td>
-<td class="hdlist2">
-<p>: <a href="https://jbake.org/">JBake</a></p>
-</td>
-</tr>
-<tr>
-<td class="hdlist1">
-컨텐츠 저장소
-</td>
-<td class="hdlist2">
-<p>: GitHub</p>
-</td>
-</tr>
-<tr>
-<td class="hdlist1">
-빌드 및 배포
-</td>
-<td class="hdlist2">
-<p>: <a href="https://www.netlify.com/">Netlify(Ubuntu 14.04)</a> ,<br>
-<a href="https://travis-ci.org/">Travis CI(Ubuntu 14.04)</a></p>
-</td>
-</tr>
-<tr>
-<td class="hdlist1">
-방문자 통계 집계
-</td>
-<td class="hdlist2">
-<p>: <a href="https://analytics.google.com/analytics/web/">Google Analytics</a></p>
-</td>
-</tr>
-</table>
-</div>
-</div>
-<div class="sect2">
-<h3 id="구축_순서">2.2. 구축 순서</h3>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>블로그 레파지토리 fork</p>
-</li>
-<li>
-<p>fork 한 레파지토리의 소스를 나에게 맞게 변경</p>
-<div class="ulist">
-<ul>
-<li>
-<p>travis 생성 및 연동</p>
-</li>
-<li>
-<p>Google Analytics 생성 및 연동</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>netlify 생성 및 git 내 fork 한 레파지토리 연동</p>
-</li>
-</ol>
-</div>
-</div>
-<div class="sect2">
-<h3 id="구축간_특이사항">2.3. 구축간 특이사항</h3>
-<div class="paragraph">
-<p>초기에 travis 나 netlify 에서 빌드 할 때 에러가 발생하여, ubuntu 버전을 16.04 &#8594; 14.04로 내려서 빌드를 하였다.
-travis는 <strong>.travis.yml</strong> 파일에 'dist: trusty' 코드를 추가하였고, netlify 에서는 <strong>Setting - Build &amp; deploy</strong> 메뉴에서 'Build image selection' 에서 수정하였다. <em>(netlify는 16.04 버전에서 정상동작하여 기존 14.04 &#8594; 16.04 로 다시 변경하였다.)</em></p>
-</div>
-<div class="paragraph">
-<p>빌드 및 배포를 Netlify와 Travis CI 두군데에서 하고 있기 때문에 본 블로그는 아래 두개의 주소로 접근 할 수 있다.</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="https://anew0m.netlify.com" class="bare">https://anew0m.netlify.com</a> - Netlify</p>
-</li>
-<li>
-<p><a href="https://anew0m.github.io/blog/" class="bare">https://anew0m.github.io/blog/</a> - Travis CI</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>끝.</p>
-</div>
-</div>
-</div>
-</div>
-    </div>
-	
-	<section id="social-share">
-        <ul class="icons">
-<!-- Social Share Button HTML -->
-
-<!-- Twitter -->
-<li><a href="//twitter.com/share?url=https://anew0m.netlify.com//hackerton_myhome.html&text=내집마련 해커톤 참여 후기&via=" target="_blank" class="share-btn twitter">
-    <i class="fa fa-twitter"></i>
-    <p>Twitter</p>
-</a></li>
-
-<!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=https://anew0m.netlify.com//hackerton_myhome.html" target="_blank" class="share-btn google-plus">
-    <i class="fa fa-google-plus"></i>
-    <p>Google+</p>
-</a></li>
-
-<!-- Facebook -->
-<li><a href="//www.facebook.com/sharer/sharer.php?u=https://anew0m.netlify.com//hackerton_myhome.html" target="_blank" class="share-btn facebook">
-    <i class="fa fa-facebook"></i>
-    <p>Facebook</p>
-</a></li>
-
-<!-- Reddit (url, title) -->
-<li><a href="//reddit.com/submit?url=https://anew0m.netlify.com//hackerton_myhome.html&title=내집마련 해커톤 참여 후기" target="_blank" class="share-btn reddit">
-    <i class="fa fa-reddit-alien"></i>
-    <p>Reddit</p>
-</a></li>
-
-<!-- LinkedIn -->
-<li><a href="//www.linkedin.com/shareArticle?url=https://anew0m.netlify.com//hackerton_myhome.html&title=내집마련 해커톤 참여 후기" target="_blank" class="share-btn linkedin">
-    <i class="fa fa-linkedin"></i>
-    <p>LinkedIn</p>
-</a></li>
-
-<!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=https://anew0m.netlify.com//hackerton_myhome.html&title=내집마련 해커톤 참여 후기" target="_blank" class="share-btn stumbleupon">
-    <i class="fa fa-stumbleupon"></i>
-    <p>StumbleUpon</p>
-</a></li>
-
-<!-- Email -->
-<li><a href="mailto:?subject=Check out this post by 정민호&body=https://anew0m.netlify.com//hackerton_myhome.html" target="_blank" class="share-btn email">
-    <i class="fa fa-envelope"></i>
-    <p>Email</p>
-</a></li>
-        </ul>
-    </section>
-     
-
-    <footer>
-	
-		<ul class="stats">
-    	    <!-- Display the categories associated with this post -->
-    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/hackerton.html'>hackerton</a></li>
-
-				<li><a class="icon fa-comment" href="../hackerton_myhome.html#disqus_thread"> &nbsp;</a></li>
+				<li><a class="icon fa-comment" href="Relational_Data_Modeling_Note-03.html#disqus_thread"> &nbsp;</a></li>
  		</ul>
     	
     </footer>
 </article>
 		
 <ul class="actions pagination">
-    <li><a href="../"
-            class=" button big previous">PREVIOUS</a></li>
-
-    <li><span
-            class="button big"> 2 of 2 </span></li>
-
-    <li><a href="../#"
-            class="disabled  button big next">NEXT</a></li>
-</ul>
-	 </div>
+  	
+  		        <li><a href="hackerton_myhome.html" 
+                class="button big previous">내집마련 해커톤 참여 후기</a></li>
+        <li><a href="Relational_Data_Modeling_Note.html" 
+                class="button big next">관계형 데이터 모델링 노트 소개</a></li>
 	
+</ul>
+		
+<div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_config = function () {
+      this.page.identifier = 'Relational_Data_Modeling_Note-03.html';
+    };
+    var disqus_shortname = 'anew0m';
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        dsq.setAttribute('data-timestamp', + new Date());
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <!--<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>-->
+</div>
+    </div>
+
 <!-- Sidebar -->
 <section id="sidebar">
 
     <!-- Intro -->
         <section id="intro">
-                                    <a href="/" class="logo"><img src="../img/main/intro.jpg" class="intro-circle" width="150px" alt="anew0m" /></a>
+                                    <a href="/" class="logo"><img src="img/main/intro.jpg" class="intro-circle" width="150px" alt="anew0m" /></a>
 
 
                 <header>
@@ -2551,7 +2224,7 @@ travis는 <strong>.travis.yml</strong> 파일에 'dist: trusty' 코드를 추가
                     <li>
                         <article>
                             <header>
-                                <h3><a href="../Relational_Data_Modeling_Note-01.html">관계형 데이터 모델링 노트 1장</a></h3>
+                                <h3><a href="Relational_Data_Modeling_Note-01.html">관계형 데이터 모델링 노트 1장</a></h3>
                                  <time class="published"
 							            datetime='Oct 04, 2019'>
 							            Oct 04, 2019</time>
@@ -2562,7 +2235,7 @@ travis는 <strong>.travis.yml</strong> 파일에 'dist: trusty' 코드를 추가
                     <li>
                         <article>
                             <header>
-                                <h3><a href="../Relational_Data_Modeling_Note-03.html">관계형 데이터 모델링 노트 3장</a></h3>
+                                <h3><a href="Relational_Data_Modeling_Note-03.html">관계형 데이터 모델링 노트 3장</a></h3>
                                  <time class="published"
 							            datetime='Oct 04, 2019'>
 							            Oct 04, 2019</time>
@@ -2573,7 +2246,7 @@ travis는 <strong>.travis.yml</strong> 파일에 'dist: trusty' 코드를 추가
                     <li>
                         <article>
                             <header>
-                                <h3><a href="../Relational_Data_Modeling_Note-02.html">관계형 데이터 모델링 노트 2장</a></h3>
+                                <h3><a href="Relational_Data_Modeling_Note-02.html">관계형 데이터 모델링 노트 2장</a></h3>
                                  <time class="published"
 							            datetime='Oct 04, 2019'>
 							            Oct 04, 2019</time>
@@ -2584,7 +2257,7 @@ travis는 <strong>.travis.yml</strong> 파일에 'dist: trusty' 코드를 추가
                     <li>
                         <article>
                             <header>
-                                <h3><a href="../Relational_Data_Modeling_Note.html">관계형 데이터 모델링 노트 소개</a></h3>
+                                <h3><a href="Relational_Data_Modeling_Note.html">관계형 데이터 모델링 노트 소개</a></h3>
                                  <time class="published"
 							            datetime='Oct 04, 2019'>
 							            Oct 04, 2019</time>
@@ -2593,6 +2266,12 @@ travis는 <strong>.travis.yml</strong> 파일에 'dist: trusty' 코드를 추가
                     </li>
 
 
+                    <li>
+                        <ul class="actions">
+                            <li><a href="archive.html"
+                            class="button">View more posts</a></li>
+                        </ul>
+                    </li>
             </ul>
         </section>
 
@@ -2606,7 +2285,7 @@ travis는 <strong>.travis.yml</strong> 파일에 'dist: trusty' 코드를 추가
                     <li>
                         <article>
                             <header>
-                                <a href="../tags/책소개.html">책소개</a>
+                                <a href="tags/책소개.html">책소개</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>
@@ -2615,7 +2294,7 @@ travis는 <strong>.travis.yml</strong> 파일에 'dist: trusty' 코드를 추가
                     <li>
                         <article>
                             <header>
-                                <a href="../tags/hackerton.html">hackerton</a>
+                                <a href="tags/hackerton.html">hackerton</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 1 </span>
                             </header>
@@ -2624,7 +2303,7 @@ travis는 <strong>.travis.yml</strong> 파일에 'dist: trusty' 코드를 추가
                     <li>
                         <article>
                             <header>
-                                <a href="../tags/책정리.html">책정리</a>
+                                <a href="tags/책정리.html">책정리</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 3 </span>
                             </header>
@@ -2633,7 +2312,7 @@ travis는 <strong>.travis.yml</strong> 파일에 'dist: trusty' 코드를 추가
                     <li>
                         <article>
                             <header>
-                                <a href="../tags/데이터모델링.html">데이터모델링</a>
+                                <a href="tags/데이터모델링.html">데이터모델링</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 4 </span>
                             </header>
@@ -2649,7 +2328,7 @@ travis는 <strong>.travis.yml</strong> 파일에 'dist: trusty' 코드를 추가
             <p>introduce</p>
 
             <ul class="actions">
-                <li><a href="../about.html" class="button">Learn More</a></li>
+                <li><a href="about.html" class="button">Learn More</a></li>
             </ul>
         </section>
 
@@ -2669,13 +2348,13 @@ travis는 <strong>.travis.yml</strong> 파일에 'dist: trusty' 코드를 추가
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
 
-		<script src="../js/jquery.min.js"></script>
-		<script src="../js/skel.min.js"></script>
-		<script src="../js/util.js"></script>
-		<script src="../js/main.js"></script>
-		<script src="../js/backToTop.js"></script>
-		<script src="../js/highlight.pack.js"></script>
-		<script src="../js/readingTime.js"></script>
+		<script src="js/jquery.min.js"></script>
+		<script src="js/skel.min.js"></script>
+		<script src="js/util.js"></script>
+		<script src="js/main.js"></script>
+		<script src="js/backToTop.js"></script>
+		<script src="js/highlight.pack.js"></script>
+		<script src="js/readingTime.js"></script>
 
 			<script id="dsq-count-scr" src="//anew0m.disqus.com/count.js" async></script>
 <script>
@@ -2685,8 +2364,8 @@ travis는 <strong>.travis.yml</strong> 파일에 'dist: trusty' 코드를 추가
   })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
   ga('create', 'UA-149448484-1', 'auto');
   ga('send', 'pageview', {
-    'page': 'https://anew0m.netlify.com/',
-    'title': '정민호의 블로그'
+    'page': 'Relational_Data_Modeling_Note-03.html',
+    'title': '관계형 데이터 모델링 노트 3장'
       });
 </script>
 		<!-- This is called by default since this theme uses highlight.js -->
