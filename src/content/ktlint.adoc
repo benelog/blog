@@ -21,7 +21,7 @@ https://ktlint.github.io/[ktlint]는 Kotlin의 공식 가이드의 규칙을 포
 https://ktlint.github.io/[ktlint]는 jar 파일로 제공되고, https://jcenter.bintray.com/ 에도 배포되어 있습니다.
 따라서 별도의 Gradle plugin이 없어도 Gradle에서 task를 정의해서도 쓸 수 있습니다.
 그런데 ktlint의 공식 사이트에서는 Gradle plugin을 더 권장한다고 나와 있습니다.
-이 글에서는 ktlin를 래핑만 Gradle plugin 중 Github에서 별 갯수가 가장 높은 https://github.com/jlleitschuh/ktlint-gradle[jlleitschuh/ktlint-gradle]를 사용했습니다.
+이 글에서는 ktlin를 래핑한 Gradle plugin 중 Github에서 별 갯수가 가장 높은 https://github.com/jlleitschuh/ktlint-gradle[jlleitschuh/ktlint-gradle]를 사용했습니다.
 
 === `.editorconfig` 설정
 ktlint는 `.editorconfig` 파일에 선언된 규칙을 포함하여 코드 스타일을 검사합니다.
