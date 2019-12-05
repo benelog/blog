@@ -115,9 +115,18 @@ Could not determine the dependencies of task ':ktlintCheck'.
 
 ----
 
-이럴 경우에는 Gradle 버전을 업그레이드해야합니다.
-다양한 Gradle 버전을 설치하는데에는 https://sdkman.io/[SDKMAN] 을 권장합니다.
-Gradle Wrapper를 업그레이드하는 방법은 https://java.ihoney.pe.kr/476 을 참조합니다.
+이럴 경우에는 Gradle의 버전을 업그레이드해야합니다.
+
+Gradle Wrapper를 쓰고 있다면
+`{프로젝트홈}/gradle/wrapper/gradle-wrapper.properties` 파일의 distributionUrl 속성에 지정된 버전을 고쳐서 버전을 올릴 수 있습니다.
+
+[source]
+----
+distributionUrl=https\://services.gradle.org/distributions/gradle-5.4.1-bin.zip
+----
+
+다양한 Gradle 버전을 별도로 설치하는데에는 https://sdkman.io/[SDKMAN] 을 권장합니다.
+Gradle이 별도로 설치되어 있을 경우 Gradle Wrapper를 업그레이드하는 방법은 https://java.ihoney.pe.kr/476 을 참조합니다.
 
 Gradle 버전을 업그레이드하기가 어려울 경우 https://ktlint.github.io/ 에 안내된 다른 Gradle Plugin이나 Plugin없이 사용하는 방법을 참고하시기 바랍니다.
 ====
