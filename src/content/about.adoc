@@ -4,3 +4,7 @@
 ~~~~~~
 
 SW 개발에 대한 글 모음
+
+
+이 블로그의 글은 https://github.com/benelog/blog 에서 관리합니다.
+오타 제보나 Pull requst를 환영합니다.

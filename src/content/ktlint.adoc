@@ -21,7 +21,7 @@ https://ktlint.github.io/[ktlint]는 Kotlin의 공식 가이드의 규칙을 포
 https://ktlint.github.io/[ktlint]는 jar 파일로 제공되고, https://jcenter.bintray.com/ 에도 배포되어 있습니다.
 따라서 별도의 Gradle plugin이 없어도 Gradle에서 task를 정의해서도 쓸 수 있습니다.
 그런데 ktlint의 공식 사이트에서는 Gradle plugin을 더 권장한다고 나와 있습니다.
-이 글에서는 ktlin를 래핑만 Gradle plugin 중 Github에서 별 갯수가 가장 높은 https://github.com/jlleitschuh/ktlint-gradle[jlleitschuh/ktlint-gradle]를 사용했습니다.
+이 글에서는 ktlint를 래핑한 Gradle plugin 중 Github에서 별 갯수가 가장 높은 https://github.com/jlleitschuh/ktlint-gradle[jlleitschuh/ktlint-gradle]를 사용했습니다.
 
 === `.editorconfig` 설정
 ktlint는 `.editorconfig` 파일에 선언된 규칙을 포함하여 코드 스타일을 검사합니다.
@@ -40,9 +40,16 @@ charset = utf-8
 end_of_line = lf
 indent_size = 4
 indent_style = space
+trim_trailing_whitespace = true
 insert_final_newline = true
 max_line_length = 120
 tab_width = 4
+
+[*.{kt,kts}]
+disabled_rules=import-ordering
+# java.* 패키지를 의존하는 경우  IntelliJ의 Orgarnize Import 기능으로는 알파벳 순서대로 import 구문을 정렬할 수 없다.
+# 이는 ktlint의 import-ordering 규칙과 맞지 않는다.
+
 ----
 
 ktlint는 `.editorconfig` 파일이 없어도 디폴트 규칙으로 실행할 수 있습니다.
@@ -58,11 +65,11 @@ ktlint는 `.editorconfig` 파일이 없어도 디폴트 규칙으로 실행할 �
 * 코드 포멧에 대한 문서와 역할도 할 수 있습니다.
 ** 위의 예시와 같이 `.editorconfig` 에 선언되는 속성의 이름은 이해하기 쉽습니다. 이 파일만 봐도 파일 포멧에 대한 일부 규칙을 파악할 수 있습니다.
 * https://kotlinlang.org/docs/reference/coding-conventions.html[Kotlin 공식 코딩 컨벤션]에 명시되지 않은 규칙까지 일치시킬 수 있습니다.
-** `max_line_length` , `insert_final_newline` 과 같은 규칙을 Kotlin 공식 코딩 컨벤션에는 명시되어 있지는 않습니다. 그러나 같은 소스를 고치면서 협업하는 개발자들이 이를 통일하지 않을 경우 불필요한 Diff 가 발생하여 코드 변경분을 파악할 때 불편해집니다.
+** `max_line_length` , `insert_final_newline` 과 같은 규칙을 Kotlin 공식 코딩 컨벤션에는 명시되어 있지는 않습니다. 그러나 같은 소스를 고치면서 협업하는 개발자들이 이를 통일하지 않을 경우 불필요한 diff 가 발생하여 코드 변경분을 파악할 때 불편해집니다.
+* `disabled_rules` 속성으로 검사하지 않을 규칙을 지정할 수 있습니다.
+** 특히 현시점에서는 `import-ordering` 규칙은 쓰지 않는 것이 좋습니다. 위의 예시 파일에도 이를 반영했습니다.
 
-=== `build.gradle` 설정
 https://github.com/jlleitschuh/ktlint-gradle[jlleitschuh/ktlint-gradle]는 아래와 같이 설정합니다.
-
 
 [source,groovy]
 .Gradle Groovy설정 (build.gradle)
@@ -83,7 +90,6 @@ plugins {
 }
 ----
 
-
 [source,kotlin]
 .Gradle Kotlin설정 (build.gradle.kts)
 ----
@@ -102,7 +108,7 @@ plugins {
 
 [CAUTION]
 ====
-https://github.com/jlleitschuh/ktlint-gradle[jlleitschuh/ktlint-gradle]는 Gradle 버전 5.4.1이상에서만 사용할 수 있습니다. 그 이하버전에서는 아래와 같은 에러가 나옵니다.
+https://github.com/jlleitschuh/ktlint-gradle[jlleitschuh/ktlint-gradle]는 Gradle 버전 5.4.1이상에서만 사용할 수 있습니다. 그 이하 버전에서는 아래와 같은 에러가 나옵니다.
 
 [source]
 ----
@@ -141,9 +147,9 @@ kotlin.code.style=official
 
 IntellJ에서 프로젝트를 import할때 위의 설정을 참조할 수 있습니다.
 
-플러그인 설정이 완료되면 ktlint를 실행하는 Gradle 태스크는  `./gradlew tasks | grep ktlint` 명령으로 확인할 수 있습니다.
+플러그인 설정이 완료되면 ktlint를 실행하는 Gradle 태스크는  `./gradlew tasks | grep ktlint` 명령으로 확인합니다.
 
-=== 스타일 검사 수행
+=== 스타일 검사
 `./gradlew ktlintCheck` 태스크는 스타일 검사를 수행합니다.
 이 태스크는 `./gradlew build` 를 실행했을 때 연결되는 전체 프로젝트 빌드 싸이클에 포함됩니다. 따라서 디폴트 설정으로는  ktlint에서 가이드하는 코드 스타일을 지키지 않으면 빌드가 실패합니다.
 
