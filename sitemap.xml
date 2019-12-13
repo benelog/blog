@@ -2,11 +2,19 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
     <url>
         <loc>https://anew0m.netlify.com//about.html</loc>
-        <lastmod>2019-11-02</lastmod>
+        <lastmod>2019-12-13</lastmod>
     </url>
     <url>
         <loc>https://anew0m.netlify.com//404.html</loc>
         <lastmod>2017-05-11</lastmod>
+    </url>
+    <url>
+        <loc>https://anew0m.netlify.com//Relational_Data_Modeling_Note-06.html</loc>
+        <lastmod>2019-12-12</lastmod>
+    </url>
+    <url>
+        <loc>https://anew0m.netlify.com//Relational_Data_Modeling_Note-07.html</loc>
+        <lastmod>2019-12-12</lastmod>
     </url>
     <url>
         <loc>https://anew0m.netlify.com//Relational_Data_Modeling_Note-02.html</loc>
@@ -17,11 +25,11 @@
         <lastmod>2019-10-04</lastmod>
     </url>
     <url>
-        <loc>https://anew0m.netlify.com//Relational_Data_Modeling_Note.html</loc>
+        <loc>https://anew0m.netlify.com//Relational_Data_Modeling_Note-03.html</loc>
         <lastmod>2019-10-04</lastmod>
     </url>
     <url>
-        <loc>https://anew0m.netlify.com//Relational_Data_Modeling_Note-03.html</loc>
+        <loc>https://anew0m.netlify.com//Relational_Data_Modeling_Note.html</loc>
         <lastmod>2019-10-04</lastmod>
     </url>
     <url>

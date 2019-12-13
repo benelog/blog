@@ -1,0 +1,1153 @@
+<!DOCTYPE HTML>
+<!--
+    Future Imperfect by HTML5 UP
+    html5up.net | @n33co
+    Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>관계형 데이터 모델링 노트 6장 - 정민호의 블로그</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="'데이터모델링 도서인 `관계형 데이터 모델링 노트 개정판` 책의 `7장 이력 데이터 이야기` 요약 및 정리">
+    <meta name="author" content="정민호">
+    <meta name="keywords" content="데이터모델링, 책정리">
+    <meta name="generator" content="JBake">
+	<meta property="og:image" content="https://anew0m.netlify.com/img/jdk/duke.jpg"/>
+
+    <link rel="stylesheet" href="css/google-font.css" />
+    <link rel="stylesheet" href="css/font-awesome.min.css" />
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/add-on.css" />
+    <link rel="stylesheet" href="css/monokai-sublime.css">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+
+    <!-- Fav and touch icons -->
+    <!--<link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">-->
+    <link rel="shortcut icon" href="img/favicon/favicon.png">
+  </head>
+  <body>
+     <!-- Wrapper -->
+        <div id="wrapper">
+
+<!-- Header -->
+<header id="header">
+            <h2><a href="https://anew0m.netlify.com/">정민호의 블로그</a></h2>
+
+    <nav class="links">
+        <ul>
+        			<li>
+	                    <a href=" archive.html">
+	                       
+	                            <i class="fa fa-archive">&nbsp;</i>Archive
+	                        
+	                    </a>
+                	</li>
+        		
+        		 
+        			<li>
+	                    <a href=" about.html">
+	                       
+	                            <i class="fa fa-user">&nbsp;</i>About
+	                        
+	                    </a>
+                	</li>
+        		
+        		 
+        			<li>
+	                    <a href=" feed.xml">
+	                       
+	                            <i class="fa fa-rss">&nbsp;</i>Subscribe
+	                        
+	                    </a>
+                	</li>
+        		
+        		 
+        </ul>
+    </nav>
+    <nav class="main">
+        <ul>
+            <li class="search">
+                <a class="fa-search" href="#search">Search</a>
+                <form id="search" method="get" action="//google.com/search">
+                    <input type="text" name="q" placeholder="Search" />
+                    <input type="hidden" name="q" value="site:https://anew0m.netlify.com/">
+                </form>
+            </li>
+            <li class="menu">
+                <a class="fa-bars" href="#menu">Menu</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+
+<!-- Menu -->
+<section id="menu">
+
+    <!-- Search -->
+        <section>
+            <form class="search" method="get" action="//google.com/search">
+                <input type="text" name="q" placeholder="Search" />
+                <input type="hidden" name="q" value="site:https://anew0m.netlify.com/">
+            </form>
+        </section>
+
+    <!-- Links -->
+        <section>
+            <ul class="links">
+        		 <li>
+                    <a href=" archive.html">
+                       
+                            <i class="fa fa-archive">&nbsp;</i>Archive
+                        
+                    </a>
+                </li>
+        		 <li>
+                    <a href=" about.html">
+                       
+                            <i class="fa fa-user">&nbsp;</i>About
+                        
+                    </a>
+                </li>
+        		 <li>
+                    <a href=" feed.xml">
+                       
+                            <i class="fa fa-rss">&nbsp;</i>Subscribe
+                        
+                    </a>
+                </li>
+            </ul>
+        </section>
+
+    <!-- Recent Posts -->
+        <section>
+            <ul class="links">
+                <header>
+                    <h3>Recent Posts</h3>
+                </header>
+                    <li>
+                        <a href="Relational_Data_Modeling_Note-07.html"><p>관계형 데이터 모델링 노트 6장</p></a>
+                    </li>
+                    <li>
+                        <a href="Relational_Data_Modeling_Note-06.html"><p>관계형 데이터 모델링 노트 6장</p></a>
+                    </li>
+                    <li>
+                        <a href="Relational_Data_Modeling_Note-01.html"><p>관계형 데이터 모델링 노트 1장</p></a>
+                    </li>
+                    <li>
+                        <a href="Relational_Data_Modeling_Note-03.html"><p>관계형 데이터 모델링 노트 3장</p></a>
+                    </li>
+            </ul>
+        </section>
+
+    <!-- Actions -->
+        <!--
+        <section>
+            <ul class="actions vertical">
+                <li><a href="#" class="button big fit">Log In</a></li>
+            </ul>
+        </section>
+        -->
+</section>
+	<div id="main">
+<article class="post">
+   <header>
+    <div class="title">
+                    <h1><a href="Relational_Data_Modeling_Note-07.html">관계형 데이터 모델링 노트 6장</a></h1>
+
+            <p>'데이터모델링 도서인 `관계형 데이터 모델링 노트 개정판` 책의 `7장 이력 데이터 이야기` 요약 및 정리</p>
+    </div>
+    <div class="meta">
+         <time class="published"
+            datetime='Dec 12, 2019'>
+            Dec 12, 2019</time>
+            <div class="published eta"></div>
+        <span class="author"/><span class="name">정민호</span><img src="img/main/jmh.jpg" alt="정민호" /></span>
+    </div>
+</header>
+
+    
+  
+         
+    <div id="content">
+       <div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#엔터티_이야기">1. 엔터티 이야기</a></li>
+<li><a href="#정규화_이야기">2. 정규화 이야기</a></li>
+<li><a href="#데이터_통합과_서브타입_이야기">3. 데이터 통합과 서브타입 이야기</a></li>
+<li><a href="#속성_이야기">4. 속성 이야기</a></li>
+<li><a href="#관계_이야기">5. 관계 이야기</a></li>
+<li><a href="#이력_데이터_이야기">6. 이력 데이터 이야기</a></li>
+<li><a href="#비정규화_이야기">7. 비정규화 이야기</a></li>
+</ul>
+</div>
+<div id="preamble">
+<div class="sectionbody">
+<hr>
+</div>
+</div>
+<div class="sect1">
+<h2 id="엔터티_이야기">1. 엔터티 이야기</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="정규화_이야기">2. 정규화 이야기</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="데이터_통합과_서브타입_이야기">3. 데이터 통합과 서브타입 이야기</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="속성_이야기">4. 속성 이야기</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="관계_이야기">5. 관계 이야기</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="이력_데이터_이야기">6. 이력 데이터 이야기</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="비정규화_이야기">7. 비정규화 이야기</h2>
+<div class="sectionbody">
+<hr>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">요약</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>비정규화(Denormalization)</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>비정규화 개요</p>
+<div class="ulist">
+<ul>
+<li>
+<p>비정규화는 정규화의 연장선에 있는 과정으로써 조회 성능만을 향상시키기 위해 데이터를 중복하거나 그룹핑 하며, 단순히 사용 편이를 위해 사용되어서는 안됨</p>
+</li>
+<li>
+<p>비정규화라는 용어보다 일반적으로 반정규화, 역정규화 등을 많이 사용되며, 정규화를 역으로 적용하는 것 이상의 의미가 내포됨</p>
+</li>
+<li>
+<p>중복 데이터는 원천데이터와 정합성을 맞춰야 함</p>
+</li>
+<li>
+<p>조회 성능은 향상되지만 데이터 정합성 문제, 데이터 품질 문제, 모델의 가독성 문제, 모델의 확장성 문제, DB 공간 문제, 쓰기 성능 문제 등 많은 단점이 존재하므로 비정규형은 매우 신중하게 선택적으로 사용해야 함</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>비정규화 방법</p>
+<div class="ulist">
+<ul>
+<li>
+<p>정규화를 거꾸로 적용한 역정규화(Reverse-Normalization) 방법</p>
+</li>
+<li>
+<p>정규형 모델에 중복 속성을 채택하는 방법</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>비정규화 원칙</p>
+<div class="ulist">
+<ul>
+<li>
+<p>최우선적으로 고려할 요소는 데이터 무결성</p>
+</li>
+<li>
+<p>정규형은 필수며, 성능 문제가 있을 떄만 비정규형을 채택</p>
+</li>
+<li>
+<p>중복 속성은 가능한 사용하지 않으며, 추출 속성은 일부 사용할 수 있음</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>비정규형의 단점 7가지</p>
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p>정합성 유지</p>
+<div class="ulist">
+<ul>
+<li>
+<p>중복 속성은 항상 원본 속성의 값으로 맞춰야하지만, 중복된 데이터가 늘어 날 수록 데이터의 정합성이 저하되어 결과적으로 데이터의 품질이 떨어지게 됨</p>
+</li>
+<li>
+<p>중복된 데이터가 적더라도 정도의 차이가 있을 뿐 데이터 품질은 자연히 저하될 수 밖에 없음</p>
+</li>
+<li>
+<p>실무에서는 어떤 이유에서든 데이터 정합성이 꺠져 있는 경우가 빈번</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>쓰기 성능 저하</p>
+<div class="ulist">
+<ul>
+<li>
+<p>비정규화의 목적은 오직 읽기(Read: Select) 성능을 향상시키는 것으로, 쓰기 성능을 포기할 만큼 읽기 성능 문제가 큰지 잘 따져봐야 함</p>
+</li>
+<li>
+<p>비정규화를 사용하더라도 트리거를 사용해서 부작용 없이 사용할 수 있을 정도가 기준이 되어야 함</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>불명확한 데이터 성격</p>
+<div class="ulist">
+<ul>
+<li>
+<p>엔터티 내 많은 중복 속성 떄문에 엔터티의 성격이 흐려질 수 있고, 엔터티의 성격이 흐려지면 제 3자가 보았을 떄 이해하기 어려움</p>
+</li>
+<li>
+<p>이해하기 어려운 모델은 사용할수록 점점 더 복잡해져 결국 조잡한 모델이 되기 쉬움</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>모델 확장성 저하</p>
+<div class="ulist">
+<ul>
+<li>
+<p>군더더기 없은 정규형에 비해 비정규형은 군더더기가 많으며 이를 수정하는 것은 어렵기 떄문에 확장성이 떨어짐</p>
+</li>
+<li>
+<p>비정규형 위주로 이루어진 모델은 어디를 수정해야 하는지 정확히 모르기 때문에 유지·보수가 어려워지며 제대로 하긴 더욱 어려워짐</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>개발 어려움</p>
+<div class="ulist">
+<ul>
+<li>
+<p>비정규형을 채택하면 개발이 쉽다는 얘기는 원천 데이터와 정합성을 체크하지 않기 떄문이며, 이는 있어서는 안 되는 일임</p>
+</li>
+<li>
+<p>중복 속성을 남발하면 개발할 당시에는 조인이 없으므로 편할지 몰라도 막상 운영하다 보면 중복된 데이터를 완벽하게 일치시키기가 쉽지 않아 문제가 됨</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>DB 저장공간 차지</p>
+<div class="ulist">
+<ul>
+<li>
+<p>인스턴스가 적은 엔터티는 큰 문제가 안 될 수 있지만, 인스턴스가 수억 건이 되는 엔터티는 20bytes 문자만 중복돼도 수십 Gbytes의 공간이 필요함</p>
+</li>
+<li>
+<p>DB 공간을 많이 차지하면 일반적으로 성능에 나쁜 영향을 미침</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>일부 조회 성능 저하</p>
+<div class="ulist">
+<ul>
+<li>
+<p>데이터 중복 시 하나의 블록에 존재할 인스턴스가 두 개의 블록에 존재할 수 있음</p>
+</li>
+<li>
+<p>조회할 떄 여러 블록을 사용하면 속도가 늦어짐</p>
+</li>
+<li>
+<p>비정규화를 하는 것이 반드시 조회 성능을 좋게하는지는 요건에 따라 달라질 수 있어 심사숙고해야함</p>
+</li>
+<li>
+<p>실제 데이터로 벤치마크하지 않는 한 좋고 나쁨을 단언 할 수 없음</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>비정규화 과정 5단계</p>
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p>함수 종속을 적용해 정규화</p>
+</li>
+<li>
+<p>성능 문제 발생 요건 도출</p>
+</li>
+<li>
+<p>비정규화 외 다른 방안 검토</p>
+<div class="ulist">
+<ul>
+<li>
+<p>뷰를 사용해서 조인 문제를 해결할 수 있는지 검토</p>
+</li>
+<li>
+<p>파티션으로 데이터를 나눠서 해결할 수 있는지 검토</p>
+</li>
+<li>
+<p>클러스터링이나 IOT(Index Oriented Table) 같은 특수 형태의 테이블을 사용해서 해결할 수 있는지 검토</p>
+</li>
+<li>
+<p>인덱스를 조정하거나 힌트(Hint) 등으로 해결할 수 있는지 검토</p>
+</li>
+<li>
+<p>그밖에 DBMS의 최신 기술을 적용해 해결할 수 있느니 검토</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>비정규화 수행</p>
+</li>
+<li>
+<p>정합성 구현 방안 검토</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>비정규화 방법</p>
+<div class="ulist">
+<ul>
+<li>
+<p>역정규화</p>
+</li>
+<li>
+<p>엔터티 합체</p>
+</li>
+<li>
+<p>엔터티 분해 - 수직</p>
+</li>
+<li>
+<p>엔터티 분해 - 수평</p>
+</li>
+<li>
+<p>요약 엔터티</p>
+</li>
+<li>
+<p>추출 속성</p>
+</li>
+<li>
+<p>반복 속성</p>
+</li>
+<li>
+<p>중복 데이터</p>
+</li>
+<li>
+<p>시스템 속성 삭제</p>
+</li>
+<li>
+<p>슈퍼타입 엔터티의 속성과 서브타입 엔터티 간 속성 이동</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>비정규화 방법 - 역정규화</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>롤다운 역정규화(Roll-Down Denormalization)</p>
+<div class="ulist">
+<ul>
+<li>
+<p>하위(자식) 엔터티를 기준으로 역정규화하는 것</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>롤업 역정규화(Roll-Up Denormalization)</p>
+<div class="ulist">
+<ul>
+<li>
+<p>상위(부모) 엔터티를 기준으로 역정규화 하는 것</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>비정규화 방법 - 엔터티 합체</p>
+<div class="ulist">
+<ul>
+<li>
+<p>일대일(1:1) 관계의 엔터티가 주를 이루며, 간혹 일대다(1:M) 관계의 엔터티도 대상이 됨</p>
+</li>
+<li>
+<p>엔터티를 합칠 때 성격이 같은지, 추후에 관계비가 바뀔 수 있는지 검토</p>
+</li>
+<li>
+<p>일대다(1:M) 관계의 엔터티는 보통 하위(자식) 엔터티를 기준으로 상위(부모) 엔터티를 합치는데, 상위(부모) 에넡티의 속성 개수가 많으면 엔터티를 합체하는 것이 적당하지 않음</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>비정규화 방법 - 엔터티 분해</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>엔터티 분해 개요</p>
+<div class="ulist">
+<ul>
+<li>
+<p>중복 데이터가 발생하지 않는 비정규화 방법</p>
+</li>
+<li>
+<p>로우 체이닝이나 로우 마이그레이션이 생기지 않는 방향으로 엔터티 설계</p>
+<div class="ulist">
+<ul>
+<li>
+<p>로우 체이닝(Row Chaining) - 전체 속성 사이즈가 블록 사이즈를 넘으면 두 개의 블록에 저장될 때</p>
+</li>
+<li>
+<p>로우 마이그레이션(Row Migration) - 한 블록에 저장되더라도 속성이 업데이트될 때 데이터가 커지면 다른 블록에 저장할 때</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>수직 분해</p>
+<div class="ulist">
+<ul>
+<li>
+<p>엔터티의 속성을 별도의 엔터티로 분해하는 것</p>
+</li>
+<li>
+<p>일대일(1:1) 관계로 분해하는 이유는 한 블록에 중요한 인스턴스를 많이 저장할 수 있기 떄문</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>수직분해 기준</p>
+<div class="ulist">
+<ul>
+<li>
+<p>사용빈도</p>
+</li>
+<li>
+<p>특별한 데이터 타입</p>
+</li>
+<li>
+<p>널(Null)이 발생할 수 있는 속성</p>
+</li>
+<li>
+<p>속성의 중요도</p>
+</li>
+<li>
+<p>업무에서 사용되는 속성별(락(Lock) 발생 최소화)</p>
+</li>
+<li>
+<p>전체 속성 사이즈가 기본 블록 사이즈를 초과 할 때(로우 체이닝, 로우 마이그레이션 발생 방지)</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>수평 분해</p>
+<div class="ulist">
+<ul>
+<li>
+<p>엔터티의 특정 인스턴스를 별도의 엔터티로 분해 하는것으로 파티셔닝(Partitioning)으로 구현됨</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>수평 분해 방법</p>
+<div class="ulist">
+<ul>
+<li>
+<p>파티셔닝</p>
+<div class="ulist">
+<ul>
+<li>
+<p>파티션된 조각은 하나의 논리적인 엔터티로 존재</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>특정 기준에 따라 엔터티 인스턴스를 분리해서 다른 엔터티로 이동시키는 것</p>
+<div class="ulist">
+<ul>
+<li>
+<p>엔터티를 아예 물리적으로 분리해서 관리</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>비정규화 방법 - 요약 엔터티</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>요약 엔터티 개요</p>
+<div class="ulist">
+<ul>
+<li>
+<p>요약 엔터티는 원천 엔터티를 대상으로 합계나 집계 등 미리 계산한 데이터를 저장한 엔터티</p>
+</li>
+<li>
+<p>미리 계산한 데이터도 데이터를 중복해서 관리하는 방법이어서 데이터 정합성을 주의 해야함</p>
+</li>
+<li>
+<p>하지만 중복 데이터라고 보기 어려운 요약 엔터티도 있음</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>요약 엔터티의 정합성을 맞추는 방법</p>
+<div class="ulist">
+<ul>
+<li>
+<p>실시간으로 요약 엔터티의 데이터를 수정하는 방법</p>
+</li>
+<li>
+<p>배치로 요약 엔터티의 데이터를 맞추는 방법</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>비정규화 방법 - 추출 속성</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>추출 속성 개요</p>
+<div class="ulist">
+<ul>
+<li>
+<p>추출 속성을 사용하는 목적은 미리 추출(계산)해서 보관한 값을 필요한 시점에 사용하기 위한것으로 추출 속성과 중복 속성은 구별됨</p>
+</li>
+<li>
+<p>추출 속성은 주로 하위(자식) 에넡티에서 많은 데이터(인스턴스)를 읽어서 연산 한 후 값을 상위(부모) 엔터티의 속성으로 가져다 놓은 속성을 말함</p>
+</li>
+<li>
+<p>추출 속성은 성능에 많은 영향을 미치므로 채택 여부를 숙고해야함</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>추출 속성의 유형</p>
+<div class="ulist">
+<ul>
+<li>
+<p>총 횟수</p>
+</li>
+<li>
+<p>처음 값</p>
+</li>
+<li>
+<p>최종 값</p>
+</li>
+<li>
+<p>더한 값</p>
+</li>
+<li>
+<p>현재 값</p>
+</li>
+<li>
+<p>이전 값</p>
+</li>
+<li>
+<p>다음 값</p>
+</li>
+<li>
+<p>추출 관계</p>
+</li>
+<li>
+<p>여부 값</p>
+<div class="ulist">
+<ul>
+<li>
+<p>여부 속성은 생각보다 정합성을 맞추기 어려워서 가능하면 지양</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>주 식별자 값의 체계와 동일한 의미의 값(체계가 있는 값)</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>이전 값을 관리하는 방법</p>
+<div class="ulist">
+<ul>
+<li>
+<p>이력 엔터티에 현재 유효한 데이터를 중복으로 관리하는 방법</p>
+</li>
+<li>
+<p>원천 엔터티에 이전 값을 관리하는 방법</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>비정규화 방법 - 추출 엔터티</p>
+<div class="ulist">
+<ul>
+<li>
+<p>추출 속성을 사용하는 방법과 유사함</p>
+</li>
+<li>
+<p>추출 엔터티는 추출 속성을 묶어서 사용하는 개념으로 현재 유효한 인스턴스와 속성만 추출해서 관리하는 엔터티</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>비정규화 방법 - 반복 속성</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>반복 속성 개요</p>
+<div class="ulist">
+<ul>
+<li>
+<p>조회 화면이 [1-Row]이냐 [N-Row] 냐에 따라서 정규형 비정규형을 사용</p>
+</li>
+<li>
+<p>조회 화면이 다양한 형태로 여러 개 존재할 떄는 중요도와 빈도에 따라 전략적으로 선택</p>
+</li>
+<li>
+<p>화면과 관련된 성능 이슈는 화면 구성이나 조회 방법 등을 바꿀 수 있는지 먼저 검토</p>
+</li>
+<li>
+<p>반복되는 속성이 한정돼 있을 때 사용할 수 있으며, 여러개의 속성이 묶여서 반복될 경우 정규화를 하는것이 좋음</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>반복 속성 유형</p>
+<div class="ulist">
+<ul>
+<li>
+<p>롤업 역정규화</p>
+</li>
+<li>
+<p>단순 비정규화</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>비정규화 방법 - 중복 데이터</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>중복 데이터 사용 방법</p>
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p>데이터 중복 관리</p>
+<div class="ulist">
+<ul>
+<li>
+<p>조회 효율을 위해 현재 시점의 데이터와 이력 데이터가 동시에 존재</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>엔터티 및 데이터 중복 관리</p>
+<div class="ulist">
+<ul>
+<li>
+<p>업무 처리를 위한 대상을 뽑기 위해</p>
+</li>
+<li>
+<p>복구 대비</p>
+</li>
+<li>
+<p>다른 서버의 DB에서 원격 조인을 피하기 위해</p>
+</li>
+<li>
+<p>조회 성능을 향상시키기 위해</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>비정규화 방법 - 시스템 속성 삭제</p>
+</li>
+<li>
+<p>비정규화 방법 - 슈퍼타입 엔터티의 속성과 서브타입 엔터티 간 속성 이동</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+    </div>
+	
+	<section id="social-share">
+        <ul class="icons">
+<!-- Social Share Button HTML -->
+
+<!-- Twitter -->
+<li><a href="//twitter.com/share?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note-07.html&text=관계형 데이터 모델링 노트 6장&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+</a></li>
+
+<!-- Google Plus -->
+<li><a href="//plus.google.com/share?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note-07.html" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+</a></li>
+
+<!-- Facebook -->
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://anew0m.netlify.com//Relational_Data_Modeling_Note-07.html" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+</a></li>
+
+<!-- Reddit (url, title) -->
+<li><a href="//reddit.com/submit?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note-07.html&title=관계형 데이터 모델링 노트 6장" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+</a></li>
+
+<!-- LinkedIn -->
+<li><a href="//www.linkedin.com/shareArticle?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note-07.html&title=관계형 데이터 모델링 노트 6장" target="_blank" class="share-btn linkedin">
+    <i class="fa fa-linkedin"></i>
+    <p>LinkedIn</p>
+</a></li>
+
+<!-- StumbleUpon (url, title) -->
+<li><a href="//www.stumbleupon.com/submit?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note-07.html&title=관계형 데이터 모델링 노트 6장" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+</a></li>
+
+<!-- Email -->
+<li><a href="mailto:?subject=Check out this post by 정민호&body=https://anew0m.netlify.com//Relational_Data_Modeling_Note-07.html" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+</a></li>
+        </ul>
+    </section>
+     
+
+    <footer>
+	
+		<ul class="stats">
+    	    <!-- Display the categories associated with this post -->
+    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
+ 	        <li><a href='tags/데이터모델링.html'>데이터모델링</a></li>
+ 	        <li><a href='tags/책정리.html'>책정리</a></li>
+
+				<li><a class="icon fa-comment" href="Relational_Data_Modeling_Note-07.html#disqus_thread"> &nbsp;</a></li>
+ 		</ul>
+    	
+    </footer>
+</article>
+		
+<ul class="actions pagination">
+  	
+  		        <li><a href="Relational_Data_Modeling_Note-02.html" 
+                class="button big previous">관계형 데이터 모델링 노트 2장</a></li>
+        <li><a href="Relational_Data_Modeling_Note-06.html" 
+                class="button big next">관계형 데이터 모델링 노트 6장</a></li>
+	
+</ul>
+		
+<div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_config = function () {
+      this.page.identifier = 'Relational_Data_Modeling_Note-07.html';
+    };
+    var disqus_shortname = 'anew0m';
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        dsq.setAttribute('data-timestamp', + new Date());
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <!--<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>-->
+</div>
+    </div>
+
+<!-- Sidebar -->
+<section id="sidebar">
+
+    <!-- Intro -->
+        <section id="intro">
+                                    <a href="/" class="logo"><img src="img/main/intro.jpg" class="intro-circle" width="150px" alt="anew0m" /></a>
+
+
+                <header>
+                    <h2>정민호의 블로그</h2>
+                    <p>평범한 일상과 IT에 관련된 글 모음</p>
+                </header>
+
+            <ul class="icons">
+                    <li><a href="feed.xml" type="application/rss+xml"
+                        target="_blank" title="RSS" class="fa fa-rss"></a></li>
+<li><a href="//github.com/anew0m" target="_blank" title="GitHub" class="fa fa-github"></a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li><a href="//linkedin.com/in/anew0m" target="_blank" title="LinkedIn" class="fa fa-linkedin"></a></li>
+
+
+
+
+
+
+
+
+<li><a href="mailto:anew0m@gmail.com" title="Email" class="fa fa-envelope"></a></li>
+            </ul>
+        </section>
+
+    <!-- Posts List -->
+        <section id="recent-posts">
+            <ul class="posts">
+                <header>
+                    <h3>Recent Posts</h3>
+                </header>
+
+                    <li>
+                        <article>
+                            <header>
+                                <h3><a href="Relational_Data_Modeling_Note-07.html">관계형 데이터 모델링 노트 6장</a></h3>
+                                 <time class="published"
+							            datetime='Dec 12, 2019'>
+							            Dec 12, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
+                                <h3><a href="Relational_Data_Modeling_Note-06.html">관계형 데이터 모델링 노트 6장</a></h3>
+                                 <time class="published"
+							            datetime='Dec 12, 2019'>
+							            Dec 12, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
+                                <h3><a href="Relational_Data_Modeling_Note-01.html">관계형 데이터 모델링 노트 1장</a></h3>
+                                 <time class="published"
+							            datetime='Oct 04, 2019'>
+							            Oct 04, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
+                                <h3><a href="Relational_Data_Modeling_Note-03.html">관계형 데이터 모델링 노트 3장</a></h3>
+                                 <time class="published"
+							            datetime='Oct 04, 2019'>
+							            Oct 04, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+
+                    <li>
+                        <ul class="actions">
+                            <li><a href="archive.html"
+                            class="button">View more posts</a></li>
+                        </ul>
+                    </li>
+            </ul>
+        </section>
+
+    <!-- Tags List can be show/hide from config-->
+        <section id="tags">
+            <ul class="posts">
+                <header>
+                    <h3>Tags</h3>
+                </header>
+
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/책소개.html">책소개</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/hackerton.html">hackerton</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/책정리.html">책정리</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 5 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/데이터모델링.html">데이터모델링</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 6 </span>
+                            </header>
+                        </article>
+                    </li>
+            </ul>
+        </section>
+
+
+    <!-- About -->
+        <section class="blurb">
+            <h2>About</h2>
+            <p>introduce</p>
+
+            <ul class="actions">
+                <li><a href="about.html" class="button">Learn More</a></li>
+            </ul>
+        </section>
+
+
+        <section id="footer">
+            <p class="copyright">&copy; 정민호의 블로그. Design: <a href="http://html5up.net" target="_blank">HTML5 UP</a>. Ported For SSG by <a href="https://github.com/jpescador/hugo-future-imperfect">Julio Pescador</a>. Adapted to JBake by <a href="//github.com/manikmagar" target="_blank">Manik Magar</a>. Baked with <a href="http://jbake.org">JBake v2.6.4</a>.
+            <a href="/sitemap.xml" target="_blank">Sitemap</a>.</p>
+        </section>
+
+</section>
+		</div>
+		<a id="back-to-top" href="#" class="fa fa-arrow-up fa-border fa-2x"></a>
+		<div id="push"></div>
+    </div>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+
+		<script src="js/jquery.min.js"></script>
+		<script src="js/skel.min.js"></script>
+		<script src="js/util.js"></script>
+		<script src="js/main.js"></script>
+		<script src="js/backToTop.js"></script>
+		<script src="js/highlight.pack.js"></script>
+		<script src="js/readingTime.js"></script>
+
+			<script id="dsq-count-scr" src="//anew0m.disqus.com/count.js" async></script>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-149448484-1', 'auto');
+  ga('send', 'pageview', {
+    'page': 'Relational_Data_Modeling_Note-07.html',
+    'title': '관계형 데이터 모델링 노트 6장'
+      });
+</script>
+		<!-- This is called by default since this theme uses highlight.js -->
+		<script>hljs.initHighlightingOnLoad();</script>
+		<!--[if lte IE 8]><script src="/js/ie/respond.min.js"></script><![endif]-->
+
+  </body>
+</html>
