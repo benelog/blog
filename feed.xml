@@ -6,8 +6,8 @@
     <atom:link href="https://anew0m.netlify.com//feed.xml" rel="self" type="application/rss+xml" />
     <description>JBake Bootstrap Template</description>
     <language>en-gb</language>
-    <pubDate>Fri, 13 Dec 2019 15:45:50 +0000</pubDate>
-    <lastBuildDate>Fri, 13 Dec 2019 15:45:50 +0000</lastBuildDate>
+    <pubDate>Fri, 13 Dec 2019 16:13:28 +0000</pubDate>
+    <lastBuildDate>Fri, 13 Dec 2019 16:13:28 +0000</lastBuildDate>
 
     <item>
       <title>관계형 데이터 모델링 노트 6장</title>
@@ -561,7 +561,7 @@
 	</description>
     </item>
     <item>
-      <title>관계형 데이터 모델링 노트 6장</title>
+      <title>관계형 데이터 모델링 노트 7장</title>
       <link>https://anew0m.netlify.com//Relational_Data_Modeling_Note-07.html</link>
       <pubDate>Thu, 12 Dec 2019 00:00:00 +0000</pubDate>
       <guid isPermaLink="false">Relational_Data_Modeling_Note-07.html</guid>
