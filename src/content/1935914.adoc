@@ -24,11 +24,11 @@ http://www.egloos.com/egloo/insert.php?eid=d0032573[]
 
 Spring Batch와 Spring WS, Spring Integration은 얽히고 섥힌 관계라고 보입니다. Spring integration의 Web Service Adapters에서 Spring Web Service를 사용하고 있고, Spring batch에서도 XML파일 처리에 Spring WS의 일부인 http://static.springframework.org/spring-ws/site/reference/html/oxm.html[Spring OXM]를 통한 위임처리를 할 수 있습니다. 그리고 위와 같이 Spring integration는 Spring Batch도 연결시켰군요.
 
-Spring Batch의 Job은 Spring Application Flatform을 통해서 OSGi 번들로도  실행가능하게 되었습니다.
+Spring Batch의 Job은 Spring Application Platform 통해서 OSGi 번들로도  실행가능하게 되었습니다.
 
 * http://blog.springsource.com/main/2008/05/30/running-a-spring-batch-job-in-the-springsource-aplication-platform/[Running a Spring Batch Job in The SpringSource Application Platform]
 
 향후 버전에서는 더욱 더 배치에 특화된 기능들이 추가될 것이라고 하네요.
 
-Spring batch + Spring Integration + Spring WS + Spring Application Flatform.. 그 미래가 어떻게 될지 정말 기대가 됩니다.
+Spring batch + Spring Integration + Spring WS + Spring Application Platform.. 그 미래가 어떻게 될지 정말 기대가 됩니다.
 
