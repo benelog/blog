@@ -168,7 +168,7 @@ IntellJ에서 프로젝트를 import할때 위의 설정을 참조할 수 있습
 
 앞에서 설명한 것처럼 `ktlintFormat` 태스크는 의도하지 않게 파일을 바꿀 위험이 있기 때문에 `addKtlintCheckGitPreCommitHook` 를 더 권장합니다.
 
-등록된 pre-commit hook은 `rm .git/hooks/pre-commit` 명령으로 등삭제할 수 있습니다.
+등록된 pre-commit hook은 `rm .git/hooks/pre-commit` 명령으로 삭제할 수 있습니다.
 
 == IntelliJ 설정
 IntelliJ의 코드 포멧터는 https://kotlinlang.org/docs/reference/coding-conventions.html[Kotlin 공식 코딩 컨벤션]이 나오기 전부터 쓰이던 디폴트 설정이 있었습니다. IntelliJ에서는 Kotlin 1.3에서는 신규로 생성되는 프로젝트에서, Kotlin 1.4에서는 모든 프로젝트에서 공식 컨벤션에 맞춘 포멧터가 디폴트로 설정될 것이라고 합니다. footnote:[https://kotlinlang.org/docs/reference/code-style-migration-guide.html 에서 설명된 계획입니다.] 오랫동안 유지보수할 Kotlin 코드라면 공식 컨벤션에 맞춰서 IntelliJ에서도 포멧터를 설정되었는지 신경을 써야 합니다.
