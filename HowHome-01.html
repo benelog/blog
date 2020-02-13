@@ -7,13 +7,13 @@
 <html lang="en">
   <head>
     <meta charset="utf-8"/>
-    <title>About - 정민호의 블로그</title>
+    <title>어떡하집 프로젝트 구상 - 정민호의 블로그</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="~~~~~~">
-    <meta name="keywords" content="">
+    <meta name="description" content="향후 내집마련에 관련된 인사이트를 얻기위해 프로젝트를 진행하려고 합니다.">
+    <meta name="author" content="정민호">
+    <meta name="keywords" content="부동산, 개인프로젝트">
     <meta name="generator" content="JBake">
-	<meta property="og:image" content="https://anew0m.netlify.com/img/main/intro.jpg"/>
+	<meta property="og:image" content="https://anew0m.netlify.com/img/jdk/duke.jpg"/>
 
     <link rel="stylesheet" href="css/google-font.css" />
     <link rel="stylesheet" href="css/font-awesome.min.css" />
@@ -156,33 +156,237 @@
         </section>
         -->
 </section>
-	
 	<div id="main">
 <article class="post">
    <header>
     <div class="title">
-        <h1>About</h1>
+                    <h1><a href="HowHome-01.html">어떡하집 프로젝트 구상</a></h1>
+
+            <p>향후 내집마련에 관련된 인사이트를 얻기위해 프로젝트를 진행하려고 합니다.</p>
     </div>
-   <!-- <div class="meta">
+    <div class="meta">
          <time class="published"
             datetime='Feb 13, 2020'>
             Feb 13, 2020</time>
-    </div> -->
+            <div class="published eta"></div>
+        <span class="author"/><span class="name">정민호</span><img src="img/main/jmh.jpg" alt="정민호" /></span>
+    </div>
 </header>
-   
+
+    
   
          
     <div id="content">
-       <div class="paragraph">
-<p>평범한 일상과 IT에 관련된 글 모음</p>
+       <div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#프로젝트를_시작한_동기">1. 프로젝트를 시작한 동기</a></li>
+<li><a href="#프로젝트_진행계획">2. 프로젝트 진행계획</a></li>
+<li><a href="#프로젝트_이슈사항">3. 프로젝트 이슈사항</a>
+<ul class="sectlevel2">
+<li><a href="#데이터_수집_부분">3.1. 데이터 수집 부분</a></li>
+<li><a href="#변경되는_주소정보">3.2. 변경되는 주소정보</a></li>
+<li><a href="#아파트_줄임말">3.3. 아파트 줄임말</a></li>
+</ul>
+</li>
+<li><a href="#프로젝트를_하면서_기대하는_것">4. 프로젝트를 하면서 기대하는 것</a></li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="프로젝트를_시작한_동기">1. 프로젝트를 시작한 동기</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>저는 오래전부터 내집마련에 관심을 가지고 있지만 막상 이렇다할 행동을 취한것은 없었습니다. 그나마 해둔것이라곤 시드머니를 만들기 위해 돈을 아껴쓰고 모으는 행동 뿐이었습니다.</p>
+</div>
+<div class="paragraph">
+<p>그러다 최근 부동산에 대한 관심도가 부쩍 늘어났습니다. 부동산관련 카페에서 다른사람이 작성한 글을 읽어보거나, 유튜브 등을 보고 있습니다.</p>
+</div>
+<div class="paragraph">
+<p>그 중에 이 프로젝트를 해봐야겠다고 마음먹게한 유튜브 영상이 하나 있었습니다.</p>
+</div>
+<div class="paragraph">
+<p>그 영상은 유튜버 <a href="https://www.youtube.com/channel/UC8tWxC9EPKUCrHmEhiYTbhQ">렘군RemGoon</a>이란 분이 업로드한 <a href="https://www.youtube.com/watch?v=0G9nu5tHMnc">부동산 랜드마크를 활용한 투자법 1탄</a>과 <a href="https://www.youtube.com/watch?v=TVms39NqQNA">부동산 랜드마크를 활용한 투자법 2탄</a> 이었습니다.</p>
+</div>
+<div class="paragraph">
+<p>이 영상에서는 랜드마크 아파트. 즉, 해당 지역의 아파트 중 시세를 이끌어 가는 대장(랜드마크) 아파트와 저평가된 아파트를 찾는 방법을 알려주었습니다.</p>
+</div>
+<div class="paragraph">
+<p>따라서 저는 이 방법을 시스템화하여 자동으로 랜드마크 아파트와 저평가된 아파트를 찾아주는 프로젝트를 구상하게 되었습니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="프로젝트_진행계획">2. 프로젝트 진행계획</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>프로젝트는 사전조사 &#8594; 설계 &#8594; 구현 단계로 진행하려고 합니다.</p>
+</div>
+<div class="paragraph">
+<p>사전조사 단계에서는 부동산과 관련하여 유사 시스템을 분석 합니다.
+유사 시스템을 분석함으로써 어떤 데이터들을 수집할 것인지 명확하게 정의할 수 있고 또, 제공하는 기능들을 통해 본 시스템에서 구현할 기능에 대한 인사이트를 얻을 수 있기 떄문입니다.</p>
+</div>
+<div class="paragraph">
+<p>설계 단계에서는 데이터를 수집과 처리, 제공하는 과정들을 제공하기 위해 어떤 툴을 사용하고 어떻게 구현할 것인지 정의 합니다.</p>
+</div>
+<div class="paragraph">
+<p>구현 단계에서는 시스템을 구현하기 위한 환경을 구축하고 기능을 개발합니다.</p>
+</div>
+<div class="paragraph">
+<p>프로젝트를 진행함에 있어 각 단계는 반드시 순서에 맞춰 진행하지 않고 필요 또는 제가 생각하는 우선순위에 따라서 유동적으로 진행하려고 합니다.</p>
+</div>
+<div class="paragraph">
+<p>그리고 제가 어떻게 조사하고 설계, 구현 했는지 포스팅 해보려고 합니다.
+포스팅은 최소 한 주에 하나는 포스팅하려고 합니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="프로젝트_이슈사항">3. 프로젝트 이슈사항</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="데이터_수집_부분">3.1. 데이터 수집 부분</h3>
+<div class="paragraph">
+<p>현재 프로젝트를 진행함에 있어 수집되어야 할 정보는 아파트와 관련된 정보입니다.
+아파트와 관련된 정보는 아파트의 좌표와 주소(도로명/지번), 관련기사, 매매가, 전세가, 세대수, 평수, 평면도 등이 있습니다.</p>
+</div>
+<div class="paragraph">
+<p>이 정보들 중 관련기사 정보를 수집할 때 특정 사이트에서 어뷰징 행위로 간주될텐데 이를 어떻게 풀것이며, 수집하는 속도를 어떻게 높일 것 인지 고민됩니다.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="변경되는_주소정보">3.2. 변경되는 주소정보</h3>
+<div class="paragraph">
+<p>사실 저는 회사에서 프로젝트를 하기 전까지 주소는 바뀌지 않는 정보인 줄 알았습니다.
+주소가 변경되는 정확한 이유는 모르겠지만 아마도 도로가 변경되거나, 도시가 생기거나 하는 등의 이유가 있지 않을까 생각됩니다.</p>
+</div>
+<div class="paragraph">
+<p>변경되는 주소는 아마도 <a href="https://post.naver.com/viewer/postView.nhn?volumeNo=7135987&amp;memberNo=36248235">PNU 코드</a>로 막연하게 해결할 수 있지 않을까 생각되는데, 문제는 주소정보를 어떻게 자동으로 최신화 할 것인지 고민됩니다.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="아파트_줄임말">3.3. 아파트 줄임말</h3>
+<div class="paragraph">
+<p>아파트 명칭이 유일하면 좋겠지만 그렇지 않고, 여러 사람들이 특정 아파트를 하나의 명칭으로 표현하면 좋겠지만 이것도 그렇지 않습니다.
+앞서 소개한 유튜브 동영상에서도 '래미안힐스테이트&#8217;를 지명인 고덕과 합쳐서 '고래힐&#8217;이라고 표현하고 있습니다.</p>
+</div>
+<div class="paragraph">
+<p>데이터 수집할 때 여러 사이트에서 아파트 정보를 수집하려고 생각하는데, 하나의 아파트가 여러 명칭들로 표현되면 난감 할것 같습니다.</p>
+</div>
+<div class="paragraph">
+<p>수작업으로 아파트 명칭의 메타정보를 관리하기엔 아파트의 수가 너무나 많은데 이를 어떻게 해결할지 고민됩니다.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="프로젝트를_하면서_기대하는_것">4. 프로젝트를 하면서 기대하는 것</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>이 프로젝트를 진행하면서 부동산에 관한 지식과 데이터와 관련된 전공 지식 향상을 기대하고 있습니다.</p>
+</div>
+<div class="paragraph">
+<p>그리고 언제가 될진 모르겠지만 향후 내집마련 시 이 시스템을 통해 인사이트를 얻을 수 있기를 기대하고 있습니다.</p>
+</div>
+<div class="paragraph">
+<p>시스템에서는 저평가된 지역 및 아파트를 도출 해주고, 특정 지역의 호재/악재를 파악 할 수 있기를 기대하고 있습니다.</p>
+</div>
+<div class="paragraph">
+<p>또 해외 부동산 정보를 수집하여 국내의 부동산과 비교함으로써 어떠한 상관관계가 있는지 파악할 수 있지 않을까 기대합니다.</p>
+</div>
+</div>
+</div>
+    </div>
+	
+	<section id="social-share">
+        <ul class="icons">
+<!-- Social Share Button HTML -->
+
+<!-- Twitter -->
+<li><a href="//twitter.com/share?url=https://anew0m.netlify.com//HowHome-01.html&text=어떡하집 프로젝트 구상&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+</a></li>
+
+<!-- Google Plus -->
+<li><a href="//plus.google.com/share?url=https://anew0m.netlify.com//HowHome-01.html" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+</a></li>
+
+<!-- Facebook -->
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://anew0m.netlify.com//HowHome-01.html" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+</a></li>
+
+<!-- Reddit (url, title) -->
+<li><a href="//reddit.com/submit?url=https://anew0m.netlify.com//HowHome-01.html&title=어떡하집 프로젝트 구상" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+</a></li>
+
+<!-- LinkedIn -->
+<li><a href="//www.linkedin.com/shareArticle?url=https://anew0m.netlify.com//HowHome-01.html&title=어떡하집 프로젝트 구상" target="_blank" class="share-btn linkedin">
+    <i class="fa fa-linkedin"></i>
+    <p>LinkedIn</p>
+</a></li>
+
+<!-- StumbleUpon (url, title) -->
+<li><a href="//www.stumbleupon.com/submit?url=https://anew0m.netlify.com//HowHome-01.html&title=어떡하집 프로젝트 구상" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+</a></li>
+
+<!-- Email -->
+<li><a href="mailto:?subject=Check out this post by 정민호&body=https://anew0m.netlify.com//HowHome-01.html" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+</a></li>
+        </ul>
+    </section>
+     
+
+    <footer>
+	
+		<ul class="stats">
+    	    <!-- Display the categories associated with this post -->
+    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
+ 	        <li><a href='tags/부동산.html'>부동산</a></li>
+ 	        <li><a href='tags/개인프로젝트.html'>개인프로젝트</a></li>
+
+				<li><a class="icon fa-comment" href="HowHome-01.html#disqus_thread"> &nbsp;</a></li>
+ 		</ul>
+    	
+    </footer>
+</article>
+		
+<ul class="actions pagination">
+  	
+  		        <li><a href="Relational_Data_Modeling_Note-07.html" 
+                class="button big previous">관계형 데이터 모델링 노트 7장</a></li>
+	
+</ul>
+		
+<div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_config = function () {
+      this.page.identifier = 'HowHome-01.html';
+    };
+    var disqus_shortname = 'anew0m';
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        dsq.setAttribute('data-timestamp', + new Date());
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <!--<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>-->
 </div>
     </div>
 
-    <footer>
-	    	
-    </footer>
-</article>
-    </div>
 <!-- Sidebar -->
 <section id="sidebar">
 
@@ -373,7 +577,6 @@
         </section>
 
 </section>
-
 		</div>
 		<a id="back-to-top" href="#" class="fa fa-arrow-up fa-border fa-2x"></a>
 		<div id="push"></div>
@@ -399,8 +602,8 @@
   })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
   ga('create', 'UA-149448484-1', 'auto');
   ga('send', 'pageview', {
-    'page': 'about.html',
-    'title': 'About'
+    'page': 'HowHome-01.html',
+    'title': '어떡하집 프로젝트 구상'
       });
 </script>
 		<!-- This is called by default since this theme uses highlight.js -->
