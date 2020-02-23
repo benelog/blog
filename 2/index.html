@@ -136,13 +136,13 @@
                         <a href="../../HowHome-01.html"><p>어떡하집 프로젝트 구상</p></a>
                     </li>
                     <li>
+                        <a href="../../HowHome-02-AptData-02.html"><p>어떡하집 프로젝트 - 아파트 정보 수집 계획(수집 정보 정의)</p></a>
+                    </li>
+                    <li>
+                        <a href="../../HowHome-02-AptData-01.html"><p>어떡하집 프로젝트 - 아파트 정보 수집 계획</p></a>
+                    </li>
+                    <li>
                         <a href="../../Relational_Data_Modeling_Note-06.html"><p>관계형 데이터 모델링 노트 6장</p></a>
-                    </li>
-                    <li>
-                        <a href="../../Relational_Data_Modeling_Note-07.html"><p>관계형 데이터 모델링 노트 7장</p></a>
-                    </li>
-                    <li>
-                        <a href="../../Relational_Data_Modeling_Note-02.html"><p>관계형 데이터 모델링 노트 2장</p></a>
                     </li>
             </ul>
         </section>
@@ -158,6 +158,1392 @@
 </section>
 	
 	<div id="main">
+<article class="post">
+   <header>
+    <div class="title">
+                    <h2><a href="../Relational_Data_Modeling_Note-07.html">관계형 데이터 모델링 노트 7장</a></h2>
+
+
+            <p>'데이터모델링 도서인 `관계형 데이터 모델링 노트 개정판` 책의 `7장 이력 데이터 이야기` 요약 및 정리</p>
+    </div>
+    <div class="meta">
+         <time class="published"
+            datetime='Dec 12, 2019'>
+            Dec 12, 2019</time>
+            <div class="published eta"></div>
+        <span class="author"/><span class="name">정민호</span><img src="../img/main/jmh.jpg" alt="정민호" /></span>
+    </div>
+</header>
+
+    
+  
+         
+    <div id="content">
+       <div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#엔터티_이야기">1. 엔터티 이야기</a></li>
+<li><a href="#정규화_이야기">2. 정규화 이야기</a></li>
+<li><a href="#데이터_통합과_서브타입_이야기">3. 데이터 통합과 서브타입 이야기</a></li>
+<li><a href="#속성_이야기">4. 속성 이야기</a></li>
+<li><a href="#관계_이야기">5. 관계 이야기</a></li>
+<li><a href="#이력_데이터_이야기">6. 이력 데이터 이야기</a></li>
+<li><a href="#비정규화_이야기">7. 비정규화 이야기</a></li>
+</ul>
+</div>
+<div id="preamble">
+<div class="sectionbody">
+<hr>
+</div>
+</div>
+<div class="sect1">
+<h2 id="엔터티_이야기">1. 엔터티 이야기</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="정규화_이야기">2. 정규화 이야기</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="데이터_통합과_서브타입_이야기">3. 데이터 통합과 서브타입 이야기</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="속성_이야기">4. 속성 이야기</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="관계_이야기">5. 관계 이야기</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="이력_데이터_이야기">6. 이력 데이터 이야기</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="비정규화_이야기">7. 비정규화 이야기</h2>
+<div class="sectionbody">
+<hr>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">요약</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>비정규화(Denormalization)</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>비정규화 개요</p>
+<div class="ulist">
+<ul>
+<li>
+<p>비정규화는 정규화의 연장선에 있는 과정으로써 조회 성능만을 향상시키기 위해 데이터를 중복하거나 그룹핑 하며, 단순히 사용 편이를 위해 사용되어서는 안됨</p>
+</li>
+<li>
+<p>비정규화라는 용어보다 일반적으로 반정규화, 역정규화 등을 많이 사용되며, 정규화를 역으로 적용하는 것 이상의 의미가 내포됨</p>
+</li>
+<li>
+<p>중복 데이터는 원천데이터와 정합성을 맞춰야 함</p>
+</li>
+<li>
+<p>조회 성능은 향상되지만 데이터 정합성 문제, 데이터 품질 문제, 모델의 가독성 문제, 모델의 확장성 문제, DB 공간 문제, 쓰기 성능 문제 등 많은 단점이 존재하므로 비정규형은 매우 신중하게 선택적으로 사용해야 함</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>비정규화 방법</p>
+<div class="ulist">
+<ul>
+<li>
+<p>정규화를 거꾸로 적용한 역정규화(Reverse-Normalization) 방법</p>
+</li>
+<li>
+<p>정규형 모델에 중복 속성을 채택하는 방법</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>비정규화 원칙</p>
+<div class="ulist">
+<ul>
+<li>
+<p>최우선적으로 고려할 요소는 데이터 무결성</p>
+</li>
+<li>
+<p>정규형은 필수며, 성능 문제가 있을 떄만 비정규형을 채택</p>
+</li>
+<li>
+<p>중복 속성은 가능한 사용하지 않으며, 추출 속성은 일부 사용할 수 있음</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>비정규형의 단점 7가지</p>
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p>정합성 유지</p>
+<div class="ulist">
+<ul>
+<li>
+<p>중복 속성은 항상 원본 속성의 값으로 맞춰야하지만, 중복된 데이터가 늘어 날 수록 데이터의 정합성이 저하되어 결과적으로 데이터의 품질이 떨어지게 됨</p>
+</li>
+<li>
+<p>중복된 데이터가 적더라도 정도의 차이가 있을 뿐 데이터 품질은 자연히 저하될 수 밖에 없음</p>
+</li>
+<li>
+<p>실무에서는 어떤 이유에서든 데이터 정합성이 꺠져 있는 경우가 빈번</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>쓰기 성능 저하</p>
+<div class="ulist">
+<ul>
+<li>
+<p>비정규화의 목적은 오직 읽기(Read: Select) 성능을 향상시키는 것으로, 쓰기 성능을 포기할 만큼 읽기 성능 문제가 큰지 잘 따져봐야 함</p>
+</li>
+<li>
+<p>비정규화를 사용하더라도 트리거를 사용해서 부작용 없이 사용할 수 있을 정도가 기준이 되어야 함</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>불명확한 데이터 성격</p>
+<div class="ulist">
+<ul>
+<li>
+<p>엔터티 내 많은 중복 속성 떄문에 엔터티의 성격이 흐려질 수 있고, 엔터티의 성격이 흐려지면 제 3자가 보았을 떄 이해하기 어려움</p>
+</li>
+<li>
+<p>이해하기 어려운 모델은 사용할수록 점점 더 복잡해져 결국 조잡한 모델이 되기 쉬움</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>모델 확장성 저하</p>
+<div class="ulist">
+<ul>
+<li>
+<p>군더더기 없은 정규형에 비해 비정규형은 군더더기가 많으며 이를 수정하는 것은 어렵기 떄문에 확장성이 떨어짐</p>
+</li>
+<li>
+<p>비정규형 위주로 이루어진 모델은 어디를 수정해야 하는지 정확히 모르기 때문에 유지·보수가 어려워지며 제대로 하긴 더욱 어려워짐</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>개발 어려움</p>
+<div class="ulist">
+<ul>
+<li>
+<p>비정규형을 채택하면 개발이 쉽다는 얘기는 원천 데이터와 정합성을 체크하지 않기 떄문이며, 이는 있어서는 안 되는 일임</p>
+</li>
+<li>
+<p>중복 속성을 남발하면 개발할 당시에는 조인이 없으므로 편할지 몰라도 막상 운영하다 보면 중복된 데이터를 완벽하게 일치시키기가 쉽지 않아 문제가 됨</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>DB 저장공간 차지</p>
+<div class="ulist">
+<ul>
+<li>
+<p>인스턴스가 적은 엔터티는 큰 문제가 안 될 수 있지만, 인스턴스가 수억 건이 되는 엔터티는 20bytes 문자만 중복돼도 수십 Gbytes의 공간이 필요함</p>
+</li>
+<li>
+<p>DB 공간을 많이 차지하면 일반적으로 성능에 나쁜 영향을 미침</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>일부 조회 성능 저하</p>
+<div class="ulist">
+<ul>
+<li>
+<p>데이터 중복 시 하나의 블록에 존재할 인스턴스가 두 개의 블록에 존재할 수 있음</p>
+</li>
+<li>
+<p>조회할 떄 여러 블록을 사용하면 속도가 늦어짐</p>
+</li>
+<li>
+<p>비정규화를 하는 것이 반드시 조회 성능을 좋게하는지는 요건에 따라 달라질 수 있어 심사숙고해야함</p>
+</li>
+<li>
+<p>실제 데이터로 벤치마크하지 않는 한 좋고 나쁨을 단언 할 수 없음</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>비정규화 과정 5단계</p>
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p>함수 종속을 적용해 정규화</p>
+</li>
+<li>
+<p>성능 문제 발생 요건 도출</p>
+</li>
+<li>
+<p>비정규화 외 다른 방안 검토</p>
+<div class="ulist">
+<ul>
+<li>
+<p>뷰를 사용해서 조인 문제를 해결할 수 있는지 검토</p>
+</li>
+<li>
+<p>파티션으로 데이터를 나눠서 해결할 수 있는지 검토</p>
+</li>
+<li>
+<p>클러스터링이나 IOT(Index Oriented Table) 같은 특수 형태의 테이블을 사용해서 해결할 수 있는지 검토</p>
+</li>
+<li>
+<p>인덱스를 조정하거나 힌트(Hint) 등으로 해결할 수 있는지 검토</p>
+</li>
+<li>
+<p>그밖에 DBMS의 최신 기술을 적용해 해결할 수 있느니 검토</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>비정규화 수행</p>
+</li>
+<li>
+<p>정합성 구현 방안 검토</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>비정규화 방법</p>
+<div class="ulist">
+<ul>
+<li>
+<p>역정규화</p>
+</li>
+<li>
+<p>엔터티 합체</p>
+</li>
+<li>
+<p>엔터티 분해 - 수직</p>
+</li>
+<li>
+<p>엔터티 분해 - 수평</p>
+</li>
+<li>
+<p>요약 엔터티</p>
+</li>
+<li>
+<p>추출 속성</p>
+</li>
+<li>
+<p>반복 속성</p>
+</li>
+<li>
+<p>중복 데이터</p>
+</li>
+<li>
+<p>시스템 속성 삭제</p>
+</li>
+<li>
+<p>슈퍼타입 엔터티의 속성과 서브타입 엔터티 간 속성 이동</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>비정규화 방법 - 역정규화</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>롤다운 역정규화(Roll-Down Denormalization)</p>
+<div class="ulist">
+<ul>
+<li>
+<p>하위(자식) 엔터티를 기준으로 역정규화하는 것</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>롤업 역정규화(Roll-Up Denormalization)</p>
+<div class="ulist">
+<ul>
+<li>
+<p>상위(부모) 엔터티를 기준으로 역정규화 하는 것</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>비정규화 방법 - 엔터티 합체</p>
+<div class="ulist">
+<ul>
+<li>
+<p>일대일(1:1) 관계의 엔터티가 주를 이루며, 간혹 일대다(1:M) 관계의 엔터티도 대상이 됨</p>
+</li>
+<li>
+<p>엔터티를 합칠 때 성격이 같은지, 추후에 관계비가 바뀔 수 있는지 검토</p>
+</li>
+<li>
+<p>일대다(1:M) 관계의 엔터티는 보통 하위(자식) 엔터티를 기준으로 상위(부모) 엔터티를 합치는데, 상위(부모) 에넡티의 속성 개수가 많으면 엔터티를 합체하는 것이 적당하지 않음</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>비정규화 방법 - 엔터티 분해</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>엔터티 분해 개요</p>
+<div class="ulist">
+<ul>
+<li>
+<p>중복 데이터가 발생하지 않는 비정규화 방법</p>
+</li>
+<li>
+<p>로우 체이닝이나 로우 마이그레이션이 생기지 않는 방향으로 엔터티 설계</p>
+<div class="ulist">
+<ul>
+<li>
+<p>로우 체이닝(Row Chaining) - 전체 속성 사이즈가 블록 사이즈를 넘으면 두 개의 블록에 저장될 때</p>
+</li>
+<li>
+<p>로우 마이그레이션(Row Migration) - 한 블록에 저장되더라도 속성이 업데이트될 때 데이터가 커지면 다른 블록에 저장할 때</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>수직 분해</p>
+<div class="ulist">
+<ul>
+<li>
+<p>엔터티의 속성을 별도의 엔터티로 분해하는 것</p>
+</li>
+<li>
+<p>일대일(1:1) 관계로 분해하는 이유는 한 블록에 중요한 인스턴스를 많이 저장할 수 있기 떄문</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>수직분해 기준</p>
+<div class="ulist">
+<ul>
+<li>
+<p>사용빈도</p>
+</li>
+<li>
+<p>특별한 데이터 타입</p>
+</li>
+<li>
+<p>널(Null)이 발생할 수 있는 속성</p>
+</li>
+<li>
+<p>속성의 중요도</p>
+</li>
+<li>
+<p>업무에서 사용되는 속성별(락(Lock) 발생 최소화)</p>
+</li>
+<li>
+<p>전체 속성 사이즈가 기본 블록 사이즈를 초과 할 때(로우 체이닝, 로우 마이그레이션 발생 방지)</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>수평 분해</p>
+<div class="ulist">
+<ul>
+<li>
+<p>엔터티의 특정 인스턴스를 별도의 엔터티로 분해 하는것으로 파티셔닝(Partitioning)으로 구현됨</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>수평 분해 방법</p>
+<div class="ulist">
+<ul>
+<li>
+<p>파티셔닝</p>
+<div class="ulist">
+<ul>
+<li>
+<p>파티션된 조각은 하나의 논리적인 엔터티로 존재</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>특정 기준에 따라 엔터티 인스턴스를 분리해서 다른 엔터티로 이동시키는 것</p>
+<div class="ulist">
+<ul>
+<li>
+<p>엔터티를 아예 물리적으로 분리해서 관리</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>비정규화 방법 - 요약 엔터티</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>요약 엔터티 개요</p>
+<div class="ulist">
+<ul>
+<li>
+<p>요약 엔터티는 원천 엔터티를 대상으로 합계나 집계 등 미리 계산한 데이터를 저장한 엔터티</p>
+</li>
+<li>
+<p>미리 계산한 데이터도 데이터를 중복해서 관리하는 방법이어서 데이터 정합성을 주의 해야함</p>
+</li>
+<li>
+<p>하지만 중복 데이터라고 보기 어려운 요약 엔터티도 있음</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>요약 엔터티의 정합성을 맞추는 방법</p>
+<div class="ulist">
+<ul>
+<li>
+<p>실시간으로 요약 엔터티의 데이터를 수정하는 방법</p>
+</li>
+<li>
+<p>배치로 요약 엔터티의 데이터를 맞추는 방법</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>비정규화 방법 - 추출 속성</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>추출 속성 개요</p>
+<div class="ulist">
+<ul>
+<li>
+<p>추출 속성을 사용하는 목적은 미리 추출(계산)해서 보관한 값을 필요한 시점에 사용하기 위한것으로 추출 속성과 중복 속성은 구별됨</p>
+</li>
+<li>
+<p>추출 속성은 주로 하위(자식) 에넡티에서 많은 데이터(인스턴스)를 읽어서 연산 한 후 값을 상위(부모) 엔터티의 속성으로 가져다 놓은 속성을 말함</p>
+</li>
+<li>
+<p>추출 속성은 성능에 많은 영향을 미치므로 채택 여부를 숙고해야함</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>추출 속성의 유형</p>
+<div class="ulist">
+<ul>
+<li>
+<p>총 횟수</p>
+</li>
+<li>
+<p>처음 값</p>
+</li>
+<li>
+<p>최종 값</p>
+</li>
+<li>
+<p>더한 값</p>
+</li>
+<li>
+<p>현재 값</p>
+</li>
+<li>
+<p>이전 값</p>
+</li>
+<li>
+<p>다음 값</p>
+</li>
+<li>
+<p>추출 관계</p>
+</li>
+<li>
+<p>여부 값</p>
+<div class="ulist">
+<ul>
+<li>
+<p>여부 속성은 생각보다 정합성을 맞추기 어려워서 가능하면 지양</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>주 식별자 값의 체계와 동일한 의미의 값(체계가 있는 값)</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>이전 값을 관리하는 방법</p>
+<div class="ulist">
+<ul>
+<li>
+<p>이력 엔터티에 현재 유효한 데이터를 중복으로 관리하는 방법</p>
+</li>
+<li>
+<p>원천 엔터티에 이전 값을 관리하는 방법</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>비정규화 방법 - 추출 엔터티</p>
+<div class="ulist">
+<ul>
+<li>
+<p>추출 속성을 사용하는 방법과 유사함</p>
+</li>
+<li>
+<p>추출 엔터티는 추출 속성을 묶어서 사용하는 개념으로 현재 유효한 인스턴스와 속성만 추출해서 관리하는 엔터티</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>비정규화 방법 - 반복 속성</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>반복 속성 개요</p>
+<div class="ulist">
+<ul>
+<li>
+<p>조회 화면이 [1-Row]이냐 [N-Row] 냐에 따라서 정규형 비정규형을 사용</p>
+</li>
+<li>
+<p>조회 화면이 다양한 형태로 여러 개 존재할 떄는 중요도와 빈도에 따라 전략적으로 선택</p>
+</li>
+<li>
+<p>화면과 관련된 성능 이슈는 화면 구성이나 조회 방법 등을 바꿀 수 있는지 먼저 검토</p>
+</li>
+<li>
+<p>반복되는 속성이 한정돼 있을 때 사용할 수 있으며, 여러개의 속성이 묶여서 반복될 경우 정규화를 하는것이 좋음</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>반복 속성 유형</p>
+<div class="ulist">
+<ul>
+<li>
+<p>롤업 역정규화</p>
+</li>
+<li>
+<p>단순 비정규화</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>비정규화 방법 - 중복 데이터</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>중복 데이터 사용 방법</p>
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p>데이터 중복 관리</p>
+<div class="ulist">
+<ul>
+<li>
+<p>조회 효율을 위해 현재 시점의 데이터와 이력 데이터가 동시에 존재</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>엔터티 및 데이터 중복 관리</p>
+<div class="ulist">
+<ul>
+<li>
+<p>업무 처리를 위한 대상을 뽑기 위해</p>
+</li>
+<li>
+<p>복구 대비</p>
+</li>
+<li>
+<p>다른 서버의 DB에서 원격 조인을 피하기 위해</p>
+</li>
+<li>
+<p>조회 성능을 향상시키기 위해</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>비정규화 방법 - 시스템 속성 삭제</p>
+</li>
+<li>
+<p>비정규화 방법 - 슈퍼타입 엔터티의 속성과 서브타입 엔터티 간 속성 이동</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+    </div>
+	
+	<section id="social-share">
+        <ul class="icons">
+<!-- Social Share Button HTML -->
+
+<!-- Twitter -->
+<li><a href="//twitter.com/share?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note-07.html&text=관계형 데이터 모델링 노트 7장&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+</a></li>
+
+<!-- Google Plus -->
+<li><a href="//plus.google.com/share?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note-07.html" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+</a></li>
+
+<!-- Facebook -->
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://anew0m.netlify.com//Relational_Data_Modeling_Note-07.html" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+</a></li>
+
+<!-- Reddit (url, title) -->
+<li><a href="//reddit.com/submit?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note-07.html&title=관계형 데이터 모델링 노트 7장" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+</a></li>
+
+<!-- LinkedIn -->
+<li><a href="//www.linkedin.com/shareArticle?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note-07.html&title=관계형 데이터 모델링 노트 7장" target="_blank" class="share-btn linkedin">
+    <i class="fa fa-linkedin"></i>
+    <p>LinkedIn</p>
+</a></li>
+
+<!-- StumbleUpon (url, title) -->
+<li><a href="//www.stumbleupon.com/submit?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note-07.html&title=관계형 데이터 모델링 노트 7장" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+</a></li>
+
+<!-- Email -->
+<li><a href="mailto:?subject=Check out this post by 정민호&body=https://anew0m.netlify.com//Relational_Data_Modeling_Note-07.html" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+</a></li>
+        </ul>
+    </section>
+     
+
+    <footer>
+	
+		<ul class="stats">
+    	    <!-- Display the categories associated with this post -->
+    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
+ 	        <li><a href='../tags/데이터모델링.html'>데이터모델링</a></li>
+ 	        <li><a href='../tags/책정리.html'>책정리</a></li>
+
+				<li><a class="icon fa-comment" href="../Relational_Data_Modeling_Note-07.html#disqus_thread"> &nbsp;</a></li>
+ 		</ul>
+    	
+    </footer>
+</article>
+<article class="post">
+   <header>
+    <div class="title">
+                    <h2><a href="../Relational_Data_Modeling_Note-06.html">관계형 데이터 모델링 노트 6장</a></h2>
+
+
+            <p>'데이터모델링 도서인 `관계형 데이터 모델링 노트 개정판` 책의 `6장 이력 데이터 이야기` 요약 및 정리</p>
+    </div>
+    <div class="meta">
+         <time class="published"
+            datetime='Dec 12, 2019'>
+            Dec 12, 2019</time>
+            <div class="published eta"></div>
+        <span class="author"/><span class="name">정민호</span><img src="../img/main/jmh.jpg" alt="정민호" /></span>
+    </div>
+</header>
+
+    
+  
+         
+    <div id="content">
+       <div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#엔터티_이야기">1. 엔터티 이야기</a></li>
+<li><a href="#정규화_이야기">2. 정규화 이야기</a></li>
+<li><a href="#데이터_통합과_서브타입_이야기">3. 데이터 통합과 서브타입 이야기</a></li>
+<li><a href="#속성_이야기">4. 속성 이야기</a></li>
+<li><a href="#관계_이야기">5. 관계 이야기</a></li>
+<li><a href="#이력_데이터_이야기">6. 이력 데이터 이야기</a></li>
+</ul>
+</div>
+<div id="preamble">
+<div class="sectionbody">
+<hr>
+</div>
+</div>
+<div class="sect1">
+<h2 id="엔터티_이야기">1. 엔터티 이야기</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="정규화_이야기">2. 정규화 이야기</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="데이터_통합과_서브타입_이야기">3. 데이터 통합과 서브타입 이야기</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="속성_이야기">4. 속성 이야기</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="관계_이야기">5. 관계 이야기</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+<div class="sect1">
+<h2 id="이력_데이터_이야기">6. 이력 데이터 이야기</h2>
+<div class="sectionbody">
+<hr>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">요약</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>이력 데이터</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>이력 데이터 개요</p>
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p>이력 데이터(Alterd Data)란?</p>
+<div class="ulist">
+<ul>
+<li>
+<p>지나간 데이터(Bygone Data). 즉 입력된 데이터가 변경(정정 아님)된 데이터를 이력데이터라고 함</p>
+</li>
+<li>
+<p>이력 데이터는 원천 데이터의 함수 종속이나 파생 종속과 연관됨</p>
+</li>
+<li>
+<p>이력 데이터를 관리하는 이유는 데이터의 과거 상태를 추적할 필요가 있기 때문</p>
+</li>
+<li>
+<p>모델링 시 주요 엔터티는 이력 데이터 요건이 없더라도 생길 것을 대비하는 것이 좋음</p>
+</li>
+<li>
+<p>주 식별자가 아닌 주 식별자에 종속된 속성 값이 바뀌면 이력 데이터가 생기게 됨</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>내역데이터란</p>
+<div class="ulist">
+<ul>
+<li>
+<p>예전에 쌓인 데이터여도 변경되지 않았다면 이력 데이터가 아니라 내역 데이터</p>
+</li>
+<li>
+<p>과거 데이터라도 본질(원천) 데이터일 수 있음</p>
+</li>
+<li>
+<p>내역 데이터는 살아있는 데이터이며, 내역 성격의 엔터티는 이력 데이터를 같이 관리하지 않아야함</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>이력 엔터티 설계 시점</p>
+<div class="ulist">
+<ul>
+<li>
+<p>1. 원천 엔터티와 동시에 이력 엔터티를 설계</p>
+<div class="ulist">
+<ul>
+<li>
+<p>이력 엔터티만을 설계하는 특정 시점이 사실상 없다는 것을 의미</p>
+</li>
+<li>
+<p>따라서 본질(원천) 데이터를 먼저 확고히 해야한 다는 점만 주의하면, 주요 엔터티는 개념 모델링 단계에서 이력 엔터티를 고려(또는 논의)하는 것이 현실적으로 효율적</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>2. 원천 엔터티의 설계가 끝난 시점인 논리 모델링이 끝난 후 또는 물리 모델링 시점에 설계</p>
+<div class="ulist">
+<ul>
+<li>
+<p>이력 데이터를 논리 모델링이 끝난 물리 모델링 단계에서 설계하면 기존(원천) 엔터티가 영향을 받을 수 있음</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>이력 엔터티 설계 시점은 종합적인 사고가 가능하다는 전제하에서는 한 번에 설계하는게 좋으며, 본질 데이터를 설계할 때 최소한 모델 구조에 대한 변경을 염두에 두고 이력 데이터를 고민해야함</p>
+<div class="ulist">
+<ul>
+<li>
+<p>중요한 엔터티는 업무 식별자(또는 주 식별자)와 주요 핵심 속성, 이력 데이터 관리 방안, 심각한 성능 이슈 등을 한꺼번에 고민하고 종합적으로 분석 판단해야함</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>그리고 이력 데이터를 설계할 때는 선분이력 방식으로 설계할지를 같이 결정해야하며, 선분이력 시 종료일자 속성이 주 식별자에 포함된다면 그 엔터티에는 하위(자식) 엔터티가 없어야 함</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>이력 엔터티 설계 방법</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>이력 엔터티 설계 방법 개요</p>
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p>엔터티 단위 이력</p>
+<div class="ulist">
+<ul>
+<li>
+<p>스냅샷 방식으로 저장 공간의 낭비가 심하나, 특정 시점의 전체 속성 값을 조회하는 요건이 많을 때 사용하면 좋음</p>
+</li>
+<li>
+<p>데이터 관리하기가 수월하며, 하위(자식) 엔터티에 미치는 영향도 차단했기 대문에 모델이 안정적인 장점이 있으나, 거의 유사한 스키마의 엔터티를 동일하게 유지해야하는 부담이 존재</p>
+</li>
+<li>
+<p>실무에서 가장 많이 사용하는 방법이며, 원천 엔터티의 하위 엔터티 또는 서브타입이 존재한다면 이 방법을 사용해야 함</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>속성 단위 이력(변경된 속성)</p>
+<div class="ulist">
+<ul>
+<li>
+<p>변경된 속성의 데이터만 별도로 관리하여 저장 공간이 가장 절약되지만, 과거 특정한 시점에 대해 변경된 속성 값과 변경되지 않은 속성 값을 같이 조회하기 어려움</p>
+</li>
+<li>
+<p>변경 데이터를 별도의 엔터티에서 관리하는 방법과 함께 관리하는 방법으로 나뉠 수 있음</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>속성 그룹 단위 이력(유사)</p>
+<div class="ulist">
+<ul>
+<li>
+<p>속성 중 내용(도메인)이 유사하거나 같이 사용될 수 있는 속성을 묶어서 별도의 엔터티에서 이력 데이터를 관리하는 방법</p>
+</li>
+<li>
+<p>적절하게 사용할 시 엔터티 단위 이력과 속성 단위 이력의 장점만을 살릴 수 있음</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>엔터티 단위 이력 설계</p>
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p>이력 데이터를 별도의 엔터티에서 관리하는 방법</p>
+<div class="olist upperalpha">
+<ol class="upperalpha" type="A">
+<li>
+<p>실체 엔터티</p>
+<div class="ulist">
+<ul>
+<li>
+<p>실체 엔터티에서는 원천 데이터를 관리하는 엔터티를 변경없이 그대로 존재하며, 이력 데이터는 원천 엔터티와 별도로 이력 엔터티에서 관리함(이력 엔터티의 주식별자에 변경일자 속성 추가)</p>
+</li>
+<li>
+<p>하위(이력) 엔터티가 존재하기 때문에 원천 데이터와 이력 데이터를 한꺼번에 조회하는 요건이 많다면 비효율이 발생</p>
+</li>
+<li>
+<p>비효율을 개선하기 위해 비정규화의 일종인 중복데이터를 사용할 수 있으나, 데이터 중복이 심하게 발생하므로 원칙적으로 사용을 지양해야함</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>기준 엔터티</p>
+<div class="ulist">
+<ul>
+<li>
+<p>기준 엔터티이면서 원천 엔터티인 엔터티는 기준일자 속성까지 포함하여 관리</p>
+</li>
+<li>
+<p>데이터는 과거에 입력됐지만 현재도 살아 있는 원천 데이터</p>
+</li>
+<li>
+<p>기준 데이터에 대한 이력(정정 아님) 데이터를 설계할 시 별도의 이력 엔터티 생성 후 관리(이력 엔터티의 주식별자에 변경일자 속성 추가)</p>
+</li>
+<li>
+<p>또는 기준 엔터티에는 현재의 데이터만 관리하고 별도의 이력 엔터티 생성 후 관리(이력 엔터티의 주식별자에 변경일자 속성 추가)</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>행위 엔터티</p>
+<div class="ulist">
+<ul>
+<li>
+<p>행위 엔터티에서는 이력을 관리하고자 하는 대상의 엔터티들의 구조를 그대로 이력 엔터티를 생성하여 관리함</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>하나의 엔터티에 원천 데이터와 변경 데이터를 함께 관리하는 방법</p>
+<div class="ulist">
+<ul>
+<li>
+<p>일반적으로 주요 실체, 행위, 엔터티에는 사용하지 않지만, 기준 엔터티는 하위 엔터티가 존재하지 않고 데이터양도 적어서 이 방법을 사용하기 적절</p>
+<div class="olist upperalpha">
+<ol class="upperalpha" type="A">
+<li>
+<p>실체 엔터티</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>이력 데이터를 설계할 때는 먼저 원천 데이터를 설계</p>
+</li>
+<li>
+<p>원천 데이터와 변경 데이터를 함께 관리하기 때문에 엔터티 명에 굳이 '~이력&#8217;을 붙이지 않음</p>
+</li>
+<li>
+<p>원천 엔터티에 변경일자 속성 또는 순번 등의 인조식별자를 추가하며, 변경일자 속성에는 변경되지 않았다는 것을 의미하는 값으로 '9999-12-31&#8217;을 사용함</p>
+<div class="olist upperalpha">
+<ol class="upperalpha" type="A">
+<li>
+<p>기준 엔터티</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>조회하는데 문제가 없다면 굳이 이력 데이터 개념으로 설계할 필요는 없음</p>
+<div class="olist upperalpha">
+<ol class="upperalpha" type="A">
+<li>
+<p>행위 엔터티</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>하위(자식) 엔터티가 존재할 때 원천 데이터와 변경 데이터를 함께 관리하는 것은 바람직하지 않음</p>
+</li>
+<li>
+<p><em>(?) 이해가 잘 안됨</em></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>속성 단위로 이력 데이터를 설계하는 방법</p>
+<div class="ulist">
+<ul>
+<li>
+<p>특정 속성에 대한 이력 엔터티를 생성 후 변경일자 및 변경값 관리</p>
+</li>
+<li>
+<p>중복 데이터가 없어 데이터 저장공간이 절약되지만, 변경되지 않은 속성까지 함께 조회하긴 어려움</p>
+</li>
+<li>
+<p>실무에서 많이 사용되지 않지만, 자주 사용하는 중요한 속성에 대해서는 이 방법의 사용을 고려해야 함</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>원천 데이터를 별도의 엔터티에서 관리하면서, 변경 데이터와 원천 데이터를 함께 관리하는 방법</p>
+<div class="ulist">
+<ul>
+<li>
+<p>원천 엔터티의 이력을 관리하고자하는 특정 속성을 추출하여 별도의 엔터티에서 데이터를 관리</p>
+</li>
+<li>
+<p>변경 이력 데이터로 설계한 것인지, 발생내역 데이터로 설계한 것인지 구분해야 함</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>속성 단위 이력 설계</p>
+<div class="ulist">
+<ul>
+<li>
+<p>역할을 관리하는 별도의 엔터티를 설계할 때 자주 사용됨</p>
+</li>
+<li>
+<p>별도의 엔터티에서 관리하는 이유는 역할은 보통 한 개가 아니라는 사실과 함께 이력 데이터까지 고려하기 때문</p>
+</li>
+<li>
+<p>성능 문제를 해결하기 위해 이력 데이터를 선분이력으로 관리하거나, 또는 비정규화(데이터 중복)하는 방법이 있음</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>속성 그룹 단위 이력 설계</p>
+<div class="ulist">
+<ul>
+<li>
+<p>속성 단위 이력 설계하는 방법과 같으며, 다만 성경이 유사한 속성들을 그룹으로 묶어서 관리하는데 차이가 있음</p>
+</li>
+<li>
+<p>유사한 속성들을 그룹으로 묶어서 관리하는 이유는 같이 조회되는 요건을 처리하기 위함</p>
+</li>
+<li>
+<p>따라서 유사한 속성이 아니더라도 같이 사용되는 속성을 그룹으로 묶을 수도 있음</p>
+</li>
+<li>
+<p>적절하게 사용하면 효율적인 모델이 되지만, 명확한 기준 없이 속성을 묶으면 원천 엔터티나 이력 엔터티의 성격이 혼한스러워질 수 있음</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>종 테이블(Vertical Table)을 이용한 이력 설계</p>
+<div class="ulist">
+<ul>
+<li>
+<p>변경된 속성을 종 테이블 형식의 별도 엔터티에서 통합 관리하는 것</p>
+</li>
+<li>
+<p>이 방법을 사용할 시 엔터티명과 속성명에 대한 관리 부담이 부가적으로 생기며, 관리할 속성이 명확하지 않고 특정 시점의 모든 속성 데이터를 조회하기 어려움</p>
+</li>
+<li>
+<p>하지만 모델을 형상 관리할 필요가 없다는게 큰 장점으로 실무에서 자주 사용되지만, 지나치게 유연해서 가능하면 사용을 자제하고 종 테이블로 관리할 시 심사숙고하여 결정할 것</p>
+</li>
+<li>
+<p>종 테이블은 유연한 만큼 이력 엔터티를 통합하는데 자유도가 높아 무분별하게 통합할 위험이 있음</p>
+</li>
+<li>
+<p>따라서 성격이 유사하거나, 같은 영역에 있는 몇개의 이력 엔터티를 통합하는게 바람직하고, 조인해서 사용하기 보다는 필요할 때 참고할 용도로 사용하면 효과적임</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>선분이력</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>선분이력 개요</p>
+<div class="ulist">
+<ul>
+<li>
+<p>선분이력은 과거 특정 시점의 데이터를 조회하는 요건이 많을 때 사용하는 방법으로 조회성능을 고려한 기법으로, 선분이력이 필요한 경우는 그다지 많지 않으므로 남용 주의</p>
+</li>
+<li>
+<p>특정 데이터가 변경된 시작일자와 변경 전의 종료일자가 이어지도록 인위적으로 데이터를 관리하는 것이 핵심이므로 변경된 릴레이션의 시작과 종료 시점을 연결하면 하나의 선분이 되는 것이 중요</p>
+</li>
+<li>
+<p>넓은 범위의 조회가 있고 성능 문제를 해결해야 한다면 선분이력 방법을 사용해야 하며, 선분이력의 종료일자에 대한 기본 값은 '9999년 12월 31일&#8217;이 적당하며, Default 제약을 설정해 사용하는것이 좋음</p>
+</li>
+<li>
+<p>선분이력을 사용할 때 시작일자와 종료일자가 겹치지 않도록 주의</p>
+</li>
+<li>
+<p>선분이력의 종료일자는 추출 속성으로 성능향상을 위해 존재하는 속성이지 본질적인 속성이 아니며, 데이터 성격상 없어도 되는 속성이므로 도입시 성능상 커다란 이득이 있는지도 따져봐야함</p>
+</li>
+<li>
+<p>성능향상을 위해 사용된 만큼 주 식별자에 포함하여 관리하는것이 좋으며, 변경순번과 같이 인조식별자를 사용하는 것은 바람직하지 않음</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>이력 엔터티 설계 절차</p>
+<div class="ulist">
+<ul>
+<li>
+<p>이력 엔터티를 설계하는 시작점은 이력 데이터를 관리하는 요건이 있느냐 인데, 이력 데이터를 쌓아두지 않더라도 이력 엔터티를 설계해 두는 것은 의미가 있음</p>
+</li>
+<li>
+<p>이력 엔터티는 총 5단계로 아래와 같이 분류 될 수 있음</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>변경 데이터를 관리해야 하는 요건이 있는지</p>
+</li>
+<li>
+<p>이력 데이터를 어떤 방법으로 관리해야 가장 효율적인지 분석</p>
+</li>
+<li>
+<p>선분이력 방법을 채택할지 결정</p>
+</li>
+<li>
+<p>이력 엔터티의 주 식별자(PK) 확정</p>
+</li>
+<li>
+<p>다른 엔터티와의 관계를 감안하여 최종적으로 확인</p>
+</li>
+</ol>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>서브타입 이력 모델</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>슈퍼·서브타입 엔터티별로 이력 데이터를 관리하는 방법</p>
+<div class="ulist">
+<ul>
+<li>
+<p>슈퍼타입 이력 엔터티와 서브타입 이력 엔터티간 참조 무결성 제약이 없기 떄문에 데이터 무결성을 장담할 수 없음</p>
+</li>
+<li>
+<p>특정 시점의 데이터를 조회하기 복잡</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>슈퍼·서브타입 엔터티와 동일한 구조의 엔터티로 이력 데이터를 관리하는 방법</p>
+<div class="ulist">
+<ul>
+<li>
+<p>직관적이고 엔터티 간에 참조 무결성 제약이 존재해 데이터 정합성이 맞으며, 조회하기 쉬움</p>
+</li>
+<li>
+<p>성능에 문제가 있을시 선분이력 방법을 적용할 수 있음</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>속성 단위로 이력 데이터를 관리하는 방법</p>
+<div class="ulist">
+<ul>
+<li>
+<p>특정 속성을 대상으로 이력을 관리할 때 사용</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>정정 데이터</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>정정 데이터란</p>
+<div class="ulist">
+<ul>
+<li>
+<p>정정 데이터는 데이터가 잘못돼 수정한 데이터로써 데이터를 변경한 이력 데이터와는 다름</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>정정 데이터 관리 방법</p>
+<div class="ulist">
+<ul>
+<li>
+<p>정정 데이터를 관리하는 방법은 정정이력을 관리하지 않고 데이터 업데이트하는 방법</p>
+</li>
+<li>
+<p>하나의 엔터티에서 변경이력 데이터를 관리하면서, 정정 데이터도 함께 관리하는 방법</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+    </div>
+	
+	<section id="social-share">
+        <ul class="icons">
+<!-- Social Share Button HTML -->
+
+<!-- Twitter -->
+<li><a href="//twitter.com/share?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note-06.html&text=관계형 데이터 모델링 노트 6장&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+</a></li>
+
+<!-- Google Plus -->
+<li><a href="//plus.google.com/share?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note-06.html" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+</a></li>
+
+<!-- Facebook -->
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://anew0m.netlify.com//Relational_Data_Modeling_Note-06.html" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+</a></li>
+
+<!-- Reddit (url, title) -->
+<li><a href="//reddit.com/submit?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note-06.html&title=관계형 데이터 모델링 노트 6장" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+</a></li>
+
+<!-- LinkedIn -->
+<li><a href="//www.linkedin.com/shareArticle?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note-06.html&title=관계형 데이터 모델링 노트 6장" target="_blank" class="share-btn linkedin">
+    <i class="fa fa-linkedin"></i>
+    <p>LinkedIn</p>
+</a></li>
+
+<!-- StumbleUpon (url, title) -->
+<li><a href="//www.stumbleupon.com/submit?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note-06.html&title=관계형 데이터 모델링 노트 6장" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+</a></li>
+
+<!-- Email -->
+<li><a href="mailto:?subject=Check out this post by 정민호&body=https://anew0m.netlify.com//Relational_Data_Modeling_Note-06.html" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+</a></li>
+        </ul>
+    </section>
+     
+
+    <footer>
+	
+		<ul class="stats">
+    	    <!-- Display the categories associated with this post -->
+    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
+ 	        <li><a href='../tags/데이터모델링.html'>데이터모델링</a></li>
+ 	        <li><a href='../tags/책정리.html'>책정리</a></li>
+
+				<li><a class="icon fa-comment" href="../Relational_Data_Modeling_Note-06.html#disqus_thread"> &nbsp;</a></li>
+ 		</ul>
+    	
+    </footer>
+</article>
 <article class="post">
    <header>
     <div class="title">
@@ -3430,2128 +4816,13 @@
     	
     </footer>
 </article>
-<article class="post">
-   <header>
-    <div class="title">
-                    <h2><a href="../Relational_Data_Modeling_Note.html">관계형 데이터 모델링 노트 소개</a></h2>
-
-
-            <p>'데이터모델링 도서인 `관계형 데이터 모델링 노트 개정판` 책을 요약 및 정리하기전 간략히 책을 소개하고자 한다.</p>
-    </div>
-    <div class="meta">
-         <time class="published"
-            datetime='Oct 04, 2019'>
-            Oct 04, 2019</time>
-            <div class="published eta"></div>
-        <span class="author"/><span class="name">정민호</span><img src="../img/main/jmh.jpg" alt="정민호" /></span>
-    </div>
-</header>
-
-    
-  
-         
-    <div id="content">
-       <div class="paragraph">
-<p><a href="https://dataprofessional.tistory.com/182">관계형 데이터 모델링 노트 개정판 - 김기창저</a></p>
-</div>
-<div class="imageblock">
-<div class="content">
-<img src="img/Relational_Data_Modeling_Note/book_cover.jpg" alt="book_cover">
-</div>
-</div>
-<div class="paragraph">
-<p><a href="https://book.naver.com/bookdb/book_detail.nhn?bid=13445378">관계형 데이터 모델링 노트 개정판</a>은 <a href="http://wisdommind.co.kr/">위즈덤마인드</a>의 김기창 대표님이 집필한 책이다.</p>
-</div>
-<div class="paragraph">
-<p>본 도서는 기존에 발간된 <a href="https://book.naver.com/bookdb/book_detail.nhn?bid=7421308">관계형 데이터 모델링 노트 - 재미와 깨달음이 있는 모델링 이야기 프리미엄 가이드 2</a>를 개선되어 재발간된 책으로, 2018.03.31에 출간되었으며 총 742 페이지로 아래와 같은 구성으로 이루어져있다.</p>
-</div>
-<div class="sidebarblock">
-<div class="content">
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>엔터티 이야기</p>
-</li>
-<li>
-<p>정규화 이야기</p>
-</li>
-<li>
-<p>데이터 통합과 서브타입 이야기</p>
-</li>
-<li>
-<p>속성 이야기</p>
-</li>
-<li>
-<p>관계 이야기</p>
-</li>
-<li>
-<p>이력 데이터 이야기</p>
-</li>
-<li>
-<p>비정규화 이야기</p>
-</li>
-</ol>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p>본 도서를 요약 및 정리하고자 생각하게된 계기는 네이버 카페인 <a href="https://cafe.naver.com/dbstudydapsqlp">데이터와사람들</a>에서 진행된 <a href="https://cafe.naver.com/dbstudydapsqlp/5370">스터디</a>를 시작하게됨으로써 도서를 요약 및 정리하기로 결심했다.</p>
-</div>
-<div class="paragraph">
-<p>따라서 책 내용을 정리하여 포스팅 하는 주기는 스터디 일정에 맞춰 19.10.05일 부터 2주 간격으로 한 장씩 포스팅 하고자하지만 유동적으로 변경될 수도 있을것 같다.</p>
-</div>
-    </div>
-	
-	<section id="social-share">
-        <ul class="icons">
-<!-- Social Share Button HTML -->
-
-<!-- Twitter -->
-<li><a href="//twitter.com/share?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note.html&text=관계형 데이터 모델링 노트 소개&via=" target="_blank" class="share-btn twitter">
-    <i class="fa fa-twitter"></i>
-    <p>Twitter</p>
-</a></li>
-
-<!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note.html" target="_blank" class="share-btn google-plus">
-    <i class="fa fa-google-plus"></i>
-    <p>Google+</p>
-</a></li>
-
-<!-- Facebook -->
-<li><a href="//www.facebook.com/sharer/sharer.php?u=https://anew0m.netlify.com//Relational_Data_Modeling_Note.html" target="_blank" class="share-btn facebook">
-    <i class="fa fa-facebook"></i>
-    <p>Facebook</p>
-</a></li>
-
-<!-- Reddit (url, title) -->
-<li><a href="//reddit.com/submit?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note.html&title=관계형 데이터 모델링 노트 소개" target="_blank" class="share-btn reddit">
-    <i class="fa fa-reddit-alien"></i>
-    <p>Reddit</p>
-</a></li>
-
-<!-- LinkedIn -->
-<li><a href="//www.linkedin.com/shareArticle?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note.html&title=관계형 데이터 모델링 노트 소개" target="_blank" class="share-btn linkedin">
-    <i class="fa fa-linkedin"></i>
-    <p>LinkedIn</p>
-</a></li>
-
-<!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note.html&title=관계형 데이터 모델링 노트 소개" target="_blank" class="share-btn stumbleupon">
-    <i class="fa fa-stumbleupon"></i>
-    <p>StumbleUpon</p>
-</a></li>
-
-<!-- Email -->
-<li><a href="mailto:?subject=Check out this post by 정민호&body=https://anew0m.netlify.com//Relational_Data_Modeling_Note.html" target="_blank" class="share-btn email">
-    <i class="fa fa-envelope"></i>
-    <p>Email</p>
-</a></li>
-        </ul>
-    </section>
-     
-
-    <footer>
-	
-		<ul class="stats">
-    	    <!-- Display the categories associated with this post -->
-    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/데이터모델링.html'>데이터모델링</a></li>
- 	        <li><a href='../tags/책소개.html'>책소개</a></li>
-
-				<li><a class="icon fa-comment" href="../Relational_Data_Modeling_Note.html#disqus_thread"> &nbsp;</a></li>
- 		</ul>
-    	
-    </footer>
-</article>
-<article class="post">
-   <header>
-    <div class="title">
-                    <h2><a href="../Relational_Data_Modeling_Note-03.html">관계형 데이터 모델링 노트 3장</a></h2>
-
-
-            <p>'데이터모델링 도서인 `관계형 데이터 모델링 노트 개정판` 책의 `3장 데이터 통합과 서브타입 이야기` 요약 및 정리</p>
-    </div>
-    <div class="meta">
-         <time class="published"
-            datetime='Oct 04, 2019'>
-            Oct 04, 2019</time>
-            <div class="published eta"></div>
-        <span class="author"/><span class="name">정민호</span><img src="../img/main/jmh.jpg" alt="정민호" /></span>
-    </div>
-</header>
-
-    
-  
-         
-    <div id="content">
-       <div id="toc" class="toc">
-<div id="toctitle">Table of Contents</div>
-<ul class="sectlevel1">
-<li><a href="#엔터티_이야기">1. 엔터티 이야기</a></li>
-<li><a href="#정규화_이야기">2. 정규화 이야기</a></li>
-<li><a href="#데이터_통합과_서브타입_이야기">3. 데이터 통합과 서브타입 이야기</a>
-<ul class="sectlevel2">
-<li><a href="#데이터_통합에_대한_서설">3.1. 데이터 통합에 대한 서설</a></li>
-<li><a href="#일반화와_상세화">3.2. 일반화와 상세화</a></li>
-<li><a href="#데이터_통합과_엔터티_통합">3.3. 데이터 통합과 엔터티 통합</a></li>
-<li><a href="#통합이_대세인가">3.4. 통합이 대세인가?</a></li>
-<li><a href="#어떤_경우에_통합을_고려하는가">3.5. 어떤 경우에 통합을 고려하는가?</a></li>
-<li><a href="#통합을_고려하지_않아도_되는_경우">3.6. 통합을 고려하지 않아도 되는 경우</a></li>
-<li><a href="#데이터_통합이_어려운_또_다른_이유">3.7. 데이터 통합이 어려운 또 다른 이유</a></li>
-<li><a href="#데이터_주제_영역이란">3.8. 데이터 주제 영역이란?</a></li>
-<li><a href="#주제_영역_설계_방법">3.9. 주제 영역 설계 방법</a></li>
-<li><a href="#데이터_오너십과_모델_오너십과데이터_통합의_시발점">3.10. 데이터 오너십과 모델 오너십과데이터 통합의 시발점</a></li>
-<li><a href="#데이터_통합과_정규화">3.11. 데이터 통합과 정규화</a></li>
-<li><a href="#통합과_합체">3.12. 통합과 합체</a></li>
-<li><a href="#주_식별자가_다른_엔터티의_통합">3.13. 주 식별자가 다른 엔터티의 통합</a></li>
-<li><a href="#서브타입에_대한_서설">3.14. 서브타입에 대한 서설</a></li>
-<li><a href="#서브타입과_부분집합">3.15. 서브타입과 부분집합</a></li>
-<li><a href="#서브타입은_어떻게_도출하는가">3.16. 서브타입은 어떻게 도출하는가?</a></li>
-<li><a href="#왜_서브타입을_사용하는가">3.17. 왜 서브타입을 사용하는가?</a></li>
-<li><a href="#한_엔터티에_서브타입이_여러_개_존재한다">3.18. 한 엔터티에 서브타입이 여러 개 존재한다?</a></li>
-<li><a href="#서브타입과_코드">3.19. 서브타입과 코드</a></li>
-<li><a href="#is_a_서브타입과_part_of_서브타입">3.20. Is-A 서브타입과 Part-Of 서브타입</a></li>
-<li><a href="#배타_서브타입과_중복_서브타입">3.21. 배타 서브타입과 중복 서브타입</a></li>
-<li><a href="#배타_서브타입과_이력_데이터">3.22. 배타 서브타입과 이력 데이터</a></li>
-<li><a href="#중복_서브타입에_대한_설계">3.23. 중복 서브타입에 대한 설계</a></li>
-<li><a href="#중복_서브타입의_주의점">3.24. 중복 서브타입의 주의점</a></li>
-<li><a href="#완전_서브타입과_불완전_서브타입">3.25. 완전 서브타입과 불완전 서브타입</a></li>
-<li><a href="#서브타입과_슈퍼타입의_관계">3.26. 서브타입과 슈퍼타입의 관계</a></li>
-<li><a href="#서브타입의_오해_슈퍼타입과_서브타입은_부모_자식_관계다">3.27. 서브타입의 오해 - 슈퍼타입과 서브타입은 부모 자식 관계다</a></li>
-<li><a href="#슈퍼타입서브타입_논리_모델의_물리_모델_변환">3.28. 슈퍼타입·서브타입 논리 모델의 물리 모델 변환</a></li>
-<li><a href="#서브타입_모델의_물리_모델_변환_서브타입별로_엔터티_분할">3.29. 서브타입 모델의 물리 모델 변환 - 서브타입별로 엔터티 분할</a></li>
-<li><a href="#서브타입_모델의_물리_모델_변환_슈퍼타입_엔터티로_통합">3.30. 서브타입 모델의 물리 모델 변환 - 슈퍼타입 엔터티로 통합</a></li>
-<li><a href="#서브타입_모델의_물리_모델_변환_슈퍼타입서브타입_개별_생성">3.31. 서브타입 모델의 물리 모델 변환 - 슈퍼타입·서브타입 개별 생성</a></li>
-<li><a href="#서브타입_모델의_물리_모델_변환_슈퍼타입서브타입_개별_생성배타_관계">3.32. 서브타입 모델의 물리 모델 변환 - 슈퍼타입·서브타입 개별 생성(배타 관계)</a></li>
-<li><a href="#erwin_툴의_서브타입_표기법">3.33. ERWin 툴의 서브타입 표기법</a></li>
-<li><a href="#중첩_서브타입">3.34. 중첩 서브타입</a></li>
-<li><a href="#서브타입_간의_관계_표현법">3.35. 서브타입 간의 관계 표현법</a></li>
-<li><a href="#잘못된_서브타입">3.36. 잘못된 서브타입</a></li>
-<li><a href="#범주에_대해서">3.37. 범주에 대해서</a></li>
-</ul>
-</li>
-</ul>
-</div>
-<div id="preamble">
-<div class="sectionbody">
-<hr>
-</div>
-</div>
-<div class="sect1">
-<h2 id="엔터티_이야기">1. 엔터티 이야기</h2>
-<div class="sectionbody">
-
-</div>
-</div>
-<div class="sect1">
-<h2 id="정규화_이야기">2. 정규화 이야기</h2>
-<div class="sectionbody">
-
-</div>
-</div>
-<div class="sect1">
-<h2 id="데이터_통합과_서브타입_이야기">3. 데이터 통합과 서브타입 이야기</h2>
-<div class="sectionbody">
-<hr>
-<div class="sidebarblock">
-<div class="content">
-<div class="title">요약</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>데이터 통합화(Generalization)</p>
-<div class="olist loweralpha">
-<ol class="loweralpha" type="a">
-<li>
-<p>데이터 통합이란?</p>
-<div class="ulist">
-<ul>
-<li>
-<p>유사한 성격의 데이터를 합치는 것으로 데이터라는 대상을 논리적, 물리적으로 일반화 하는것을 말함</p>
-</li>
-<li>
-<p>데이터 통합은 정규화를 기반으로 이뤄져야하고 의미가 있는선까지 일반화 해야하며, 성능 측면도 검토해야함</p>
-</li>
-<li>
-<p>엔터티를 일반화하거나 상세화하면 슈퍼타입(Supertype)과 서브타입(Subtype)이 생김</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>통합시 주의할 점</p>
-<div class="olist lowerroman">
-<ol class="lowerroman" type="i">
-<li>
-<p>성능</p>
-<div class="ulist">
-<ul>
-<li>
-<p>데이터를 통합하면 A집합과 B집합의 인스턴스 개수가 합쳐지기 때문에 데이터가 늘어나며, 인서트가 많이 발생하는 엔터티에 다른 엔터티를 통합하는것은 바람직하지 않음</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>정체성 희성</p>
-<div class="ulist">
-<ul>
-<li>
-<p>지나치게 일반화 하면 데이터 정체성이 희석되므로 통합에 실익이 있는지 고려해야하며, 업무적인 일대일 관계는 분리하는 것이 바람직</p>
-</li>
-<li>
-<p>엔터티는 실체, 행위, 기준, 가공 엔터티로 분류할 수 있으며, 다른 분류의 엔터티 간에 통합이 발생하면 데이터의 정체성이 희석됨</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>무결성 저하</p>
-<div class="ulist">
-<ul>
-<li>
-<p>통합해서 같이 사용하게 됨으로써 제약 조건을 생성하지 못하거나, 도메인을 정확히 설정하지 못할 수 있음</p>
-</li>
-<li>
-<p>주로 Not Null 제약이나 참조무결성(IR) 제약을 생성하지 못함</p>
-</li>
-<li>
-<p>데이터를 일반화 할 수록 무결성이 떨어짐</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>마이그레이션 가능 여부</p>
-<div class="ulist">
-<ul>
-<li>
-<p>현실적인 문제로, 다른 모든 조건을 만족하더라도 마이그레이션에 문제가 생기면 통합 모델을 사용할 수 없음</p>
-</li>
-</ul>
-</div>
-</li>
-</ol>
-</div>
-</li>
-<li>
-<p>통합시 고려사항</p>
-<div class="olist lowerroman">
-<ol class="lowerroman" type="i">
-<li>
-<p>요약</p>
-<div class="ulist">
-<ul>
-<li>
-<p>데이터의 본질(설격)이 유사할 때</p>
-</li>
-<li>
-<p>식별자가 동일하면서 유사한 속성이 존재할 때</p>
-</li>
-<li>
-<p>식별자는 다르지만, 기초 속성이 유사할 때</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>데이터의 성격이 유사할 때</p>
-</li>
-<li>
-<p>엔터티의 기초속성이 유사할 때</p>
-</li>
-<li>
-<p>데이터가 조회 등에 같이 사용될 때</p>
-</li>
-<li>
-<p>역할을 관리할 때</p>
-</li>
-<li>
-<p>대칭적인 업무일 때</p>
-</li>
-<li>
-<p>계층 관계가 존재할 때</p>
-</li>
-<li>
-<p>공통 속성이 존재할 때</p>
-</li>
-<li>
-<p>배타 관계가 발생할 때</p>
-</li>
-<li>
-<p>집계 엔터티의 집계 대상이 같을 때</p>
-</li>
-<li>
-<p>비정규화를 수행할 때</p>
-</li>
-<li>
-<p>일대일 관계일 때</p>
-</li>
-<li>
-<p>유사한 종류의 데이터를 하나의 기준으로 만들 때</p>
-</li>
-<li>
-<p>업무가 변경될 가능성이 많을 때</p>
-</li>
-</ol>
-</div>
-</li>
-</ol>
-</div>
-</li>
-<li>
-<p>서브타입(Subtypes)</p>
-<div class="olist loweralpha">
-<ol class="loweralpha" type="a">
-<li>
-<p>서브타입이란</p>
-<div class="ulist">
-<ul>
-<li>
-<p>보통 서브타입이란 용어에는 슈퍼타입이 포함되어 있어서, 서브타입이라고만 표현해도 포괄적으로 슈퍼타입까지 포함됨</p>
-</li>
-<li>
-<p>서브타입이란 서브타입 엔터티(Subtypes Entity)를 말하며, 엔터티를 통합하거나 상세화한 결과가 서브타입으로 이는 모델의 확장성을 좋게함</p>
-</li>
-<li>
-<p>공통 속성은 슈퍼타입 엔터티에 속하고 고유 속성은 서브타입 엔터티에 속하며 고유 속성이 없는 서브타입(불완전(Incomplete) 서브타입)이 존재 할 수 있음</p>
-</li>
-<li>
-<p>슈터타입과 서브 타입은 부모·자식 관계가 아니라 동등한 관계로 슈퍼타입과 서브타입을 하나의 인스턴스로 인식해야함</p>
-</li>
-<li>
-<p>서브타입 엔터티 간의 관계는 일반적으로 상호 배타적(Exclusive)이지만, 간혹 포함적(Inclusive)일 때도 있음</p>
-</li>
-<li>
-<p>데이터가 어떤 종류(집합)로 이루어졌는지를 한눈에 보여주기 위함</p>
-</li>
-<li>
-<p>서브타입으로 도출된 엔터티는 핵심 엔터티일 가능성이 크므로 모델링시 심도있게 고민</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>서브타입 도출 방법</p>
-<div class="olist lowerroman">
-<ol class="lowerroman" type="i">
-<li>
-<p>유사한 성격의 엔터티를 모아서 슈퍼타입을 생성하는 방법(Roll-Up Supertypes)</p>
-<div class="ulist">
-<ul>
-<li>
-<p>두개 이상의 유사한 엔터티에서 공통 속성을 도출하는 방법이며, 엔터티 통합(일반화)라고 함</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>복잡한 엔터티를 분해해서 서브타입을 생성하는 방법(Break-Down Subtypes)</p>
-<div class="ulist">
-<ul>
-<li>
-<p>복잡한 하나의 엔터티에서 유사한 속성끼리 분류하는 방법이며, 엔터티 상세화 또는 논리화(Logicalization)라고 함</p>
-</li>
-<li>
-<p>분류할 때 주요 속성부터 분석</p>
-</li>
-</ul>
-</div>
-</li>
-</ol>
-</div>
-</li>
-<li>
-<p>서브타입과 코드의 차이점</p>
-<div class="ulist">
-<ul>
-<li>
-<p>전체 집합의 성격을 파악하는 게 '서브타입&#8217;이고, 특정 속성의 성격을 파악하는게 '코드'</p>
-</li>
-</ul>
-</div>
-</li>
-</ol>
-</div>
-</li>
-</ol>
-</div>
-<table class="tableblock frame-all grid-all" style="width: 70%;">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">서브타입</th>
-<th class="tableblock halign-left valign-top">코드</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">전체 집합에 대한 부분집합을 표현</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">특정 속성의 구분을 표현</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">전체 집합의 성격을 파악</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">한 속성의 성격을 파악</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">속한 속성이 여러 개 존재</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">속한 속성이 거의 존재하지 않음</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">한 엔터티에 하나만 존재</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">한 엔터티에 여러 개 존재</p></td>
-</tr>
-</tbody>
-</table>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>서브타입의 종류(Is-A, Part-Of)</p>
-<div class="olist loweralpha">
-<ol class="loweralpha" type="a">
-<li>
-<p>Is-A 서브타입</p>
-<div class="ulist">
-<ul>
-<li>
-<p>인스턴스를 기준으로 묶으며, 서브타입과 연관</p>
-</li>
-<li>
-<p>데이터를 일반화 하면 부분집합은 전체 집합과 '이다'(Is-A) 관계가 성립하며, 역으로 '전체 집합 중에 부분집합이 존재한다&#8217;는 관계도 성립</p>
-</li>
-<li>
-<p>예) '개인고객(부분집합)은 고객(전체 집합)이다&#8217;는 관계가 성립하며, 역으로 '고객(전체 집합) 중에 개인고객(부분집합)이 존재한다&#8217;는 관계도 성립</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>Part-Of 서브타입</p>
-<div class="ulist">
-<ul>
-<li>
-<p>인스턴스를 기준으로 묶지 않으며, 수직분할(일대일 관계)과 연관</p>
-</li>
-<li>
-<p>요소(속성)를 기준으로 묶을 수 있는데, 이 때 '일부'(Part-Of) 관계가 성립</p>
-</li>
-<li>
-<p>예) '프로그램(부분집합)과 사용자매뉴얼(부분집합)은 소프트웨어(전체 집합)의 구성요소이다.'는 관계가 성립</p>
-</li>
-<li>
-<p>예) '프로그램은 소프트웨어이다', '사용자매뉴얼은 소프트웨어이다' 와 같이 '이다'(Is-A)관계가 성립하지 못함</p>
-</li>
-<li>
-<p>일대일(1:1) 관계를 서브타입으로 잘못 파악한 것이 아닌지 의심해 볼 것</p>
-</li>
-</ul>
-</div>
-</li>
-</ol>
-</div>
-</li>
-<li>
-<p>서브타입 구분(배타, 중복, 완전, 불완전)</p>
-<div class="olist loweralpha">
-<ol class="loweralpha" type="a">
-<li>
-<p>배타 서브타입(Exclusive Subtype 또는 Disjoint Subtype)</p>
-<div class="ulist">
-<ul>
-<li>
-<p>배타 서브타입은 서브타입 부분집합 간에 중복이 발생하지 않는 서브타입</p>
-</li>
-<li>
-<p>하나의 슈퍼타입 인스턴스는 단 하나의 서브타입과 관계(일대일 관계)가 발생하며, 전체 서브타입의 합은 슈퍼타입이 됨</p>
-</li>
-<li>
-<p>상호 배타적이기 때문에 포함관계가 없어야함</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>중복 서브타입(Inclusive Subtype 또는 Overlapping Subtype)</p>
-<div class="ulist">
-<ul>
-<li>
-<p>중복 서브타입은 서브타입 부분집합 간에 중복이 발생하는 서브타입</p>
-</li>
-<li>
-<p>서브타입 A와 B가 있을 때 A에도 속하고 B에도 속하는 인스턴스가 있는 서브타입</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>중복 서브타입 관리 방법</p>
-<div class="olist lowerroman">
-<ol class="lowerroman" type="i">
-<li>
-<p>슈퍼타입 인스턴스와 서브타입 인스턴스가 일대일(1:1) 대응(논리적 관계비)</p>
-<div class="ulist">
-<ul>
-<li>
-<p>서브타입 인스턴스의 개수를 합하면 슈퍼타입 인스턴스의 개수와 동일</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>슈퍼타입 인스턴스와 서브타입 인스턴스가 일대다(1:M) 대응(논리적 관계비)</p>
-<div class="ulist">
-<ul>
-<li>
-<p>한 개의 슈퍼타입 인스턴스가 두 개의 서브타입 인스턴스와 대응</p>
-</li>
-<li>
-<p>실체(사람)와 역할(고객, 개인고객, 사원)을 관리하는 엔터티를 구분하여 설계하는 방법을 고려해 볼 것</p>
-</li>
-</ul>
-</div>
-</li>
-</ol>
-</div>
-</li>
-<li>
-<p>배타 서브타입과 중복 서브타입 판단 기준</p>
-<div class="ulist">
-<ul>
-<li>
-<p>배타 서브타입과 중복 서브타입을 판단하는 기준은 특정 시점에 동시에 발생할 수 있는지 여부</p>
-</li>
-<li>
-<p>배타 서브타입은 특정 시점에 중복이 발생하지 않으며, 중복 서브타입은 특정 시점에 중복이 발생할 수 있음</p>
-</li>
-<li>
-<p>이력 데이터의 경우 현재 시점을 기준으로 서브타입 양쪽에 데이터가 있는지를 따지면 배타 서브타입인지 중복 서브타입인지 알 수 있음</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>완전 서브타입(Complete Subtype)</p>
-<div class="ulist">
-<ul>
-<li>
-<p>완전 서브타입은 슈퍼타입의 모든 인스턴스가 최소한 하나의 서브타입 인스턴스와 관계가 존재하는 서브타입</p>
-</li>
-<li>
-<p>일반적이고 대부분을 차지하며, 서브타입에 인스턴스가 생성될 때 서브타입에도 인스턴스가 생성되면 완전 서브타입</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>불완전 서브타입(Incomplete Subtype)</p>
-<div class="ulist">
-<ul>
-<li>
-<p>불완전 서브타입은 슈퍼타입에만 인스턴스가 존재하고 서브타입에는 인스턴스가 존재하지 않는 서브타입</p>
-</li>
-<li>
-<p>서브타입에 인스턴스가 생성될 때 서브타입에도 인스턴스가 생성되지 않으면 불완전 서브타입</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>서브타입 구분(배타, 중복, 완전, 불완전)별 특성</p>
-</li>
-</ol>
-</div>
-</li>
-</ol>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 20%;">
-<col style="width: 40%;">
-<col style="width: 40%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-center valign-top">인스턴스 제약</th>
-<th class="tableblock halign-center valign-top">배타</th>
-<th class="tableblock halign-center valign-top">중복</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-center valign-middle" rowspan="3"><p class="tableblock"><code>완전</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">EC(Exclusive-Complete) 서브타입</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">IC(Inclusive-Complete) 서브타입</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock">- 슈퍼타입의 한 인스턴스는 하나의 서브타입 인스턴스와 관계 존재</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">- 슈퍼타입의 한 인스턴스가 두 개 이상의 서브타입 인스턴스와 관계가 존재할 수 있음</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock">- 슈퍼타입의 모든 인스턴스는 서브타입 인스턴스와 관계가 존재</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">- 슈퍼타입의 모든 인스턴스는 서브타입 인스턴스와 관계가 존재</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-middle" rowspan="3"><p class="tableblock"><code>불완전</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">EI(Exclusive-Incomplete) 서브타입</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">II(Inclusive-Incomplete) 서브타입</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock">- 슈퍼타입의 한 인스턴스는 하나의 서브타입 인스턴스와 관계 존재</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">- 슈퍼타입의 한 인스턴스가 두 개 이상의 서브타입 인스턴스와 관계가 존재할 수 있음</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock">- 슈퍼타입의 어떤 인스턴스는 서브타입의 인스턴스와 관계가 존재하지 않음</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">- 슈퍼타입의 어떤 인스턴스는 서브타입의 인스턴스와 관계가 존재하지 않음</p></td>
-</tr>
-</tbody>
-</table>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>슈퍼타입·서브타입 논리 모델의 물리 모델 변환 방법</p>
-<div class="olist loweralpha">
-<ol class="loweralpha" type="a">
-<li>
-<p>물리 모델로 변환시 고려 사항</p>
-<div class="ulist">
-<ul>
-<li>
-<p>성능(논리적인 판단, 조회 범위 및 횟수)</p>
-</li>
-<li>
-<p>관리적인 측면</p>
-</li>
-<li>
-<p>사용 결합도</p>
-</li>
-<li>
-<p>통합 관점</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>서브타입별로 엔터티 분할(타입1-분할)</p>
-<div class="ulist">
-<ul>
-<li>
-<p>서브타입마다 별도의 엔터티로 만드는 방법</p>
-</li>
-<li>
-<p>서브타입별로 엔터티를 각자 생성한 후에, 슈퍼타입의 주 식별자를 포함한 속성 전부를 양쪽 엔터티에 추가</p>
-</li>
-<li>
-<p>주 식별자의 값이 중복되면 안되므로 이를 체크하기 위한 로직 또는 엔터티가 필요함</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>슈퍼타입 엔터티 하나로 통합(타입2-통합)</p>
-<div class="ulist">
-<ul>
-<li>
-<p>슈퍼타입에 서브타입을 통합하는 방법</p>
-</li>
-<li>
-<p>각 서브타입에 속하는 속성을 슈퍼타입에 포함시키고, 서브타입을 삭제해 슈퍼타입만 남김</p>
-</li>
-<li>
-<p>각 서브타입을 슈퍼타입으로 포함시킴으로써 서브타인간 식별할 수 있는 속성이 추가되어야하고, 속성의 널(Null) 값이 많이 발생되므로 이를 체크하기 위한 Check 제약이 필요함</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>슈퍼타입 엔터티와 개별 서브타입 엔터티로 분할(타입3-혼합)</p>
-<div class="ulist">
-<ul>
-<li>
-<p>슈퍼타입과 개별 서브타입을 별도의 엔터티로 분할하는 방법</p>
-</li>
-<li>
-<p>슈퍼타입·서브타입 논리 모델 구조가 그대로 물리 모델로 변환되며, 이 때 두가지 방법이 있음</p>
-<div class="olist lowerroman">
-<ol class="lowerroman" type="i">
-<li>
-<p>슈퍼타입과 서브타입의 관계가 일대일(1:1) 관계</p>
-</li>
-<li>
-<p>슈퍼타입과 서브타입의 관계가 배타(Arc) 관계</p>
-</li>
-</ol>
-</div>
-</li>
-<li>
-<p>모델 구조적으로도 직관적이라 실무에서 주로 사용되는 모델이</p>
-</li>
-<li>
-<p>하지만 서브타입은 서로 배타적이어야하며(배타 서브타입), 모든 서브타입의 합집합이 전체 집합이 돼야 한다(완전 서브타입)는 서브타입의 일반적인 정의를 표현한 최적을 모델은 아님</p>
-</li>
-<li>
-<p>이 모델에서는 서브타입이 상위 엔터티의 성격을 지니며, 슈퍼타입의 주 식별자 값을 체크하기 위해 트리거가 필요함</p>
-</li>
-<li>
-<p>장점으로 모델 구조가 일종의 제약 역할을 하여 데이터를 더욱 정확하게 관리한다는 점</p>
-</li>
-<li>
-<p>단점으로 참조 무결성 제약을 생성할 수 없다는 점과 주 식별자 값을 생성하기 어려워 지고, 채번하기 복잡하다는 점</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>서브타입 모델을 물리 모델로 변활할 때의 선택 기준</p>
-<div class="olist lowerroman">
-<ol class="lowerroman" type="i">
-<li>
-<p>서브타입별로 엔터티 분할(타입1-분할)</p>
-<div class="olist upperalpha">
-<ol class="upperalpha" type="A">
-<li>
-<p>선택기준</p>
-<div class="ulist">
-<ul>
-<li>
-<p>서브타입별 업무가 서로 독립적일 때</p>
-</li>
-<li>
-<p>서브타입별 속성/관계가 많이 다를 때</p>
-</li>
-<li>
-<p>서브타입별 주 식별자가 상호 배타적이 아닐 때</p>
-</li>
-<li>
-<p>모든 서브타입을 동시에 조회하는 경우가 드물 때</p>
-</li>
-<li>
-<p>서브타입이 업무적으로 서로 약 결합(Loosely Coupled) 관계일 때</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>장점</p>
-<div class="ulist">
-<ul>
-<li>
-<p>엔터티의 속성이 근본적으로 구분되므로 엔터티를 명확하게 관리할 수 있음</p>
-</li>
-<li>
-<p>대부분의 조회 요건이 개별 서브타입을 사용할 때 효율적</p>
-</li>
-<li>
-<p>각 엔터티에 해당하는 업무에 대해 상호 영향을 미치지 않고(Loosely Coupled) 처리할 수 있음</p>
-</li>
-<li>
-<p>즉 정규직사원 엔터티에 속성을 추가할 때 계약직사원 엔터티에 영향을 끼치지 않음</p>
-</li>
-<li>
-<p>각 엔터티의 크기가 줄어듦</p>
-</li>
-<li>
-<p>슈퍼타입과 서브타입 엔터티의 조인이 필요 없으므로 성능 면에서 유리</p>
-</li>
-<li>
-<p>널(Null) 값을 갖는 속성이 줄어듦</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>단점</p>
-<div class="ulist">
-<ul>
-<li>
-<p>정규직 사원과 계약직 사원을 동시에 조회하는 요건이 있을 때(강 결합; Tightly Coupled)유니온이 발생하여 쿼리가 복잡해지고 성능 측면에서 불리해짐</p>
-</li>
-<li>
-<p>사원유형코드 속성과 같이 서브타입을 구분하는 속성을 사용하면 처리하기 불편함</p>
-</li>
-<li>
-<p>시퀀스나 채번 관리 엔터티를 사용해 주 식별자 값을 생성하기 복잡함</p>
-</li>
-<li>
-<p>업무가 개별적으로 처리되더라도 데이터는 통합된 모습이 아니므로 DW(Data Warehouse) 등의 요건에 의해 조회가 복잡해질 수 있음</p>
-</li>
-<li>
-<p>공통 속성이 개별 엔터티에 반복됨으로써 넓은 의미의 1정규형이 아님</p>
-</li>
-</ul>
-</div>
-</li>
-</ol>
-</div>
-</li>
-<li>
-<p>슈퍼타입 엔터티 하나로 통합(타입2-통합)</p>
-<div class="olist upperalpha">
-<ol class="upperalpha" type="A">
-<li>
-<p>선택기준</p>
-<div class="ulist">
-<ul>
-<li>
-<p>서브타입별 고유 속성이 적을 때</p>
-</li>
-<li>
-<p>속성이 지속적으로 늘어날 가능성이 작을 때</p>
-</li>
-<li>
-<p>하나의 서브타입은 속성도 많고 업무도 중요하며, 나머지 서브타입은 속성도 적고 덜 중요할 때</p>
-</li>
-<li>
-<p>서브타입 전체를 대상으로 하는 업무가 빈번할 때</p>
-</li>
-<li>
-<p>데이터 건수가 많지 않을 때</p>
-</li>
-<li>
-<p>업무가 중요하지 않을 때</p>
-</li>
-<li>
-<p>서브타입의 중복 서브타입일 때</p>
-</li>
-<li>
-<p>서브타입이 업무적으로 서로 강 결합(Tightly Coupled) 관계일 때</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>장점</p>
-<div class="ulist">
-<ul>
-<li>
-<p>슈퍼타입과 서브타입 엔터티의 조인이 발생하지 않아 조회 쿼리가 단순해지며 성능이 좋아질 때가 많음</p>
-</li>
-<li>
-<p>엔터티 수가 감소해 관리가 용이해짐</p>
-</li>
-<li>
-<p>복잡한 관계가 없어져 모델이 단순해지기 때문에 ERD를 관리하기 수월함</p>
-</li>
-<li>
-<p>전체 서브타입을 검색할 때 유니온이 발생하지 않아 성능 측면에서 효율적</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>단점</p>
-<div class="ulist">
-<ul>
-<li>
-<p>엔터티의 속성 개수가 많아져 크기가 증가함</p>
-</li>
-<li>
-<p>널(Null) 값이 존재하는 속성이 많아짐</p>
-</li>
-<li>
-<p>업무가 추가되거나 변경되면 애플리케이션에 끼치는 영향이 커짐</p>
-</li>
-<li>
-<p>업무 규칙을 모델에 표현하기 어려움</p>
-</li>
-<li>
-<p>공통 속성만을 조회하는 요건이 빈번하거나 조회 범위가 넓으면 I/O가 많아져 성능이 나빠짐</p>
-</li>
-<li>
-<p>엔터티의 정체성이 희성될 수 있음</p>
-</li>
-</ul>
-</div>
-</li>
-</ol>
-</div>
-</li>
-<li>
-<p>슈퍼타입 엔터티와 개별 서브타입 엔터티로 분할(타입3-혼합)</p>
-<div class="olist upperalpha">
-<ol class="upperalpha" type="A">
-<li>
-<p>선택기준</p>
-<div class="dlist">
-<dl>
-<dt class="hdlist1">업무 연관성이 있을 때</dt>
-<dd>
-<div class="ulist">
-<ul>
-<li>
-<p>서브타입이 업무적으로 서로 강 결합(Tightly Coupled) 관계일 때</p>
-</li>
-</ul>
-</div>
-</dd>
-<dt class="hdlist1">주요 엔터티일 때</dt>
-<dd>
-<div class="ulist">
-<ul>
-<li>
-<p>업무의 변화가 빈번해 속성이 자주 추가될 때</p>
-</li>
-<li>
-<p>중요 속성과 참고 속성으로 분리될 수 있을 때</p>
-</li>
-</ul>
-</div>
-</dd>
-<dt class="hdlist1">공통 속성을 주로 사용할 때</dt>
-<dd>
-<div class="ulist">
-<ul>
-<li>
-<p>서브타입별 공통 속성을 대상으로 하는 업무가 빈번할 때</p>
-</li>
-<li>
-<p>슈퍼타입의 조회가 빈번하고 조회 범위가 넓을 때</p>
-</li>
-</ul>
-</div>
-</dd>
-<dt class="hdlist1">고유 속성이 많을 때</dt>
-<dd>
-<div class="ulist">
-<ul>
-<li>
-<p>서브타입별 고유 속성이 많을 때</p>
-</li>
-<li>
-<p>공통 업무와 고유 업무가 다양하게 존재할 때</p>
-</li>
-</ul>
-</div>
-</dd>
-<dt class="hdlist1">통합하면 속성 개수가 많아질 때</dt>
-<dd>
-<div class="ulist">
-<ul>
-<li>
-<p>통합(타입2)하면 속성 개수가 너무 많아질 때</p>
-</li>
-</ul>
-</div>
-</dd>
-<dt class="hdlist1">트랜잭션을 분리할 때</dt>
-<dd>
-<div class="ulist">
-<ul>
-<li>
-<p>트랜잭션의 락을 방지하기 위해 엔터티를 분리해야 할 때</p>
-</li>
-</ul>
-</div>
-</dd>
-</dl>
-</div>
-</li>
-<li>
-<p>장점</p>
-<div class="ulist">
-<ul>
-<li>
-<p>슈퍼타입 엔터티의 한 블록에 많은 인스턴스가 저장되므로 핵심 조회 요건의 성능이 좋아질 때가 많음</p>
-</li>
-<li>
-<p>논리 모델과 유사한 구조이기 때문에 모델에 업무 규칙이 표현되므로 모델의 가독성이 높아짐</p>
-</li>
-<li>
-<p>추가 업무로 생기는 애플리케이션의 변경 영향을 줄일 수 있음</p>
-</li>
-<li>
-<p>집계나 DW의 요건을 만족할 가능성이 커짐(전사 차원에서 고려)</p>
-</li>
-<li>
-<p>데이터 저장 공간을 가장 효율적으로 사용</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>단점</p>
-<div class="ulist">
-<ul>
-<li>
-<p>조회 요건에 따라 조인이나 조인 후의 유니온 쿼리 등이 발생해 성능 효율이 떨어질 수 있음</p>
-</li>
-<li>
-<p>여러 엔터티로 나뉘어 엔터티 개수가 늘어나며 관리가 어려워짐</p>
-</li>
-<li>
-<p>배타, 중복, 완전, 불완전 서브타입의 종류에 따라 인스턴스를 발생시킬 때 혼성이 발생할 수 있음</p>
-</li>
-</ul>
-</div>
-</li>
-</ol>
-</div>
-</li>
-</ol>
-</div>
-</li>
-</ol>
-</div>
-</li>
-<li>
-<p>중첩 서브타입(Nested Subtype)</p>
-<div class="ulist">
-<ul>
-<li>
-<p>중첩 서브타입은 서브타입 안에 다시 서브타입이 존재할 때 중첩 서브타입이라 하며, 물리적으로 구현되는 일은 적음</p>
-</li>
-<li>
-<p>중첩 서브타입에는 중첩된 서브타입의 수 만큼 구분자가 필요함</p>
-<div class="olist loweralpha">
-<ol class="loweralpha" type="a">
-<li>
-<p>서브타입 간의 관계 관리 방법</p>
-<div class="olist lowerroman">
-<ol class="lowerroman" type="i">
-<li>
-<p>슈퍼타입 엔터티에 재귀 관계 도출</p>
-</li>
-</ol>
-</div>
-</li>
-</ol>
-</div>
-</li>
-<li>
-<p>관계가 어떤 관계인지 명확한 반면, 관계가 늘어나면 속성도 늘어나게 되는 유연하지 않은 모델</p>
-<div class="olist lowerroman">
-<ol class="lowerroman" type="i">
-<li>
-<p>서브타입 엔터티 사이의 관계 도출</p>
-</li>
-</ol>
-</div>
-</li>
-<li>
-<p>요건을 서브타입 엔터티 간의 관계로 관리하는 모델로 완전 서브타입 일 때만 사용할 수 있음</p>
-</li>
-<li>
-<p>업무 규칙을 가장 구체적으로 관리할 수 있는 모델이지만, 여러 관계를 관리하려면 관계 속성이 계속 늘어나기 때문에 유연하지 않은 모델</p>
-<div class="olist lowerroman">
-<ol class="lowerroman" type="i">
-<li>
-<p>슈퍼타입 엔터티에 별도의 관계 엔터티 도출</p>
-</li>
-</ol>
-</div>
-</li>
-<li>
-<p>다대다(M:M) 재귀 관계를 관리하는 BOM(Bill Of Materials) 모델</p>
-</li>
-</ul>
-</div>
-</li>
-</ol>
-</div>
-</div>
-</div>
-<hr>
-<div class="sect2">
-<h3 id="데이터_통합에_대한_서설">3.1. 데이터 통합에 대한 서설</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d">3.1.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="일반화와_상세화">3.2. 일반화와 상세화</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_2">3.2.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="데이터_통합과_엔터티_통합">3.3. 데이터 통합과 엔터티 통합</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_3">3.3.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="통합이_대세인가">3.4. 통합이 대세인가?</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_4">3.4.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="어떤_경우에_통합을_고려하는가">3.5. 어떤 경우에 통합을 고려하는가?</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_5">3.5.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="통합을_고려하지_않아도_되는_경우">3.6. 통합을 고려하지 않아도 되는 경우</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_6">3.6.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="데이터_통합이_어려운_또_다른_이유">3.7. 데이터 통합이 어려운 또 다른 이유</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_7">3.7.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="데이터_주제_영역이란">3.8. 데이터 주제 영역이란?</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_8">3.8.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="주제_영역_설계_방법">3.9. 주제 영역 설계 방법</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_9">3.9.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="데이터_오너십과_모델_오너십과데이터_통합의_시발점">3.10. 데이터 오너십과 모델 오너십과데이터 통합의 시발점</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_10">3.10.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="데이터_통합과_정규화">3.11. 데이터 통합과 정규화</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_11">3.11.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="통합과_합체">3.12. 통합과 합체</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_12">3.12.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="주_식별자가_다른_엔터티의_통합">3.13. 주 식별자가 다른 엔터티의 통합</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_13">3.13.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="서브타입에_대한_서설">3.14. 서브타입에 대한 서설</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_14">3.14.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="서브타입과_부분집합">3.15. 서브타입과 부분집합</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_15">3.15.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="서브타입은_어떻게_도출하는가">3.16. 서브타입은 어떻게 도출하는가?</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_16">3.16.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="왜_서브타입을_사용하는가">3.17. 왜 서브타입을 사용하는가?</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_17">3.17.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="한_엔터티에_서브타입이_여러_개_존재한다">3.18. 한 엔터티에 서브타입이 여러 개 존재한다?</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_18">3.18.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="서브타입과_코드">3.19. 서브타입과 코드</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_19">3.19.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="is_a_서브타입과_part_of_서브타입">3.20. Is-A 서브타입과 Part-Of 서브타입</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_20">3.20.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="배타_서브타입과_중복_서브타입">3.21. 배타 서브타입과 중복 서브타입</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_21">3.21.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="배타_서브타입과_이력_데이터">3.22. 배타 서브타입과 이력 데이터</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_22">3.22.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="중복_서브타입에_대한_설계">3.23. 중복 서브타입에 대한 설계</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_23">3.23.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="중복_서브타입의_주의점">3.24. 중복 서브타입의 주의점</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_24">3.24.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="완전_서브타입과_불완전_서브타입">3.25. 완전 서브타입과 불완전 서브타입</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_25">3.25.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="서브타입과_슈퍼타입의_관계">3.26. 서브타입과 슈퍼타입의 관계</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_26">3.26.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="서브타입의_오해_슈퍼타입과_서브타입은_부모_자식_관계다">3.27. 서브타입의 오해 - 슈퍼타입과 서브타입은 부모 자식 관계다</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_27">3.27.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="슈퍼타입서브타입_논리_모델의_물리_모델_변환">3.28. 슈퍼타입·서브타입 논리 모델의 물리 모델 변환</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_28">3.28.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="서브타입_모델의_물리_모델_변환_서브타입별로_엔터티_분할">3.29. 서브타입 모델의 물리 모델 변환 - 서브타입별로 엔터티 분할</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_29">3.29.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="서브타입_모델의_물리_모델_변환_슈퍼타입_엔터티로_통합">3.30. 서브타입 모델의 물리 모델 변환 - 슈퍼타입 엔터티로 통합</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_30">3.30.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="서브타입_모델의_물리_모델_변환_슈퍼타입서브타입_개별_생성">3.31. 서브타입 모델의 물리 모델 변환 - 슈퍼타입·서브타입 개별 생성</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_31">3.31.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="서브타입_모델의_물리_모델_변환_슈퍼타입서브타입_개별_생성배타_관계">3.32. 서브타입 모델의 물리 모델 변환 - 슈퍼타입·서브타입 개별 생성(배타 관계)</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_32">3.32.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="erwin_툴의_서브타입_표기법">3.33. ERWin 툴의 서브타입 표기법</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_33">3.33.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="중첩_서브타입">3.34. 중첩 서브타입</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_34">3.34.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="서브타입_간의_관계_표현법">3.35. 서브타입 간의 관계 표현법</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_35">3.35.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="잘못된_서브타입">3.36. 잘못된 서브타입</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_36">3.36.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-<div class="sect2">
-<h3 id="범주에_대해서">3.37. 범주에 대해서</h3>
-<div class="sidebarblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>o</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="d_37">3.37.1. d</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>d</p>
-</li>
-</ul>
-</div>
-<hr>
-</div>
-</div>
-</div>
-</div>
-    </div>
-	
-	<section id="social-share">
-        <ul class="icons">
-<!-- Social Share Button HTML -->
-
-<!-- Twitter -->
-<li><a href="//twitter.com/share?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note-03.html&text=관계형 데이터 모델링 노트 3장&via=" target="_blank" class="share-btn twitter">
-    <i class="fa fa-twitter"></i>
-    <p>Twitter</p>
-</a></li>
-
-<!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note-03.html" target="_blank" class="share-btn google-plus">
-    <i class="fa fa-google-plus"></i>
-    <p>Google+</p>
-</a></li>
-
-<!-- Facebook -->
-<li><a href="//www.facebook.com/sharer/sharer.php?u=https://anew0m.netlify.com//Relational_Data_Modeling_Note-03.html" target="_blank" class="share-btn facebook">
-    <i class="fa fa-facebook"></i>
-    <p>Facebook</p>
-</a></li>
-
-<!-- Reddit (url, title) -->
-<li><a href="//reddit.com/submit?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note-03.html&title=관계형 데이터 모델링 노트 3장" target="_blank" class="share-btn reddit">
-    <i class="fa fa-reddit-alien"></i>
-    <p>Reddit</p>
-</a></li>
-
-<!-- LinkedIn -->
-<li><a href="//www.linkedin.com/shareArticle?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note-03.html&title=관계형 데이터 모델링 노트 3장" target="_blank" class="share-btn linkedin">
-    <i class="fa fa-linkedin"></i>
-    <p>LinkedIn</p>
-</a></li>
-
-<!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=https://anew0m.netlify.com//Relational_Data_Modeling_Note-03.html&title=관계형 데이터 모델링 노트 3장" target="_blank" class="share-btn stumbleupon">
-    <i class="fa fa-stumbleupon"></i>
-    <p>StumbleUpon</p>
-</a></li>
-
-<!-- Email -->
-<li><a href="mailto:?subject=Check out this post by 정민호&body=https://anew0m.netlify.com//Relational_Data_Modeling_Note-03.html" target="_blank" class="share-btn email">
-    <i class="fa fa-envelope"></i>
-    <p>Email</p>
-</a></li>
-        </ul>
-    </section>
-     
-
-    <footer>
-	
-		<ul class="stats">
-    	    <!-- Display the categories associated with this post -->
-    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
- 	        <li><a href='../tags/데이터모델링.html'>데이터모델링</a></li>
- 	        <li><a href='../tags/책정리.html'>책정리</a></li>
-
-				<li><a class="icon fa-comment" href="../Relational_Data_Modeling_Note-03.html#disqus_thread"> &nbsp;</a></li>
- 		</ul>
-    	
-    </footer>
-</article>
 		
 <ul class="actions pagination">
     <li><a href="../"
             class=" button big previous">PREVIOUS</a></li>
 
     <li><span
-            class="button big"> 2 of 3 </span></li>
+            class="button big"> 2 of 4 </span></li>
 
     <li><a href="../3/"
             class=" button big next">NEXT</a></li>
@@ -5626,32 +4897,32 @@
                     <li>
                         <article>
                             <header>
+                                <h3><a href="../HowHome-02-AptData-02.html">어떡하집 프로젝트 - 아파트 정보 수집 계획(수집 정보 정의)</a></h3>
+                                 <time class="published"
+							            datetime='Feb 13, 2020'>
+							            Feb 13, 2020</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
+                                <h3><a href="../HowHome-02-AptData-01.html">어떡하집 프로젝트 - 아파트 정보 수집 계획</a></h3>
+                                 <time class="published"
+							            datetime='Feb 13, 2020'>
+							            Feb 13, 2020</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
                                 <h3><a href="../Relational_Data_Modeling_Note-06.html">관계형 데이터 모델링 노트 6장</a></h3>
                                  <time class="published"
 							            datetime='Dec 12, 2019'>
 							            Dec 12, 2019</time>
-                            </header>
-                        </article>
-                    </li>
-
-                    <li>
-                        <article>
-                            <header>
-                                <h3><a href="../Relational_Data_Modeling_Note-07.html">관계형 데이터 모델링 노트 7장</a></h3>
-                                 <time class="published"
-							            datetime='Dec 12, 2019'>
-							            Dec 12, 2019</time>
-                            </header>
-                        </article>
-                    </li>
-
-                    <li>
-                        <article>
-                            <header>
-                                <h3><a href="../Relational_Data_Modeling_Note-02.html">관계형 데이터 모델링 노트 2장</a></h3>
-                                 <time class="published"
-							            datetime='Oct 04, 2019'>
-							            Oct 04, 2019</time>
                             </header>
                         </article>
                     </li>
@@ -5690,7 +4961,16 @@
                             <header>
                                 <a href="../tags/부동산.html">부동산</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
+                                <span style="float:right;"> 3 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="../tags/개인프로젝트.html">개인프로젝트</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 3 </span>
                             </header>
                         </article>
                     </li>
@@ -5700,15 +4980,6 @@
                                 <a href="../tags/책정리.html">책정리</a>
                                 <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
                                 <span style="float:right;"> 5 </span>
-                            </header>
-                        </article>
-                    </li>
-                    <li>
-                        <article>
-                            <header>
-                                <a href="../tags/개인프로젝트.html">개인프로젝트</a>
-                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
-                                <span style="float:right;"> 1 </span>
                             </header>
                         </article>
                     </li>

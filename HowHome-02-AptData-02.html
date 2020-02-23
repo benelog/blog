@@ -1,0 +1,2487 @@
+<!DOCTYPE HTML>
+<!--
+    Future Imperfect by HTML5 UP
+    html5up.net | @n33co
+    Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>어떡하집 프로젝트 - 아파트 정보 수집 계획(수집 정보 정의) - 정민호의 블로그</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="선행 시스템들을 분석하여 수집할 아파트 정보를 정의 합니다.">
+    <meta name="author" content="정민호">
+    <meta name="keywords" content="부동산, 개인프로젝트">
+    <meta name="generator" content="JBake">
+	<meta property="og:image" content="https://anew0m.netlify.com/img/jdk/duke.jpg"/>
+
+    <link rel="stylesheet" href="css/google-font.css" />
+    <link rel="stylesheet" href="css/font-awesome.min.css" />
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/add-on.css" />
+    <link rel="stylesheet" href="css/monokai-sublime.css">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+
+    <!-- Fav and touch icons -->
+    <!--<link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">-->
+    <link rel="shortcut icon" href="img/favicon/favicon.png">
+  </head>
+  <body>
+     <!-- Wrapper -->
+        <div id="wrapper">
+
+<!-- Header -->
+<header id="header">
+            <h2><a href="https://anew0m.netlify.com/">정민호의 블로그</a></h2>
+
+    <nav class="links">
+        <ul>
+        			<li>
+	                    <a href=" archive.html">
+	                       
+	                            <i class="fa fa-archive">&nbsp;</i>Archive
+	                        
+	                    </a>
+                	</li>
+        		
+        		 
+        			<li>
+	                    <a href=" about.html">
+	                       
+	                            <i class="fa fa-user">&nbsp;</i>About
+	                        
+	                    </a>
+                	</li>
+        		
+        		 
+        			<li>
+	                    <a href=" feed.xml">
+	                       
+	                            <i class="fa fa-rss">&nbsp;</i>Subscribe
+	                        
+	                    </a>
+                	</li>
+        		
+        		 
+        </ul>
+    </nav>
+    <nav class="main">
+        <ul>
+            <li class="search">
+                <a class="fa-search" href="#search">Search</a>
+                <form id="search" method="get" action="//google.com/search">
+                    <input type="text" name="q" placeholder="Search" />
+                    <input type="hidden" name="q" value="site:https://anew0m.netlify.com/">
+                </form>
+            </li>
+            <li class="menu">
+                <a class="fa-bars" href="#menu">Menu</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+
+<!-- Menu -->
+<section id="menu">
+
+    <!-- Search -->
+        <section>
+            <form class="search" method="get" action="//google.com/search">
+                <input type="text" name="q" placeholder="Search" />
+                <input type="hidden" name="q" value="site:https://anew0m.netlify.com/">
+            </form>
+        </section>
+
+    <!-- Links -->
+        <section>
+            <ul class="links">
+        		 <li>
+                    <a href=" archive.html">
+                       
+                            <i class="fa fa-archive">&nbsp;</i>Archive
+                        
+                    </a>
+                </li>
+        		 <li>
+                    <a href=" about.html">
+                       
+                            <i class="fa fa-user">&nbsp;</i>About
+                        
+                    </a>
+                </li>
+        		 <li>
+                    <a href=" feed.xml">
+                       
+                            <i class="fa fa-rss">&nbsp;</i>Subscribe
+                        
+                    </a>
+                </li>
+            </ul>
+        </section>
+
+    <!-- Recent Posts -->
+        <section>
+            <ul class="links">
+                <header>
+                    <h3>Recent Posts</h3>
+                </header>
+                    <li>
+                        <a href="HowHome-01.html"><p>어떡하집 프로젝트 구상</p></a>
+                    </li>
+                    <li>
+                        <a href="HowHome-02-AptData-02.html"><p>어떡하집 프로젝트 - 아파트 정보 수집 계획(수집 정보 정의)</p></a>
+                    </li>
+                    <li>
+                        <a href="HowHome-02-AptData-01.html"><p>어떡하집 프로젝트 - 아파트 정보 수집 계획</p></a>
+                    </li>
+                    <li>
+                        <a href="Relational_Data_Modeling_Note-06.html"><p>관계형 데이터 모델링 노트 6장</p></a>
+                    </li>
+            </ul>
+        </section>
+
+    <!-- Actions -->
+        <!--
+        <section>
+            <ul class="actions vertical">
+                <li><a href="#" class="button big fit">Log In</a></li>
+            </ul>
+        </section>
+        -->
+</section>
+	<div id="main">
+<article class="post">
+   <header>
+    <div class="title">
+                    <h1><a href="HowHome-02-AptData-02.html">어떡하집 프로젝트 - 아파트 정보 수집 계획(수집 정보 정의)</a></h1>
+
+            <p>선행 시스템들을 분석하여 수집할 아파트 정보를 정의 합니다.</p>
+    </div>
+    <div class="meta">
+         <time class="published"
+            datetime='Feb 13, 2020'>
+            Feb 13, 2020</time>
+            <div class="published eta"></div>
+        <span class="author"/><span class="name">정민호</span><img src="img/main/jmh.jpg" alt="정민호" /></span>
+    </div>
+</header>
+
+    
+  
+         
+    <div id="content">
+       <div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#들어가며">1. 들어가며</a></li>
+<li><a href="#kb부동산_liiv_on">2. KB부동산 Liiv ON</a>
+<ul class="sectlevel2">
+<li><a href="#아파트_정보">2.1. 아파트 정보</a></li>
+<li><a href="#검색_정보">2.2. 검색 정보</a></li>
+<li><a href="#kb부동산_liiv_on에서_시사점">2.3. KB부동산 Liiv ON에서 시사점</a></li>
+</ul>
+</li>
+<li><a href="#한국감정원">3. 한국감정원</a>
+<ul class="sectlevel2">
+<li><a href="#아파트_정보_2">3.1. 아파트 정보</a></li>
+<li><a href="#한국감정원에서_시사점">3.2. 한국감정원에서 시사점</a></li>
+</ul>
+</li>
+<li><a href="#아파트실거래가">4. 아파트실거래가</a>
+<ul class="sectlevel2">
+<li><a href="#아파트_정보_3">4.1. 아파트 정보</a></li>
+<li><a href="#전산공부">4.2. 전산공부</a></li>
+<li><a href="#아파트실거래가에서_시사점">4.3. 아파트실거래가에서 시사점</a></li>
+</ul>
+</li>
+<li><a href="#네이버_부동산">5. 네이버 부동산</a>
+<ul class="sectlevel2">
+<li><a href="#아파트_정보_4">5.1. 아파트 정보</a></li>
+<li><a href="#네이버부동산에서_시사점">5.2. 네이버부동산에서 시사점</a></li>
+</ul>
+</li>
+<li><a href="#시사점">6. 시사점</a></li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="들어가며">1. 들어가며</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>데이터와 관련된 서비스를 제공할 때 현재 가지고 있는 데이터를 효과적으로 제공것이 중요하다고 생각합니다.
+데이터를 효과적으로 제공하기 위해서는 그것의 기본이되는 로우(Raw) 데이터를 잘 가지고 있는것 또한 중요하다고 생각합니다.</p>
+</div>
+<div class="paragraph">
+<p>따라서 저는 로우(Raw) 데이터를 잘 가지고 있기 위해 선행 시스템들을 분석하여 어떤 데이터를 수집할 것인지 정의하려고 합니다.
+분석할 선행 시스템은 아래와 같습니다.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><a href="https://onland.kbstar.com/quics?page=okbland&amp;QSL=F">KB부동산 Liiv ON</a></p>
+</li>
+<li>
+<p><a href="http://www.kab.co.kr/">한국감정원</a></p>
+</li>
+<li>
+<p><a href="http://rt.molit.go.kr/">아파트실거래가</a></p>
+</li>
+<li>
+<p><a href="https://land.naver.com/">네이버 부동산</a></p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="kb부동산_liiv_on">2. <a href="https://onland.kbstar.com/quics?page=okbland&amp;QSL=F">KB부동산 Liiv ON</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="아파트_정보">2.1. 아파트 정보</h3>
+<div class="sect3">
+<h4 id="기본_정보">2.1.1. 기본 정보</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-01.PNG" alt="기본정보">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-02.PNG" alt="기본정보2">
+</div>
+</div>
+<div class="paragraph">
+<p>기본정보 부분에서 제공되는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>아파트 명칭</p>
+</li>
+<li>
+<p>아파트 주소</p>
+</li>
+<li>
+<p>아파트 공급면적</p>
+</li>
+<li>
+<p>아파트 세대 수</p>
+</li>
+<li>
+<p>아파트 준공년월</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="단지_정보">2.1.2. 단지 정보</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-02-1-1.PNG" alt="단지정보1">
+</div>
+</div>
+<div class="paragraph">
+<p>아파트 주변 분위기를 느낄 수 있는 사진 정보를 제공하고 있습니다.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-02-1-2.PNG" alt="단지정보2">
+</div>
+</div>
+<div class="paragraph">
+<p>기본정보에서 제공되는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>아파트 동 수</p>
+</li>
+<li>
+<p>아파트 세대 수</p>
+</li>
+<li>
+<p>아파트 주차 공간 수</p>
+</li>
+<li>
+<p>아파트 용적률</p>
+</li>
+<li>
+<p>아파트 건폐율</p>
+</li>
+<li>
+<p>아파트 난방방식</p>
+</li>
+<li>
+<p>아파트 건설사 명칭</p>
+</li>
+<li>
+<p>아파트 내진설계 설명</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-02-1-3.PNG" alt="단지정보3">
+</div>
+</div>
+<div class="paragraph">
+<p>면적별 세대수에서 제공되는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>아파트 면적 유형</p>
+</li>
+<li>
+<p>아파트 면적 유형별 세대 수</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-02-1-4.PNG" alt="단지정보4">
+</div>
+</div>
+<div class="paragraph">
+<p>위치&amp;편의시설에서 제공되는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>아파트 인근 시설 정보</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="시세실거래가">2.1.3. 시세/실거래가</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-02-2-1.PNG" alt="시세/실거래가1">
+</div>
+</div>
+<div class="paragraph">
+<p>시세/실거래가에서 제공되는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>아파트 공급면적</p>
+</li>
+<li>
+<p>아파트 전용면적</p>
+</li>
+<li>
+<p>아파트 매매가격-하위평균가격</p>
+</li>
+<li>
+<p>아파트 매매가격-일반평균가격</p>
+</li>
+<li>
+<p>아파트 매매가격-상위평균가격</p>
+</li>
+<li>
+<p>아파트 전세가격-하위평균가격</p>
+</li>
+<li>
+<p>아파트 전세가격-일반평균가격</p>
+</li>
+<li>
+<p>아파트 전세가격-상위평균가격</p>
+</li>
+<li>
+<p>아파트 월세가격-보증금</p>
+</li>
+<li>
+<p>아파트 월세가격-월세</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-02-2-2.PNG" alt="시세/실거래가2">
+</div>
+</div>
+<div class="paragraph">
+<p>시세에서 제공되는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>아파트 면적별 세대 수</p>
+</li>
+<li>
+<p>아파트 면적별 방 수</p>
+</li>
+<li>
+<p>아파트 면적별 욕실 수</p>
+</li>
+<li>
+<p>아파트 현광구조 정보</p>
+</li>
+<li>
+<p>아파트 기타 전용면적</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-02-2-3.PNG" alt="시세/실거래가3">
+</div>
+</div>
+<div class="paragraph">
+<p>시세변동 추이에서 제공되는 정보는 시세란에서 제공되는 정보를 차트 형식으로 가공하여 제공되는것으로 추측됩니다.
+따라서 별도로 수집해야할 정보는 없는것 같습니다.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-02-2-4.PNG" alt="시세/실거래가4">
+</div>
+</div>
+<div class="paragraph">
+<p>주변단지 유사 면적대 시세 비교에서 제공되는 정보는 수집된 정보를 바탕으로 임의의 기준으로 선정된 아파트 들을 비교한것으로 추측됩니다.
+따라서 별도로 수집해야할 정보는 없는것 같습니다.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-02-2-5.PNG" alt="시세/실거래가5">
+</div>
+</div>
+<div class="paragraph">
+<p>최근 거래동향 정보에서 제공되는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>중개업소 리뷰</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-02-2-6.PNG" alt="시세/실거래가6">
+</div>
+</div>
+<div class="paragraph">
+<p>KB시세에서 제공되는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>단지명</p>
+</li>
+<li>
+<p>주소(지번)</p>
+</li>
+<li>
+<p>주소(도로명)</p>
+</li>
+<li>
+<p>공급면적</p>
+</li>
+<li>
+<p>전용면적</p>
+</li>
+<li>
+<p>세대수</p>
+</li>
+<li>
+<p>방 수</p>
+</li>
+<li>
+<p>욕실 수</p>
+</li>
+<li>
+<p>현관구조</p>
+</li>
+<li>
+<p>매매가격</p>
+</li>
+<li>
+<p>전세가격</p>
+</li>
+<li>
+<p>월세가격</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="매물보기">2.1.4. 매물보기</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-02-3-1.PNG" alt="매물보기1">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-02-3-2.PNG" alt="매물보기2">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-02-3-3.PNG" alt="매물보기3">
+</div>
+</div>
+<div class="paragraph">
+<p>매물보기에서 제공되는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>거래구분(매매,전세,월세)</p>
+</li>
+<li>
+<p>매물 가격</p>
+</li>
+<li>
+<p>매물 명칭</p>
+</li>
+<li>
+<p>공급면적</p>
+</li>
+<li>
+<p>전용면적</p>
+</li>
+<li>
+<p>매매 층 수</p>
+</li>
+<li>
+<p>매매 아파트 층수</p>
+</li>
+<li>
+<p>매매 중개업소</p>
+</li>
+<li>
+<p>매매 등급</p>
+</li>
+<li>
+<p>대단지 여부</p>
+</li>
+<li>
+<p>발코니 확장 여부</p>
+</li>
+<li>
+<p>전월세 포함 여부</p>
+</li>
+<li>
+<p>올수리 여부</p>
+</li>
+<li>
+<p>역세권 여부</p>
+</li>
+<li>
+<p>급매물 여부</p>
+</li>
+<li>
+<p>무융자 여부</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="학교정보">2.1.5. 학교정보</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-02-4-1.PNG" alt="학교정보1">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-02-4-2.PNG" alt="학교정보2">
+</div>
+</div>
+<div class="paragraph">
+<p>학교정보1, 학교정보2에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>학교 주소</p>
+</li>
+<li>
+<p>학생 수</p>
+</li>
+<li>
+<p>학급당 학생 수</p>
+</li>
+<li>
+<p>설립 구분</p>
+</li>
+<li>
+<p>설립 일자</p>
+</li>
+<li>
+<p>교원 수</p>
+</li>
+<li>
+<p>교사당 학생 수</p>
+</li>
+<li>
+<p>연락처</p>
+</li>
+<li>
+<p>관할 교육청</p>
+</li>
+<li>
+<p>방과후 프로그램 수</p>
+</li>
+<li>
+<p>방과후 프로그램 참여 학생 수</p>
+</li>
+<li>
+<p>남녀공학 여부</p>
+</li>
+<li>
+<p>남자전용 여부</p>
+</li>
+<li>
+<p>여자전용 여부</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-02-4-3.PNG" alt="학교정보3">
+</div>
+</div>
+<div class="paragraph">
+<p>학교정보3에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>학교 도서관 현황</p>
+<div class="ulist">
+<ul>
+<li>
+<p>도서 수</p>
+</li>
+<li>
+<p>1인당 도서 수</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>학생/학부모 상담실적</p>
+<div class="ulist">
+<ul>
+<li>
+<p>내부 상담 수</p>
+</li>
+<li>
+<p>외부 상담 수</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>급식 현황</p>
+<div class="ulist">
+<ul>
+<li>
+<p>교실 구분(일반,교과,특별,수준변)</p>
+</li>
+<li>
+<p>교실 구분별 수</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>돌봄교실</p>
+<div class="ulist">
+<ul>
+<li>
+<p>돌봄 오후/저녁 구분</p>
+</li>
+<li>
+<p>구분별 학급 수</p>
+</li>
+<li>
+<p>구분별 학생 수</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>교사 현황</p>
+<div class="ulist">
+<ul>
+<li>
+<p>교사 구분(일반,특수)</p>
+</li>
+<li>
+<p>교사 구분별 수</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>기타</p>
+<div class="ulist">
+<ul>
+<li>
+<p>학생식당 수</p>
+</li>
+<li>
+<p>학생 자율 동아리 수</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="평면도">2.1.6. 평면도</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-02-5-1.PNG" alt="평면도1">
+</div>
+</div>
+<div class="paragraph">
+<p>평면도에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>공급면적</p>
+</li>
+<li>
+<p>전용면적</p>
+</li>
+<li>
+<p>면적별 방 수</p>
+</li>
+<li>
+<p>면적별 욕실 수</p>
+</li>
+<li>
+<p>면적별 세대 수</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="동호수">2.1.7. 동호수</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-02-6-1.PNG" alt="동호수1">
+</div>
+</div>
+<div class="paragraph">
+<p>동호수에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>동별 세대 수</p>
+</li>
+<li>
+<p>동별 최고 층 수</p>
+</li>
+<li>
+<p>동별 최저 층 수</p>
+</li>
+<li>
+<p>동별 매매 수</p>
+</li>
+<li>
+<p>동별 전세 수</p>
+</li>
+<li>
+<p>동별 월세 수</p>
+</li>
+<li>
+<p>동 호수별 거래여부</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="검색_정보">2.2. 검색 정보</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-03.PNG" alt="검색정보1">
+</div>
+</div>
+<div class="sect3">
+<h4 id="단지시세">2.2.1. 단지/시세</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-03-1-1.PNG" alt="단지/시세1">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-03-1-2.PNG" alt="단지/시세2">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-03-1-3.PNG" alt="단지/시세3">
+</div>
+</div>
+<div class="paragraph">
+<p>단지/시세에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>매물 유형(아파트,연립/다세대)</p>
+</li>
+<li>
+<p>아파트 소재지</p>
+</li>
+<li>
+<p>아파트 단지명칭</p>
+</li>
+<li>
+<p>아파트 면적분포</p>
+</li>
+<li>
+<p>아파트 매매(시세)</p>
+</li>
+<li>
+<p>아파트 전세(시세)</p>
+</li>
+<li>
+<p>아파트 매매(실거래가)</p>
+</li>
+<li>
+<p>아파트 매매(실거래가)</p>
+</li>
+<li>
+<p>매물 전용면적</p>
+</li>
+<li>
+<p>매물 호 명칭</p>
+</li>
+<li>
+<p>매물 하한가</p>
+</li>
+<li>
+<p>매물 일반가</p>
+</li>
+<li>
+<p>매물 상한가</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="매물">2.2.2. 매물</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-03-2-1.PNG" alt="단지/시세">
+</div>
+</div>
+<div class="paragraph">
+<p>매물에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>매물 유형</p>
+</li>
+<li>
+<p>매물 거래 유형</p>
+</li>
+<li>
+<p>매물 거래 등급</p>
+</li>
+<li>
+<p>매물 명칭</p>
+</li>
+<li>
+<p>매물 소재지</p>
+</li>
+<li>
+<p>매물 설명</p>
+</li>
+<li>
+<p>공급면적</p>
+</li>
+<li>
+<p>전용면적</p>
+</li>
+<li>
+<p>매물 동 명칭</p>
+</li>
+<li>
+<p>매물 층 수</p>
+</li>
+<li>
+<p>매물 방 수</p>
+</li>
+<li>
+<p>매물 중개업소</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="분양">2.2.3. 분양</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-03-3-1.PNG" alt="분양">
+</div>
+</div>
+<div class="paragraph">
+<p>분양에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>분양 진행 단계</p>
+</li>
+<li>
+<p>분양 소재지</p>
+</li>
+<li>
+<p>분양 단지 명칭</p>
+</li>
+<li>
+<p>분양 공급면적</p>
+</li>
+<li>
+<p>분양 전용면적</p>
+</li>
+<li>
+<p>분양 세대수</p>
+</li>
+<li>
+<p>분양 총세대수</p>
+</li>
+<li>
+<p>분양시기</p>
+</li>
+<li>
+<p>분양 종류</p>
+</li>
+<li>
+<p>분양 건설사</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="경매">2.2.4. 경매</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-03-4-1.PNG" alt="경매">
+</div>
+</div>
+<div class="paragraph">
+<p>경매에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>경매 사건번호</p>
+</li>
+<li>
+<p>경매 매물 유형</p>
+</li>
+<li>
+<p>경매 매물 소새지</p>
+</li>
+<li>
+<p>경매 토지면적</p>
+</li>
+<li>
+<p>경매 건물면적</p>
+</li>
+<li>
+<p>경매 감정가격</p>
+</li>
+<li>
+<p>경매 최저가격</p>
+</li>
+<li>
+<p>경매 단계</p>
+</li>
+<li>
+<p>경매 입찰일</p>
+</li>
+<li>
+<p>경매 중개업소</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="뉴스자료실">2.2.5. 뉴스/자료실</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LiivON/AptData-01-AptInfo-03-5-1.PNG" alt="뉴스/자료실">
+</div>
+</div>
+<div class="paragraph">
+<p>뉴스/자료실에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>뉴스 일자</p>
+</li>
+<li>
+<p>뉴스 제목</p>
+</li>
+<li>
+<p>뉴스 내용</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="kb부동산_liiv_on에서_시사점">2.3. KB부동산 Liiv ON에서 시사점</h3>
+<div class="paragraph">
+<p>KB부동산 Liiv ON에서 제공하는 정보는 아파트 정보 외에도 여러가지 정보가 있었습니다.
+현재 초점을 둔 부분은 아파트 자체와 관련된 정보였는데, 추후 기능 확장 시 고려해 볼 부분이 많이 있었던것 같습니다.</p>
+</div>
+<div class="paragraph">
+<p>정리하면 KB부동산 Liiv ON에서 아파트 자체와 관련된 정보는 아래의 내용으로 요약할 수 있을 것 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>아파트 명칭</p>
+</li>
+<li>
+<p>아파트 주소(지번/도로명)</p>
+</li>
+<li>
+<p>아파트 총 동 수</p>
+</li>
+<li>
+<p>아파트 총 세대 수</p>
+</li>
+<li>
+<p>아파트 건폐율</p>
+</li>
+<li>
+<p>아파트 용적률</p>
+</li>
+<li>
+<p>아파트 건설사</p>
+</li>
+<li>
+<p>아파트 준공년월</p>
+</li>
+<li>
+<p>아파트 동별 현관구조</p>
+</li>
+<li>
+<p>아파트 동별 전체 층 수</p>
+</li>
+<li>
+<p>아파트 공급/전용면적</p>
+</li>
+<li>
+<p>아파트 공급/전용면적별 세대 수</p>
+</li>
+<li>
+<p>아파트 공급/전용면적별 방/욕실 수</p>
+</li>
+<li>
+<p>아파트 매매 가격</p>
+</li>
+<li>
+<p>아파트 전세 가격</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="한국감정원">3. <a href="http://www.kab.co.kr/">한국감정원</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="아파트_정보_2">3.1. 아파트 정보</h3>
+<div class="sect3">
+<h4 id="기본정보">3.1.1. 기본정보</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/KAB/AptData-01-AptInfo-01.PNG" alt="기본정보">
+</div>
+</div>
+<div class="paragraph">
+<p>기본정보에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>아파트 명칭</p>
+</li>
+<li>
+<p>아파트 주소지</p>
+</li>
+<li>
+<p>아파트 전체 동 수</p>
+</li>
+<li>
+<p>아파트 전체 세대 수</p>
+</li>
+<li>
+<p>아파트 준공년월</p>
+</li>
+<li>
+<p>아파트 주변시설</p>
+</li>
+<li>
+<p>아파트 면적 유형</p>
+</li>
+<li>
+<p>아파트 면적 유형별 세대 수</p>
+</li>
+<li>
+<p>아파트 매매 가격</p>
+</li>
+<li>
+<p>아파트 전세 가격</p>
+</li>
+<li>
+<p>아파트 월세 보증금 가격</p>
+</li>
+<li>
+<p>아파트 월세 가격</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="면적별_정보">3.1.2. 면적별 정보</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/KAB/AptData-01-AptInfo-02-1.PNG" alt="면적별 정보">
+</div>
+</div>
+<div class="paragraph">
+<p>면적별 정보에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>아파트 면적별 전용면적</p>
+</li>
+<li>
+<p>아파트 면적별 공용면적</p>
+</li>
+<li>
+<p>아파트 면적별 호 수</p>
+</li>
+<li>
+<p>아파트 면적별 방 수</p>
+</li>
+<li>
+<p>아파트 면적별 거실 수</p>
+</li>
+<li>
+<p>아파트 면적별 주방 수</p>
+</li>
+<li>
+<p>아파트 면적별 욕실 수</p>
+</li>
+<li>
+<p>아파트 면적별 현관구조</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="건축물_연간에너지사용량_등급_정보">3.1.3. 건축물 연간에너지사용량 등급 정보</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/KAB/AptData-01-AptInfo-02-2.PNG" alt="건축물 연간에너지사용량 등급 정보">
+</div>
+</div>
+<div class="paragraph">
+<p>건축물 연강에너지사용량 등급 정보에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>아파트 단지 명칭</p>
+</li>
+<li>
+<p>아파트 전용면적 면적구간</p>
+</li>
+<li>
+<p>아파트 면적구간별 총 에너지 사용량</p>
+</li>
+<li>
+<p>아파트 면적구간별 건축물 연간에너지 사용량 등급</p>
+</li>
+<li>
+<p>아파트 에너지평가 설명</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="전용면적_시세추이">3.1.4. 전용면적 시세추이</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/KAB/AptData-01-AptInfo-02-3.PNG" alt="전용면적 시세추이">
+</div>
+</div>
+<div class="paragraph">
+<p>전용면적 시세추이에서 제공하는 정보는 기존 정보를 차트 형식으로 가공하여 제공되는것으로 추측됩니다.
+따라서 별도로 수집해야할 정보는 없는것 같습니다.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="전용면적_실거래_가격">3.1.5. 전용면적 실거래 가격</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/KAB/AptData-01-AptInfo-02-4.PNG" alt="전용면적 실거래 가격">
+</div>
+</div>
+<div class="paragraph">
+<p>전용면적 실거래 가격에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>매물 전용면적</p>
+</li>
+<li>
+<p>매물 계약월</p>
+</li>
+<li>
+<p>매물 계약일자</p>
+</li>
+<li>
+<p>매물 거래금액</p>
+</li>
+<li>
+<p>매물 층</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="면적별_실거래_분석">3.1.6. 면적별 실거래 분석</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/KAB/AptData-01-AptInfo-02-5.PNG" alt="면적별 실거래 분석">
+</div>
+</div>
+<div class="paragraph">
+<p>면적별 실거래 분석에서 제공하는 정보는 기존 정보를 차트 형식으로 가공하여 제공되는것으로 추측됩니다.
+따라서 별도로 수집해야할 정보는 없는것 같습니다.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="소재지_유사_면적대별_시세비교">3.1.7. 소재지 유사 면적대별 시세비교</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/KAB/AptData-01-AptInfo-02-6.PNG" alt="소재지 유사 면적대별 시세비교">
+</div>
+</div>
+<div class="paragraph">
+<p>소재지 유사 면적대별 시세비교에서 제공하는 정보는 수집된 정보를 바탕으로 임의의 기준으로 선정된 아파트 들을 비교한것으로 추측됩니다.
+따라서 별도로 수집해야할 정보는 없는것 같습니다.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="비슷한_가격대_주변_아파트">3.1.8. 비슷한 가격대 주변 아파트</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/KAB/AptData-01-AptInfo-02-7.PNG" alt="비슷한 가격대 주변아파트">
+</div>
+</div>
+<div class="paragraph">
+<p>비슷한 가격대 주변 아파트에서 제공하는 정보는 수집된 정보를 바탕으로 임의의 기준으로 선정된 아파트 들을 비교한것으로 추측됩니다.
+따라서 별도로 수집해야할 정보는 없는것 같습니다.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="학군정보">3.1.9. 학군정보</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/KAB/AptData-01-AptInfo-02-8.PNG" alt="학군정보">
+</div>
+</div>
+<div class="paragraph">
+<p>학군정보에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>학교 명칭</p>
+</li>
+<li>
+<p>학교 사립/공립 구분</p>
+</li>
+<li>
+<p>학교 초중고 구분</p>
+</li>
+<li>
+<p>학교 위치</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="편의시설">3.1.10. 편의시설</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/KAB/AptData-01-AptInfo-02-9.PNG" alt="편의시설">
+</div>
+</div>
+<div class="paragraph">
+<p>편의시설에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>편의시설 명칭</p>
+</li>
+<li>
+<p>편의시설 위치</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="교통시설">3.1.11. 교통시설</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/KAB/AptData-01-AptInfo-02-10.PNG" alt="교통시설">
+</div>
+</div>
+<div class="paragraph">
+<p>교통시설에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>교통시설 명칭</p>
+</li>
+<li>
+<p>교통시설 위치</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="한국감정원에서_시사점">3.2. 한국감정원에서 시사점</h3>
+<div class="paragraph">
+<p>한국감정원에서 제공하는 정보는 아파트 정보 외에도 여러가지 정보가 있었습니다.
+현재 초점을 둔 부분은 아파트 자체와 관련된 정보였는데, 추후 기능 확장 시 고려해 볼 부분이 많이 있었던것 같습니다.</p>
+</div>
+<div class="paragraph">
+<p>정리하면 한국감정원에서 아파트 자체와 관련된 정보는 아래의 내용으로 요약할 수 있을 것 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>아파트 명칭</p>
+</li>
+<li>
+<p>아파트 주소</p>
+</li>
+<li>
+<p>아파트 동 수</p>
+</li>
+<li>
+<p>아파트 세대 수</p>
+</li>
+<li>
+<p>아파트 준공 년월</p>
+</li>
+<li>
+<p>아파트 매매 가격</p>
+</li>
+<li>
+<p>아파트 전세 가격</p>
+</li>
+<li>
+<p>아파트 월세 보증금 가격</p>
+</li>
+<li>
+<p>아파트 월세 가격</p>
+</li>
+<li>
+<p>아파트 면적 유형</p>
+</li>
+<li>
+<p>아파트 면적 유형별 세대 수</p>
+</li>
+<li>
+<p>아파트 면적별 전용면적</p>
+</li>
+<li>
+<p>아파트 면적별 공용면적</p>
+</li>
+<li>
+<p>아파트 면적별 호 수</p>
+</li>
+<li>
+<p>아파트 면적별 방 수</p>
+</li>
+<li>
+<p>아파트 면적별 거실 수</p>
+</li>
+<li>
+<p>아파트 면적별 주방 수</p>
+</li>
+<li>
+<p>아파트 면적별 욕실 수</p>
+</li>
+<li>
+<p>아파트 면적별 현관구조</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="아파트실거래가">4. <a href="http://rt.molit.go.kr/">아파트실거래가</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="아파트_정보_3">4.1. 아파트 정보</h3>
+<div class="sect3">
+<h4 id="기본정보_2">4.1.1. 기본정보</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/rt/AptData-01-AptInfo-01.PNG" alt="기본정보1">
+</div>
+</div>
+<div class="paragraph">
+<p>기본정보에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>아파트 명칭</p>
+</li>
+<li>
+<p>아파트 지번</p>
+</li>
+<li>
+<p>아파트 도로조건</p>
+</li>
+<li>
+<p>아파트 전용면적 유형</p>
+</li>
+<li>
+<p>아파트 거래가격</p>
+</li>
+<li>
+<p>아파트 건축년도</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="전산공부">4.2. 전산공부</h3>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/rt/AptData-01-AptInfo-02.PNG" alt="전산공부">
+</div>
+</div>
+<div class="sect3">
+<h4 id="토지이용계획확인원">4.2.1. 토지이용계획확인원</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/rt/AptData-01-AptInfo-02-1.PNG" alt="토지이용계획확인원">
+</div>
+</div>
+<div class="paragraph">
+<p>토지이용계획확인원에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>아파트 토지이용계획 내용</p>
+</li>
+<li>
+<p>아파트 토지관련 법 내용</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="토지대장">4.2.2. 토지대장</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/rt/AptData-01-AptInfo-02-2.PNG" alt="토지대장">
+</div>
+</div>
+<div class="paragraph">
+<p>토지대장에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>아파트 토지이동일</p>
+</li>
+<li>
+<p>아파트 토지이동사유</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="건축물대장">4.2.3. 건축물대장</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/rt/AptData-01-AptInfo-02-3.PNG" alt="건축물대장">
+</div>
+</div>
+<div class="paragraph">
+<p>건축물대장에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>아파트 건폐율</p>
+</li>
+<li>
+<p>아파트 용적률</p>
+</li>
+<li>
+<p>아파트 지상층수</p>
+</li>
+<li>
+<p>아파트 주구조</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="아파트실거래가에서_시사점">4.3. 아파트실거래가에서 시사점</h3>
+<div class="paragraph">
+<p>아파트실거래가에서 제공하는 정보는 아파트 정보 외에도 여러가지 정보가 있었습니다.
+현재 초점을 둔 부분은 아파트 자체와 관련된 정보였는데, 추후 기능 확장 시 고려해 볼 부분이 많이 있었던것 같습니다.</p>
+</div>
+<div class="paragraph">
+<p>정리하면 아파트실거래가에서 아파트 자체와 관련된 정보는 아래의 내용으로 요약할 수 있을 것 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>아파트 명칭</p>
+</li>
+<li>
+<p>아파트 지번</p>
+</li>
+<li>
+<p>아파트 도로조건</p>
+</li>
+<li>
+<p>아파트 건축년월</p>
+</li>
+<li>
+<p>아파트 거래가격</p>
+</li>
+<li>
+<p>아파트 건폐율</p>
+</li>
+<li>
+<p>아파트 용적률</p>
+</li>
+<li>
+<p>아파트 지상층수</p>
+</li>
+<li>
+<p>아파트 주구조</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="네이버_부동산">5. <a href="https://land.naver.com/">네이버 부동산</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="아파트_정보_4">5.1. 아파트 정보</h3>
+<div class="sect3">
+<h4 id="기본정보_3">5.1.1. 기본정보</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LandNaver/AptData-01-AptInfo-01.PNG" alt="기본정보1">
+</div>
+</div>
+<div class="paragraph">
+<p>기본정보에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>아파트 명칭</p>
+</li>
+<li>
+<p>아파트 전체 세대 수</p>
+</li>
+<li>
+<p>아파트 전체 동 수</p>
+</li>
+<li>
+<p>아파트 공공임대 세대 수</p>
+</li>
+<li>
+<p>아파트 최저 층 수</p>
+</li>
+<li>
+<p>아파트 최고 층 수</p>
+</li>
+<li>
+<p>아파트 준공년월</p>
+</li>
+<li>
+<p>아파트 세대당 주차대수</p>
+</li>
+<li>
+<p>아파트 용적률</p>
+</li>
+<li>
+<p>아파트 건폐율</p>
+</li>
+<li>
+<p>아파트 건설사</p>
+</li>
+<li>
+<p>아파트 난방 유형</p>
+</li>
+<li>
+<p>아파트 주소(지번/도로명)</p>
+</li>
+<li>
+<p>아파트 면적 유형</p>
+</li>
+<li>
+<p>아파트 채광 방향</p>
+</li>
+<li>
+<p>아파트 거래가격</p>
+</li>
+<li>
+<p>아파트 거래설명</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="단지정보">5.1.2. 단지정보</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LandNaver/AptData-01-AptInfo-02-1-1.PNG" alt="단지정보1">
+</div>
+</div>
+<div class="paragraph">
+<p>단지정보에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>아파트 명칭</p>
+</li>
+<li>
+<p>아파트 전체 세대 수</p>
+</li>
+<li>
+<p>아파트 전체 동 수</p>
+</li>
+<li>
+<p>아파트 공공임대 세대 수</p>
+</li>
+<li>
+<p>아파트 최저 층 수</p>
+</li>
+<li>
+<p>아파트 최고 층 수</p>
+</li>
+<li>
+<p>아파트 준공년월</p>
+</li>
+<li>
+<p>아파트 세대당 주차대수</p>
+</li>
+<li>
+<p>아파트 용적률</p>
+</li>
+<li>
+<p>아파트 건폐율</p>
+</li>
+<li>
+<p>아파트 건설사</p>
+</li>
+<li>
+<p>아파트 난방 유형</p>
+</li>
+<li>
+<p>아파트 주소(지번/도로명)</p>
+</li>
+<li>
+<p>아파트 면적 유형</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LandNaver/AptData-01-AptInfo-02-1-2.PNG" alt="단지정보2">
+</div>
+</div>
+<div class="paragraph">
+<p>단지 내 면적별 정보에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>아파트 공급면적</p>
+</li>
+<li>
+<p>아파트 전용면적</p>
+</li>
+<li>
+<p>아파트 전용면적비율</p>
+</li>
+<li>
+<p>아파트 방 수</p>
+</li>
+<li>
+<p>아파트 욕실 수</p>
+</li>
+<li>
+<p>아파트 현관구조</p>
+</li>
+<li>
+<p>아파트 면적별 세대 거래 수</p>
+</li>
+<li>
+<p>아파트 면적별 매매 거래 수</p>
+</li>
+<li>
+<p>아파트 면적별 전세 거래 수</p>
+</li>
+<li>
+<p>아파트 면적별 월세 거래 수</p>
+</li>
+<li>
+<p>아파트 면적별 단기 거래 수</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LandNaver/AptData-01-AptInfo-02-1-3.PNG" alt="단지정보3">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="시세실거래가_2">5.1.3. 시세/실거래가</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LandNaver/AptData-01-AptInfo-02-2-1.PNG" alt="시세/실거래가1">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LandNaver/AptData-01-AptInfo-02-2-2.PNG" alt="시세/실거래가2">
+</div>
+</div>
+<div class="paragraph">
+<p>매매 실거래가에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>매물 계약년월</p>
+</li>
+<li>
+<p>매물 거래가격</p>
+</li>
+<li>
+<p>매물 거래 층</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LandNaver/AptData-01-AptInfo-02-2-3.PNG" alt="시세/실거래가3">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LandNaver/AptData-01-AptInfo-02-2-4.PNG" alt="시세/실거래가4">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LandNaver/AptData-01-AptInfo-02-2-5.PNG" alt="시세/실거래가5">
+</div>
+</div>
+<div class="paragraph">
+<p>매매 시세에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>매물 기준일자</p>
+</li>
+<li>
+<p>매물 하한가격</p>
+</li>
+<li>
+<p>매물 상한가격</p>
+</li>
+<li>
+<p>매물 평균변동액</p>
+</li>
+<li>
+<p>매물 매매가 대비 전세가</p>
+</li>
+<li>
+<p>매물 하위 평균가</p>
+</li>
+<li>
+<p>매물 일반평균가</p>
+</li>
+<li>
+<p>매물 상위평균가</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="동호수_2">5.1.4. 동호수</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LandNaver/AptData-01-AptInfo-02-3-1.PNG" alt="동호수">
+</div>
+</div>
+<div class="paragraph">
+<p>동호수에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>동별 면적 유형</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="학군정보_2">5.1.5. 학군정보</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LandNaver/AptData-01-AptInfo-02-4-1.PNG" alt="학군정보1">
+</div>
+</div>
+<div class="paragraph">
+<p>학군정보에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>학교 명칭</p>
+</li>
+<li>
+<p>학교 배정 동</p>
+</li>
+<li>
+<p>학교 주소</p>
+</li>
+<li>
+<p>학교 연락처</p>
+</li>
+<li>
+<p>학교 사립/공립 구분</p>
+</li>
+<li>
+<p>학교 설립일자</p>
+</li>
+<li>
+<p>학교 관할 교육청</p>
+</li>
+<li>
+<p>학교 교원 수</p>
+</li>
+<li>
+<p>학교 학생 수</p>
+</li>
+<li>
+<p>학교 홈페이지 주소</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LandNaver/AptData-01-AptInfo-02-4-2.PNG" alt="학군정보2">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LandNaver/AptData-01-AptInfo-02-4-3.PNG" alt="학군정보3">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LandNaver/AptData-01-AptInfo-02-4-4.PNG" alt="학군정보4">
+</div>
+</div>
+<div class="paragraph">
+<p>학생현황에서 제공하는 정보는 아래와 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>학급당 학생 수</p>
+</li>
+<li>
+<p>교사당 학생 수</p>
+</li>
+<li>
+<p>학년별 학급 수</p>
+</li>
+<li>
+<p>학년별 학생 수</p>
+</li>
+<li>
+<p>학생/학부모 상담 구분(내부/외부)</p>
+</li>
+<li>
+<p>학생/학부모 상담 구분별 상담 수</p>
+</li>
+<li>
+<p>급식 운영방식</p>
+</li>
+<li>
+<p>급식 비용</p>
+</li>
+<li>
+<p>급식 지원 대상 학생수</p>
+</li>
+<li>
+<p>급식 비용 지원 총액</p>
+</li>
+<li>
+<p>방과후 프로그램 수</p>
+</li>
+<li>
+<p>방과후 프로그램 참여 학생 수</p>
+</li>
+<li>
+<p>도서관 장서 수</p>
+</li>
+<li>
+<p>도서관 1인당 장서 수</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="사진">5.1.6. 사진</h4>
+<div class="imageblock">
+<div class="content">
+<img src="img/HowHome/AptData/01/LandNaver/AptData-01-AptInfo-02-5-1.PNG" alt="사진">
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="네이버부동산에서_시사점">5.2. 네이버부동산에서 시사점</h3>
+<div class="paragraph">
+<p>네이버부동산에서 제공하는 정보는 아파트 정보 외에도 여러가지 정보가 있었습니다.
+현재 초점을 둔 부분은 아파트 자체와 관련된 정보였는데, 추후 기능 확장 시 고려해 볼 부분이 많이 있었던것 같습니다.</p>
+</div>
+<div class="paragraph">
+<p>정리하면 네이버부동산에서 아파트 자체와 관련된 정보는 아래의 내용으로 요약할 수 있을 것 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>아파트 명칭</p>
+</li>
+<li>
+<p>아파트 전체 세대 수</p>
+</li>
+<li>
+<p>아파트 전체 동 수</p>
+</li>
+<li>
+<p>아파트 공공임대 세대 수</p>
+</li>
+<li>
+<p>아파트 최저 층 수</p>
+</li>
+<li>
+<p>아파트 최고 층 수</p>
+</li>
+<li>
+<p>아파트 준공년월</p>
+</li>
+<li>
+<p>아파트 세대당 주차대수</p>
+</li>
+<li>
+<p>아파트 용적률</p>
+</li>
+<li>
+<p>아파트 건폐율</p>
+</li>
+<li>
+<p>아파트 건설사</p>
+</li>
+<li>
+<p>아파트 난방 유형</p>
+</li>
+<li>
+<p>아파트 주소(지번/도로명)</p>
+</li>
+<li>
+<p>아파트 면적 유형</p>
+</li>
+<li>
+<p>아파트 공급면적</p>
+</li>
+<li>
+<p>아파트 전용면적</p>
+</li>
+<li>
+<p>아파트 전용면적비율</p>
+</li>
+<li>
+<p>아파트 면적별 방 수</p>
+</li>
+<li>
+<p>아파트 면적별 욕실 수</p>
+</li>
+<li>
+<p>아파트 면적별 현관구조</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="시사점">6. 시사점</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>많은 사이트들을 조사하진 못했지만 제가 생각했을 때 많이 사용된다고 판단한 사이트들을 조사해보앗습니다.</p>
+</div>
+<div class="paragraph">
+<p>조사한 사이트들은 단순히 아파트 자체에 대한 정보 뿐만 아니라 다양한 정보를 함께 보여주고 있었습니다.</p>
+</div>
+<div class="paragraph">
+<p>대표적으로 학군과 관련된 정보와 주변시설에 관련된 정보였는데,
+아마도 학군과 주변시설이 아파트 가격형성에 영향을 미치는것이 아닌가 생각이 듭니다.</p>
+</div>
+<div class="paragraph">
+<p>당장은 아파트 자체에 관련된 정보만을 수집하겟만, 추후 학군 및 시설과 관련된 정보를 추가로 관리하면 좋을것 같다는 생각이 들었습니다.</p>
+</div>
+<div class="paragraph">
+<p>아파트와 관련된 핵심 정보는 아래와 같이 정리 할 수 있을 것 같습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>아파트 명칭</p>
+</li>
+<li>
+<p>아파트 주소(지번/도로명)</p>
+</li>
+<li>
+<p>아파트 전체 동 수</p>
+</li>
+<li>
+<p>아파트 전체 세대 수</p>
+</li>
+<li>
+<p>아파트 공공임대 세대 수</p>
+</li>
+<li>
+<p>아파트 세대당 주차대수</p>
+</li>
+<li>
+<p>아파트 난방 유형</p>
+</li>
+<li>
+<p>아파트 용적률</p>
+</li>
+<li>
+<p>아파트 건폐율</p>
+</li>
+<li>
+<p>아파트 건설사</p>
+</li>
+<li>
+<p>아파트 준공년월</p>
+</li>
+<li>
+<p>아파트 동별 현관구조</p>
+</li>
+<li>
+<p>아파트 동별 전체 층 수</p>
+</li>
+<li>
+<p>아파트 공급/전용면적</p>
+</li>
+<li>
+<p>아파트 전용면적비율</p>
+</li>
+<li>
+<p>아파트 공급/전용면적별 세대 수</p>
+</li>
+<li>
+<p>아파트 공급/전용면적별 방/욕실 수</p>
+</li>
+<li>
+<p>아파트 매매 가격</p>
+</li>
+<li>
+<p>아파트 전세 가격</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>그리고 아파트 거래정보 수집과 과련하여 네이버부동산 사이트에서 힌트를 얻을 수 있었습니다.</p>
+</div>
+<div class="paragraph">
+<p>네이버부동산에서는 시세/실거래가 부분에서 '한국감정원(부동산테크)', '국토교통부', 'KB부동산', '부동산뱅크&#8217;을 기준으로 정보를 제공하고 있었습니다.</p>
+</div>
+<div class="paragraph">
+<p>먼저 공공데이터포털과 위 4개의 사이트에서 데이터를 얻을 수 있는지 확인해보고 얻을 수 없다면 크롤러를 이용하여 데이터를 수집하는 방법을 고려해보겠습니다.</p>
+</div>
+</div>
+</div>
+    </div>
+	
+	<section id="social-share">
+        <ul class="icons">
+<!-- Social Share Button HTML -->
+
+<!-- Twitter -->
+<li><a href="//twitter.com/share?url=https://anew0m.netlify.com//HowHome-02-AptData-02.html&text=어떡하집 프로젝트 - 아파트 정보 수집 계획(수집 정보 정의)&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+</a></li>
+
+<!-- Google Plus -->
+<li><a href="//plus.google.com/share?url=https://anew0m.netlify.com//HowHome-02-AptData-02.html" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+</a></li>
+
+<!-- Facebook -->
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://anew0m.netlify.com//HowHome-02-AptData-02.html" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+</a></li>
+
+<!-- Reddit (url, title) -->
+<li><a href="//reddit.com/submit?url=https://anew0m.netlify.com//HowHome-02-AptData-02.html&title=어떡하집 프로젝트 - 아파트 정보 수집 계획(수집 정보 정의)" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+</a></li>
+
+<!-- LinkedIn -->
+<li><a href="//www.linkedin.com/shareArticle?url=https://anew0m.netlify.com//HowHome-02-AptData-02.html&title=어떡하집 프로젝트 - 아파트 정보 수집 계획(수집 정보 정의)" target="_blank" class="share-btn linkedin">
+    <i class="fa fa-linkedin"></i>
+    <p>LinkedIn</p>
+</a></li>
+
+<!-- StumbleUpon (url, title) -->
+<li><a href="//www.stumbleupon.com/submit?url=https://anew0m.netlify.com//HowHome-02-AptData-02.html&title=어떡하집 프로젝트 - 아파트 정보 수집 계획(수집 정보 정의)" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+</a></li>
+
+<!-- Email -->
+<li><a href="mailto:?subject=Check out this post by 정민호&body=https://anew0m.netlify.com//HowHome-02-AptData-02.html" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+</a></li>
+        </ul>
+    </section>
+     
+
+    <footer>
+	
+		<ul class="stats">
+    	    <!-- Display the categories associated with this post -->
+    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
+ 	        <li><a href='tags/부동산.html'>부동산</a></li>
+ 	        <li><a href='tags/개인프로젝트.html'>개인프로젝트</a></li>
+
+				<li><a class="icon fa-comment" href="HowHome-02-AptData-02.html#disqus_thread"> &nbsp;</a></li>
+ 		</ul>
+    	
+    </footer>
+</article>
+		
+<ul class="actions pagination">
+  	
+  		        <li><a href="Relational_Data_Modeling_Note-07.html" 
+                class="button big previous">관계형 데이터 모델링 노트 7장</a></li>
+        <li><a href="HowHome-01.html" 
+                class="button big next">어떡하집 프로젝트 구상</a></li>
+	
+</ul>
+		
+<div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_config = function () {
+      this.page.identifier = 'HowHome-02-AptData-02.html';
+    };
+    var disqus_shortname = 'anew0m';
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        dsq.setAttribute('data-timestamp', + new Date());
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <!--<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>-->
+</div>
+    </div>
+
+<!-- Sidebar -->
+<section id="sidebar">
+
+    <!-- Intro -->
+        <section id="intro">
+                                    <a href="/" class="logo"><img src="img/main/intro.jpg" class="intro-circle" width="150px" alt="anew0m" /></a>
+
+
+                <header>
+                    <h2>정민호의 블로그</h2>
+                    <p>평범한 일상과 IT에 관련된 글 모음</p>
+                </header>
+
+            <ul class="icons">
+                    <li><a href="feed.xml" type="application/rss+xml"
+                        target="_blank" title="RSS" class="fa fa-rss"></a></li>
+<li><a href="//github.com/anew0m" target="_blank" title="GitHub" class="fa fa-github"></a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li><a href="//linkedin.com/in/anew0m" target="_blank" title="LinkedIn" class="fa fa-linkedin"></a></li>
+
+
+
+
+
+
+
+
+<li><a href="mailto:anew0m@gmail.com" title="Email" class="fa fa-envelope"></a></li>
+            </ul>
+        </section>
+
+    <!-- Posts List -->
+        <section id="recent-posts">
+            <ul class="posts">
+                <header>
+                    <h3>Recent Posts</h3>
+                </header>
+
+                    <li>
+                        <article>
+                            <header>
+                                <h3><a href="HowHome-01.html">어떡하집 프로젝트 구상</a></h3>
+                                 <time class="published"
+							            datetime='Feb 13, 2020'>
+							            Feb 13, 2020</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
+                                <h3><a href="HowHome-02-AptData-02.html">어떡하집 프로젝트 - 아파트 정보 수집 계획(수집 정보 정의)</a></h3>
+                                 <time class="published"
+							            datetime='Feb 13, 2020'>
+							            Feb 13, 2020</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
+                                <h3><a href="HowHome-02-AptData-01.html">어떡하집 프로젝트 - 아파트 정보 수집 계획</a></h3>
+                                 <time class="published"
+							            datetime='Feb 13, 2020'>
+							            Feb 13, 2020</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
+                                <h3><a href="Relational_Data_Modeling_Note-06.html">관계형 데이터 모델링 노트 6장</a></h3>
+                                 <time class="published"
+							            datetime='Dec 12, 2019'>
+							            Dec 12, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+
+                    <li>
+                        <ul class="actions">
+                            <li><a href="archive.html"
+                            class="button">View more posts</a></li>
+                        </ul>
+                    </li>
+            </ul>
+        </section>
+
+    <!-- Tags List can be show/hide from config-->
+        <section id="tags">
+            <ul class="posts">
+                <header>
+                    <h3>Tags</h3>
+                </header>
+
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/책소개.html">책소개</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/hackerton.html">hackerton</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/부동산.html">부동산</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 3 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/개인프로젝트.html">개인프로젝트</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 3 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/책정리.html">책정리</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 5 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/데이터모델링.html">데이터모델링</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 6 </span>
+                            </header>
+                        </article>
+                    </li>
+            </ul>
+        </section>
+
+
+    <!-- About -->
+        <section class="blurb">
+            <h2>About</h2>
+            <p>introduce</p>
+
+            <ul class="actions">
+                <li><a href="about.html" class="button">Learn More</a></li>
+            </ul>
+        </section>
+
+
+        <section id="footer">
+            <p class="copyright">&copy; 정민호의 블로그. Design: <a href="http://html5up.net" target="_blank">HTML5 UP</a>. Ported For SSG by <a href="https://github.com/jpescador/hugo-future-imperfect">Julio Pescador</a>. Adapted to JBake by <a href="//github.com/manikmagar" target="_blank">Manik Magar</a>. Baked with <a href="http://jbake.org">JBake v2.6.4</a>.
+            <a href="/sitemap.xml" target="_blank">Sitemap</a>.</p>
+        </section>
+
+</section>
+		</div>
+		<a id="back-to-top" href="#" class="fa fa-arrow-up fa-border fa-2x"></a>
+		<div id="push"></div>
+    </div>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+
+		<script src="js/jquery.min.js"></script>
+		<script src="js/skel.min.js"></script>
+		<script src="js/util.js"></script>
+		<script src="js/main.js"></script>
+		<script src="js/backToTop.js"></script>
+		<script src="js/highlight.pack.js"></script>
+		<script src="js/readingTime.js"></script>
+
+			<script id="dsq-count-scr" src="//anew0m.disqus.com/count.js" async></script>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-149448484-1', 'auto');
+  ga('send', 'pageview', {
+    'page': 'HowHome-02-AptData-02.html',
+    'title': '어떡하집 프로젝트 - 아파트 정보 수집 계획(수집 정보 정의)'
+      });
+</script>
+		<!-- This is called by default since this theme uses highlight.js -->
+		<script>hljs.initHighlightingOnLoad();</script>
+		<!--[if lte IE 8]><script src="/js/ie/respond.min.js"></script><![endif]-->
+
+  </body>
+</html>
