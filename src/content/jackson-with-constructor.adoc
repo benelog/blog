@@ -264,7 +264,7 @@ image:img/jackson/intellij-settings-gradle.png[intellij-settings-gradle.png,titl
 
 image:img/jackson/intellij-settings-java-compiler.png[intellij-settings-java-compiler.png,title="Settings의 Java Compiler 설정"]
 
-Jackson의 ParameterNameModule 을 쓰기 위해서는 다음과 같은 의존성 추가가 필요합니다.
+Jackson의 ParameterNameModule 을 쓰기 위해서는 다음과 같이 의존성을 추가해야합니다.
 
 [source,groovy]
 .ParameterNameModule 의존성 추가
@@ -272,10 +272,10 @@ Jackson의 ParameterNameModule 을 쓰기 위해서는 다음과 같은 의존�
     implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names:2.10.3'
 ----
 
-`ObjectMapper` 선언에서는 `registerModule` 메서드로 `ParameterNamesModule` 을 추가한다.
+`ObjectMapper` 선언에서는 `registerModule()` 메서드로 `ParameterNamesModule` 을 추가합니다.
 
 [source,ObjectMapper 선언]
-.ObjectMapper에 ParameterNamesModule 선언 추가
+.ObjectMapper에 ParameterNamesModule 추가
 ----
     var objectMapper = new ObjectMapper()
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
@@ -293,9 +293,11 @@ Spring Boot에서는 `ParameterNamesModule` 을 편하게 쓸 수 있도록 아�
 ** https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web/2.2.5.RELEASE[spring-boot-starter-web] -> https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-json/2.2.5.RELEASE[spring-boot-starter-json] -> `jackson-module-parameter-names` 로 의존관계가 연결됩니다.
 * 디폴트로 등록되는 `ObjectMapper` bean에는 `ParameterNamesModule` 이 이미 추가되어 있습니다.
 ** https://github.com/spring-projects/spring-boot/blob/33e414fcb2f04bec653f799228907a577ac27a10/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/jackson/JacksonAutoConfiguration.java#L108[JacksonAutoConfiguration.java#L108] 참조
-** `RestTeamplteBuilder` 로 RestTemplate을 생성한다면 디폴트 등록된 ObjectMapper 을 참조하는  `MappingJackson2HttpMessageConverter` 가 `RestTemplate` 에 주입됩니다.
+** `RestTeamplteBuilder` 로 `RestTemplate` 을 생성한다면 디폴트 등록된 ObjectMapper 을 참조하는  `MappingJackson2HttpMessageConverter` 가 `RestTemplate` 에 주입됩니다.
 
-Lombok과 함께 쓸때에도 `lombok.config` 의 추가 설정 없이도 잘 동작합니다.
+`ParameterNamesModule` 은 Lombok에서 자동으로 만든 생성자도 잘 인식합니다.
+`lombok.config` 에 추가 설정을 하지 않아도 된다는 점이 `@ConstructorProperties` 를 쓸 때와의 차이점입니다.
+
 이 방식의 장단점은
 
 * 장점
