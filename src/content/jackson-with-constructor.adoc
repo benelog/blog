@@ -178,7 +178,7 @@ public class AccessLog {
 ----
 
 Lombok을 활용한다면 이 과정을 더 편하게 할 수 있습니다.
-`lombok.config`를 다음과 같은 선언을 하면 Lombok에서 만드는 생성자에서 `@ConstructorProperties` 를 자동으로 넣어줍니다.
+`lombok.config` 를 다음과 같은 선언을 하면 Lombok에서 만드는 생성자에서 `@ConstructorProperties` 를 자동으로 넣어줍니다.
 
 [source,properties]
 .lombok.config 설정
@@ -294,6 +294,18 @@ Spring Boot에서는 `ParameterNamesModule` 을 편하게 쓸 수 있도록 아�
 * 디폴트로 등록되는 `ObjectMapper` bean에는 `ParameterNamesModule` 이 이미 추가되어 있습니다.
 ** https://github.com/spring-projects/spring-boot/blob/33e414fcb2f04bec653f799228907a577ac27a10/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/jackson/JacksonAutoConfiguration.java#L108[JacksonAutoConfiguration.java#L108] 참조
 ** `RestTeamplteBuilder` 로 RestTemplate을 생성한다면 디폴트 등록된 ObjectMapper 을 참조하는  `MappingJackson2HttpMessageConverter` 가 `RestTemplate` 에 주입됩니다.
+
+Lombok과 함께 쓸때에도 `lombok.config` 의 추가 설정 없이도 잘 동작합니다.
+이 방식의 장단점은
+
+* 장점
+** 코드가 짧습니다.
+** Jackson에 대한 의존성이 없습니다.
+* 단점
+** 생성자의 파라미터명과 JSON 속성의 이름이 반드시 일치해야 합니다.
+*** 생성자의 파라미터 이름이 JSON파싱에 쓰인다는것을 의식하지 않는다면, 파라미터 명을 잘 모르고 고쳐서 JSON 파싱이 안되게 하는 부작용이 쓰일수 있습니다.
+** 컴파일 옵션을 의식하지 않으면 특정 개발자의 IDE에서는 의도대로 동작하지 않을수 있습니다.
+** 생성자가 여러 개 일때는 `@JsonCreator` 와 같은 다른 방식과 병행해서 써야 합니다.
 
 == 예제 소스 저장소
 
