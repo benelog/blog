@@ -108,7 +108,7 @@ com.fasterxml.jackson.databind.exc.InvalidDefinitionException: Cannot construct 
 ----
 
 JSON을 파싱한 결과를 전달할 적절한 생성자를 찾지 못했을 때 발생하는 에러입니다.
-이 문제를 해결하기 위해 JSON 속성값을 전달받을 생성자를 지정하는 방법을 정리합니다.
+이 문제를 해결하는 방법을 정리합니다.
 
 == 생성자로 JSON 속성값을 전달하는 방법들
 
@@ -186,8 +186,8 @@ Lombok을 활용한다면 이 과정을 더 편하게 할 수 있습니다.
 lombok.anyConstructor.addConstructorProperties=true
 ----
 
-`@Builder`, `@AllArgsConstructor` 와 같은 애노테이션을 붙이면 Lombok에서는 생성자를 만들어줍니다.
-이를 통해 JSON 파싱한 값을 넣을 클래스를 더 단순하게 만들 수 이씁니다.
+`@Builder`, `@AllArgsConstructor` 와 같은 애노테이션을 클래스에 붙이면 Lombok에서는 자동으로 생성자를 만들어줍니다.
+이를 통해 JSON 파싱한 값을 넣을 클래스를 더 단순하게 만들 수 있습니다.
 
 [source,java]
 .Lombok을 이용한 AccessLog 클래스 선언
@@ -206,7 +206,7 @@ public class AccessLog {
 이 이후 버전부터는 디폴트가 아니므로 `lombok.config` 에 명시적인 선언이 필요합니다.
 ( https://multifrontgarden.tistory.com/222 참조 )
 
-`@ConstructorProperties` 를 직접 쓸때의 장단점은 다음과 같다고 생각합니다.
+`@ConstructorProperties` 를 직접 쓸 때의 장단점은 다음과 같다고 생각합니다.
 
 * 장점
 ** `@JsonCreator` + `@JsonProperties` 보다는 코딩량이 조금 적습니다.
