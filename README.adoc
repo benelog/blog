@@ -1,7 +1,7 @@
 = 개발을 통한 자기수양
 정상혁의 개발 블로그
 
-image::https://api.netlify.com/api/v1/badges/ec666dc3-a1a6-4d63-9cc1-55815147c9cf/deploy-status[Netlify Status, link="https://app.netlify.com/sites/blog-benelog/deploys"]
+image::https://api.netlify.com/api/v1/badges/42ef4cbb-a113-4dbe-b1d4-eedab4d6163b/deploy-status[Netlify Status, link="https://app.netlify.com/sites/blog-benelog/deploys"]
 
 
 == 사용 기술
