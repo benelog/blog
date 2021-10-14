@@ -46,7 +46,7 @@ public static Integer valueOf(int i) {
   else
   return new Integer(i);
 }
----
+----
 
 처음에 나왔던 저의 Eclipse 캡쳐화면을 보면 findbugs 플러그인에서 new Integer()사용 코드에 대한 경고를 보여주고 있습니다. 자세한 설명을 보니, `Integer.valueOf()` 를 사용할 경우 약 3.5배 정도 실행속도가 빠르다고 하네요.
 
