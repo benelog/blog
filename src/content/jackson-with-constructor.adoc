@@ -1,4 +1,4 @@
-= Jackson으로 파싱한 JSON 속성값을 생성자로 전달하기
+= 으로 파싱한 JSON 속성값을 생성자로 전달하기
 정상혁
 2020-03-15
 :jbake-type: post
@@ -9,8 +9,11 @@
 :idprefix:
 :toc:
 :sectnums:
-:source-repo: https://github.com/benelog/jackson-expriment
+:source-repo: https://github.com/benelog/jackson-experiment
 :source-link-base: ${source-repo}/tree/master
+
+* 변경이력
+** 2022.05.07 : 예제 프로젝트를 JDK17로 변경
 
 == Jackson에서 `(no Creators, like default construct, exist)` 에러 메시지
 
@@ -318,7 +321,6 @@ Spring Boot에서는 `ParameterNamesModule` 을 편하게 쓸 수 있도록 아�
 ** + Lombok : link:{source-link-base}/src/test/java/net/benelog/jackson/LombokTest.java[LombokTest.java], link:lombok.config[lombok.config]
 * `ParameterNameModule` 활용 : link:{source-link-base}/src/test/java/net/benelog/jackson/ParameterNameModuleTest.java[ParameterNameModuleTest.java], link:{source-link-base}/build.gradle#L28[build.gradle]
 
-Text blocks 문법을 활용하려고 JDK 13을 쓴 예제입니다.
-InteliJ 안에서 경고가 뜬다면 'Set Language level to 13(Preview)' 를 선택해줍니다.
-
-image:img/jackson/text-blocks.png[text-blocks.png,title="Text Block"]
+이 예제는 JDK 17을 써서 작성했습니다.
+Text blocks 문법을 썼기 때문에 JDK 15이상이 필요합니다.
+이 문법이 'Preview'로 들어간 JDK 13,14에서는 컴파일 옵션으로 '--enable-preview' 을 넣어야합니다.
