@@ -6,9 +6,9 @@
 :jbake-tags: Test
 :idprefix:
 
-image:http://farm4.static.flickr.com/3215/2986232393_20848d9b65.jpg[image,width=332,height=500]
+image:https://farm4.static.flickr.com/3215/2986232393_20848d9b65.jpg[image,width=332,height=500]
 
-(이미지 출처: http://www.flickr.com/photos/titicat/2986232393/ )
+(이미지 출처: https://www.flickr.com/photos/titicat/2986232393/ )
 
 ____
 "컴퓨터가 내 의도를 이해했는지 표시하는 신호등을 설치하고, 그 신호에 의지해서 사람이 더 읽기 편하고 고치기 쉬운 코드를 개발하는 기법입니다.

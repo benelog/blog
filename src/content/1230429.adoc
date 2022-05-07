@@ -16,9 +16,6 @@ http://www.creativecommons.or.kr/[CCK(Creative Commons Korea)]의 Code can be an
 
 8bit 화면 같은 행사 로고를 보고 저도  제 세대에 맞게 Quick Basic으로 코드를 짜볼 생각을 해봤습니다. 이 행사 중에 '8bit kid의 생애'라는 패널토론 주제도 있었었죠. ^^; 저는 그 다음 시대인 IBM XT세대입니다. 허큘리스 그래픽카드, 5.25인치 FDD, 조금 지나서 ADLIB card, 2400bps MNP 모뎀 등이 저에게는 가슴을 파고드는 핵심단어들이에요.
 
-image:http://goodhyun.com/WindowsLiveWriter/Codecanbeanart_BB3/ccsalon_banner_1.gif[ccsalon_banner,width=320,height=230]
-
-
 그 추억의 시절에 제가 가장 많아 가지고 놀았던 프로그램 언어가 Quick-Basic이였습니다. Basic에서 행번호를 없애고 구조화프로그래밍 개념을 도입한, 당시 저에게는 충격적으로 대단한 언어였어요.   이 도구에다  basic을 배웠던 사람이면 누구나 회상할 추억의 명령어 line(선긋기), play(음악연주), read,data(데이터 읽는 구문)을 넣어서 코딩을 해봐야겠다고 마음 먹었습니다. 대신 제 PC환경상 그때의 Quick-basic 대신 Window XP에 내장되어 있는 q-basic을 사용할 수 밖에 없었어요. 프롬프트에서 qbasic이라고 치면 언제나 튀어나오는 도구죠.
 
 Quick-Basic과 q-basic이 뭐가 다르냐구요? 문법은 거의 똑같은것 같아요. Quick-basic은 따로 패키지로 나와서 버전4.5까지 발표되었었는데, q-basic은 어느 새 MS-DOS의 상위버전에 포함되어서 나오더군요 . Quick-Basic에서는 실행파일(.exe)도 만들 수 있고, 각종 라이브러리도 많았었습니다. 아뭏든 대타로 q-basic을 썼기에 실행할때는  아래와 같이 치면 됩니다.
@@ -71,8 +68,5 @@ END SUB
 
 
 == 다른분들의 발표작
-* http://www.uxkorea.net/blog_post_65.aspx
-* http://blog.bizarre07.com/6
 * http://colus.egloos.com/3421372
-* http://wookay.egloos.com/3130646
-* http://blog.naver.com/htouya/60037720407
+* https://www.sqler.com/board_uxkorea/172190
