@@ -111,10 +111,12 @@ https://sdkman.io/install 참조
 === IntelliJ
 https://www.jetbrains.com/ko-kr/toolbox-app/ 에서 Toolbox로 설치
 
-Plugin 설치
 
-* https://plugins.jetbrains.com/plugin/7391-asciidoc
-* https://plugins.jetbrains.com/plugin/1065-checkstyle-idea
+* Terminal에서 zsh 지정
+** `Settings` > `Tools` > `Application Settings` > `Shell Path` : `/bin/zsh`
+* Plugin 설치
+** https://plugins.jetbrains.com/plugin/7391-asciidoc
+** https://plugins.jetbrains.com/plugin/1065-checkstyle-idea
 
 == Node.js
 nvm 설치
