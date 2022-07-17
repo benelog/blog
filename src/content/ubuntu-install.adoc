@@ -1,0 +1,154 @@
+= Ubuntu 22.04 설치
+정상혁
+2022-07-17
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: linux
+:idprefix:
+
+새 컴퓨터를 받아서 설치한 프로그램들을 정리해봅니다.
+
+* Ubuntu는 영문판으로 설치
+** `Desktop`, `Download` 같은 디렉토리가 영문으로 나오는 것이 편리해서
+
+== 한글 설정
+`Settings` 에서
+
+* `Regision & Language` 에서 `Manage Installed Lanauges` 에 한글 추가
+* `Keyboard` > `Input Sources` 에 `Korean(Hangul)` 추가하고 "..." 눌러서 `Preference` 선택
+** `Hangul toggle key` 에 `Shift + Space` 지정
+
+== terminal
+여러 창을 띄우기에 편한 터미널 프로그램
+
+`sudo apt install terminator`
+
+== 자주쓰는 cli 도구
+
+=== curl
+
+`sudo apt install curl`
+
+=== ifconfig
+
+`sudo apt install net-tools`
+
+==== ssh 설정
+
+`sudo vi /etc/ssh/ssh_config` 하여 아래를 마지막에 추가
+
+[source]
+----
+HostkeyAlgorithms ssh-dss,ssh-rsa
+KexAlgorithms +diffie-hellman-group1-sha1
+----
+
+https://kr.analysisman.com/2018/08/linux-ssh.html 참조
+
+=== GIT 사용환경
+
+=== git / gitk
+
+`sudo apt-get install git gitk`
+
+=== GitHub SSH 설정
+
+https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
+
+==== oh-myzsh
+
+[source]
+----
+sudo apt install zsh
+curl -L http://install.ohmyz.sh | sh
+----
+
+( https://github.com/robbyrussell/oh-my-zsh 참고 )
+
+terminator의 `Preference` > `Profile` > `Command` 에서
+
+* `Rn a custom command instead of my shell` 체크
+* `Custom commands` : `zsh`
+
+==== scm_breeze
+
+[source]
+----
+git clone git://github.com/ndbroadbent/scm_breeze.git ~/.scm_breeze
+~/.scm_breeze/install.sh
+source ~/.bashrc   # or source ~/.zshrc
+----
+
+( https://github.com/ndbroadbent/scm_breeze 참고 )
+
+== 웹브라우저
+
+=== 크롬
+
+[source]
+----
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+sudo apt install ./google-chrome-stable_current_amd64.deb
+----
+
+== Java 개발 환경
+여러 JDK를 설치하고 관리하는 방법은 SDKMAN + direnv를 추천 ( https://blog.benelog.net/installing-jdk.html 참조)
+
+=== SDKMAN
+[source]
+----
+curl -s "https://get.sdkman.io" | bash
+source "$HOME/.sdkman/bin/sdkman-init.sh"
+sdk install java
+----
+
+https://sdkman.io/install 참조
+
+=== direnv
+* `sudo apt install direnv` 설치
+* https://direnv.net/docs/hook.html 참조하여 `~/.bashrc` 와 `~/.zshrc` 수정
+
+=== IntelliJ
+https://www.jetbrains.com/ko-kr/toolbox-app/ 에서 Toolbox로 설치
+
+Plugin 설치
+
+* https://plugins.jetbrains.com/plugin/7391-asciidoc
+* https://plugins.jetbrains.com/plugin/1065-checkstyle-idea
+
+== Node.js
+nvm 설치
+
+== 미디어 도구
+
+=== Pinta
+
+`sudo apt install pinta`
+
+=== VidCutter
+
+`sudo snap install vidcutter`
+
+https://github.com/ozmartian/vidcutter 참조
+
+=== ShotCut
+
+`snap install shotcut --classic`
+
+https://shotcut.org/ 참조
+
+== 기타 참고
+아직까지 22.04에서는 겪지 않았으나 이전 버전에서 참고한 자료
+
+=== 무선 인터넷 안 잡힐 때
+
+* `rfkill list all`
+* http://askubuntu.com/questions/380586/wireless-is-disabled-by-hardware-switch-wifi-doesnt-work-hard-blocked-yes
+* http://askubuntu.com/questions/847250/new-ubuntu-16-04-with-no-wifi/847282
+
+=== NGINX 설치 후 자동으로 시작 안하게
+
+`sudo update-rc.d -f nginx disable`
+
+### Secure Boot
+https://wiki.ubuntu.com/UEFI/SecureBoot 참조
