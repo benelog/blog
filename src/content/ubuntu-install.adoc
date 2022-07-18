@@ -92,9 +92,11 @@ sudo apt install ./google-chrome-stable_current_amd64.deb
 ----
 
 == Java 개발 환경
+
 여러 JDK를 설치하고 관리하는 방법은 SDKMAN + direnv를 추천 ( https://blog.benelog.net/installing-jdk.html 참조)
 
 === SDKMAN
+
 [source]
 ----
 curl -s "https://get.sdkman.io" | bash
@@ -106,11 +108,12 @@ https://sdkman.io/install 참조
 
 === direnv
 * `sudo apt install direnv` 설치
-* https://direnv.net/docs/hook.html 참조하여 `~/.bashrc` 와 `~/.zshrc` 수정
+* `~/.bashrc` 와 `~/.zshrc` 에 `eval "$(direnv hook bash)"` 추가
+
+https://direnv.net/docs/hook.html 참조
 
 === IntelliJ
 https://www.jetbrains.com/ko-kr/toolbox-app/ 에서 Toolbox로 설치
-
 
 * Terminal에서 zsh 지정
 ** `Settings` > `Tools` > `Application Settings` > `Shell Path` : `/bin/zsh`
@@ -119,7 +122,24 @@ https://www.jetbrains.com/ko-kr/toolbox-app/ 에서 Toolbox로 설치
 ** https://plugins.jetbrains.com/plugin/1065-checkstyle-idea
 
 == Node.js
-nvm 설치
+
+=== nvm 설치
+
+[source]
+----
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+----
+
+
+.~/.bash_profile, ~/.zshrc, ~/.profile,  ~/.bashrc 등에 추가
+
+[source]
+----
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+----
+
+https://github.com/nvm-sh/nvm#installing-and-updating 참고
 
 == 미디어 도구
 
