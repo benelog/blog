@@ -55,7 +55,7 @@ https://kr.analysisman.com/2018/08/linux-ssh.html 참조
 
 https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
 
-==== oh-myzsh
+=== oh-myzsh
 
 [source]
 ----
@@ -70,7 +70,7 @@ terminator의 `Preference` > `Profile` > `Command` 에서
 * `Rn a custom command instead of my shell` 체크
 * `Custom commands` : `zsh`
 
-==== scm_breeze
+=== scm_breeze
 
 [source]
 ----
