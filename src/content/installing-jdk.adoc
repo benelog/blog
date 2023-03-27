@@ -13,6 +13,8 @@
 다양한 배포판과 버전의 JDK를 명령어 한 줄로 설치하고 OS의 쉘에서 사용할 JDK를 쉽게 지정할 수 있게 해주는 도구들을 소개합니다.
 
 .주요 변경이력
+* 2023.03.27
+** Jabba 설치를 안내하는 URL을 현재 관리되는 포크된 버전으로 변경
 * 2019.07.03
 ** Homebrew에 대한 소개를 별도의 단락으로 분리
 ** Chocolatey에 대한 설명 보강
@@ -79,7 +81,7 @@ JDK의 설치와 OS의 명령행에서 사용할 버전을 지정할 때는 아�
 macOS +
 Windows(Cygwin, Git Bash)
 
-|https://github.com/shyiko/jabba[jabba]
+|https://github.com/Jabba-Team/jabba[jabba]
 |JDK 설치 특화 도구
 |Linux +
 macOS +
@@ -535,7 +537,7 @@ sdk use java 8.0.212.hs-adpt
 === jabba
 jabba는 JDK의 설치/버전 관리만을 위한 도구입니다.
 
-각 OS별 jabba의 설치 방법은 https://github.com/shyiko/jabba#installation 을 참조합니다.
+각 OS별 jabba의 설치 방법은 https://github.com/Jabba-Team/jabba#installation 을 참조합니다.
 
 설치할 수 있는 JDK의 배포판은 `jabba ls-remote`  명령으로 확인할 수 있습니다.
 이중 Amazon에서 제공하는 Corretto 배포판 JDK 11을 설치한다면 아래와 같은 명령을 내립니다.
@@ -622,7 +624,7 @@ Zulu OpenJDK + OpenJFX +
 SapMachine +
 Liberica JDK +
 
-|https://github.com/shyiko/jabba[jabba]
+|https://github.com/Jabba-Team/jabba[jabba]
 |Oracle JDK +
 Oracle의 OpenJDK 빌드 *(*2)* +
 Adopt OpenJDK +
