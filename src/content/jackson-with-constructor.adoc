@@ -10,7 +10,7 @@
 :toc:
 :sectnums:
 :source-repo: https://github.com/benelog/jackson-experiment
-:source-link-base: ${source-repo}/tree/master
+:source-link-base: {source-repo}/tree/master
 
 * 변경이력
 ** 2023.06.25 : Spring Boot Gradle plugin에서 `-parameter` 옵션을 넣어주는 소스로의 링크 변경
