@@ -1,0 +1,44 @@
+= Git-Flow에 대해서 다시 생각해보기
+정상혁
+2023-10-23
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: git
+:idprefix:
+
+Git의 브랜치 전략으로 Git-flow가 가장 유명하고 자주 언급됩니다.
+그런데 이 전략은 복잡도와 실행하는 난이도가 높은 편입니다.
+Git-flow를 쓰고 있다고 주장하는 조직에서도 창시자 Vincent가 제안한 원래의 프로세스를 그대로 쓰는 경우는 드물다고 느껴집니다.
+
+Git-flow가 특히 인터넷 서비스 개발에서 보편적으로 권장할만한 전략일지는 저는 의문입니다.
+브랜치 전략은 복잡하게 시작해서 단순하게 줄여나가기 보다는 단순하게 시작해서 필요에 따라 복잡도를 늘여가는 편이 시행착오가 적다고 생각합니다.
+여러 버전을 동시에 운영하고 백포트 패치를 해야하는 설류션 개발에서는 Git-flow가 적합한 조직이 있을법도 합니다.
+즉, Git-flow는 필요에 따라 종착역은 될수 있지만 시작점으로 권장하고 싶은 정책은 아닙니다.
+
+Git-flow가 그 이름 때문에 필요 이상으로 권장되고 있다고 저는 생각합니다. Git이 지금보다 대중화되지 않았을 때 제안된 모델이고 그 당시 다른 유명한 모델이 없겠기에 Git-flow라고 불리지 않았을까 추정하기도합니다. 만약 창시자의 이름을 딴 Vincent-flow정도의 이름이였다면 많은 사람들이 따르려고 생각하지 않았을지도 모릅니다. Git-flow가 유용해보인다면 그 이름이 Vincent-flow라도 마찬가지일지를 한번 돌아봐도 이름에 과도하게 끌린건 아닌지 돌아보는데 도움이 될듯합니다.
+
+저는 https://about.gitlab.com/topics/version-control/what-is-gitlab-flow/[GitLab-flow]정도면 규모가 큰 협업을 하는 서비스의 개발 프로세스와도 잘 맞다고 생각합니다. 물론 필요하다면 여기서 더 세분화된 브랜치를 추가할수도 있습니다.
+
+뱅크 샐러드에서는 Git-flow보다 더 단순한 전략으로 리뷰-배포 프로세스를 개선했다는 사례도 있습니다.
+
+https://blog.banksalad.com/tech/become-an-organization-that-deploys-1000-times-a-day/
+
+> 먼저 Git-flow를 활용한다면 하나의 기능을 배포하는 데 있어서 무려 5번의 branch switching이 필요하고, 6번의 Pull Request와 이에 따른 6번의 Code Review가 필요했습니다. 이 말은 다르게 말하면 코드 오너가 6번이나 코드를 리뷰하고 승인을 해줘야 한다는 것이죠. 이렇게 복잡한 프로세스는 자연스럽게 배포를 귀찮은 존재로 만듭니다. 이로 인해 간단한 수정 사항의 경우 develop branch에 merge 한 뒤 배포하지 않는 일이 종종 발생하기 시작했습니다. 이런 배포되지 않은 변경 사항이 쌓이면서 나중에 필요할 때 한 번에 너무 많은 변경사항을 포함한, 부담스러운 배포를 진행해야만 했습니다. 배포 시 변경 사항이 많을수록 장애가 발생할 수 있는 확률은 당연히 증가하기 때문에 개발자에게는 배포는 무서운 존재가 되었습니다.
+
+Git-flow의 창시자 Vincent Driessen는 그의 아티클에 10년간의 회고를 덧붙였습니다. 거기서 지속적인 배포를 하는 프로젝트에서는 GitHub-flow와 같은 더 단순한 모델을 권장한다는 언급을 했습니다.
+
+https://nvie.com/posts/a-successful-git-branching-model/
+
+> If your team is doing continuous delivery of software, I would suggest to adopt a much simpler workflow (like GitHub flow) instead of trying to shoehorn git-flow into your team.
+
+> 귀사의 팀이 지속적으로 소프트웨어를 제공하고 있다면, 귀사의 팀에 git-flow를 도입하는 대신 훨씬 간단한 워크플로우(GitHub flow와 같은)를 채택하는 것을 제안합니다.
+
+(번역은 파파고에게 맡겼습니다.)
+
+많은 조직에서는 특히 운영 환경에서는 지속적인 배포(continuous delivery)와는 먼 프로세스를 택하고 있을 수도 있습니다. 그럼에도 개발과 테스트 환경에서라도 자주 활발히 통합되어 테스트되고 리뷰되는걸 추구한다면 Vincent의 회고를 더 깊이 새겨둘만합니다.
+
+아래 문장으로 Vincent의 10년만의 회고는 끝이 납니다.
+
+> To conclude, always remember that panaceas don't exist. Consider your own context. Don't be hating. Decide for yourself.
+
+> 결론적으로, 만병통치약은 존재하지 않는다는 것을 항상 기억하세요. 자신만의 맥락을 고려하세요. 미워하지 말고, 스스로 결정하세요.
