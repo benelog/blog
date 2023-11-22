@@ -1,0 +1,258 @@
+= 필독 개발자 온보딩 가이드
+정상혁
+2023-11-23
+:jbake-type: post
+:jbake-status: published
+:jbake-tags:
+:jbake-description: Jackson으로 JSON을 파싱한 속성값을 객체의 생성자로 전달할 수 있는 여러가지 방법을 정리했습니다.
+:jbake-og: {"image": "https://image.yes24.com/goods/119108069/XL"}
+:idprefix:
+:toc:
+:toclevels: 1
+:source-repo: https://github.com/benelog/jackson-experiment
+:source-link-base: {source-repo}/tree/master
+
+image::https://image.yes24.com/goods/119108069/XL[Cover]
+
+(이미지 출처 : https://www.yes24.com/Product/Goods/119108069 )
+
+== 감상
+(내돈내산 후기입니다)
+
+
+많지 않은 분량으로 실무 개발자의 폭넓은 업무를 다루면서 결코 얄팍하지 않은 지식을 전달하는 책입니다.
+협업, 설계, 구현, 테스트, 문서화, 긴급 대응, 경력 관리 등 다양한 분야에 대한 알찬 조언을 책 한권에 눌러 담았고 더 많은 분량을 학습하고 싶은 독자를 위한 참고자료들도 매 장마다 소개하고 있습니다.
+
+이 책은 신입 개발자를 대상으로 한 책으로 홍보되고 있지만 경력이 많은 개발자가 읽을만한 가치도 충분합니다. 저도 과거의 경험을 돌아보면서 생각을 정리할 수 있었습니다. 스스로 절실하게 얻은 교훈이 이 책에도 적혀 있는 보면 반가웠고 깊은 공감이 되는 문장들도 많이 만날수 있었습니다.
+
+예를 들면, Dark launching이나 Feature toggle 같이 제 경험에서 유용했던 기법이 개발 실무의 액기스를 전하는 이 책에서도 소개되니 반갑고 안심이 되었습니다. 긴급 대응을 위한 당번(on call) 제도와 같이 더 개선을 해야 할 요소도 독서 후에 더 크게 느껴지기도 했습니다. 전에는 썼지만 근래에는 활용하지 않았던 Liquibase를 통한 DB 스키마 관리도 다음 프로젝트에서는 다시 시도해봐야겠다는 생각도 듭니다.
+
+유용하다고 느낀 지침과 조언을 새겨두고 실천하기 위해 여러 번 읽어야겠다는 생각을 하면서 마지막 장을 덮었습니다.
+
+== 의견 메모
+책을 보다가 의견을 메모한 부분을 옮겨봅니다.
+
+=== p102
+
+____
+예외는 일찍 던지고 최대한 나중에 처리하자.
+____
+
+최대한 나중에 처리하는 것보다는 적절한 추상화 레이어에서 처리하자는 것이 좋다고 생각한다. 예를 들면 사용자의 ID로 조회했을 때 DB 조회가 실패했을 때 생기는 `EmptyResultDataAccessException`을
+어플리케이션 콜스택의 마지막에서 처리하기보다는 비지니스 로직을 다루는 레이어에서 `UserNotFoundException`과 같이 비지니스 맥락의 의미가 부여된 예외로 바꾸는 것이 좋을 때도 있다.
+
+=== p204
+
+____
+기능 브랜치 기반 개발은 트렁크의 코드가 사용자에게 릴르스하기엔 너무 불안정해서 트렁크를 안정화시키는 동안 개발자가 기능 개발을 수행할 수 없는 경우에 사용하는 방법이다. 고객이 각자 다른 버전의 소프트웨어를
+사용하는 경우에 보편적으로 기능 브랜치 기반 개발 전략을 채택한다. 서비스 지향 시스템(service-oriented systems)은 일반적으로 트렁크 기반 개발 전략을 채택한다.
+
+가장 보편적인 기능 브랜치 전략은 2010년 빈센트 드리센이 소개한 깃플로(Gitflow)라고 부르는 전략이다.
+____
+
+Git-flow는 필요에 따라 팀 브랜치 정책의 종착역은 될수 있지만
+시작점으로 권장하고 싶지는 않다. 자세한 의견은
+https://blog.benelog.net/rethink-about-git-flow[Git-Flow에 대해서 다시
+생각해보기]라는 글로 따로 정리했다.
+
+=== p212
+
+____
+버전 제어 시스템을 릴리스 리포지토리처럼 사용할 수는 있지만 원래
+용도라고 보기 어렵다. 버전 제어 시스템에서는 검색이나 배포 관련 기능을
+별로 제공하지 않는다. 대규모 배포를 위해 만들어진 시스템이 아니므로 그런
+상황에서는 문제를 일으킬 수도 있다. 버전 제어 시스템 머신과 동일한
+머신이 개발자 체아크웃, 도구로부터의 요청, 배포 요청을 모두 담당하면
+프로덕션 배포에 영향을 미칠 수 있다.
+____
+
+Node.js나 Go언어의 오픈소스 생태계에서는 GitHub.com을 릴리스
+리포지토리처럼 쓰는 관행이 굳어졌다. 하지만 사내에서라면 이를 분리하는
+것이 좋다는 저자의 의견에 동의한다. 버전 관리 시스템은 GitHub
+Enterprise를 쓰더라도 릴리스 저장소는 Nexus나 Artifactory를 쓰는 식이다.
+분리하면 두 시스템을 각각 업그레이드하기에도 유리하다.
+
+=== p213
+
+____
+릴리스는 최대한 자주 수행하자. 릴리스 주기가 늘어지 거짓된 안정감을 심어줄 수 있다. 즉 릴리스 사이의 주지가 길면 변경사항을 테스트할 충분한 시간이 있는 것처럼 느껴지기 때문이다. 실제로 릴리스 주기를 짧게 가져가면 더 안정적인 소프트웨어를 구현할 수 있어 버그가 발견됐을 때 더 쉽게 처리할 수 있다. 매 주기마다 릴리스되는 변경사항의 수가 더 적으므로 각 릴리스의 위험도도 낮아진다.
+____
+
+공감한다. 1~2주에 한번 릴리스하는 조직과 한달에 한번 릴리스하는 조직을 비교했을 때 후자의 릴리스가 훨씬 힘겹고 위험한 일이 되는 현상을 몇 번 목격했다. 테스트와 모니터링의 자동화 수준이 높아져야 릴리스의 비용이 적어져서 더 자주 릴리스하게 될 수 있기도하다.
+
+=== p212
+
+____
+배포를 원자적으로 만드는 가장 쉬운 방법은 기존에 설치된 소프트웨어를 덮어쓰는 것이 아니라 다른 경로에 소프트웨어를 설치하는 것이다. 일단 패키지가 설치된 다음에는 단축 아이콘이나 심볼릭 링크를 이용해 교체하면
+된다.
+____
+
+(의견) 많이 쓰던 기법이다. 사내 배포 시스템에서 디폴트로 제공이
+되기도한다. 이동욱 님이 발표한 https://youtu.be/_nkJkWVH-mo?t=2452[우아한스프링배치] 발표에서도 이
+기법을 응용한 무중단 배포를 소개하고 있다. 배포된 최신 버전 파일로  심볼릭 링크를 교체하고 (`ln -s -f v2.jar app.jar`) readlink 명령어로 그 파일을 실행하는(`java -jar ${readlink ./app.jar`}) 이용하는 방식이다.
+
+=== p219
+
+____
+한 번에 모조리 새 코드로 전환하는 일은 위험하다. 테스트를 아무리 많이 해도 버그 발생 가능성을 없앨 수는 없으며 한 번에 모든 사용자에게 코드를 롤아웃하면 모두가 동시에 문제를 겪을 수 있다. 따라서 변경 사항을
+점진적으로 롤아웃하고 시스템 상태 지표를 모니터링 하는 편이 좋다.
+____
+
+규모가 있는 시스템을 변경하는 개발자라면 절실하게 읽어야할 문장이다.
+
+=== p311
+
+데이터베이스 스키마 마이그레이션 도구인 Liquibase 등을 소개함.
+
+____
+데이터베이스와 애플리케이션 수명주기를 결합해서는 안 된다. 애플리케이션 배포 과정에서 스키마를 마이그레이션하는 것은 위험하다.
+____
+
+의도한 바은 아니지만 JPA의 스키마 관리 기능이 운영환경에서 실행되어서 발생하는 장애를 종종 전해듣는다. 스프링 부트의 `spring.jpa.hibernate.ddl-auto` 같은 옵션도 Local PC에 DB가 따로 설치되어 있거나 Embeded DB를 쓸때만 활성화해야 한다고 생각한다. 공용 개발 DB에서부터는 Liquibase와 같은 스키마 관리 도구를 활용하는 것이 좋다. 공용 개발 DB라도 여러 개가 있는 것이 다양한 테스트를 하는데 유리하고, 개발 DB가 여러개가 되면 스키마 관리 도구의 필요성이 높아진다.
+Oracle 등 개발자가 여러 인스턴스를 설치하는데 제약이 있는 DB를 오랫동안 써 온 개발자는 이런 도구의 필요성을 느끼거나 적용할 수 있는 기회를  얻기가 어려울 수도 있다.
+
+운영DB는 DBA가 따로 SQL파일을 실행해서 스키마를 반영하는 회사라도 Liquibase는 충분히 사용 가능하다. Liquibase는 오프라인 지원 기능이 있어서 실제 DB에 스키마 변경을 실행하지 않고 DDL을 파일로 뽑아낼수도 있다. 예를  들어 스키마 버전 1.0.0-RC1과 1.0.0-RC2 버전 사이에 변경된 컬럼을 반영하는 DDL을 담은 .sql파일을 뽑을 때는 아래 명령어로 가능하다.
+
+[source]
+----
+rm target/release.csv
+mvn liquibase:updateSQL -Dliquibase.url='offline:mysql?changeLogFile=target/release.csv' -Dliquibase.toTag=1.0.0-RC1
+mvn liquibase:updateSQL -Dliquibase.url='offline:mysql?changeLogFile=target/release.csv' -Dliquibase.toTag=1.0.0-RC2
+----
+
+== 추천자료
+
+이 책에서는 각 장의 끝무렵에 ’레벨업을 위한 읽을 거리’로 해당 장에서 다룬 주제를 더 깊이 있게 학습하는데 도움이 되는 자료를 추천했습니다.
+여러 번 언급되는 구글의 SRE 관련 책들은 https://sre.google/books/ 에서 무료로 열람도 가능합니다.
+
+표기된 제목이 여러가지 이유로 달라진 책들은 다음과 같습니다.
+
+* [8장] https://www.yes24.com/Product/Goods/11406822[Continuous Delivery: 신뢰할 수 있는 소프트웨어 출시]
+** 번역판 초판에는 이 책 제목이 `신뢰할 수 있는 소프트웨어 출시' 였으나 중쇄를 하면서 원서와 동일하게 제목이 바뀌었다고
+함.(https://www.facebook.com/fupfin.geek/posts/pfbid02ksHoMdnvhkJkN9xWS4qQimt541smxX3oscttadaYVMHLxtQ6CZtkKsHEw82LjXs3l?comment_id=328411842995894[박성철 님의 관련 댓글]) ’개발자 온보딩 가이드’에서는 번역판 초판의 제목으로 표기되어 있어 있음.
+* [8장] https://smartstore.naver.com/yes24book/products/9565539174[Release의 모든 것 - 대규모 웹 분산 시스템을 위한 운영 고려 설계] (번역서 2판. 2023년 11월 출간)
+** 번역서 1판 : https://www.yes24.com/Product/Goods/2753365[Release it:성공적인 출시를 위한 소프트웨어 설계와 배치] (2007년 출판) 이 제목으로 책에서는 표기
+* [10장] Elements of Style : 영어 글쓰기에 대한 유명한 책으로 번역판도 여러 번 나옴.
+** https://product.kyobobook.co.kr/detail/S000001729444[글쓰기의 요소(삽화판)] (2016년 출판, 장영준 역) : ’개발자 온보딩 가이드’에서 소개한 판인데 현재 품절이라 중고로만 구할 수 있음.
+https://www.yes24.com/Product/Goods/74241463[Yes24에서 원서]가 같은 삽화가 들어간 판으로는 배송비 고려하면 가장 싸게 구할 수 있는
+경로인 듯함.
+** https://play.google.com/store/books/details/%EC%9C%8C%EB%A6%AC%EC%97%84_%EC%8A%A4%ED%8A%B8%EB%A0%81%ED%81%AC_2%EC%84%B8_%EA%B8%80%EC%93%B0%EA%B8%B0%EC%9D%98_%EC%9A%94%EC%86%8C[글쓰기의 요소] (2016년 출판. 김영일 역, 전자책)
+** https://www.yes24.com/Product/Goods/2746329[영어 글쓰기의 기본]
+(2007년 출판, 조서연 공역) : 번역서와 원서가 한권으로 묶여서 나온 판이다. 현재도 구매 가능하다. 역자가 쓴 저서인 https://www.yes24.com/Product/Goods/4671236[영어 글쓰기의 기본 2]도 있다.
+
+=== 2장 역량을 높이는 의식적 노력
+
+* (책)https://www.yes24.com/Product/Goods/4045732[프로그래머의 길,멘토에게 묻다]
+* (책)https://www.yes24.com/Product/Goods/95735260[나는 왜 도와달라는 말을 못할까: 부담은 줄이고 성과는 높이는 부탁의 기술]
+* 짝 프로그래밍
+** (책)https://www.yes24.com/Product/Goods/2126201[익스트림 프로그래밍]
+** (웹)https://martinfowler.com/articles/on-pair-programming.html[On Pair Programming]
+* 가면 증후군이나 더닝 크루거 효과에 대한 참고자료
+** (책)자존감은 어떻게 시작되는가: 당신의 인생을 결정짓는 자세의 차이
+*** https://www.yes24.com/Product/Goods/36962337[종이책]
+*** https://play.google.com/store/books/details/%EC%97%90%EC%9D%B4%EB%AF%B8_%EC%BB%A4%EB%94%94_%EC%9E%90%EC%A1%B4%EA%B0%90%EC%9D%80_%EC%96%B4%EB%96%BB%EA%B2%8C_%EC%8B%9C%EC%9E%91%EB%90%98%EB%8A%94%EA%B0%80?id=IFcxDwAAQBAJ[전자책]
+
+=== 3장 코드와 함께 춤을: 레거시 코드에 임하는 우리의 자세
+
+* (책)https://www.yes24.com/Product/Goods/64586851[레거시 코드 활용 전략: 손대기 두려운 낡은 코드, 안전한 변경과 테스트 기법]
+* (책)https://www.amazon.com/Legacy-Code-Programmers-Toolbox-Professionals/dp/1691064130[The Legacy Code Programmer’s Toolbox: Practical Skills for Software Professionals Working with Legacy Code]
+* (책)https://www.yes24.com/Product/Goods/89649360[리팩터링 2판: 코드 구조를 체계적으로 개선하여 효율적인 리팩터링 구현하기]
+* (책)https://www.yes24.com/Product/Goods/16928943[맨먼스 미신]
+
+=== 4장 운영 환경을 고려한 코드 작성: 개발환경과 프로덕션 환경은 엄연히 다르다.
+
+* (책)https://www.yes24.com/Product/Goods/44130507[Code Complete 코드 컴플리트 2: 더 나은 소프트웨어 구현을 위한 실무 지침서] : 8장에서 방어적 프로그래밍에 대해서 다룸.
+* (책)https://www.yes24.com/Product/Goods/11681152[Clean Code:소프트웨어 장인 정신] : 7장과 8장에서 예외처리와 경계에 대해서 다룸
+* (웹)https://aws.amazon.com/builders-library/[The Amazon Builders’ Library]
+* (책)https://www.yes24.com/Product/Goods/105804670[SRE를 위한 시스템 설계와 구축: 구글이 공개하는 SRE 모범 사례와 설계, 구현, 운영 노하우]
+* (책)https://www.yes24.com/Product/Goods/57979286[사이트 신뢰성 엔지니어링: 구글이 공개하는 서비스 개발과 운영 노하우]
+
+=== 5장 피할 수 없는 코드 의존성의 관리: 복잡한 프로그램을 짜봐야 비로서 깨닫는 의존성이 진실
+
+* (웹)https://semver.org/[시맨틱 버저닝 스펙]
+* (웹)https://peps.python.org/pep-0440/[PEP 440 – Version Identification and Dependency Specification]
+
+=== 6장 테스트! 개발자의 든든한 지원군
+
+* (책)https://www.yes24.com/Product/Goods/104084175[단위 테스트:생산성과 품질을 위한 단위 테스트 원칙과 패턴]
+* (책)https://www.yes24.com/Product/Goods/12246033[테스트 주도 개발]
+* (책)https://www.yes24.com/Product/Goods/107077663[실용주의 프로그래머]: 속성 기반 테스팅(Property based testing)절 살펴보기
+* (책)https://www.yes24.com/Product/Goods/14829054[탐험적 테스팅: 배우고 통찰하며 개선하는 소프트웨어 테스트]
+
+=== 7장 올바로 주고받는 코드 리뷰: 원만한 팀 협업과 높은 코드 품질을 목표로
+
+* (웹)https://google.github.io/eng-practices/review/[구글의 Code Review Developer Guide]
+* (책)https://www.yes24.com/Product/Goods/14759898[하버드 피드백의 기술: 밀어붙이는 피드백에서 끌어당기는 피드백으로]
+(https://play.google.com/store/books/details/%EB%8D%94%EA%B8%80%EB%9F%AC%EC%8A%A4_%EC%8A%A4%ED%86%A4_%EC%89%B4%EB%9D%BC_%ED%9E%8C_%ED%95%98%EB%B2%84%EB%93%9C_%ED%94%BC%EB%93%9C%EB%B0%B1%EC%9D%98_%EA%B8%B0%EC%88%A0?id=6RirBAAAQBAJ[Google
+play 이북])
+
+=== 8장 고객 앞으로! 소프트웨어 전달: 마침내 프로덕션 환경에 안착시킬 소프트웨어의 종착지
+
+* (책)https://www.yes24.com/Product/Goods/33057253[팀을 위한 Git: Git 워크플로우를 효율적으로 만드는 사용자 중심 접근법] (Yes24 전자책)
+* (책)https://www.yes24.com/Product/Goods/11406822[Continuous Delivery: 신뢰할 수 있는 소프트웨어 출시]
+* (책)https://www.yes24.com/Product/Goods/57979286[사이트 신뢰성 엔지니어링: 구글이 공개하는 서비스 개발과 운영 노하우] : 8장에 릴리스 엔지니어링 참조
+* (웹)https://aws.amazon.com/ko/builders-library/[Amazon Builders' Library]
+* (책)https://smartstore.naver.com/yes24book/products/9565539174[Release의 모든 것 - 대규모 웹 분산 시스템을 위한 운영 고려 설계] (번역서 2판. 2023년 11월 출간)
+** 번역서 1판 : https://www.yes24.com/Product/Goods/2753365[Release it:성공적인 출시를 위한 소프트웨어 설계와 배치] (2007년 출판)
+** 원서 2판 : https://www.amazon.com/Release-Design-Deploy-Production-Ready-Software/dp/1680502395/[Release It!: Design and Deploy Production-Ready Software] (2018년 출간)
+
+=== 9장 긴급대응 온콜 업무
+
+* (웹)https://increment.com/on-call/when-the-pager-goes-off/[What happens when the pager goes off?] : 책에서 발췌한 장애 대응 5단계
+* (책)https://www.yes24.com/Product/Goods/57979286[사이트 신뢰성 엔지니어링: 구글이 공개하는 서비스 개발과 운영 노하우]
+** 4장: SLI, SLO를 직접 정의해야할 때 참조
+** 11장, 13장, 14장, 15장 : 온콜, 비상 대기, 장애 처리, 포스트터모텀
+
+=== 10장 견고한 소프트웨어를 위한 기술 설계 절차
+
+* (동영상)https://www.youtube.com/watch?v=f84n5oFoZBc[Hammock Driven Development - Rich Hickey] : 복잡한 소프트웨어 설계 과정을 가장 잘 설명한 자료라고 소개됨.
+* (웹)대규모 오픈소스 프로젝트의 설계 과정
+** https://github.com/python/peps[파이썬 개선 제안(PEP)]
+** https://cwiki.apache.org/confluence/display/kafka/kafka+improvement+proposals[카프카
+개선 제안(KIP)]
+** https://github.com/rust-lang/rfcs[러스트 검토 요청(RFCs)]
+* (웹)https://wecode.wepay.com/posts/effective-software-design-documents[Effective Software Design Documents] : 위페이가 설계를 수행하는 방법과 그 방법이 어떻게 개선돼왔는지를 설명
+** https://github.com/wepay/design_doc_template[설계 문서 템플릿]
+* (책)Elements of Style
+** https://product.kyobobook.co.kr/detail/S000001729444[글쓰기의 요소(삽화판)] (2016년 출판, 장영준 역)
+** https://play.google.com/store/books/details/%EC%9C%8C%EB%A6%AC%EC%97%84_%EC%8A%A4%ED%8A%B8%EB%A0%81%ED%81%AC_2%EC%84%B8_%EA%B8%80%EC%93%B0%EA%B8%B0%EC%9D%98_%EC%9A%94%EC%86%8C[글쓰기의 요소] (2016년 출판. 김영일 역, 전자책)
+** https://www.yes24.com/Product/Goods/2746329[영어 글쓰기의 기본]
+(2007년 출판, 조서연 공역) : 번역서와 원서가 한권으로 묶여서 나온 판
+* (책)https://www.yes24.com/Product/Goods/2774464[글쓰기 생각쓰기]
+* (웹)폴 그레이엄(Paul Grahm)의 글쓰기에 대한 기고
+** http://www.paulgraham.com/useful.html[How to Write Usefully]
+** http://www.paulgraham.com/talk.html[Write Like You Talk]
+
+=== 11장 소프트웨어 수명주기를 고려한 진화하는 아키텍처 구현
+
+* (책)진화적 아키텍처: 피트니스 함수, 거버넌스 자동화를 활용해 생산성 높은 소프트웨어 구축하기
+** https://www.yes24.com/Product/Goods/121961003[종이책]
+** https://play.google.com/store/books/details/%EB%8B%90_%ED%8F%AC%EB%93%9C_%EC%A7%84%ED%99%94%EC%A0%81_%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98?id=6w_UEAAAQBAJ[전자책]
+** `필독! 개발자 온보딩 가이드' 본문에서는 원서가 소개되어 있는데, 2023년 8월에 번역판이 출판되었다.
+* (책)https://www.yes24.com/Product/Goods/25100510[도메인 주도 설계 구현: Implementing Domain-Driven Design]
+* (책)https://www.amazon.com/Philosophy-Software-Design-2nd-ebook/dp/B09B8LFKQL/[A Philosophy of Software Design, 2ED]
+* (책)https://www.amazon.com/Elements-Clojure-Zachary-Tellman/dp/0359360580/[Elements of Clojure]
+* (동영상)(https://www.youtube.com/watch?v=SxdOUGdseq4)[Simple Made Easy - Rich Hickey
+(2011)] : 간결성, 복잡성, 손쉬움, 좋은 소프트웨어를 구현하는 방법에 대해서 설명
+* (책)https://www.amazon.com/Data-Mesh-Zhamak-Dehghani-ebook/dp/B09V4KWWJ8/[Data Mesh]
+* (책)https://www.yes24.com/Product/Goods/595ref=sr_1_1?crid=3UIMYGOHHDTLL&keywords=data+mesh&qid=1698069866&sprefix=data+me%2Caps%2C261&sr=8-166585[데이터 중심 애플리케이션 설계: 신뢰할 수 있고 확장 가능하며 유지보수하기 쉬운
+시스템을 지탱하는 핵심 아이디어]
+
+=== 12장 효율적인 협업을 위한 애자일 문화
+
+* (웹)https://agilemanifesto.org/principles.html[Principles behind the Agile Manifesto]
+* (웹)https://www.atlassian.com/agile[Atlassian의 애자일 문서]
+
+=== 13장 관리자, 팀장, 상사와 함께 일하기
+
+* (책)개발 7년차, 매니저 1일차: 개발만 해왔던 내가, 어느 날 갑자기 ‘팀’을 맡았다!
+** https://www.yes24.com/Product/Goods/87336637[종이책]
+** https://play.google.com/store/books/details/%EC%B9%B4%EB%AF%B8%EC%9C%A0_%ED%91%B8%EB%A5%B4%EB%8B%88%EC%97%90_%EA%B0%9C%EB%B0%9C_7%EB%85%84%EC%B0%A8_%EB%A7%A4%EB%8B%88%EC%A0%80_1%EC%9D%BC%EC%B0%A8?id=Qbf_DwAAQBAJ[전자책]
+* (책)https://www.amazon.com/Elegant-Puzzle-Systems-Engineering-Management-ebook/dp/B07QYCHJ7V/[An
+Elegant Puzzle: Systems of Engineering Management]
+* (책)일의 99%는 피드백이다: 하버드 협상연구소에서 알려주는 대화의 기술
+** https://www.yes24.com/Product/Goods/102003851[종이책]
+** https://play.google.com/store/books/details/%EB%8D%94%EA%B8%80%EB%9F%AC%EC%8A%A4_%EC%8A%A4%ED%86%A4_%EC%89%B4%EB%9D%BC_%ED%9E%8C_%EC%9D%BC%EC%9D%98_99_%EB%8A%94_%ED%94%BC%EB%93%9C%EB%B0%B1%EC%9D%B4%EB%8B%A4?id=UccyEAAAQBAJ[전자책]
+* (책)https://www.amazon.com/Managing-Up-Move-Work-Succeed-ebook/dp/B07BB4QFDF/[Managing
+Up: How to Move up, Win at Work, and Succeed with Any Type of Boss] :상사나 관리자의 개성을 어떻게 고려해야하는지, 엄격한 관리자에 대응하는 법, 이직하는 방법 등을 다룸.
+* (책)https://www.yes24.com/Product/Goods/61333181[하이 아웃풋 매니지먼트: 어떻게 성과를 높일 것인가]
