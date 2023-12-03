@@ -1,0 +1,75 @@
+= 카멜 케이스를 쓸 때 약어 표기
+정상혁
+2023-12-02
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: code-review, convention
+:idprefix:
+
+자바나 코틀린에서 약어(acronym)가 클래스명이나 메서드명의 일부로 들어갈 때 자바에서는 첫 한 글자만, 코틀린에서는 두 글자까지만 대문자로 표기하는 방식을 권장합니다.
+비슷하게 카멜 케이스를 쓰는 자바스크립트와 같은 다른 언어에서도 이 관례가 무난하다고 생각합니다.
+기존의 바꿀 수 없는 코드나 외부 라이브러리 사용 등으로 어쩔 수 없는 경우에는 전부 대문자로 쓰더라도 이를 최소화하는 노력을 하고 프로젝트 내부 문서로도 예외의 경우로 명시하면 좋습니다.
+
+위의 관례는 약어 전체를 대문자로 표기하는 관례에 비해서 다음과 같은 장점이 있습니다.
+
+* 연속된 약어가 조합될 경우 단어 사이의 구문이 더 잘 인지됩니다.
+** 예: `XMLRPCAPIURL` vs `XmlRpcApiUrl`
+* 일관성을 유지하기가 더 쉽습니다.
+** 전부 대문자로 표기해야할 단어들을 따로 기억할 필요가 없습니다.
+** 사람마다 다르게 판단할 여지가 적은 단순한 규칙입니다.
+** 영향력이 큰 책이나 가이드에서 지지받고 있는 규칙입니다. 새로 합류한 구성원도 따를 가능성이 높습니다.
+
+자바와 코틀린으로 나누어서 이 관례에 대해 참고할 수 있는 자료를 정리합니다.
+
+== 자바의 관례
+JDK 내부에서는 이 관례가 통일되어 있지 않습니다.
+다음과 같이 약어를 쓸 때 전부 대문자와 첫 글자만 대문자 표기가 혼재하고 있습니다.
+
+* java.net.HttpURLConnection (한 클래스 이름에서도 Http는 첫글자만 대문자, URL은 다 대문자로 표기했습니다.)
+* javax.xml.bind.annotation.XmlElement
+
+Effective Java의 3판에서는 약어라도 첫글자만 대문자로 하는 방식에 대한 지지도를 더 높인 느낌입니다. 2판의 `Upppercase may be more common` 문구가 `Some programmers still use uppercase`로 바뀌었습니다.
+
+:image:img/effective-java/camel-casing.png[camel-casing]
+
+3판에서의 해당 단락의 전체 내용은 아래와 같습니다.
+
+.Item 68: Adhere to generally accepted naming conventions (원서 289~290 페이지)
+[quote]
+There is some disagreements as to whether acronyms should be uppercase or have only their first letter capitalized. While some programmers stil use uppercase, a strong argument can be made in favor of capitalizing only the first letter: even if multiple acronyms occur back-to-back, you can still tell where one word starts and the next word ends. Which class name would you rather see, HTTPURL or HttpUrl?
+
+.아이템 68: 일반적으로 통용되는 명명 규칙을 따르라 (번역서 382 페이지)
+[quote]
+약자의 경우 첫 글자만 대문자로 할지 전체를 대문자로 할지는 살짝 논란이 있다. 전체를 대문자로 쓰는 프로그래머도 있지만, 그래도 첫 글자만 대문자로 하는 쪽이 훨씬 많다. HttpUrl처럼 여러 약자가 혼합된 경우라도 각 약자의 시작과 끝을 명확히 알 수 있기 때문이다. (HTTPURL과 비교해보자)
+
+자바 초창기에 비해 점점 첫 글자만 대문자로 쓰는 점유율이 높아졌다고 해석될만도 합니다.
+
+스프링 프레임워크에서도 초창기에는 두 방식이 혼재하다가 점점 첫글자만 대문자로 쓰는 관례로 바뀐 것으로 보입니다.
+URL 단어 표기는 다음과 같은 예시가 있습니다.
+
+* https://github.com/spring-projects/spring-framework/blob/main/spring-beans/src/main/java/org/springframework/beans/propertyeditors/URLEditor.java[URLEditor] : 2002년 작성
+* https://github.com/spring-projects/spring-framework/blob/main/spring-core/src/main/java/org/springframework/core/io/UrlResource.java[UrlResource] : 2003년 작성
+* https://github.com/spring-projects/spring-framework/blob/main/spring-webmvc/src/main/java/org/springframework/web/servlet/tags/UrlTag.java[UrlTag] : 2009년 작성 추정
+
+DAO, XML, SQL 등은 모두 처음부터 첫글자만 대문자로 표기된 것으로 보입니다.
+
+* https://github.com/spring-projects/spring-framework/blob/main/spring-jdbc/src/main/java/org/springframework/jdbc/core/support/JdbcDaoSupport.java[JdbcDaoSupport] : 2003년 처음 작성
+* https://github.com/spring-projects/spring-framework/blob/main/spring-jdbc/src/main/java/org/springframework/jdbc/support/xml/SqlXmlValue.java[SqlXmlValue] : 2008년 작성 추정
+* https://github.com/spring-projects/spring-framework/blob/main/spring-oxm/src/main/java/org/springframework/oxm/XmlMappingException.java[XmlMappingException] : 2009년 작성 추정
+
+== 코틀린의 관례
+
+코틀린 언어 사이트의 코딩 컨벤션 가이드에서도 약어의 표기 방식에 언급하고 있습니다.
+약어가 두 글자라면 다 대문자로 쓰고, 길어지면 한 글자만 대문자로 쓰라고 권장하고 있습니다.
+
+https://kotlinlang.org/docs/coding-conventions.html#choose-good-names
+
+.Choose Good names
+[quote]
+When using an acronym as part of a declaration name, capitalize it if it consists of two letters (IOStream); capitalize only the first letter if it is longer (XmlFormatter, HttpInputStream).
+
+.좋은 이름을 선택해라
+[quote]
+선언된 이름의 일부에 약어가 들어 갈 때는 두 개의 문자로 구성된 약어는 대문자로 쓰고(IOStream) 긴 문자는 첫 글자만 대소문자로 쓰세요. (XmlFormatter, HttpInputStream).
+
+언어 공식 사이트의 가이드에 있는 내용이므로 보편적으로 인지되고 유지될 가능성이 높은 관례입니다.
