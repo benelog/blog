@@ -1,4 +1,4 @@
-= Spring의 @Scheduled annotation으로 설정된 cron expression을 테스트하기
+= Spring의 @Scheduled로 지정된 크론 표현식을 테스트하기
 정상혁
 2011-05-23
 :jbake-type: post
@@ -6,142 +6,115 @@
 :jbake-tags: Spring,Cron,test,Spring-Test
 :idprefix:
 
-Spring 3.0부터는 Quartz가 없이도 실행 스케쥴 설정이 가능합니다. 설정과 테스트 방법을 정리했습니다.
+* 변경 이력
+** 2024.06.05 스프링 프레임워크 버전 5.3 이상에 맞는 코드로 수정
 
-== @Schedule 를 써서 크론 표현식 설정
-실행을 하고 싶은 메소드를 `@Component`, `@Schedule` annotaion을 통해 지정을 합니다.
+---
+
+스프링에서는 `@Schedule` 애너테이션을 통해 크론 표현식으로 특정 메서드를 예약 실행할 수 있습니다.
+그런데 실제로 잘 실행될지는 해당 시간이 되어야 알 수 있으므로 실수가 있어도 늦게 발견될 가능성이 높습니다.
+크론 표현식이 기대대로 해석되는지도 테스트 코드로 검증을 한다면 위험을 줄일 수 있습니다.
+
+그런 상황에서 참고할 수 있는 코드를 정리해봤습니다.
+스프링 프레임워크 6.1.8 버전에 의존하여 작성된 코드이나 버전 5.3 이상에서는 동일한 방식으로 사용할 수 있을 것으로 예상합니다.
+5.3버전을 기준으로 날짜 관련 클래스가 JDK 8의 API를 활용하는 방식으로 바뀌었습니다.
+스프링 3.0 에서는 `java.util.Date` 등의 과거 API를 활용하는 방식으로 응용하실 수도 있습니다.
+
+== 크론 표현식으로 예약 실행할 메서드 지정
+대상이 되는 메소드에 `@Schedule` 애너테이션의 `cron`, `zone` 속성을 지정합니다.
+`zone` 속성은 필수는 아니지만 지정하면 명확성이 높아지고 시스템 기본값에 영향받지 않는다는 장점이 있습니다.
 
 [source,java]
+.JobSchedule.java
 ----
+import java.time.Instant;
+import java.util.Properties;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
 @Component
-public class BaseballScheduledJobLauncher extends JobLaunchSupport {
+@EnableScheduling
+public class JobSchedule {
 
-.....
-
-    @Scheduled(cron="45 * * * * MON-FRI")
-    public void baseballJob() {
-        JobParameters params = createTimeParameter();
-        run("baseballJob", params);
-    }
-
-
-    @Scheduled(cron="45 10 5 * * MON-FRI")
-    public void baseballExportJob() {
-        JobParameters params = createTimeParameter();
-        run("baseballExportJob", params);
-    }
-
+  @Scheduled(cron = "0 0,10 0 * * ?", zone = "Asia/Seoul")
+  public void startHelloJob() {
+    // 실행할 코드
+  }
 }
+
 ----
-
-Java 파일에 설정된 Annotation을 인식하기 위해서 Application context의 xml파일에 component-scan과 annotation으로 schedule을 설정하겠다는 선언을 추가합니다.  그리고 schedule을 실행할 thread pool의 크기도 지정합니다.
-
-[source,xml]
-----
-    <context:component-scan base-package="edu.batch.baseball.schedule"/>
-    <task:scheduler id="myScheduler" pool-size="10"/>
-    <task:annotation-driven scheduler="myScheduler"/>
-----
-
-
-
-'task'와 'component'의 namespace가 xml에 추가되어 있어야 합니다.
 
 == 테스트 코드
-테스트 코드를 단순하게 만들기 위해서 크론표현식을 추출하고 검사하는 코드는 SpringCronExpressionTestUtils클래스로 분리했습니다.
+크론 표현식을 추출하고 검사하는 코드는 ScheduleTestUtils 클래스로 분리했습니다.
 
 [source,java]
 ----
-package edu.batch.baseball.schedule;
-
-import static edu.batch.support.launch.SpringcronExpressionTestUtils.*;
-
-import java.util.Arrays;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
-
-import edu.batch.baseball.schedule.BaseballScheduledJobLauncher;
-
-public class BaseballScheduledJobLauncherTest {
-
-    private static final String DATE_PATTERN = "yyyy/MM/dd hh:mm:ss";
-
-    @Test
-    public void testBaseballJobSchedule() {
-        String initialTime = "2010/09/01 09:00:00";
-        List<String> expectedTimeList = Arrays.asList(
-                "2010/09/01 09:00:45",
-                "2010/09/01 09:01:45",
-                "2010/09/01 09:02:45");
-        String cronExpression = getcronExpressionOfMethod(BaseballScheduledJobLauncher.class, "baseballJob");
-        assertSchedule(cronExpression, initialTime, expectedTimeList,DATE_PATTERN);
-    }
-}
+class JobScheduleTest {
+  @Test
+  void scheduleHelloJob() {
+    var initialTime = LocalDateTime.of(2024, 6, 10, 0, 5);
+    List<LocalDateTime> expectedTimes = List.of(
+        LocalDateTime.of(2024, 6, 10, 0, 10),
+        LocalDateTime.of(2024, 6, 11, 0, 0),
+        LocalDateTime.of(2024, 6, 11, 0, 10)
+    );
+    ScheduleTestUtils.assertCronExpression(
+        JobSchedule.class, "startHelloJob",
+        toInstant(initialTime),
+        expectedTimes.stream().map(this::toInstant).toList()
+    );
+  }
 ----
 
 
 [source,java]
-.SpringCronExpressionTestUtils
+.ScheduleTestUtils.java
 ----
-package edu.batch.support.launch;
-
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Method;
-import java.text.ParseException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
-
-import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.commons.lang.time.DateUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.scheduling.support.SimpleTriggerContext;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
 
-public class SpringCronExpressionTestUtils {
+public class ScheduleTestUtils {
+  public static void assertCronExpression(
+      Class<?> targetClass, String methodName,
+      Instant initialTime, List<Instant> expectedTimes
+  ) {
+    Method method = ReflectionUtils.findMethod(targetClass, methodName);
+    assertThat(method).isNotNull();
 
-    public static String getCronExpressionOfMethod(Class<?> targetClass,
-            String methodName)  {
-        Method scheduledMethod;
-        try {
-            scheduledMethod = targetClass.getDeclaredMethod(methodName,
-                    new Class[] {});
-        } catch (SecurityException e) {
-            throw new IllegalArgumentException("cannot access the method : " + methodName, e);
-        } catch (NoSuchMethodException e) {
-            throw new IllegalArgumentException(e);
-        }
-        Scheduled scheduleInfo = scheduledMethod.getAnnotation(Scheduled.class);
-        String cronExpression = scheduleInfo.cron();
-        return cronExpression;
+    Scheduled scheduled = method.getAnnotation(Scheduled.class);
+    CronTrigger trigger = getTrigger(scheduled);
+    var context = new SimpleTriggerContext(initialTime, initialTime, initialTime);
+
+    for (Instant expected : expectedTimes) {
+      Instant actual = trigger.nextExecution(context);
+      assertThat(actual).isEqualTo(expected);
+      context.update(actual, actual, actual);
     }
+  }
 
-    public static void assertSchedule(String cronExpression, String initialTime,
-            List<String> expectedTimeList, String datePattern) {
-        CronTrigger trigger = new CronTrigger(cronExpression);
-        Date startTime;
-        try {
-            startTime = DateUtils.parseDate(initialTime,
-                    new String[] { datePattern });
-        } catch (ParseException e) {
-            throw new IllegalArgumentException("wrong date format", e);
-        }
-        SimpleTriggerContext context = new SimpleTriggerContext();
-        context.update(startTime, startTime, startTime);
-
-        for (String exptectedTime : expectedTimeList) {
-            Date nextExecutionTime = trigger.nextExecutionTime(context);
-            String actualTime = DateFormatUtils.format(nextExecutionTime,
-                    datePattern);
-            assertThat("executed on expected time", actualTime,
-                    is(exptectedTime));
-            context.update(nextExecutionTime, nextExecutionTime,
-                    nextExecutionTime);
-        }
+  private static CronTrigger getTrigger(Scheduled scheduled) {
+    // 스프링의 ScheduledAnnotationBeanPostProcessor 코드를 참고함
+    if (StringUtils.hasText(scheduled.zone())) {
+      return new CronTrigger(scheduled.cron(), StringUtils.parseTimeZoneString(scheduled.zone()));
+    } else {
+      return new CronTrigger(scheduled.cron());
     }
-
+  }
 }
 ----
 
