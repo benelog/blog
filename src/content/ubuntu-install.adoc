@@ -1,4 +1,4 @@
-= Ubuntu 22.04 설치
+= Ubuntu 24.04 설치
 정상혁
 2022-07-17
 :jbake-type: post
@@ -12,9 +12,11 @@
 ** `Desktop`, `Download` 같은 디렉토리가 영문으로 나오는 것이 편리해서
 
 == 한글 설정
+`sudo apt install ibus-hangul`
+
 `Settings` 에서
 
-* `Regision & Language` 에서 `Manage Installed Lanauges` 에 한글 추가
+* `Regision & Language` 에서 `Manage Installed Lanauges` 에 'Korean' 추가
 * `Keyboard` > `Input Sources` 에 `Korean(Hangul)` 추가하고 "..." 눌러서 `Preference` 선택
 ** `Hangul toggle key` 에 `Shift + Space` 지정
 
