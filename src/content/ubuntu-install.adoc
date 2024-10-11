@@ -147,11 +147,11 @@ https://github.com/nvm-sh/nvm#installing-and-updating 참고
 
 === Pinta
 
-`sudo apt install pinta`
+`snap install pinta`
 
 === VidCutter
 
-`sudo snap install vidcutter`
+`snap install vidcutter`
 
 https://github.com/ozmartian/vidcutter 참조
 
