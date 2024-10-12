@@ -119,6 +119,12 @@ https://sdkman.io/install 참조
 https://direnv.net/docs/hook.html 참조
 
 === IntelliJ
+
+[source]
+----
+sudo apt install fuse
+----
+
 https://www.jetbrains.com/ko-kr/toolbox-app/ 에서 Toolbox로 설치
 
 * Terminal에서 zsh 지정
