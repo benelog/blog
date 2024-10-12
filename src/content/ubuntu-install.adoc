@@ -73,12 +73,16 @@ terminator의 `Preference` > `Profile` > `Command` 에서
 * `Custom commands` : `zsh`
 
 === scm_breeze
+zsh에서 실행할 때의 기준
 
 [source]
 ----
-git clone git://github.com/ndbroadbent/scm_breeze.git ~/.scm_breeze
+git clone https://github.com/scmbreeze/scm_breeze.git ~/.scm_breeze
 ~/.scm_breeze/install.sh
-source ~/.bashrc   # or source ~/.zshrc
+source "${ZDOTDIR:-$HOME}/.zshrc
+bash
+source ~/.bashrc
+exit
 ----
 
 ( https://github.com/ndbroadbent/scm_breeze 참고 )
