@@ -69,7 +69,7 @@ curl -L http://install.ohmyz.sh | sh
 
 terminator의 `Preference` > `Profile` > `Command` 에서
 
-* `Rn a custom command instead of my shell` 체크
+* `Run a custom command instead of my shell` 체크
 * `Custom commands` : `zsh`
 
 === scm_breeze
