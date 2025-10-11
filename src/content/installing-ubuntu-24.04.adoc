@@ -1,6 +1,6 @@
 = Ubuntu 24.04 설치
 정상혁
-2022-07-17
+2025-10-09
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: linux
@@ -20,12 +20,9 @@
 * `Keyboard` > `Input Sources` 에 `Korean(Hangul)` 추가하고 "..." 눌러서 `Preference` 선택
 ** `Hangul toggle key` 에 `Shift + Space` 지정
 
-== terminal
-여러 창을 띄우기에 편한 터미널 프로그램
+== 하드웨어 설정
 
-`sudo apt install terminator`
-
-== 키보드 설정
+=== 키보드 설정
 일부 키보드의 경우 F1~F12가 잘 인식되지 않은 경우도 있음. 해당 장비가 애플 키보드 타입으로 인식되고 자동 모드가 Fn가 기본적으로 눌러져있는 것으로 인식되기 떄문. hid_apple 모듈의 fnmode 변수 설정으로 이 문제를 해결할 수 있음.
 
 * 현재 모드 확인 : `lsmod | grep hid_` (디폴트는 자동 모드인 3)
@@ -33,7 +30,7 @@
 * 일시적으로 설정 값이 변경하여 테스트 : `echo 2 | sudo tee /sys/module/hid_apple/parameters/fnmode`
 
 [source]
-.키보드 펑션키 모드 변경이 재부틱후에도 적용되도록
+.키보드 펑션키 모드 변경이 재부팅 후에도 적용되도록
 ----
 echo "options hid_apple fnmode=2" | sudo tee /etc/modprobe.d/hid_apple.conf
 sudo update-initramfs -u
@@ -44,7 +41,21 @@ sudo update-initramfs -u
 * https://sunyzero.tistory.com/290
 * https://mathncode.tistory.com/25
 
-== 자주쓰는 cli 도구
+=== 웹 캠 설정
+Intel Ultra 7 258v CPU를 쓰는 Dell XPS 13 plus 9350에서는 웹캠을 위한 드라이버 설치를 따로 해줘야했음.
+같은 CPU를 쓰는 Lenovo Thinkpad X1 Carbon G13는 기본 설치만으로 잘 되었음.
+
+Dell XPS 13 plus 9350에서 웹캠이 안 잡힐 때 참고한 자료
+
+* https://wiki.ubuntu.com/IntelMIPICamera
+* https://wiki.ubuntu.com/Dell
+
+== CLI 도구
+
+=== Terminator
+여러 창을 띄우기에 편한 터미널 프로그램
+
+`sudo apt install terminator`
 
 === curl
 
@@ -65,8 +76,6 @@ KexAlgorithms +diffie-hellman-group1-sha1
 ----
 
 https://kr.analysisman.com/2018/08/linux-ssh.html 참조
-
-=== GIT 사용환경
 
 === git / gitk
 
@@ -106,17 +115,7 @@ exit
 
 ( https://github.com/ndbroadbent/scm_breeze 참고 )
 
-== 웹브라우저
-
-=== 크롬
-
-[source]
-----
-wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-sudo apt install ./google-chrome-stable_current_amd64.deb
-----
-
-== Java 개발 환경
+== 개발 환경
 
 여러 JDK를 설치하고 관리하는 방법은 SDKMAN + direnv를 추천 ( https://blog.benelog.net/installing-jdk.html 참조)
 
@@ -132,6 +131,7 @@ sdk install java
 https://sdkman.io/install 참조
 
 === direnv
+
 * `sudo apt install direnv` 설치
 * `~/.bashrc` 와 `~/.zshrc` 에 `eval "$(direnv hook bash)"` 추가
 
@@ -152,9 +152,9 @@ https://www.jetbrains.com/ko-kr/toolbox-app/ 에서 Toolbox로 설치
 ** https://plugins.jetbrains.com/plugin/7391-asciidoc
 ** https://plugins.jetbrains.com/plugin/1065-checkstyle-idea
 
-== Node.js
+=== Node.js
 
-=== nvm 설치
+==== nvm 설치
 
 [source]
 ----
@@ -172,7 +172,19 @@ export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || pr
 
 https://github.com/nvm-sh/nvm#installing-and-updating 참고
 
-== 미디어 도구
+== 정보 관리 프로그램
+
+=== 크롬
+
+[source]
+----
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+sudo apt install ./google-chrome-stable_current_amd64.deb
+----
+
+=== Obsidian
+
+snap으로 설치하면 한글 문제가 있음. Appimage로 설치
 
 === Pinta
 
@@ -191,7 +203,7 @@ https://github.com/ozmartian/vidcutter 참조
 https://shotcut.org/ 참조
 
 == 기타 참고
-아직까지 22.04에서는 겪지 않았으나 이전 버전에서 참고한 자료
+이전 버전에서 참고한 자료
 
 === 무선 인터넷 안 잡힐 때
 
@@ -203,5 +215,6 @@ https://shotcut.org/ 참조
 
 `sudo update-rc.d -f nginx disable`
 
-### Secure Boot
+=== Secure Boot
+
 https://wiki.ubuntu.com/UEFI/SecureBoot 참조
