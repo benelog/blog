@@ -1,6 +1,5 @@
 plugins {
-    id 'org.jbake.site' version '5.0.0'
-    id 'org.ajoberstar.git-publish' version '2.1.1'
+    id 'org.jbake.site' version '5.5.0'
 }
 
 buildDir = 'output'
@@ -10,26 +9,9 @@ FileInputStream stream = new FileInputStream('src/jbake.properties');
 jbakeProps.load(new InputStreamReader(stream, 'UTF-8'));
 
 jbake {
-    version = '2.6.4'
+    version = '2.6.7'
     srcDirName  = 'src'
-    destDirName = ''
+    destDirName = './'
     configuration = jbakeProps
     clearCache = true
 }
-
-apply plugin: 'org.ajoberstar.git-publish'
-
-
-gitPublish {
-    repoUri = 'https://github.com/benelog/blog.git'
-    branch = 'gh-pages'
-    repoDir = file('public')
-    contents {
-        from(file(buildDir)) {
-            into '.'
-        }
-    }
-}
-
-gitPublishCommit.dependsOn bake
-
