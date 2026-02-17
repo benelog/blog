@@ -624,6 +624,62 @@ strong {
     margin-bottom: 24px;
 }
 
+/* Social Share Buttons */
+#social-share {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-color);
+}
+
+#social-share ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+#social-share ul li {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+#social-share ul li::marker {
+    content: none;
+}
+
+#social-share ul li p {
+    display: none;
+}
+
+.share-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    color: #ffffff;
+    border: none;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    font-size: 15px;
+    transition: opacity 0.2s ease;
+}
+
+.share-btn:hover {
+    opacity: 0.85;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.share-btn.twitter     { background: #1DA1F2; }
+.share-btn.facebook    { background: #1877F2; }
+.share-btn.linkedin    { background: #0A66C2; }
+.share-btn.reddit      { background: #FF4500; }
+.share-btn.email       { background: var(--text-secondary); }
+
 /* Disqus comments */
 #disqus_thread {
     margin-top: 24px;

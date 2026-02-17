@@ -2,3 +2,4 @@ output/
 public/
 .gradle/
 .idea/
+build/

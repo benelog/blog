@@ -6,12 +6,6 @@
     <p>Twitter</p>
 </a></li>
 
-<!-- Google Plus -->
-<li><a href="//plus.google.com/share?url=${config.site_host}/${post.noExtensionUri!post.uri}" target="_blank" class="share-btn google-plus">
-    <i class="fa fa-google-plus"></i>
-    <p>Google+</p>
-</a></li>
-
 <!-- Facebook -->
 <li><a href="//www.facebook.com/sharer/sharer.php?u=${config.site_host}/${post.noExtensionUri!post.uri}" target="_blank" class="share-btn facebook">
     <i class="fa fa-facebook"></i>
@@ -28,12 +22,6 @@
 <li><a href="//www.linkedin.com/shareArticle?url=${config.site_host}/${post.noExtensionUri!post.uri}&title=${post.title}" target="_blank" class="share-btn linkedin">
     <i class="fa fa-linkedin"></i>
     <p>LinkedIn</p>
-</a></li>
-
-<!-- StumbleUpon (url, title) -->
-<li><a href="//www.stumbleupon.com/submit?url=${config.site_host}/${post.noExtensionUri!post.uri}&title=${post.title}" target="_blank" class="share-btn stumbleupon">
-    <i class="fa fa-stumbleupon"></i>
-    <p>StumbleUpon</p>
 </a></li>
 
 <!-- Email -->

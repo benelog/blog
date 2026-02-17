@@ -7,6 +7,12 @@
        ${post.body}
     </div>
 
+    <section id="social-share">
+        <ul class="icons">
+            <#include "../commons/share-links.ftl">
+        </ul>
+    </section>
+
     <footer>
         <#include "../commons/footer-tags.ftl">
     </footer>
