@@ -3,8 +3,8 @@
 2023-11-23
 :jbake-type: post
 :jbake-status: published
-:jbake-tags:
-:jbake-description: Jackson으로 JSON을 파싱한 속성값을 객체의 생성자로 전달할 수 있는 여러가지 방법을 정리했습니다.
+:jbake-tags: 책
+:jbake-description: '필독 개발자 온보딩 가이드' 책에 대한 감상과 의견 메모입니다.
 :jbake-og: {"image": "https://image.yes24.com/goods/119108069/XL"}
 :idprefix:
 :toc:
