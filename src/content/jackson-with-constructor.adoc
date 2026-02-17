@@ -292,7 +292,7 @@ Jackson의 ParameterNameModule 을 쓰기 위해서는 다음과 같이 의존�
 Spring Boot에서는 `ParameterNamesModule` 을 편하게 쓸 수 있도록 아래와 같은 기본 설정이 제공됩니다.
 
 * Spring Boot Gradle Plugin에서 Java 컴파일의 `-parameters` 옵션이 자동 추가됩니다.
-** ( https://github.com/spring-projects/spring-boot/blob/main/spring-boot-project/spring-boot-tools/spring-boot-gradle-plugin/src/main/java/org/springframework/boot/gradle/plugin/JavaPluginAction.java#L90[JavaPluginAction.java#L90] 참조 )
+** ( https://github.com/spring-projects/spring-boot/blob/main/build-plugin/spring-boot-gradle-plugin/src/main/java/org/springframework/boot/gradle/plugin/JavaPluginAction.java#L261[JavaPluginAction.java#L90] 참조 )
 * `spring-boot-starter-web` 에서 이미 `jackson-module-parameter-names` 에 대한 의존성이 추가되어 있습니다.
 ** https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web/2.2.5.RELEASE[spring-boot-starter-web] -> https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-json/2.2.5.RELEASE[spring-boot-starter-json] -> `jackson-module-parameter-names` 로 의존관계가 연결됩니다.
 * 디폴트로 등록되는 `ObjectMapper` bean에는 `ParameterNamesModule` 이 이미 추가되어 있습니다.
