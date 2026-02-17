@@ -3,8 +3,10 @@
 :jbake-status: published
 ~~~~~~
 
-SW 개발에 대한 글 모음
-
+S/W 개발에 관한 정상혁의 글 모음입니다.
 
 이 블로그의 글은 https://github.com/benelog/blog 에서 관리합니다.
-오타 제보나 Pull requst를 환영합니다.
+
+== 연관 사이트
+* https://facebook.com/benelog : 프로그래밍 관련 정보 공유
+* https://www.linkedin.com/in/benelog/ : 경력 공유

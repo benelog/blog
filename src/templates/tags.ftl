@@ -1,15 +1,15 @@
 <#include "header.ftl">
 
-	<#include "menu.ftl">
+    <#include "menu.ftl">
 
-    <div id="main">
-        <h1>Tag: ${tag}</h1>
-        
+    <div class="container">
+        <div class="content-card">
+            <h1>Tag: ${tag}</h1>
+        </div>
+
         <#list tag_posts as post>
-        	<#include "post/content-list.ftl">
-        
+            <#include "post/content-list.ftl">
         </#list>
     </div>
 
-	<#include "commons/sidebar.ftl">
 <#include "footer.ftl">

@@ -1,10 +1,9 @@
-<ul class="actions pagination">
+<ul class="pagination">
     <li><a href="${content.rootpath}${previousFileName!'#'}"
-            class="<#if (previousFileName?? == false) >disabled </#if> button big previous">PREVIOUS</a></li>
+            class="<#if (previousFileName?? == false) >disabled</#if>">PREVIOUS</a></li>
 
-    <li><span
-            class="button big"> ${currentPageNumber} of ${numberOfPages} </span></li>
+    <li><span class="page-info">${currentPageNumber} / ${numberOfPages}</span></li>
 
     <li><a href="${content.rootpath}${nextFileName!'#'}"
-            class="<#if (nextFileName?? == false) >disabled </#if> button big next">NEXT</a></li>
+            class="<#if (nextFileName?? == false) >disabled</#if>">NEXT</a></li>
 </ul>

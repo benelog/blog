@@ -1,16 +1,15 @@
 <#include "header.ftl">
-	
-	<#include "menu.ftl">
-	
-	<div id="main">
+
+    <#include "menu.ftl">
+
+    <div class="container">
         <#list published_posts as post>
-		<#if (post??) >
-			<#include "post/content-single.ftl">
-		</#if>
-		</#list>
-		
-		<#include "post/prev-next.ftl">
-	 </div>
-	
-	<#include "commons/sidebar.ftl">
+        <#if (post??) >
+            <#include "post/content-single.ftl">
+        </#if>
+        </#list>
+
+        <#include "post/prev-next.ftl">
+    </div>
+
 <#include "footer.ftl">

@@ -1,12 +1,12 @@
-<ul class="actions pagination">
-  	
-  		<#if (post.previousContent)??> 
-        <li><a href="${content.rootpath}${post.previousContent.noExtensionUri!post.previousContent.uri}" 
-                class="button big previous">${content.previousContent.title}</a></li>
-         </#if>
-       <#if (post.nextContent)??> 
-        <li><a href="${content.rootpath}${post.nextContent.noExtensionUri!post.nextContent.uri}" 
-                class="button big next">${content.nextContent.title}</a></li>
-        </#if>
-	
-</ul>
+<div class="post-nav">
+    <#if (post.previousContent)??>
+    <span class="nav-prev">
+        <a href="${content.rootpath}${post.previousContent.noExtensionUri!post.previousContent.uri}">${post.previousContent.title}</a>
+    </span>
+    </#if>
+    <#if (post.nextContent)??>
+    <span class="nav-next">
+        <a href="${content.rootpath}${post.nextContent.noExtensionUri!post.nextContent.uri}">${post.nextContent.title}</a>
+    </span>
+    </#if>
+</div>

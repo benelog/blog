@@ -1,0 +1,4 @@
+= Tags
+:jbake-type: alltags
+:jbake-status: published
+:idprefix:
