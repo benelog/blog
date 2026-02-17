@@ -2,7 +2,7 @@ plugins {
     id 'org.jbake.site' version '5.5.0'
 }
 
-buildDir = 'output'
+layout.buildDirectory = file('output')
 
 Properties jbakeProps = new Properties()
 FileInputStream stream = new FileInputStream('src/jbake.properties');

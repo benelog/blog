@@ -16,7 +16,7 @@ Korean-language static blog ("개발수양록") by 정상혁, built with JBake 2
 ./gradlew clean bake
 ```
 
-Requires JDK 8 (configured via `.sdkmanrc` as `8.0.462-tem`). Use `sdk env` if using SDKMAN.
+Requires JDK 25 (configured via `.sdkmanrc` as `25-tem`). Use `sdk env` if using SDKMAN.
 
 ## Architecture
 
