@@ -8,5 +8,10 @@
                 </#list>
             </ul>
         </nav>
+        <form class="header-search" method="get" action="//google.com/search">
+            <input type="text" name="q" />
+            <input type="hidden" name="q" value="site:${config.site_host}">
+            <button type="submit" class="search-btn" aria-label="검색"><i class="fa fa-search"></i></button>
+        </form>
     </div>
 </header>

@@ -9,7 +9,7 @@
                 <#list alltags as tag>
                 <li>
                     <a href="${content.rootpath}${config.tag_path}/${tag}${config.output_extension}">
-                        ${tag}
+                        #${tag}
                         <span class="tag-count">${db.getPublishedPostsByTag(tag).size()}</span>
                     </a>
                 </li>
