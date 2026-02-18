@@ -1,6 +1,6 @@
 <header class="site-header">
     <div class="header-inner">
-        <a href="${config.site_host}" class="site-title">${config.site_title}</a>
+        <a href="${config.site_host}" class="site-title"><img src="${content.rootpath}img/main/logo.svg" alt="" class="site-logo">${config.site_title}</a>
         <div class="header-nav-row">
             <nav>
                 <ul>
