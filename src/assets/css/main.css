@@ -874,7 +874,11 @@ strong {
     }
 
     .site-header .header-inner {
-        padding: 0 16px;
+        padding: 8px 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        height: auto;
+        gap: 6px;
     }
 
     .site-header nav ul {
