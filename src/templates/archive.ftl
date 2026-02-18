@@ -20,10 +20,10 @@
                     <li>
                         <span class="archive-date">${post.date?string("dd")}</span>
                         <a href="${content.rootpath}${post.noExtensionUri!post.uri}"><#escape x as x?xml>${post.title}</#escape></a>
-                        <#if post.tags??>
+                        <#if post.tags?has_content>
                             <span class="post-tags-inline">
                                 <#list post.tags as tag>
-                                <a href="${content.rootpath}${config.tag_path}/${tag}${config.output_extension}">#${tag}</a>
+                                <#if tag?has_content><a href="${content.rootpath}${config.tag_path}/${tag}${config.output_extension}">#${tag}</a></#if>
                                 </#list>
                             </span>
                         </#if>

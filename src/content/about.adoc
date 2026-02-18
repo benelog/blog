@@ -3,7 +3,7 @@
 :jbake-status: published
 ~~~~~~
 
-image::https://blog.benelog.net/img/main/intro.jpg[intro, align="center"]
+image::./img/main/intro.svg[intro, align="center"]
 
 
 S/W 개발에 관한 정상혁의 글을 모아놓은 블로그입니다.

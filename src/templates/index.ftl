@@ -12,10 +12,10 @@
                 <li>
                     <span class="recent-post-date">${recentPost.date?string("yyyy-MM-dd")}</span>
                     <a href="${content.rootpath}${recentPost.noExtensionUri!recentPost.uri}">${recentPost.title}</a>
-                    <#if recentPost.tags??>
+                    <#if recentPost.tags?has_content>
                     <span class="post-tags-inline">
                         <#list recentPost.tags as tag>
-                        <a href="${content.rootpath}${config.tag_path}/${tag}${config.output_extension}">#${tag}</a>
+                        <#if tag?has_content><a href="${content.rootpath}${config.tag_path}/${tag}${config.output_extension}">#${tag}</a></#if>
                         </#list>
                     </span>
                     </#if>
