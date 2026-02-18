@@ -1,11 +1,60 @@
-= 개발을 통한 자기수양
+= 개발수양록
 정상혁의 개발 블로그
+:toc:
 
 image::https://api.netlify.com/api/v1/badges/42ef4cbb-a113-4dbe-b1d4-eedab4d6163b/deploy-status[Netlify Status, link="https://app.netlify.com/sites/blog-benelog/deploys"]
 
+https://blog.benelog.net/
 
 == 사용 기술
-* http://jbake.org/[Jbake]
-* Gradle
-* 템플릿 : https://github.com/manikmagar/jbake-future-imperfect-template
 
+* http://jbake.org/[JBake] 2.6.7
+* Gradle
+
+== 환경 요구사항
+
+* JDK 25 (`.sdkmanrc`에 `25-tem`으로 설정)
+* https://sdkman.io/[SDKMAN] 사용 시 `sdk env` 명령으로 자동 설정 가능
+
+== 빌드
+
+[source,bash]
+----
+# 사이트 빌드 (output/ 디렉토리에 생성)
+./gradlew bake
+
+# 클린 빌드
+./gradlew clean bake
+----
+
+== 디렉토리 구조
+
+[source]
+----
+src/
+├── content/       # AsciiDoc(.adoc) 포스트 및 페이지
+│   └── img/       # 포스트 이미지
+├── templates/     # FreeMarker(.ftl) 템플릿
+├── assets/        # CSS, JS, 폰트, 이미지 등 정적 자원
+└── jbake.properties  # 사이트 설정
+output/            # 빌드 결과물 (gitignore)
+----
+
+== 포스트 작성
+
+`src/content/` 에 `.adoc` 파일을 생성하고 아래 헤더 형식을 사용합니다.
+
+[source,asciidoc]
+----
+= 포스트 제목
+정상혁
+2026-02-18
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: tag1, tag2
+:description: 간략한 설명
+:jbake-last_updated: 2026-02-18
+:idprefix:
+----
+
+포스트 이미지는 `src/content/img/<토픽-슬러그>/` 에 저장합니다.
