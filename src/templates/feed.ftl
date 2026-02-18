@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>JBake</title>
+    <title>${config.site_title}</title>
     <link>${config.site_host}</link>
     <atom:link href="${config.site_host}/${config.feed_file}" rel="self" type="application/rss+xml" />
-    <description>JBake Bootstrap Template</description>
-    <language>en-gb</language>
+    <description>${config.sidebar_intro_summary}</description>
+    <language>ko</language>
     <pubDate>${published_date?string("EEE, d MMM yyyy HH:mm:ss Z")}</pubDate>
     <lastBuildDate>${published_date?string("EEE, d MMM yyyy HH:mm:ss Z")}</lastBuildDate>
 
