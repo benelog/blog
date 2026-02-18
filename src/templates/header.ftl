@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="<#if (content.rootpath)??>${content.rootpath}<#else></#if>css/add-on.css" />
     <link rel="stylesheet" href="<#if (content.rootpath)??>${content.rootpath}<#else></#if>css/monokai-sublime.css">
 
+    <link rel="icon" type="image/svg+xml" href="<#if (content.rootpath)??>${content.rootpath}<#else></#if>img/favicon/favicon.svg">
     <link rel="shortcut icon" href="<#if (content.rootpath)??>${content.rootpath}<#else></#if>img/favicon/favicon.png">
   </head>
   <body>
