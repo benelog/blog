@@ -1,0 +1,160 @@
+= Ubuntu OEM 커널의 자동 / 수동 설치
+정상혁
+2026-02-20
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: linux, ubuntu
+:description: Ubuntu OEM 커널과 HWE 커널과의 차이와 Ubuntu 공식 ISO 이미지에서 OEM 커널이 선택되는 원리를 정리합니다.
+:jbake-last_updated: 2026-02-20
+:toc:
+:idprefix:
+
+Ubuntu 공식 홈페이지에서 ISO를 받아 같은 방법으로 설치했음에도 설치 시점에 따라서 Lenovo ThinkPad에는 OEM 커널이, Dell XPS에는 HWE 커널이 설치되는 경우를 경험했습니다.
+이 글에서는 두 커널와 차이와 자동 선택되는 원리 등을 정리합니다.
+현상의 분석과 이 글의 작성에는 Claude Code의 도움을 받았습니다.
+
+== Ubuntu 설치 시점에 따른 경험 차이
+저는 Lenovo와 Dell 2개의 모델에  Ubuntu를 설치해서 사용하고 있습니다.
+2024년 11월에 Dell XPS 13 9350에 Ubuntu 24.04를 설치했을 때는 웹캠이 제대로 동작하지 않았습니다.
+2025년 8월경 ThinkPad에서 Ubuntu 24.04를 설치했을 때는 웹캡이 바로 잡혔습니다.
+이 둘의 차이는 Dell XPS 13 9350에서는 HWE 커널이 설치된 반면, ThinkPad에서는 OEM 커널이 설치되었기 때문입니다.
+
+현재는 2개의 기기를 Ubuntu 공식 인증기기로 등록되어 있어서 둘 다 기본적으로 OEM 커널이 설치될 것으로 예상합니다.
+
+* https://ubuntu.com/certified/202407-34214[Dell XPS 13 9350]
+* https://ubuntu.com/certified/202411-36001[Lenovo ThinkPad X1 Carbon Gen 13 LNL]
+
+== OEM 커널 vs HWE 커널
+
+Ubuntu 24.04 LTS에서 최신 하드웨어 지원을 위해 제공하는 커널은 크게 두 가지입니다.
+
+[cols="1,2,2", options="header"]
+|===
+| 항목 | OEM 커널 | HWE 커널
+
+| 패키지명 예
+| `linux-oem-24.04d`
+| `linux-generic-hwe-24.04`
+
+| 커널 접미사 예
+| `6.17.0-1011-oem`
+| `6.17.0-14-generic`
+
+| 대상
+| 특정 OEM 파트너 기기 (Lenovo, Dell 등)
+| 일반 사용자 전체
+
+| 포함 패치
+| 해당 기기 전용 드라이버·패치 (카메라, 지문인식, 열 관리 등)
+| 범용 최신 하드웨어 지원
+
+| 관리 주체
+| Canonical OEM 팀 + OEM 파트너
+| Canonical / Ubuntu 커뮤니티
+
+| 업데이트 경로
+| OEM 파트너 저장소 (`oem.archive.ubuntu.com`)
+| 기본 Ubuntu 저장소
+|===
+
+HWE(Hardware Enablement) 커널은 LTS 버전에서 새 하드웨어를 지원하기 위해 최신 업스트림 커널을 백포팅한 것입니다.
+OEM 커널은 여기에 더해 특정 기기에서만 필요한 패치가 추가로 적용됩니다.
+즉, OEM 커널은 하드웨어 제조사와 Canonical이 협력하여, 해당 기기에서 "설치 후 바로 동작(out-of-the-box)"하는 경험을 제공하기 위한 것입니다.
+
+최신 노트북, 특히 Intel Meteor Lake / Lunar Lake CPU를 탑재한 기기들은 HWE커널에서 아직 완전히 지원되지 않은 하드웨어가 있습니다.
+대표적인 예가 내장 카메라(MIPI/IPU7)와 일부 지문인식 센서입니다.
+
+== OEM 커널이 자동으로 선택되는 원리
+
+Ubuntu 인스톨러(Subiquity)는 설치 중에 `ubuntu-drivers` 도구를 호출하여 현재 하드웨어를 감지합니다.
+이때 DMI(System Management BIOS) 정보를 읽어 Canonical OEM 파트너 목록과 대조합니다.
+
+예를 들어 Lenovo ThinkPad X1 Carbon Gen 13의 경우, 아래와 같은 메타패키지가 매칭됩니다.
+
+[source]
+----
+Package: oem-sutton-dacia-meta
+Modaliases: meta(dmi:*bvnLENOVO:bvrN4B*:pvrThinkPad*)
+Depends: linux-oem-24.04c, oem-sutton-meta
+Ubuntu-Oem-Kernel-Flavour: oem
+Description: hardware support for Lenovo ThinkPad X1 2-in-1 G10, X1 Carbon G13
+----
+
+`Modaliases` 필드의 패턴(`dmi:*bvnLENOVO:bvrN4B*:pvrThinkPad*`)이 현재 기기의 DMI 정보와 일치하면,
+해당 메타패키지와 함께 OEM 커널이 자동으로 설치됩니다.
+
+설치 흐름을 정리하면 다음과 같습니다.
+
+[source]
+----
+Ubuntu 설치 중
+└─ ubuntu-drivers 가 DMI 정보 확인
+   └─ OEM 메타패키지 패턴 매칭
+      └─ oem-sutton-dacia-meta 설치
+         └─ linux-oem-24.04d 의존성으로 OEM 커널 설치
+            └─ → 부팅 커널: 6.17.0-1011-oem
+----
+
+어떤 커널이 설치될지는 **하드웨어가 Canonical OEM 파트너 목록에 등록되어 있느냐**에 달려 있습니다.
+
+다음과 같이 Intel Ultra 7 258V CPU를 쓰는 기기라도 차이가 생길 수 있습니다.
+
+[cols="1,2,2", options="header"]
+|===
+| 기기 | OEM 메타패키지 | 설치되는 커널
+
+| Lenovo ThinkPad X1 Carbon G13
+| `oem-sutton-dacia-meta`
+| `linux-oem-24.04d` (OEM 커널)
+
+| Dell XPS 13 9350
+| `oem-sutton-dacia-meta`
+| `linux-oem-24.04d` (OEM 커널)
+
+| OEM 파트너 목록에 없는 기기
+| 없음
+| `linux-generic-hwe-24.04` (HWE 커널)
+|===
+
+그래서 설치 시기와 모델에 따라 어느 커널이 설치 될지가 달랐던 것입니다.
+https://ubuntu.com/certified[우분투 공식 인증기기]라면 OEM 커널이 설치시에 바로 감지되어 설치될 가능성이 높습니다.
+
+설치 후 `ubuntu-drivers list-oem` 명령으로 현재 기기에 감지된 OEM 메타패키지를 확인할 수 있습니다.
+
+== OEM 커널을 수동으로 설치/제거
+
+현재 어떤 커널이 설치되어 있는지는 다음 명령으로 확인할 수 있습니다.
+
+[source,bash]
+.설치된 커널과 OEM 메타패키지 확인
+----
+# 현재 부팅된 커널
+uname -r
+
+# 설치된 커널 패키지 목록
+dpkg -l | grep linux-image | grep '^ii'
+
+# ubuntu-drivers가 감지하는 OEM 메타패키지 확인
+ubuntu-drivers list-oem
+----
+
+우분투 초기 설치 시점에 HWE 커널이 자동 선택되었지만, OEM 커널로 전환을 하고 싶다면 아래와 같이 수동으로 설치할 수 있습니다.
+
+[source,bash]
+.OEM 커널 수동 설치
+----
+# 설치 가능한 OEM 메타패키지 목록 검색
+apt search linux-oem-24.04
+
+# OEM 커널 수동 설치 (24.04 기준)
+sudo apt install linux-oem-24.04d
+----
+
+반대로 OEM 커널 없이 HWE 커널만 사용하고 싶다면, OEM 메타패키지를 제거하면 됩니다.
+단, 해당 하드웨어에서 필요한 드라이버가 빠질 수 있으므로 주의가 필요합니다.
+
+== 참고 자료
+
+* https://wiki.ubuntu.com/Kernel/OEMKernel[Ubuntu OEM Kernel — Ubuntu Wiki]
+* https://ubuntu.com/certified[Ubuntu Certified Hardware]
+* https://wiki.ubuntu.com/IntelMIPICamera[Intel MIPI Camera — Ubuntu Wiki]
