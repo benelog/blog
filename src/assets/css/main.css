@@ -297,6 +297,10 @@ li::marker {
     color: var(--naver-green);
 }
 
+li p {
+    margin-bottom: 0;
+}
+
 /* Code */
 code {
     background-color: #f1f3f5;
