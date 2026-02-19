@@ -1,9 +1,9 @@
 /* Naver-inspired blog style */
 
 :root {
-    --naver-green: #03C75A;
-    --naver-green-dark: #009f47;
-    --naver-green-light: #e8f7ef;
+    --color-primary: #03C75A;
+    --color-primary-dark: #009f47;
+    --color-primary-light: #e8f7ef;
     --text-primary: #080808;
     --text-secondary: #666666;
     --text-tertiary: #999999;
@@ -54,7 +54,7 @@ body {
 .site-header .site-title {
     font-size: 22px;
     font-weight: 800;
-    color: var(--naver-green);
+    color: var(--color-primary);
     text-decoration: none;
     letter-spacing: -0.5px;
     white-space: nowrap;
@@ -93,8 +93,8 @@ body {
 }
 
 .site-header nav a:hover {
-    color: var(--naver-green);
-    background-color: var(--naver-green-light);
+    color: var(--color-primary);
+    background-color: var(--color-primary-light);
     text-decoration: none;
 }
 
@@ -126,7 +126,7 @@ body {
 }
 
 .header-search input[type="text"]:focus {
-    border-color: var(--naver-green);
+    border-color: var(--color-primary);
 }
 
 .header-search input[type="hidden"] {
@@ -151,12 +151,12 @@ body {
 }
 
 .search-btn:hover {
-    color: var(--naver-green);
-    border-color: var(--naver-green);
+    color: var(--color-primary);
+    border-color: var(--color-primary);
 }
 
 .header-search:focus-within .search-btn {
-    border-color: var(--naver-green);
+    border-color: var(--color-primary);
 }
 
 /* Main content */
@@ -194,7 +194,7 @@ h1::after {
     left: 0;
     width: 48px;
     height: 3px;
-    background-color: var(--naver-green);
+    background-color: var(--color-primary);
     border-radius: 2px;
 }
 
@@ -205,7 +205,7 @@ h2 {
     margin-top: 36px;
     margin-bottom: 14px;
     padding-left: 14px;
-    border-left: 3px solid var(--naver-green);
+    border-left: 3px solid var(--color-primary);
     letter-spacing: -0.3px;
 }
 
@@ -234,13 +234,13 @@ p {
 
 /* Links */
 a {
-    color: var(--naver-green);
+    color: var(--color-primary);
     text-decoration: none;
     transition: all 0.15s ease;
 }
 
 a:hover {
-    color: var(--naver-green-dark);
+    color: var(--color-primary-dark);
     text-decoration: underline;
 }
 
@@ -256,7 +256,7 @@ a:hover {
 #toc.toc #toctitle {
     font-size: 15px;
     font-weight: 800;
-    color: var(--naver-green);
+    color: var(--color-primary);
     margin-bottom: 12px;
 }
 
@@ -277,7 +277,7 @@ a:hover {
 }
 
 #toc.toc a:hover {
-    color: var(--naver-green);
+    color: var(--color-primary);
     text-decoration: none;
 }
 
@@ -294,7 +294,7 @@ li {
 }
 
 li::marker {
-    color: var(--naver-green);
+    color: var(--color-primary);
 }
 
 li p {
@@ -337,7 +337,7 @@ pre code {
 /* Blockquote */
 blockquote {
     border: none;
-    background-color: var(--naver-green-light);
+    background-color: var(--color-primary-light);
     padding: 20px 24px;
     margin: 20px 0;
     border-radius: 12px;
@@ -351,7 +351,7 @@ blockquote::before {
     left: 18px;
     top: 10px;
     font-size: 32px;
-    color: var(--naver-green);
+    color: var(--color-primary);
     font-weight: 800;
     line-height: 1;
 }
@@ -374,7 +374,7 @@ table {
 }
 
 th {
-    background-color: var(--naver-green);
+    background-color: var(--color-primary);
     color: #ffffff;
     font-weight: 700;
     padding: 12px 20px;
@@ -395,7 +395,7 @@ tr:last-child td {
 }
 
 tr:hover td {
-    background-color: var(--naver-green-light);
+    background-color: var(--color-primary-light);
 }
 
 /* Horizontal rule */
@@ -451,7 +451,7 @@ strong {
 .post-tags a {
     display: inline-block;
     background-color: var(--bg-page);
-    color: var(--naver-green);
+    color: var(--color-primary);
     font-size: 13px;
     font-weight: 700;
     padding: 6px 14px;
@@ -460,7 +460,7 @@ strong {
 }
 
 .post-tags a:hover {
-    background-color: var(--naver-green-light);
+    background-color: var(--color-primary-light);
     text-decoration: none;
 }
 
@@ -486,7 +486,7 @@ strong {
 }
 
 .post-nav a:hover {
-    color: var(--naver-green);
+    color: var(--color-primary);
     text-decoration: none;
     box-shadow: var(--shadow-card-hover);
 }
@@ -534,7 +534,7 @@ strong {
 }
 
 .pagination a:hover {
-    color: var(--naver-green);
+    color: var(--color-primary);
     box-shadow: var(--shadow-card-hover);
     text-decoration: none;
 }
@@ -545,7 +545,7 @@ strong {
 }
 
 .pagination .page-info {
-    color: var(--naver-green);
+    color: var(--color-primary);
     cursor: default;
 }
 
@@ -588,14 +588,14 @@ strong {
 }
 
 .content-card .post-list-item h2 a:hover {
-    color: var(--naver-green);
+    color: var(--color-primary);
     text-decoration: none;
 }
 
 .continue-reading {
     display: inline-block;
     padding: 8px 20px;
-    background-color: var(--naver-green);
+    background-color: var(--color-primary);
     color: #ffffff;
     border-radius: 20px;
     font-size: 13px;
@@ -605,20 +605,20 @@ strong {
 }
 
 .continue-reading:hover {
-    background-color: var(--naver-green-dark);
+    background-color: var(--color-primary-dark);
     color: #ffffff;
     text-decoration: none;
 }
 
 /* Posts page */
 .archive-section h4 {
-    color: var(--naver-green);
+    color: var(--color-primary);
     font-size: 15px;
     font-weight: 800;
     margin-top: 28px;
     margin-bottom: 12px;
     padding-bottom: 8px;
-    border-bottom: 2px solid var(--naver-green-light);
+    border-bottom: 2px solid var(--color-primary-light);
 }
 
 .archive-section ul {
@@ -649,7 +649,7 @@ strong {
 }
 
 .archive-section a:hover {
-    color: var(--naver-green);
+    color: var(--color-primary);
     text-decoration: none;
 }
 
@@ -659,8 +659,8 @@ strong {
     margin-bottom: 16px;
     font-size: 16px;
     font-weight: 800;
-    color: var(--naver-green);
-    border-bottom: 2px solid var(--naver-green-light);
+    color: var(--color-primary);
+    border-bottom: 2px solid var(--color-primary-light);
     padding-bottom: 8px;
     border-left: none;
     padding-left: 0;
@@ -698,7 +698,7 @@ strong {
 }
 
 .recent-post-list a:hover {
-    color: var(--naver-green);
+    color: var(--color-primary);
 }
 
 .post-tags-inline a {
@@ -709,7 +709,7 @@ strong {
 }
 
 .post-tags-inline a:hover {
-    color: var(--naver-green);
+    color: var(--color-primary);
 }
 
 /* Tags page */
@@ -739,13 +739,13 @@ strong {
 }
 
 .tags-list a:hover {
-    background-color: var(--naver-green-light);
-    color: var(--naver-green);
+    background-color: var(--color-primary-light);
+    color: var(--color-primary);
     text-decoration: none;
 }
 
 .tags-list .tag-count {
-    background-color: var(--naver-green);
+    background-color: var(--color-primary);
     color: #ffffff;
     font-size: 11px;
     padding: 2px 8px;
@@ -849,7 +849,7 @@ strong {
 }
 
 .site-footer a:hover {
-    color: var(--naver-green);
+    color: var(--color-primary);
 }
 
 /* Back to top */
@@ -872,7 +872,7 @@ strong {
 }
 
 #back-to-top:hover {
-    color: var(--naver-green);
+    color: var(--color-primary);
     box-shadow: var(--shadow-card-hover);
     text-decoration: none;
 }
