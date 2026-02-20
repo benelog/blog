@@ -15,11 +15,11 @@ Ubuntu 공식 홈페이지에서 ISO를 받아 같은 방법으로 설치했음�
 
 == Ubuntu 설치 시점에 따른 경험 차이
 저는 Lenovo와 Dell 2개의 모델에  Ubuntu를 설치해서 사용하고 있습니다.
-2024년 11월에 Dell XPS 13 9350에 Ubuntu 24.04를 설치했을 때는 웹캠이 제대로 동작하지 않았습니다.
-2025년 8월경 ThinkPad에서 Ubuntu 24.04를 설치했을 때는 웹캡이 바로 잡혔습니다.
-이 둘의 차이는 Dell XPS 13 9350에서는 HWE 커널이 설치된 반면, ThinkPad에서는 OEM 커널이 설치되었기 때문입니다.
+2024년 11월에 Dell XPS 13 9350 모델에 Ubuntu 24.04를 설치했을 때는 웹캠이 제대로 동작하지 않았습니다.
+2025년 8월경 Lenovo ThinkPad X1 Carbon Gen 13에 Ubuntu 24.04를 설치했을 때는 웹캡이 바로 잡혔습니다.
+이 둘의 차이는 당시 Dell에서는 HWE 커널이 설치된 반면, Lenovo에서는 OEM 커널이 설치되었기 때문입니다.
 
-현재는 2개의 기기를 Ubuntu 공식 인증기기로 등록되어 있어서 둘 다 기본적으로 OEM 커널이 설치될 것으로 예상합니다.
+2026년 2월 현재에는 2개의 모델이 모두 Ubuntu 공식 인증기기로 등록되어 있어서 OEM 커널이 설치될 것으로 예상합니다.
 
 * https://ubuntu.com/certified/202407-34214[Dell XPS 13 9350]
 * https://ubuntu.com/certified/202411-36001[Lenovo ThinkPad X1 Carbon Gen 13 LNL]
@@ -61,7 +61,7 @@ HWE(Hardware Enablement) 커널은 LTS 버전에서 새 하드웨어를 지원�
 OEM 커널은 여기에 더해 특정 기기에서만 필요한 패치가 추가로 적용됩니다.
 즉, OEM 커널은 하드웨어 제조사와 Canonical이 협력하여, 해당 기기에서 "설치 후 바로 동작(out-of-the-box)"하는 경험을 제공하기 위한 것입니다.
 
-최신 노트북, 특히 Intel Meteor Lake / Lunar Lake CPU를 탑재한 기기들은 HWE커널에서 아직 완전히 지원되지 않은 하드웨어가 있습니다.
+Intel Meteor Lake / Lunar Lake CPU를 탑재한 기기들은 HWE 커널에서 완전히 지원되지 않은 하드웨어가 있었습니다.
 대표적인 예가 내장 카메라(MIPI/IPU7)와 일부 지문인식 센서입니다.
 
 == OEM 커널이 자동으로 선택되는 원리
