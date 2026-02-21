@@ -67,6 +67,7 @@ body {
 .site-header .site-logo {
     height: 36px;
     width: 42px;
+    border-radius: 0;
 }
 
 .site-header .site-title:hover {
