@@ -3,7 +3,7 @@
 2008-05-23
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: Java,exception
+:jbake-tags: java,exception
 :idprefix:
 
 Java 의 Exception 처리는 C++로부터 도입되었지만 checked exception은 Java만의 독특한 특징입니다. 아시다시비, 컴파일러가 exception을 꼭 처리해라고 강요하는 것이죠.  이것은  Java 이후에 설계된 언어인 C#이나 루비에도 채택되지 않았습니다. 즉 Java 이외의 다른 언어들의 Exception 처리 방식은 Java의 unchecked exception과 동일한 방식입니다.

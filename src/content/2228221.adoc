@@ -3,7 +3,7 @@
 2009-02-08
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: Spring,Spring-MVC
+:jbake-tags: spring,spring-mvc
 :idprefix:
 
 간단한 파일 업로드 기능을 만들어야 할 일이 생겨서, Spring 2.5의 annotation을 이용한 Action에서 이를 처리하게 했습니다. 실무에서 썼던 것을 더 단순한 예제로 재구성해서 정리해봅니다.

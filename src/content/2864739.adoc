@@ -3,7 +3,7 @@
 2011-10-23
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: 자작도구,test,Spring-Test
+:jbake-tags: 자작도구,test,spring-test
 :idprefix:
 
 서버에 1,2개 파일만을 올려야할 때는  FTP를  따로 설치하는 일이 번거롭다고 느껴집니다. 그럴 때  간단하게 다운받아서 실행할 수 있는 웹어플리케이션을 만들어봤습니다.

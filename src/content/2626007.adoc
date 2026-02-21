@@ -3,7 +3,7 @@
 2010-06-17
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: BeanUtils,성능,Java
+:jbake-tags: beanutils,성능,java
 :idprefix:
 
 .수정이력

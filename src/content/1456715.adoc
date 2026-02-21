@@ -3,7 +3,7 @@
 2007-09-06
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: CSS
+:jbake-tags: css
 :idprefix:
 
 주로 Head first HTML/CSS에 있는 내용을 정리했습니다.

@@ -3,7 +3,7 @@
 2008-12-10
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: Spring,뉴스
+:jbake-tags: spring,뉴스
 :idprefix:
 
 * http://javajigi.tistory.com/207[Spring Source 진영의 향후 RoadMap]

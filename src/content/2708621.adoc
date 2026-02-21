@@ -3,7 +3,7 @@
 2010-11-08
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: Java,SQL,XML,MyBatis,Spring-JDBC
+:jbake-tags: java,sql,xml,mybatis,spring-jdbc
 :idprefix:
 
 .변경 이력

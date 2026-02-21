@@ -3,7 +3,7 @@
 2012-05-17
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: FTP,자작도구,Test
+:jbake-tags: ftp,자작도구,test
 :idprefix:
 
 == 배경

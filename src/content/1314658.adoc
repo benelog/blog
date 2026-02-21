@@ -3,7 +3,7 @@
 2007-07-04
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: CSS,HTML
+:jbake-tags: css,html
 :idprefix:
 
 제가 있는 프로젝트의 UI 표준은  2004년 10월경에 처음 정해졌습니다.

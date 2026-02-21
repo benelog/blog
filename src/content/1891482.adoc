@@ -3,7 +3,7 @@
 2008-05-16
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: XML,open-API,Naver
+:jbake-tags: xml,open-api,naver
 :idprefix:
 
 네이버 Open API Cafe에서 검색 API의 Java Client 모듈을 보게 되었습니다.

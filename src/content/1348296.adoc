@@ -3,7 +3,7 @@
 2007-07-19
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: AOP
+:jbake-tags: aop
 :idprefix:
 
 부서원들과 같이 하는 세미나를 위해서 정리했었던 자료 중의 일부입니다. 대충 알고 있었던 것도 막상 누가 물어보면 한마디로 설명하는 것은 어렵다고 종종 느낍니다.  세미나 발표 준비를 하면서 모르면서 알고 있었다고 착각했던 부분을 많이 발견할 수 있어서 좋았습니다.

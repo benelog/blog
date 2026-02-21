@@ -3,7 +3,7 @@
 2013-03-05
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: Spring,보안
+:jbake-tags: spring,보안
 :idprefix:
 
 === 취약점의 조건

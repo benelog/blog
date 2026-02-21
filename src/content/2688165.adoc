@@ -3,7 +3,7 @@
 2010-10-01
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: Eclipse,test
+:jbake-tags: eclipse,test
 :idprefix:
 
 == Static Import 설정

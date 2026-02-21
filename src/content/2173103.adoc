@@ -3,7 +3,7 @@
 2008-12-16
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: Java,generics
+:jbake-tags: java,generics
 :idprefix:
 
 .수정이력

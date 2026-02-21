@@ -3,7 +3,7 @@
 2008-05-15
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: batch,Spring-Batch,Spring
+:jbake-tags: batch,spring-batch,spring
 :idprefix:
 
 일반적인 온라인 어플리케이션에서는 사용자가 보내는 event 한번에 하나의 트랜잭션을 묶어서 처리합니다. 하지만 배치처리에서는 하나의 처리가 하나의 트랜잭션으로 관리되는 것은 때로는 문제가 될 여지가 있습니다.

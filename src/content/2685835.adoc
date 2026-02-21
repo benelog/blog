@@ -3,7 +3,7 @@
 2010-09-27
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: JUnit,Test,PowerMock
+:jbake-tags: junit,test,powermock
 :idprefix:
 
 private 메소드를 어떻게 테스트해야 할지에 대한 질문은 테스트 코드 작성에 대한 자주 나오는 질문 중에 하나입니다. 이에 대한 답변을 간단히 정리해봅니다.

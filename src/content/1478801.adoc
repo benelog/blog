@@ -3,7 +3,7 @@
 2007-09-17
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: Sybase,날짜
+:jbake-tags: sybase,날짜
 :idprefix:
 
 sybase에서 select convert(varchar,getdate(),112)로 찍어보면 오늘 날짜가 20070831 형식으로 나오죠. 이런 형식들이 정리된 자료를 한 번 만들어 보았습니다.

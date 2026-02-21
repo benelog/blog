@@ -3,7 +3,7 @@
 2008-05-30
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: effective-Java,Java
+:jbake-tags: effective-java,java
 :idprefix:
 
 Amazon에서 예약주문 단계에서 판매상태로 바뀌었습니다.

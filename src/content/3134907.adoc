@@ -3,7 +3,7 @@
 2015-02-25
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: Java,Naver,책
+:jbake-tags: java,naver,책
 :idprefix:
 
 image::img/book-cover/naver-java.jpg[cover]

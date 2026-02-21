@@ -3,7 +3,7 @@
 2010-10-29
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: Spring,Spring-One,행사후기
+:jbake-tags: spring,spring-one,행사후기
 :idprefix:
 
 == 논쟁에 응하다

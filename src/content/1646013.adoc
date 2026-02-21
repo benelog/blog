@@ -3,7 +3,7 @@
 2007-12-14
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: 코딩연습, Lotto
+:jbake-tags: 코딩연습, lotto
 :idprefix:
 
 바로 아래 포스팅에서 간단한 로또생성기 코드를 만들어봤었죠. (http://blog.benelog.net/1642193).

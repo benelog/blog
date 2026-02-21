@@ -3,7 +3,7 @@
 2011-12-06
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: WAS,Maven,Eclipse
+:jbake-tags: was,maven,eclipse
 :idprefix:
 
 Local 개발환경에서 WAS를 띄우는 여러가지 방식과 장단점에 대해서 정리해 봤습니다.  저는 상황에 따라서 아래 3가지 방법들을 그때 그때 골라서 씁니다.

@@ -3,7 +3,7 @@
 2008-06-16
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: Spring,Spring-Batch,Spring-Integration,뉴스
+:jbake-tags: spring,spring-batch,spring-integration,뉴스
 :idprefix:
 
 Spring portfolio의 일부 중 최근에 관심을 제가 관심을 가지고 있는  Spring batch와 Spring integration을 연결한 프로토타입 코드들이 나왔습니다.

@@ -3,7 +3,7 @@
 2011-11-25
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: Winstone,Jetty
+:jbake-tags: winstone,jetty
 :idprefix:
 
 Winstone(http://winstone.sourceforge.net/ )은 jar파일 하나로 실행되는 간단한 Servlet Container입니다.

@@ -3,7 +3,7 @@
 2007-07-31
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: Google,검색,행사후기
+:jbake-tags: google,검색,행사후기
 :idprefix:
 
 많은 분들이 그렇듯이 저도 생활정보는 네이버로 찾고  일과 관련된 정보나  웹을 구석구석 뒤지고 싶을 때는 google을 쓰고 있습니다.  google을 써오기는 해도  "검색기록"이라고는 것을 신경도 안 쓰고 있었는데, 얼마 전에 한번 찍어보니 꽤나 신기하더군요.

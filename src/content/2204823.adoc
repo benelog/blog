@@ -3,7 +3,7 @@
 2009-01-16
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: Hudson,Maven,정적분석
+:jbake-tags: hudson,maven,정적분석
 :idprefix:
 
 JavaNCSS를 Maven2을 통해 실행하고, Hudson을 통해 리포트를 확인하는 과정을 정리했습니다. http://www.kclee.de/clemens/java/javancss/[JavaNCSS]는 주석이 아닌 라인수(Non Commenting Source Statements,NCSS)와 순환복잡도 수 (Cyclomatic Comlexity Number, CCN) 등을 측정해 주는 도구입니다.

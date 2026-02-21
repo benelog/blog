@@ -3,7 +3,7 @@
 2008-06-17
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: Spring,뉴스
+:jbake-tags: spring,뉴스
 :idprefix:
 
 * http://www.springify.com/archives/15[Live from SpringOne 2008: Collected bits about Spring 3.0]

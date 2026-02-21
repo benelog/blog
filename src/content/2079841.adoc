@@ -3,7 +3,7 @@
 2008-09-30
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: FindBugs,Maven,Hudson,Eclipse,정적분석
+:jbake-tags: findbugs,maven,hudson,eclipse,정적분석
 :idprefix:
 
 http://findbugs.sourceforge.net/[FindBugs]를 이용한 코드검사를 Maven2을 통해 실행하고, Hudson을 통해 확인하는 설정을 정리해 봅니다.

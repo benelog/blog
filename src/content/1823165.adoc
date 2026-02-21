@@ -3,7 +3,7 @@
 2008-04-01
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: Java,coding-convention
+:jbake-tags: java,coding-convention
 :idprefix:
 
 == Coding Convention 문서

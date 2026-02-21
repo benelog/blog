@@ -3,7 +3,7 @@
 2009-03-25
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: Hadoop,Oracle
+:jbake-tags: hadoop,oracle
 :idprefix:
 
 Hadoop의 Map-Reduce처리에서는 DB를 바로 연결해서 처리할 수 있는  http://hadoop.apache.org/core/docs/current/api/org/apache/hadoop/mapred/lib/db/DBInputFormat.html[DBInputFormat], http://hadoop.apache.org/core/docs/current/api/org/apache/hadoop/mapred/lib/db/DBOutputFormat.html[DBOutputFormat]의 클래스가 제공되고 있습니다.

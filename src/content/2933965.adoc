@@ -3,7 +3,7 @@
 2012-05-30
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: Java,Concurrency
+:jbake-tags: java,concurrency
 :idprefix:
 
 == 스레드 안전성을 어떻게 문서에 표기할까?

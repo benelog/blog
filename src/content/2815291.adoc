@@ -3,7 +3,7 @@
 2011-06-21
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: Test
+:jbake-tags: test
 :idprefix:
 
 2010년 9월에 Kent Beck과의 인터뷰가 SE-Radio 사이트에 올라왔었습니다.

@@ -3,7 +3,7 @@
 2008-08-04
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: Spring,Spring-Batch,뉴스
+:jbake-tags: spring,spring-batch,뉴스
 :idprefix:
 
 (수정이력: 2008.01.19 - 스프링배치 관련 링크들은 http://www.ksug.org/94로 옮기고, 최근 자료를 포함시켰습니다.)

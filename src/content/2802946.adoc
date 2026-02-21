@@ -3,7 +3,7 @@
 2011-05-23
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: Spring,Cron,test,Spring-Test
+:jbake-tags: spring,cron,test,spring-test
 :idprefix:
 
 * 변경 이력

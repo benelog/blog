@@ -3,7 +3,7 @@
 2008-09-25
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: Cubrid,JDBC
+:jbake-tags: cubrid,jdbc
 :idprefix:
 
 다음의  코드는 1000건을 insert하면서 100건마다 한번씩 commit을 하는 기능을 수행합니다. 대용량 데이터를 입력 할 때 이렇게 주기적으로 commit을 해주는 것은 일반적인 처리방식입니다. Cubrid DB에서는 이와 같은 코드를 실행시키면 'Attempt to access a closed PreparedStatement.'라는 에러 메시지를 받게 될 수도 있습니다.

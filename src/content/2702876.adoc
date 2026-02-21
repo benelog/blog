@@ -3,7 +3,7 @@
 2010-10-28
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: PMD, 정적분석
+:jbake-tags: pmd, 정적분석
 :idprefix:
 
 이전에 PMD 룰셋 검토했을 때 정리했던  의견입니다.
