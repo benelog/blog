@@ -3,7 +3,7 @@
 2013-04-17
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: android,test,dependencyinjection
+:jbake-tags: android,test
 :idprefix:
 
 제가 지난달에 썼던 글이 네이버의 기술블로그인 http://helloworld.naver.com/[http://helloworld.naver.com]에 공개되었습니다.

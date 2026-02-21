@@ -3,7 +3,7 @@
 2013-01-29
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: java,string,multiline,자작도구
+:jbake-tags: java,string,자작도구
 :idprefix:
 
 Andrian Walker라는 영국 개발자가 만든 라이브러리를 제가 수정해서 Github에 올렸습니다.

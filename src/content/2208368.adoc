@@ -3,7 +3,7 @@
 2009-01-19
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: maven,eclipse,정적분석
+:jbake-tags: maven,eclipse,static-analysis
 :idprefix:
 
 http://clarkware.com/software/JDepend.html[JDepend]는 Java패키지간의 의존성에 대한 수치들을 알려 주는 도구입니다.

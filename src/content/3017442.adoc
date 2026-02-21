@@ -3,7 +3,7 @@
 2013-04-17
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: android,robolectric,test,행사후기
+:jbake-tags: android,test,행사후기
 :idprefix:
 
 지난 2013/04/13일, 종로 페럼타회에서 열렸던 '구글 개발자와 함께하는 GDG Korea Android 컨퍼런스 '에서 공유된 내용입니다

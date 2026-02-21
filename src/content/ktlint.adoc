@@ -3,7 +3,7 @@
 2019-11-12
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: kotlin,ktlint,coding-convention
+:jbake-tags: kotlin,coding-convention,static-analysis
 :jbake-description: Kotlin 언어에는 공식 코딩 컨벤션이 정의되어 있습니다. 이를 준수할수 있도록 Gradle 빌드에서 ktlint로 코드 스타일을 검사하고, IntelliJ의 포멧터, Git의 pre-commit hook과 연동하는 방법을 안내합니다.
 :jbake-og: {"image": "img/kotlin-code-style/ktlint-logo.jpg"}
 :idprefix:

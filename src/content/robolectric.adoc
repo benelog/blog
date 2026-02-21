@@ -4,7 +4,7 @@
 :jbake-last_updated: 2018-05-23
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: testing, android
+:jbake-tags: test, android
 :description: Android 테스팅 프레임워크 Robolectric에 대한 소개
 :idprefix:
 
@@ -187,8 +187,6 @@ public class PixelUtilsTest {
 === 단말의 SDK 정보를 원하는 값으로
 
 === System 서비스의 결과를 원하는 값으로
-
-'''
 
 몇가지 예를 들었는데, Robolectric을 결국 어떻게 활용할 것이 좋을까요? JVM에서 테스트해도 동일한 결과를 보장하는 문자열, 날짜 처리, 프로토콜 파싱 영역에서 이득이 많습니다. 주로java.lang, java.util , java.io 패키지가 다루는 영역에 우선 집중하기는 것이 좋습니다. 처음부터 Activity, Fragment같은 UI영역까지 포함한 통합 테스트에 너무 많은 기대를 걸면 오히려 어려울 수 있습니다. Utility 클래스부터 우선 적용해보면서 점점 영역을 넓혀가시기를 권장드립니다.
 
