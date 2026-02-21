@@ -65,8 +65,8 @@ body {
 }
 
 .site-header .site-logo {
-    height: 28px;
-    width: 34px;
+    height: 36px;
+    width: 42px;
 }
 
 .site-header .site-title:hover {
@@ -299,6 +299,30 @@ li::marker {
 
 li p {
     margin-bottom: 0;
+}
+
+/* Code block with title (AsciiDoc listingblock) */
+.listingblock {
+    margin-bottom: 20px;
+}
+
+.listingblock .title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    background-color: #f0f0f0;
+    border: 1px solid var(--border-color);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    padding: 6px 16px;
+    margin-bottom: 0;
+}
+
+.listingblock pre {
+    margin-top: 0;
+    margin-bottom: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }
 
 /* Code */
