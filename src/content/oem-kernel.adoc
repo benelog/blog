@@ -108,7 +108,7 @@ Ubuntu 설치 중
 | `linux-oem-24.04d` (OEM 커널)
 
 | Dell XPS 13 9350
-| `oem-sutton-dacia-meta`
+| `oem-somerville-tyrogue-meta`
 | `linux-oem-24.04d` (OEM 커널)
 
 | OEM 파트너 목록에 없는 기기
