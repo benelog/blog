@@ -3,23 +3,23 @@
 2026-02-20
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: linux, ubuntu
+:jbake-tags: linux
 :description: Ubuntu OEM 커널과 HWE 커널과의 차이와 Ubuntu 공식 ISO 이미지에서 OEM 커널이 선택되는 원리를 정리합니다.
 :jbake-last_updated: 2026-02-20
 :toc:
 :idprefix:
 
 Ubuntu 공식 홈페이지에서 ISO를 받아 같은 방법으로 설치했음에도 설치 시점에 따라서 Lenovo ThinkPad에는 OEM 커널이, Dell XPS에는 HWE 커널이 설치되는 경우를 경험했습니다.
-이 글에서는 두 커널와 차이와 자동 선택되는 원리 등을 정리합니다.
+이 글에서는 두 커널의 차이와 자동 선택되는 원리 등을 정리합니다.
 현상의 분석과 이 글의 작성에는 Claude Code의 도움을 받았습니다.
 
 == Ubuntu 설치 시점에 따른 경험 차이
 저는 Lenovo와 Dell 2개의 모델에  Ubuntu를 설치해서 사용하고 있습니다.
 2024년 11월에 Dell XPS 13 9350 모델에 Ubuntu 24.04를 설치했을 때는 웹캠이 제대로 동작하지 않았습니다.
-2025년 8월경 Lenovo ThinkPad X1 Carbon Gen 13에 Ubuntu 24.04를 설치했을 때는 웹캡이 바로 잡혔습니다.
+2025년 8월경 Lenovo ThinkPad X1 Carbon Gen 13에 Ubuntu 24.04를 설치했을 때는 웹캠이 바로 잡혔습니다.
 이 둘의 차이는 당시 Dell에서는 HWE 커널이 설치된 반면, Lenovo에서는 OEM 커널이 설치되었기 때문입니다.
 
-2026년 2월 현재에는 2개의 모델이 모두 Ubuntu 공식 인증기기로 등록되어 있어서 OEM 커널이 설치될 것으로 예상합니다.
+2026년 2월 현재에는 2개의 모델이 모두 Ubuntu 공식 인증기기로 등록되어 있어서 OEM 커널이 설치될 것으로 예상됩니다.
 
 * https://ubuntu.com/certified/202407-34214[Dell XPS 13 9350]
 * https://ubuntu.com/certified/202411-36001[Lenovo ThinkPad X1 Carbon Gen 13 LNL]
@@ -120,7 +120,7 @@ Ubuntu 설치 중
 https://ubuntu.com/certified[우분투 공식 인증기기]라면 OEM 커널이 설치시에 바로 감지되어 설치될 가능성이 높습니다.
 
 
-아래 명령을 참고로 알아주시면 기기에 대한 정보를 파악하는데 도움이 됩니다.
+아래 명령을 참고로 알아두시면 기기에 대한 정보를 파악하는데 도움이 됩니다.
 
 * `ubuntu-drivers list-oem` : 기기에 감지된 OEM 메타패키지
 * `sudo dmidecode -s system-product-name` :  기기의 정확한 모델명
@@ -129,7 +129,7 @@ https://ubuntu.com/certified[우분투 공식 인증기기]라면 OEM 커널이 
 
 현재 어떤 커널이 설치되어 있는지는 다음 명령으로 확인할 수 있습니다.
 
-[source,bash]
+[source, bash]
 .설치된 커널과 OEM 메타패키지 확인
 ----
 # 현재 부팅된 커널
@@ -144,7 +144,7 @@ ubuntu-drivers list-oem
 
 우분투 초기 설치 시점에 HWE 커널이 자동 선택되었지만, OEM 커널로 전환을 하고 싶다면 아래와 같이 수동으로 설치할 수 있습니다.
 
-[source,bash]
+[source, bash]
 .OEM 커널 수동 설치
 ----
 # 설치 가능한 OEM 메타패키지 목록 검색
@@ -152,6 +152,22 @@ apt search linux-oem-24.04
 
 # OEM 커널 수동 설치 (24.04 기준)
 sudo apt install linux-oem-24.04d
+----
+
+앞으로 업데이트에도 HWE 커널이 설치되지 않도록 하려면, HWE 커널의 메타 패키지를 제거하면 됩니다.
+
+[source, bash]
+.HWE 커널 제거
+----
+sudo apt remove linux-headers-generic-hwe-24.04
+----
+
+또는 HWE 커널의 메타 패키지를 보류(hold) 상태로 설정할 수 있습니다.
+
+[source, bash]
+.HWE 커널 보류 설정
+----
+sudo apt-mark hold linux-headers-generic-hwe-24.04
 ----
 
 반대로 OEM 커널 없이 HWE 커널만 사용하고 싶다면, OEM 메타패키지를 제거하면 됩니다.
