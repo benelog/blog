@@ -5,7 +5,7 @@
     <div class="container">
         <#if (currentPageNumber == 1)>
         <div class="content-card">
-            <h2 class="recent-posts-title">최근 포스트</h2>
+            <h2 class="recent-posts-title">Recent Posts</h2>
             <ul class="recent-post-list">
                 <#list db.getPublishedPosts() as recentPost>
                 <#if recentPost?index < 5>
@@ -23,6 +23,7 @@
                 </#if>
                 </#list>
             </ul>
+            <a href="${content.rootpath}archive.html" class="all-posts-link">All Posts →</a>
         </div>
         </#if>
 

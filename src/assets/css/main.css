@@ -701,6 +701,21 @@ strong {
     color: var(--color-primary);
 }
 
+.all-posts-link {
+    display: block;
+    text-align: right;
+    margin-top: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.all-posts-link:hover {
+    color: var(--color-primary-dark);
+    text-decoration: none;
+}
+
 .post-tags-inline a {
     color: var(--text-tertiary);
     font-size: 12px;
