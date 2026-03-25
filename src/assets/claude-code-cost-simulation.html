@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code Token Cost Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #f7f8fb;
+  --surface: #ffffff;
+  --surface-alt: #f0f2f7;
+  --border: #dfe3ec;
+  --border-strong: #c4cad8;
+  --text: #1b2137;
+  --text-secondary: #5a6278;
+  --text-muted: #8b91a5;
+  --accent: #2563eb;
+  --accent-light: #dbeafe;
+  --teal: #0d9488;
+  --teal-bg: rgba(13, 148, 136, 0.12);
+  --blue: #3b82f6;
+  --blue-bg: rgba(59, 130, 246, 0.12);
+  --amber: #d97706;
+  --amber-bg: rgba(217, 119, 6, 0.12);
+  --rose: #e11d48;
+  --rose-bg: rgba(225, 29, 72, 0.08);
+  --emerald: #059669;
+  --emerald-bg: rgba(5, 150, 105, 0.10);
+  --purple: #7c3aed;
+  --purple-bg: rgba(124, 58, 237, 0.10);
+  --chart-grid: rgba(0,0,0,0.06);
+  --chart-text: #6b7280;
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --card-shadow-hover: 0 4px 12px rgba(0,0,0,0.08);
+  --formula-bg: #f8f9fc;
+  --formula-border: #e0e4ed;
+  --slider-track: #dfe3ec;
+  --slider-thumb: #2563eb;
+  --toggle-off: #cbd5e1;
+  --toggle-on: #2563eb;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0c111b;
+    --surface: #151c2c;
+    --surface-alt: #1a2236;
+    --border: #253049;
+    --border-strong: #354163;
+    --text: #e8ecf4;
+    --text-secondary: #9ca3b8;
+    --text-muted: #6b7390;
+    --accent: #5b8def;
+    --accent-light: rgba(91, 141, 239, 0.15);
+    --teal: #2dd4bf;
+    --teal-bg: rgba(45, 212, 191, 0.12);
+    --blue: #60a5fa;
+    --blue-bg: rgba(96, 165, 250, 0.12);
+    --amber: #fbbf24;
+    --amber-bg: rgba(251, 191, 36, 0.10);
+    --rose: #fb7185;
+    --rose-bg: rgba(251, 113, 133, 0.08);
+    --emerald: #34d399;
+    --emerald-bg: rgba(52, 211, 153, 0.10);
+    --purple: #a78bfa;
+    --purple-bg: rgba(167, 139, 250, 0.10);
+    --chart-grid: rgba(255,255,255,0.06);
+    --chart-text: #7b8298;
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+    --card-shadow-hover: 0 4px 12px rgba(0,0,0,0.4);
+    --formula-bg: #111827;
+    --formula-border: #253049;
+    --slider-track: #253049;
+    --slider-thumb: #5b8def;
+    --toggle-off: #374151;
+    --toggle-on: #5b8def;
+  }
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+
+header p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
+/* Explanation Section */
+.explanation {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+.explain-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--card-shadow);
+}
+
+.explain-card h3 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.formula-box {
+  background: var(--formula-bg);
+  border: 1px solid var(--formula-border);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  color: var(--text);
+  overflow-x: auto;
+}
+
+.formula-box .var {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.formula-box .comment {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.cost-legend {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.cost-legend-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.cost-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+.cost-dot.input { background: var(--blue); }
+.cost-dot.output { background: var(--amber); }
+.cost-dot.cache-write { background: var(--teal); }
+.cost-dot.cache-read { background: var(--emerald); }
+.cost-dot.cache-miss { background: var(--rose); }
+
+.price-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.price-table th, .price-table td {
+  padding: 0.5rem 0.75rem;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+}
+
+.price-table th {
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.price-table th:first-child, .price-table td:first-child {
+  text-align: left;
+}
+
+.price-table td {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+}
+
+.price-table tr:last-child td { border-bottom: none; }
+
+.price-table .model-name {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 500;
+}
+
+.source-link {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}
+
+.source-link a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.source-link a:hover {
+  text-decoration: underline;
+}
+
+.opusplan-info {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.opusplan-info ul {
+  padding-left: 1.25rem;
+  margin-top: 0.5rem;
+}
+
+.opusplan-info li { margin-bottom: 0.35rem; }
+
+.tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.tag.pro { background: var(--emerald-bg); color: var(--emerald); }
+.tag.con { background: var(--rose-bg); color: var(--rose); }
+
+/* Controls */
+.controls-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--card-shadow);
+}
+
+.controls-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.controls-header h2 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+
+.controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.control-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.control-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.control-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.85rem;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--slider-track);
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--slider-thumb);
+  border: 2px solid var(--surface);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--slider-thumb);
+  border: 2px solid var(--surface);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  cursor: pointer;
+}
+
+/* Opusplan Toggle */
+.opusplan-section {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.opusplan-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.opusplan-header h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--toggle-off);
+  border-radius: 12px;
+  transition: 0.25s;
+}
+
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.25s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.toggle input:checked + .toggle-slider {
+  background: var(--toggle-on);
+}
+
+.toggle input:checked + .toggle-slider::before {
+  transform: translateX(20px);
+}
+
+.opusplan-controls {
+  display: none;
+}
+
+.opusplan-controls.active {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.plan-position-select {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 0.85rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--surface-alt);
+  color: var(--text);
+  cursor: pointer;
+  outline: none;
+  width: 100%;
+}
+
+/* Summary Cards */
+.summary-section {
+  margin-bottom: 2rem;
+}
+
+.summary-row-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  margin-top: 1.25rem;
+  padding-left: 0.25rem;
+}
+
+.summary-row-label:first-child {
+  margin-top: 0;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.summary-grid-cost {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.summary-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  box-shadow: var(--card-shadow);
+  transition: box-shadow 0.2s;
+}
+
+.summary-card:hover {
+  box-shadow: var(--card-shadow-hover);
+}
+
+.summary-card .label {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.5rem;
+}
+
+.summary-card .value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.summary-card .sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.35rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.summary-card.highlight {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.opusplan-summary {
+  display: none;
+}
+
+.opusplan-summary.active {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.savings-positive { color: var(--emerald); }
+.savings-negative { color: var(--rose); }
+
+/* Charts */
+.charts-section {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+.chart-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--card-shadow);
+}
+
+.chart-container h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.chart-wrapper {
+  position: relative;
+  width: 100%;
+  height: 380px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .explanation { grid-template-columns: 1fr; }
+  .summary-grid, .summary-grid-cost, .opusplan-summary.active { grid-template-columns: repeat(2, 1fr); }
+  .controls-grid, .opusplan-controls.active { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .container { padding: 1rem; }
+  header h1 { font-size: 1.3rem; }
+  .summary-grid, .summary-grid-cost, .opusplan-summary.active { grid-template-columns: 1fr; }
+  .cost-legend { grid-template-columns: 1fr; }
+  .chart-wrapper { height: 280px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Claude Code Token Cost Simulator</h1>
+    <p>API 호출 턴이 늘어날수록 토큰과 비용이 어떻게 누적되는지 시각화하는 인터랙티브 시뮬레이터</p>
+  </header>
+
+  <!-- Explanation -->
+  <section class="explanation">
+    <div class="explain-card">
+      <h3>토큰 누적 공식</h3>
+      <div class="formula-box">
+        <span class="comment">// "턴" = 1회의 API 호출(모델 요청→응답). 사용자의 채팅 입력 1건이</span><br>
+        <span class="comment">// 도구 호출 등으로 여러 번의 API 호출을 발생시킬 수 있으므로,</span><br>
+        <span class="comment">// 사용자 메시지 수 ≠ 턴 수. 실제 턴 수는 이보다 훨씬 많을 수 있음.</span><br><br>
+        <span class="comment">// 턴 n의 입력 토큰 (stateless API → 매 턴 전체 재전송)</span><br>
+        <span class="var">input(n)</span> = <span class="var">B</span> + n·<span class="var">T</span> + (<span class="var">O</span> + <span class="var">Th</span>)·(n − 1)<br><br>
+        <span class="var">B</span>  = 시스템 프롬프트 + 도구 정의 (매 턴 고정)<br>
+        <span class="var">T</span>  = 턴당 새 사용자 입력 토큰<br>
+        <span class="var">O</span>  = 턴당 출력 토큰 (히스토리 누적)<br>
+        <span class="var">Th</span> = 턴당 thinking 토큰 (히스토리 누적)<br><br>
+        <span class="comment">// 총 입력 = N·B + T·N(N+1)/2 + (O+Th)·N(N−1)/2</span><br>
+        <span class="comment">// → 삼각수(이차) 성장, O/Th 포함 시 더 가파름</span>
+      </div>
+      <div class="source-link"><a href="https://docs.anthropic.com/en/docs/claude-code/costs" target="_blank" rel="noopener">Claude Code Costs →</a></div>
+    </div>
+
+    <div class="explain-card">
+      <h3>비용 구성 요소</h3>
+      <div class="cost-legend">
+        <div class="cost-legend-item">
+          <div class="cost-dot input"></div>
+          <div><strong>Input 토큰</strong><br><span style="color:var(--text-muted);font-size:0.8rem">정가 또는 캐시 가격 적용</span></div>
+        </div>
+        <div class="cost-legend-item">
+          <div class="cost-dot output"></div>
+          <div><strong>Output + Thinking</strong><br><span style="color:var(--text-muted);font-size:0.8rem">항상 output 정가로 과금</span></div>
+        </div>
+        <div class="cost-legend-item">
+          <div class="cost-dot cache-write"></div>
+          <div><strong>Cache Write</strong><br><span style="color:var(--text-muted);font-size:0.8rem">정가의 125% (신규 캐시 저장)</span></div>
+        </div>
+        <div class="cost-legend-item">
+          <div class="cost-dot cache-read"></div>
+          <div><strong>Cache Read</strong><br><span style="color:var(--text-muted);font-size:0.8rem">정가의 10% (캐시 재사용)</span></div>
+        </div>
+        <div class="cost-legend-item">
+          <div class="cost-dot cache-miss"></div>
+          <div><strong>Cache Miss</strong><br><span style="color:var(--text-muted);font-size:0.8rem">캐시 TTL(5분) 만료, 모델 전환, 또는 프롬프트 변경 시 캐시 적중 실패 → Cache Write 비용으로 재저장</span></div>
+        </div>
+      </div>
+      <div class="source-link"><a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching" target="_blank" rel="noopener">Anthropic Prompt Caching →</a></div>
+    </div>
+
+    <div class="explain-card">
+      <h3>모델별 가격표 ($/M tokens)</h3>
+      <table class="price-table">
+        <thead>
+          <tr><th>모델</th><th>Input</th><th>Output</th><th>Cache Write</th><th>Cache Read</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="model-name">Sonnet 4/4.6</td><td>$3</td><td>$15</td><td>$3.75</td><td>$0.30</td></tr>
+          <tr><td class="model-name">Opus 4/4.6</td><td>$15</td><td>$75</td><td>$18.75</td><td>$1.50</td></tr>
+          <tr><td class="model-name">Haiku 4.5</td><td>$0.80</td><td>$4</td><td>$1.00</td><td>$0.08</td></tr>
+        </tbody>
+      </table>
+      <div class="source-link"><a href="https://docs.anthropic.com/en/docs/about-claude/models" target="_blank" rel="noopener">Anthropic Models &amp; Pricing →</a></div>
+    </div>
+
+    <div class="explain-card">
+      <h3>Opusplan 트레이드오프</h3>
+      <div class="opusplan-info">
+        Plan 턴은 Opus, 실행 턴은 Sonnet을 사용하는 전략.
+        <ul>
+          <li><span class="tag pro">유리</span> 복잡한 계획 수립에 Opus의 높은 추론 능력 활용</li>
+          <li><span class="tag pro">유리</span> 실행 턴은 Sonnet으로 비용 절감</li>
+          <li><span class="tag con">불리</span> 모델 전환 시 캐시가 격리되어 rebuild 필요</li>
+          <li><span class="tag con">불리</span> 전환 직후 턴은 캐시 히트율 0% → 비용 급증</li>
+          <li><span class="tag con">불리</span> Opus output/thinking 토큰은 Sonnet의 5배 가격</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Controls -->
+  <section class="controls-section">
+    <div class="controls-header">
+      <h2>시뮬레이션 설정</h2>
+    </div>
+
+    <div class="controls-grid">
+      <div class="control-item">
+        <div class="control-label"><span>API 호출 턴 수</span><span class="control-value" id="turnsVal">20</span></div>
+        <input type="range" id="turns" min="5" max="40" value="20">
+      </div>
+      <div class="control-item">
+        <div class="control-label"><span>Base Tokens (B)</span><span class="control-value" id="baseVal">30,000</span></div>
+        <input type="range" id="base" min="5000" max="80000" step="1000" value="30000">
+      </div>
+      <div class="control-item">
+        <div class="control-label"><span>턴당 입력 토큰 (T)</span><span class="control-value" id="inputTVal">4,000</span></div>
+        <input type="range" id="inputT" min="500" max="10000" step="100" value="4000">
+      </div>
+      <div class="control-item">
+        <div class="control-label"><span>턴당 출력 토큰 (O)</span><span class="control-value" id="outputTVal">2,000</span></div>
+        <input type="range" id="outputT" min="500" max="16000" step="100" value="2000">
+      </div>
+      <div class="control-item">
+        <div class="control-label"><span>턴당 Thinking 토큰 (Th)</span><span class="control-value" id="thinkingTVal">8,000</span></div>
+        <input type="range" id="thinkingT" min="0" max="32000" step="500" value="8000">
+      </div>
+      <div class="control-item">
+        <div class="control-label"><span>Base 캐시 히트율</span><span class="control-value" id="baseCacheVal">100%</span></div>
+        <input type="range" id="baseCache" min="0" max="100" value="100">
+      </div>
+      <div class="control-item">
+        <div class="control-label"><span>Conversation 캐시 히트율</span><span class="control-value" id="convCacheVal">85%</span></div>
+        <input type="range" id="convCache" min="0" max="100" value="85">
+      </div>
+    </div>
+
+    <!-- Opusplan -->
+    <div class="opusplan-section">
+      <div class="opusplan-header">
+        <label class="toggle">
+          <input type="checkbox" id="opusplanToggle">
+          <span class="toggle-slider"></span>
+        </label>
+        <h3>Opusplan 비교 모드</h3>
+      </div>
+      <div class="opusplan-controls" id="opusplanControls">
+        <div class="control-item">
+          <div class="control-label"><span>Plan 턴 수 (Opus)</span><span class="control-value" id="planTurnsVal">3</span></div>
+          <input type="range" id="planTurns" min="1" max="10" value="3">
+        </div>
+        <div class="control-item">
+          <div class="control-label"><span>Plan 턴 위치</span></div>
+          <select class="plan-position-select" id="planPosition">
+            <option value="early" selected>세션 초반</option>
+            <option value="middle">세션 중반</option>
+            <option value="distributed">분산 (교차)</option>
+          </select>
+        </div>
+        <div class="control-item">
+          <div class="control-label"><span>Opus Thinking 토큰</span><span class="control-value" id="opusThinkingVal">16,000</span></div>
+          <input type="range" id="opusThinking" min="0" max="64000" step="1000" value="16000">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Summary -->
+  <section class="summary-section">
+    <div class="summary-row-label">토큰량</div>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="label">총 입력 토큰</div>
+        <div class="value" id="totalInput">-</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">총 출력 토큰</div>
+        <div class="value" id="totalOutput">-</div>
+      </div>
+    </div>
+
+    <div class="summary-row-label">모델별 비용 (캐시 적용)</div>
+    <div class="summary-grid-cost">
+      <div class="summary-card">
+        <div class="label">Sonnet 4/4.6</div>
+        <div class="value" id="costSonnet">-</div>
+        <div class="sub" id="savingsSonnet"></div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Opus 4/4.6</div>
+        <div class="value" id="costOpus">-</div>
+        <div class="sub" id="savingsOpus"></div>
+        <div class="sub" id="opusMultiplier" style="margin-top:0.25rem"></div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Haiku 4.5</div>
+        <div class="value" id="costHaiku">-</div>
+        <div class="sub" id="savingsHaiku"></div>
+      </div>
+    </div>
+
+    <div class="summary-row-label" id="opusplanSummaryLabel" style="display:none">Opusplan 비교</div>
+    <div class="opusplan-summary" id="opusplanSummary">
+      <div class="summary-card">
+        <div class="label">Opusplan 비용</div>
+        <div class="value" id="opusplanCost">-</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">vs Sonnet</div>
+        <div class="value" id="costDiffSonnet">-</div>
+        <div class="sub" id="costDiffSonnetPct"></div>
+      </div>
+      <div class="summary-card">
+        <div class="label">vs Opus</div>
+        <div class="value" id="costDiffOpus">-</div>
+        <div class="sub" id="costDiffOpusPct"></div>
+      </div>
+      <div class="summary-card">
+        <div class="label">캐시 Rebuild 비용</div>
+        <div class="value" id="rebuildCost">-</div>
+        <div class="sub" id="rebuildTurns"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Charts -->
+  <section class="charts-section">
+    <div class="chart-container">
+      <h3>턴별 입력 토큰 분해</h3>
+      <div class="chart-wrapper">
+        <canvas id="tokenChart"></canvas>
+      </div>
+    </div>
+    <div class="chart-container">
+      <h3>누적 비용 곡선</h3>
+      <div class="chart-wrapper">
+        <canvas id="costChart"></canvas>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const MODELS = {
+  sonnet: { name: 'Sonnet 4/4.6', input: 3, output: 15, cacheWrite: 3.75, cacheRead: 0.30 },
+  opus:   { name: 'Opus 4/4.6',   input: 15, output: 75, cacheWrite: 18.75, cacheRead: 1.50 },
+  haiku:  { name: 'Haiku 4.5',    input: 0.80, output: 4, cacheWrite: 1.00, cacheRead: 0.08 }
+};
+
+function getConfig() {
+  return {
+    turns: +document.getElementById('turns').value,
+    base: +document.getElementById('base').value,
+    inputT: +document.getElementById('inputT').value,
+    outputT: +document.getElementById('outputT').value,
+    thinkingT: +document.getElementById('thinkingT').value,
+    baseCacheRate: +document.getElementById('baseCache').value / 100,
+    convCacheRate: +document.getElementById('convCache').value / 100,
+    opusplan: document.getElementById('opusplanToggle').checked,
+    planTurns: +document.getElementById('planTurns').value,
+    planPosition: document.getElementById('planPosition').value,
+    opusThinking: +document.getElementById('opusThinking').value
+  };
+}
+
+function getOpusPlanTurnModels(N, planCount, position) {
+  const models = new Array(N).fill('sonnet');
+  planCount = Math.min(planCount, N);
+  if (position === 'early') {
+    for (let i = 0; i < planCount; i++) models[i] = 'opus';
+  } else if (position === 'middle') {
+    const start = Math.floor((N - planCount) / 2);
+    for (let i = start; i < start + planCount; i++) models[i] = 'opus';
+  } else {
+    // distributed
+    if (planCount === 1) {
+      models[0] = 'opus';
+    } else {
+      const step = (N - 1) / (planCount - 1);
+      for (let i = 0; i < planCount; i++) {
+        models[Math.round(i * step)] = 'opus';
+      }
+    }
+  }
+  return models;
+}
+
+function computeTurnData(cfg, modelKey, overrideBaseCacheRate, overrideConvCacheRate, thinkingOverride) {
+  const m = MODELS[modelKey];
+  const B = cfg.base;
+  const T = cfg.inputT;
+  const O = cfg.outputT;
+  const Th = thinkingOverride !== undefined ? thinkingOverride : cfg.thinkingT;
+  const bcr = overrideBaseCacheRate !== undefined ? overrideBaseCacheRate : cfg.baseCacheRate;
+  const ccr = overrideConvCacheRate !== undefined ? overrideConvCacheRate : cfg.convCacheRate;
+
+  const turns = [];
+  for (let n = 1; n <= cfg.turns; n++) {
+    const convTokens = n * T + (O + Th) * (n - 1);
+    const totalInput = B + convTokens;
+
+    const baseCached = B * bcr;
+    const baseUncached = B * (1 - bcr);
+    const convCached = convTokens * ccr;
+    const convUncached = convTokens * (1 - ccr);
+
+    const inputCostCached = (baseCached * m.cacheRead + baseUncached * m.cacheWrite +
+                              convCached * m.cacheRead + convUncached * m.cacheWrite) / 1e6;
+    const outputCost = (O + Th) * m.output / 1e6;
+    const inputCostNocache = totalInput * m.input / 1e6;
+    const turnCostCached = inputCostCached + outputCost;
+    const turnCostNocache = inputCostNocache + outputCost;
+
+    turns.push({
+      n, totalInput, baseCached, convCached,
+      uncached: baseUncached + convUncached,
+      turnCostCached, turnCostNocache,
+      inputCostCached, outputCost, inputCostNocache
+    });
+  }
+  return turns;
+}
+
+function computeOpusplan(cfg) {
+  const turnModels = getOpusPlanTurnModels(cfg.turns, cfg.planTurns, cfg.planPosition);
+  const B = cfg.base;
+  const T = cfg.inputT;
+  const O = cfg.outputT;
+
+  const turns = [];
+  let rebuildCostTotal = 0;
+
+  for (let i = 0; i < cfg.turns; i++) {
+    const n = i + 1;
+    const modelKey = turnModels[i];
+    const m = MODELS[modelKey];
+    const Th = modelKey === 'opus' ? cfg.opusThinking : cfg.thinkingT;
+
+    // Check model switch
+    const prevModel = i > 0 ? turnModels[i - 1] : turnModels[i];
+    const switched = i > 0 && turnModels[i] !== turnModels[i - 1];
+
+    const bcr = switched ? 0 : cfg.baseCacheRate;
+    const ccr = switched ? 0 : cfg.convCacheRate;
+
+    const convTokens = n * T + (O + Th) * (n - 1);
+    const totalInput = B + convTokens;
+
+    const baseCached = B * bcr;
+    const baseUncached = B * (1 - bcr);
+    const convCached = convTokens * ccr;
+    const convUncached = convTokens * (1 - ccr);
+
+    const inputCostCached = (baseCached * m.cacheRead + baseUncached * m.cacheWrite +
+                              convCached * m.cacheRead + convUncached * m.cacheWrite) / 1e6;
+    const outputCost = (O + Th) * m.output / 1e6;
+    const turnCost = inputCostCached + outputCost;
+
+    // Compute rebuild cost: extra cost vs if we had normal cache rates
+    if (switched) {
+      const normalBaseCached = B * cfg.baseCacheRate;
+      const normalBaseUncached = B * (1 - cfg.baseCacheRate);
+      const normalConvCached = convTokens * cfg.convCacheRate;
+      const normalConvUncached = convTokens * (1 - cfg.convCacheRate);
+      const normalInputCost = (normalBaseCached * m.cacheRead + normalBaseUncached * m.cacheWrite +
+                                normalConvCached * m.cacheRead + normalConvUncached * m.cacheWrite) / 1e6;
+      rebuildCostTotal += inputCostCached - normalInputCost;
+    }
+
+    turns.push({
+      n, totalInput, baseCached, convCached,
+      uncached: baseUncached + convUncached,
+      turnCost, modelKey, switched
+    });
+  }
+
+  return { turns, rebuildCost: rebuildCostTotal };
+}
+
+function formatTokens(val) {
+  if (val >= 1e9) return (val / 1e9).toFixed(1) + 'B';
+  if (val >= 1e6) return (val / 1e6).toFixed(1) + 'M';
+  if (val >= 1e3) return (val / 1e3).toFixed(1) + 'K';
+  return val.toLocaleString('ko-KR');
+}
+
+function formatCost(val) {
+  if (val >= 1) return '$' + val.toFixed(2);
+  if (val > 0) return '$' + val.toFixed(3);
+  return '$0.000';
+}
+
+function formatInt(val) {
+  return Math.round(val).toLocaleString('ko-KR');
+}
+
+// Chart setup
+const isDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+function getChartColors() {
+  const dark = isDark.matches;
+  return {
+    grid: dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+    text: dark ? '#7b8298' : '#6b7280',
+    baseCached: dark ? 'rgba(45,212,191,0.7)' : 'rgba(13,148,136,0.7)',
+    convCached: dark ? 'rgba(96,165,250,0.7)' : 'rgba(59,130,246,0.7)',
+    uncached: dark ? 'rgba(251,191,36,0.7)' : 'rgba(217,119,6,0.7)',
+    baseline: dark ? 'rgba(251,113,133,0.6)' : 'rgba(225,29,72,0.5)',
+    cached: dark ? '#5b8def' : '#2563eb',
+    nocache: dark ? '#fb7185' : '#e11d48',
+    sonnet: dark ? '#60a5fa' : '#3b82f6',
+    opusplan: dark ? '#a78bfa' : '#7c3aed',
+    opusonly: dark ? '#fb923c' : '#ea580c',
+    haiku: dark ? '#34d399' : '#059669',
+  };
+}
+
+let tokenChart, costChart;
+
+function createCharts() {
+  const c = getChartColors();
+  const tokenCtx = document.getElementById('tokenChart').getContext('2d');
+  const costCtx = document.getElementById('costChart').getContext('2d');
+
+  tokenChart = new Chart(tokenCtx, {
+    type: 'bar',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'Base Cached', data: [], backgroundColor: c.baseCached, stack: 'stack', order: 2 },
+        { label: 'Conv Cached', data: [], backgroundColor: c.convCached, stack: 'stack', order: 2 },
+        { label: 'Uncached', data: [], backgroundColor: c.uncached, stack: 'stack', order: 2 },
+        { label: 'No-Cache Baseline', data: [], type: 'line', borderColor: c.baseline, borderDash: [6, 3],
+          borderWidth: 2, pointRadius: 0, fill: false, order: 1 }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          labels: { color: c.text, font: { family: "'Noto Sans KR', sans-serif", size: 11 }, usePointStyle: true, pointStyle: 'rect' }
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => ctx.dataset.label + ': ' + formatTokens(ctx.raw)
+          }
+        }
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false }, ticks: { color: c.text, font: { family: "'JetBrains Mono', monospace", size: 10 } } },
+        y: {
+          stacked: true,
+          grid: { color: c.grid },
+          ticks: { color: c.text, font: { family: "'JetBrains Mono', monospace", size: 10 }, callback: v => formatTokens(v) }
+        }
+      }
+    }
+  });
+
+  costChart = new Chart(costCtx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'Sonnet', data: [], borderColor: c.sonnet, backgroundColor: c.sonnet + '18', borderWidth: 2.5, pointRadius: 2, pointHoverRadius: 5, fill: true, tension: 0.2 },
+        { label: 'Opus', data: [], borderColor: c.opusonly, borderWidth: 2.5, pointRadius: 2, pointHoverRadius: 5, fill: false, tension: 0.2 },
+        { label: 'Haiku', data: [], borderColor: c.haiku, borderWidth: 2.5, pointRadius: 2, pointHoverRadius: 5, fill: false, tension: 0.2 },
+        { label: 'Opusplan', data: [], borderColor: c.opusplan, borderWidth: 2.5, pointRadius: 2, pointHoverRadius: 5, fill: false, tension: 0.2, hidden: true }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          labels: { color: c.text, font: { family: "'Noto Sans KR', sans-serif", size: 11 }, usePointStyle: true }
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => ctx.dataset.label + ': ' + formatCost(ctx.raw)
+          }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: c.text, font: { family: "'JetBrains Mono', monospace", size: 10 } } },
+        y: {
+          grid: { color: c.grid },
+          ticks: { color: c.text, font: { family: "'JetBrains Mono', monospace", size: 10 }, callback: v => formatCost(v) }
+        }
+      }
+    }
+  });
+}
+
+function update() {
+  const cfg = getConfig();
+
+  // Update display values
+  document.getElementById('turnsVal').textContent = cfg.turns;
+  document.getElementById('baseVal').textContent = formatInt(cfg.base);
+  document.getElementById('inputTVal').textContent = formatInt(cfg.inputT);
+  document.getElementById('outputTVal').textContent = formatInt(cfg.outputT);
+  document.getElementById('thinkingTVal').textContent = formatInt(cfg.thinkingT);
+  document.getElementById('baseCacheVal').textContent = Math.round(cfg.baseCacheRate * 100) + '%';
+  document.getElementById('convCacheVal').textContent = Math.round(cfg.convCacheRate * 100) + '%';
+  document.getElementById('planTurnsVal').textContent = cfg.planTurns;
+  document.getElementById('opusThinkingVal').textContent = formatInt(cfg.opusThinking);
+
+  // Opusplan controls visibility
+  const opCtrl = document.getElementById('opusplanControls');
+  const opSummary = document.getElementById('opusplanSummary');
+  const opLabel = document.getElementById('opusplanSummaryLabel');
+  if (cfg.opusplan) {
+    opCtrl.classList.add('active');
+    opSummary.classList.add('active');
+    opLabel.style.display = '';
+  } else {
+    opCtrl.classList.remove('active');
+    opSummary.classList.remove('active');
+    opLabel.style.display = 'none';
+  }
+
+  // Compute per-model data
+  const sonnetData = computeTurnData(cfg, 'sonnet');
+  const opusData = computeTurnData(cfg, 'opus');
+  const haikuData = computeTurnData(cfg, 'haiku');
+  const labels = sonnetData.map(d => 'T' + d.n);
+
+  // Token totals (same regardless of model)
+  let totalInput = 0, totalOutputTokens = 0;
+  sonnetData.forEach(d => {
+    totalInput += d.totalInput;
+    totalOutputTokens += cfg.outputT + cfg.thinkingT;
+  });
+
+  document.getElementById('totalInput').textContent = formatTokens(totalInput);
+  document.getElementById('totalOutput').textContent = formatTokens(totalOutputTokens);
+
+  // Per-model cost summaries
+  function modelCostSummary(data, valueId, savingsId) {
+    let cached = 0, nocache = 0;
+    data.forEach(d => { cached += d.turnCostCached; nocache += d.turnCostNocache; });
+    document.getElementById(valueId).textContent = formatCost(cached);
+    const pct = nocache > 0 ? ((1 - cached / nocache) * 100).toFixed(1) : 0;
+    document.getElementById(savingsId).textContent = '캐시로 ' + pct + '% 절감';
+    return { cached, nocache };
+  }
+
+  const sonnetCost = modelCostSummary(sonnetData, 'costSonnet', 'savingsSonnet');
+  const opusCost = modelCostSummary(opusData, 'costOpus', 'savingsOpus');
+  const haikuCost = modelCostSummary(haikuData, 'costHaiku', 'savingsHaiku');
+
+  // Show Opus cost multiplier vs Sonnet and Haiku
+  const mulEl = document.getElementById('opusMultiplier');
+  const vsSonnet = sonnetCost.cached > 0 ? (opusCost.cached / sonnetCost.cached).toFixed(1) : '-';
+  const vsHaiku = haikuCost.cached > 0 ? (opusCost.cached / haikuCost.cached).toFixed(1) : '-';
+  mulEl.textContent = 'Sonnet의 ' + vsSonnet + '배 · Haiku의 ' + vsHaiku + '배';
+
+  // Token chart (use Sonnet as reference for token breakdown)
+  tokenChart.data.labels = labels;
+  tokenChart.data.datasets[0].data = sonnetData.map(d => d.baseCached);
+  tokenChart.data.datasets[1].data = sonnetData.map(d => d.convCached);
+  tokenChart.data.datasets[2].data = sonnetData.map(d => d.uncached);
+  tokenChart.data.datasets[3].data = sonnetData.map(d => d.totalInput);
+
+  // Cost chart - per-model cumulative lines
+  let sonnetCum = 0, opusCum = 0, haikuCum = 0;
+  const sonnetCumArr = sonnetData.map(d => { sonnetCum += d.turnCostCached; return sonnetCum; });
+  const opusCumArr = opusData.map(d => { opusCum += d.turnCostCached; return opusCum; });
+  const haikuCumArr = haikuData.map(d => { haikuCum += d.turnCostCached; return haikuCum; });
+
+  costChart.data.labels = labels;
+  costChart.data.datasets[0].data = sonnetCumArr;
+  costChart.data.datasets[1].data = opusCumArr;
+  costChart.data.datasets[2].data = haikuCumArr;
+
+  // Opusplan
+  if (cfg.opusplan) {
+    const opResult = computeOpusplan(cfg);
+    let opplanCum = 0;
+    const opplanCumArr = opResult.turns.map(d => { opplanCum += d.turnCost; return opplanCum; });
+
+    const opplanTotal = opplanCumArr[opplanCumArr.length - 1] || 0;
+
+    document.getElementById('opusplanCost').textContent = formatCost(opplanTotal);
+
+    function showDiff(total, base, valueId, pctId) {
+      const d = total - base;
+      const el = document.getElementById(valueId);
+      el.textContent = (d >= 0 ? '+' : '-') + formatCost(Math.abs(d));
+      el.className = 'value ' + (d > 0 ? 'savings-negative' : 'savings-positive');
+      const pct = base > 0 ? ((d / base) * 100).toFixed(1) : 0;
+      const pctEl = document.getElementById(pctId);
+      pctEl.textContent = (d >= 0 ? '+' : '-') + Math.abs(pct) + '%';
+      pctEl.className = 'sub ' + (d > 0 ? 'savings-negative' : 'savings-positive');
+    }
+    showDiff(opplanTotal, sonnetCost.cached, 'costDiffSonnet', 'costDiffSonnetPct');
+    showDiff(opplanTotal, opusCost.cached, 'costDiffOpus', 'costDiffOpusPct');
+
+    document.getElementById('rebuildCost').textContent = formatCost(opResult.rebuildCost);
+    const turnModels = getOpusPlanTurnModels(cfg.turns, cfg.planTurns, cfg.planPosition);
+    let switches = 0;
+    for (let i = 1; i < turnModels.length; i++) {
+      if (turnModels[i] !== turnModels[i - 1]) switches++;
+    }
+    document.getElementById('rebuildTurns').textContent = switches + '회 모델 전환';
+
+    costChart.data.datasets[3].hidden = false;
+    costChart.data.datasets[3].data = opplanCumArr;
+  } else {
+    costChart.data.datasets[3].hidden = true;
+  }
+
+  tokenChart.update('none');
+  costChart.update('none');
+}
+
+// Init
+createCharts();
+update();
+
+// Dark mode change
+isDark.addEventListener('change', () => {
+  const c = getChartColors();
+  tokenChart.data.datasets[0].backgroundColor = c.baseCached;
+  tokenChart.data.datasets[1].backgroundColor = c.convCached;
+  tokenChart.data.datasets[2].backgroundColor = c.uncached;
+  tokenChart.data.datasets[3].borderColor = c.baseline;
+  tokenChart.options.scales.x.ticks.color = c.text;
+  tokenChart.options.scales.y.ticks.color = c.text;
+  tokenChart.options.scales.y.grid.color = c.grid;
+  tokenChart.options.plugins.legend.labels.color = c.text;
+
+  costChart.data.datasets[0].borderColor = c.sonnet;
+  costChart.data.datasets[0].backgroundColor = c.sonnet + '18';
+  costChart.data.datasets[1].borderColor = c.opusonly;
+  costChart.data.datasets[2].borderColor = c.haiku;
+  costChart.data.datasets[3].borderColor = c.opusplan;
+  costChart.options.scales.x.ticks.color = c.text;
+  costChart.options.scales.y.ticks.color = c.text;
+  costChart.options.scales.y.grid.color = c.grid;
+  costChart.options.plugins.legend.labels.color = c.text;
+
+  tokenChart.update();
+  costChart.update();
+});
+
+// Event listeners
+document.querySelectorAll('input[type="range"], select, input[type="checkbox"]').forEach(el => {
+  el.addEventListener('input', update);
+});
+</script>
+</body>
+</html>

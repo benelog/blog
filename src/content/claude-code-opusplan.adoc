@@ -1,0 +1,53 @@
+= Claude Code의 '/model opusplan'과 showClearContextOnPlanAccept 옵션
+정상혁
+2026-03-26
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: claude-code, AI
+:description: Claude Code에서 /model opusplan 설정과 showClearContextOnPlanAccept 옵션을 소개합니다.
+:jbake-last_updated: 2026-03-26
+:toc:
+:idprefix:
+
+== /model opusplan
+
+`/model opusplan` 을 선택하면 Opus로 plan을 세우고 Sonnet으로 실행하는 전략을 쓸 수 있습니다. 복잡한 작업에서 Opus의 추론 능력으로 계획을 세우고, 실행은 비용이 낮은 Sonnet으로 처리하는 방식입니다.
+그런데 같은 세션 안에서 모델이 전환되면, 그때까지 쌓인 히스토리 전체가 캐시 미스로 재과금됩니다. 턴이 많이 진행된 후에 전환할수록 삼각수 효과로 누적된 토큰이 크기 때문에 비용 타격이 큽니다.
+
+TIP: 토큰 비용의 삼각수 효과와 Prompt Caching에 대한 자세한 설명은 link:claude-code-cost.html[Claude Code 토큰 비용과 프롬프트 캐싱]을 참고하세요.
+
+== showClearContextOnPlanAccept 설정
+세션 중간에 모델이 전환될 때 발생하는 부정적인 효과를 줄이는데 도움이 될 수도 있는 옵션이 있습니다. https://docs.anthropic.com/en/docs/claude-code/settings[Claude Code 설정]의 `showClearContextOnPlanAccept` 옵션이 `true` 이면, plan 승인 시 컨텍스트를 클리어할지 선택하는 옵션이 나타납니다.
+'Yes, clear context(??% used) and by pass permissions' 를 선택하면, 컨텍스트를 클리어하면 planning 단계에서 쌓인 히스토리가 제거된 상태에서 실행이 시작되므로, 모델 전환으로 인한 캐시 무효화 비용을 피할 수 있습니다.
+
+이 선택지가 나오도록 활성화하려면 `~/.claude/settings.json` 에 다음과 같이 추가합니다.
+
+[source,json]
+----
+{
+  "preferences": {
+    "showClearContextOnPlanAccept": true
+  }
+}
+----
+
+=== showClearContextOnPlanAccept은 기본값 변경 이력
+https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md[Claude Code의 CHANGELOG]에 따르면 showClearContextOnPlanAccept은 아래와 같은 이력을 가지고 있습니다.
+
+* v2.1.0(2026-01-07) : "Clear context" 옵션이 plan 승인 시 기본 선택으로 처음 도입
+* v2.1.2(2026-01-09) : Shift+Tab 단축키로 이 옵션을 건너뛸 수 있는 기능도 추가
+* v2.1.81(2026-03-20) : 기본값이 `false` 로 변경
+
+따라서 2026년 3월 말 현 시점에서는 showClearContextOnPlanAccept 속성값을 직접 추가하지 않으면 "clear context" 옵션이 나타나지 않습니다.
+
+== Plan 실행 전 컨텍스트 클리어의 트레이드오프
+
+이 옵션은 opusplan이 아닌 경우에도 유용할 때도 있습니다. 같은 모델로 plan mode를 사용하더라도, plan 단계에서 많은 턴이 쌓였다면 컨텍스트를 클리어하고 실행을 시작하면 이후 턴의 입력 토큰 크기를 줄일 수 있습니다.
+
+그런데 컨텍스트 클리어에는 트레이드오프가 있습니다. Plan 파일 자체는 디스크(`~/.claude/plans/`)에 저장되어 보존되지만, planning 중에 읽은 파일 내용이나 탐색 결과는 모두 사라집니다. 따라서 실행 단계에서 필요한 파일을 plan을 가이드 삼아 다시 읽어야 하며, 이 과정에서 추가 토큰이 소비됩니다. planning 중의 논의 내용 중 plan 텍스트에 반영되지 않은 부분도 유실됩니다.
+
+Plan 실행 전에 컨텍스트 클리어에 대해서 아래와 같은 부정적인 사용자 피드백이 있습니다.
+
+* https://github.com/anthropics/claude-code/issues/18523[#18523] Plan 승인 대화상자의 기본 옵션을 설정할 수 있게 해달라는 요청. 컨텍스트를 유지해야 복잡한 문제에서 더 나은 결정을 내릴 수 있고, auto-compact가 이미 컨텍스트를 관리하므로 강제 클리어가 불필요하다는 의견.
+* https://github.com/anthropics/claude-code/issues/18878[#18878] "Clear context" 기본 옵션을 비활성화하거나 순서를 변경할 수 있게 해달라는 요청. plan에 포함되지 않은 대화 맥락이 유실되는 문제를 지적하며, 파괴적인 동작이 기본값이 되어서는 안 된다는 의견.
+* https://github.com/anthropics/claude-code/issues/25734[#25734] "Clear context and implement"가 기본 옵션인 것은 파괴적이고 되돌릴 수 없다는 문제 제기. 터미널 스크롤백까지 지워져 복구가 불가능하며, 가장 파괴적인 옵션이 기본값이 되어서는 안 된다는 의견.
