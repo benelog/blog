@@ -109,6 +109,14 @@ public class Example {
 
 - 언어를 반드시 지정: `java`, `kotlin`, `bash`, `json`, `xml`, `gradle` 등
 - 에러 메시지나 실행 결과는 `[source]` (언어 미지정)로 표시
+- 파일 내용을 보여주는 코드 블록에는 가급적 파일명을 소제목으로 표시:
+  ```adoc
+  [source,yaml]
+  ..golangci.yml
+  ----
+  version: "2"
+  ----
+  ```
 
 ### 테이블
 
