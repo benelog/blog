@@ -1,0 +1,173 @@
+= Go 코드에 품질 도구 적용하기
+정상혁
+2026-03-29
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: go, 개발환경
+:description: Go 프로젝트에서 기본적으로 갖추면 좋은 코드 품질 도구들(gofmt, goimports, go vet, golangci-lint)을 정리하고, Makefile로 통합하는 방법을 소개합니다.
+:toc:
+:sectnums:
+:idprefix:
+
+Go는 언어 차원에서 코드 포맷팅 도구(`gofmt`)를 제공하고, 표준 도구 체인에 정적 분석(`go vet`)이 포함되어 있습니다.
+이런 도구들을 프로젝트 초기에 설정해두면 코드 리뷰에서 스타일 논쟁을 줄이고, 흔한 실수를 빌드 전에 잡을 수 있습니다.
+
+이 글에서는 Go로 개발하는 프로젝트에서 기본적으로 갖추면 좋은 도구들과 설정 방법을 정리합니다.
+
+== gofmt: 코드 포맷팅
+
+Go 커뮤니티에서는 `gofmt` 이 사실상 표준 포맷터입니다.
+탭/스페이스, 중괄호 위치 같은 스타일 논쟁 없이 모든 Go 코드가 동일한 포맷을 따르게 됩니다.
+
+[source,bash]
+----
+gofmt -w .
+----
+
+`-w` 플래그는 파일을 직접 수정합니다. `-l` 플래그를 쓰면 포맷이 맞지 않는 파일 목록만 출력합니다.
+
+[source,bash]
+----
+gofmt -l .
+----
+
+포맷이 맞지 않는 파일이 있으면 파일 경로가 출력되고, 모두 맞으면 아무것도 출력되지 않습니다.
+CI에서는 이 출력을 검사해서 포맷팅되지 않은 코드가 머지되는 것을 막을 수 있습니다.
+
+== goimports: import 정리
+
+https://pkg.go.dev/golang.org/x/tools/cmd/goimports[goimports]는 `gofmt`의 기능에 더해 import 문을 자동으로 정리합니다.
+
+- 사용하지 않는 import를 제거
+- 필요한 import를 자동 추가
+- import를 표준 라이브러리 / 외부 패키지 / 로컬 패키지 순으로 그룹핑
+
+[source,bash]
+----
+go install golang.org/x/tools/cmd/goimports@latest
+goimports -w .
+----
+
+`gofmt` 대신 `goimports`만 실행해도 포맷팅까지 함께 처리됩니다.
+다만 두 도구가 하는 일이 다르므로, 린터 설정에서는 둘 다 활성화하는 것이 좋습니다.
+
+== go vet: 정적 분석
+
+`go vet`은 Go 표준 도구 체인에 포함된 정적 분석 도구입니다.
+컴파일러가 잡지 못하는 의심스러운 코드를 검출합니다.
+
+[source,bash]
+----
+go vet ./...
+----
+
+대표적으로 잡아주는 문제들은 다음과 같습니다.
+
+- `fmt.Printf`의 포맷 문자열과 인자 불일치
+- 도달할 수 없는 코드
+- 구조체 비교 시 의도하지 않은 동작
+- `context.Context`를 값으로 저장하는 패턴
+
+별도 설치 없이 바로 사용할 수 있으므로, 모든 Go 프로젝트에서 기본으로 실행하는 것이 좋습니다.
+
+== golangci-lint: 통합 린터
+
+https://golangci-lint.run/[golangci-lint]는 여러 린터를 하나의 도구로 통합해서 실행해주는 린터 러너입니다.
+개별 린터를 따로 설치하고 실행할 필요 없이, 설정 파일 하나로 원하는 린터를 선택해서 쓸 수 있습니다.
+
+[source,bash]
+----
+go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+golangci-lint run ./...
+----
+
+=== 설정 파일
+
+프로젝트 루트에 `.golangci.yml` 파일을 만들어 활성화할 린터를 지정합니다.
+
+[source,yaml]
+----
+linters:
+  enable:
+    - gofmt
+    - goimports
+    - govet
+    - errcheck
+    - staticcheck
+    - unused
+    - ineffassign
+    - misspell
+----
+
+=== 추천 린터
+
+[cols="1,3", options="header"]
+|===
+|린터 |설명
+
+|gofmt
+|코드 포맷팅 검사
+
+|goimports
+|import 문 정리 검사
+
+|govet
+|`go vet`과 동일한 정적 분석
+
+|errcheck
+|에러 반환값을 무시하는 코드 검출
+
+|staticcheck
+|Go 코드의 버그, 성능 문제, 스타일 문제를 종합적으로 검사
+
+|unused
+|사용되지 않는 변수, 함수, 타입 검출
+
+|ineffassign
+|이후에 사용되지 않는 변수 할당 검출
+
+|misspell
+|영어 오탈자 검출
+|===
+
+`errcheck`은 특히 중요합니다. Go에서 에러를 반환값으로 처리하는 관례상, 에러를 무시하는 코드는 런타임에 예상치 못한 동작을 일으킬 수 있습니다.
+
+== Makefile로 통합
+
+위 도구들을 개별로 실행하는 것은 번거로우므로, Makefile에 통합하면 편리합니다.
+
+[source,makefile]
+----
+.PHONY: fmt lint test check
+
+fmt:
+	gofmt -w .
+	goimports -w .
+
+lint:
+	golangci-lint run ./...
+
+test:
+	go test ./...
+
+check: fmt lint test
+----
+
+`make check` 한 번으로 포맷팅, 린트, 테스트를 모두 실행할 수 있습니다.
+
+[source,bash]
+----
+make check
+----
+
+여기서 `go vet`을 별도 타겟으로 두지 않은 이유는, golangci-lint에 govet 린터가 포함되어 있어서 `make lint`에서 이미 실행되기 때문입니다.
+마찬가지로 `gofmt`과 `goimports`도 golangci-lint에서 검사하지만, `fmt` 타겟은 파일을 직접 수정하는 역할이므로 별도로 둡니다.
+
+코드 수정 후 커밋하기 전에 `make check`를 실행하는 습관을 들이면, CI에서 실패하는 상황을 줄일 수 있습니다.
+
+== 참고 자료
+
+* https://go.dev/blog/gofmt[go fmt your code - The Go Blog]
+* https://pkg.go.dev/golang.org/x/tools/cmd/goimports[goimports - pkg.go.dev]
+* https://pkg.go.dev/cmd/vet[go vet - pkg.go.dev]
+* https://golangci-lint.run/[golangci-lint 공식 문서]
