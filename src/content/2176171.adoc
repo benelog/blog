@@ -8,13 +8,13 @@
 
 코드 검사도구인 http://pmd.sourceforge.net/[PMD] 를 Eclipse plugin을 설정하고, Maven을 통해서도 같은 규칙으로 코드를 검사한 보고서를 생성하고, Hudson을 통해서 확인하는 과정을 정리해 봤습니다.
 
-Eclipse에서는 update site를 http://pmd.sf.net/eclipse 로 지정해서 플러인을 설치합니다.
+Eclipse에서는 update site를 http://pmd.sf.net/eclipse 로 지정해서 플러그인을 설치합니다.
 
 Eclipse 메뉴의 Window- Preferences를 가면 Rule설정 파일을 export, import할 수 있는 기능이 있습니다.
 
 image:img/pmd/eclipse-pmd-rule.jpg[eclipse-pmd-rule.jpg]
 
-Project의 Properties에도 PMD관련 설정이 있습니다. 외부에서 만든 Rule파일을 바로 참조해도 되고, 여기서 설정된 것을파일로 생성할 수도 있습니다. 이미 있는 프로젝트에서 Rule를 설정할 때는 Project의 Properties에서 Rule들을고른 후에 생기는 warning이나 error를 보고 warning이 안 뜨게 소스를 고거나 Rule을 제외한 후, 최종결정Rule들로 Ruleset 정의 파일을 생성하는 것이 편리할 것입니다. 저는 처음에 모든 Rule을 다 선택한 다음에warning들을 없애가면서 Rule들을 하나하나 검토해 나갔었습니다.
+Project의 Properties에도 PMD관련 설정이 있습니다. 외부에서 만든 Rule파일을 바로 참조해도 되고, 여기서 설정된 것을파일로 생성할 수도 있습니다. 이미 있는 프로젝트에서 Rule를 설정할 때는 Project의 Properties에서 Rule들을고른 후에 생기는 warning이나 error를 보고 warning이 안 뜨게 소스를 고치거나 Rule을 제외한 후, 최종결정Rule들로 Ruleset 정의 파일을 생성하는 것이 편리할 것입니다. 저는 처음에 모든 Rule을 다 선택한 다음에warning들을 없애가면서 Rule들을 하나하나 검토해 나갔었습니다.
 
 image:img/pmd/eclipse-pmd-project.jpg[eclipse-pmd-project.jpg]
 
@@ -28,7 +28,7 @@ image:img/pmd/eclipse-pmd-project.jpg[eclipse-pmd-project.jpg]
 </natures>
 ----
 
-이제 해당 프로젝트는 Eclipse의 Problems View에서 PMD에서 보고하는 error, warning까지 모두 다 뜨게됩니다. 개발을 하면서 Rule 준수에 대한 빠른 피드백을 얻기 위해 되도록 이 기능을 사용하는 것이 좋습니다. 대신 이미Project에 warning이 많으면 새로운 warning들이 잘 눈에 띄지 않게 되므로, Project를 warning없이깨끗히 정리한 다음에 사용할 것을 권장해 드립니다.
+이제 해당 프로젝트는 Eclipse의 Problems View에서 PMD에서 보고하는 error, warning까지 모두 다 뜨게됩니다. 개발을 하면서 Rule 준수에 대한 빠른 피드백을 얻기 위해 되도록 이 기능을 사용하는 것이 좋습니다. 대신 이미Project에 warning이 많으면 새로운 warning들이 잘 눈에 띄지 않게 되므로, Project를 warning없이깨끗이 정리한 다음에 사용할 것을 권장해 드립니다.
 
 모든 Rule을 다 적용하면 아마 굉장히 많은 warning과 때로는 에러까지도 나올 것입니다. 그런 것들을 다 검토해서 포함시킬지를 결정해야 합니다. http://pmd.sourceforge.net/rule-guidelines.html를 참조하셔서, 프로젝트 상황에 맞게 적용해야겠죠. 그중 몇가지 Rule에 대해서만 언급을 하고 넘어가겠습니다.
 
@@ -37,7 +37,7 @@ image:img/pmd/eclipse-pmd-project.jpg[eclipse-pmd-project.jpg]
 * http://pmd.sourceforge.net/rules/controversial.html[Controversial Rules]-OnlyOneReturnRule :  메서드에서 return문이 여러 개일 경우 경고를 주는데, 메서드 중간의 return문은 복잡한 조건문의 구조를 단순하게 하는데 도움이 경우가 많고, http://www.yes24.com/Goods/FTGoodsView.aspx?goodsNo=2824034&CategoryNumber=001001003016001006[켄트벡의 구현패턴] 7장 중 '보호절'을 보면 이를 권장하고 있습니다.
 * http://pmd.sourceforge.net/rules/design.html[Design Rules]-UnnecessaryLocalBeforeReturn: return 전에 따로 local 변수로 반환할 값을 선언할 때 주는 경고인데, 기능적으로는 별 의미 없는 코드이나,return 문장에는 @SupressWarning 의 Annotation을 추가할 수 없기 때문에,  Annotation 적용범위를 최소화하기 위해 그런 선언이 필요한 때도 있습니다. (Java Language Spec 9.7, EffectiveJava 2nd Edition Item 24 참조)
 
-검토해보니 가장 부담없이 적용가능한 RuleSet이 괄호에 대한 규칙을 정의하는 Braces Rules이고, Controversial Rules가 이름 그래도 가장 제외할 것이 많은 Rule Set입니다.
+검토해보니 가장 부담없이 적용가능한 RuleSet이 괄호에 대한 규칙을 정의하는 Braces Rules이고, Controversial Rules가 이름 그대로 가장 제외할 것이 많은 Rule Set입니다.
 
 이런 과정을 거쳐서 선별된 Rule 정의 파일이 만들어지면 그것을 Maven의 PMD plugin에서도 참조할 수 있게 설정합니다. 저는 Rule설정 파일이름을 .ruleset으로 하고 pom.xml에 추가했습니다.
 

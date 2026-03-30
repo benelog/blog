@@ -87,7 +87,7 @@ class UserService\{
 
 그리고 Inject 가능한 API 형식으로 환경에 대한 추상화도 지원할 것이라고 합니다.
 
-보통 database의 URL 같은 속성들은 별도의 property 파일로 배서 관리하는 placeholders라는 기능을 쓰는데, 이 기능도 실제 환경에 의존적으로 placeholder를 나름대로 지정할 수 있는 기능이 나온다고 합니다.
+보통 database의 URL 같은 속성들은 별도의 property 파일로 빼서 관리하는 placeholders라는 기능을 쓰는데, 이 기능도 실제 환경에 의존적으로 placeholder를 나름대로 지정할 수 있는 기능이 나온다고 합니다.
 
 === Java-based applicaion configuration
 이미 3.0에 JavaConfig 기능이 포함되어서 @Configuration, @Bean 등의 Annotation이 추가되었는데, 어떤 기능들이 더 추가되는 것일지 궁금했었습니다. 3.1에 들어가는 Java-based configuration은 tx나, aop 같은 custom name-space와 같은 선언들이 Java파일로도 가능하게 하는 것이였습니다. Spring Batch나 Security, Integration에서도 이러한 custom name-space들을 많이 쓰는데, 그런 설정들이 xml로 bean 선언을 할 때는 설정을 간편하게 하지만, JavaConfig로 옮기기에는 불편해서 아쉬웠던 점이 있습니다. Spring Batch에서 ItemReader, ItemWriter 선언을 JavaConfig로 옮겨보니 훨씬 코드가 짧아지고 Compile time의 validation 범위도 넓어져서 만족했었는데, Job과 Step의 선언은 custom namespace로 하는 것이 더 간편해서, XML에 남겨두었었습니다. 그리고 유사하게
@@ -176,8 +176,8 @@ XML로 Bean 선언을 할 때 p namespace과 같은 역할을 하는 c namespace
 그리고 당연히 java 5, 6 user를 위한 기능도 있을 것이고, 그런 기능들은 Spring 3.1이 GA로 간 다음에 사용자들의 요청에 따라서 결정될 것이라고 합니다.
 
 === Java SE 7 Support
-Spring 3.2의 초점은 JRE 7 을 가장 잘 쓰는 사용법이라고 했습니다. JDBC 4.1에 대한 지원과 Java concurrent 패지지에서 개선되는 fork-join 프레임웍에 대한 지원계획이 있었습니다.
+Spring 3.2의 초점은 JRE 7 을 가장 잘 쓰는 사용법이라고 했습니다. JDBC 4.1에 대한 지원과 Java concurrent 패키지에서 개선되는 fork-join 프레임웍에 대한 지원계획이 있었습니다.
 
 === 멀티코어의 Concurrent 프로그래밍에 초점
-동시 요청보다 Core수가 더 많은 시나리오에 초점을 맞추어서 API제공을 계획하고 있다고 합니다. 예를 들면 Spring Batch에서 큰 Xml파일을 처리할 때와 같이, 처리 요청은 하나이기 때문에 요청 건별로 병렬처리르 하기가 힘들지만 자원소모가 커서 병렬처리를 했을 때의 이득이 큰 경우를 염두에 둔 것이였습니다. 그런 곳에 사용할 수 있는 특화된 ForkJoinPool이 Application context안에 들어갈 것이라고 했습니다.
+동시 요청보다 Core수가 더 많은 시나리오에 초점을 맞추어서 API제공을 계획하고 있다고 합니다. 예를 들면 Spring Batch에서 큰 Xml파일을 처리할 때와 같이, 처리 요청은 하나이기 때문에 요청 건별로 병렬처리를 하기가 힘들지만 자원소모가 커서 병렬처리를 했을 때의 이득이 큰 경우를 염두에 둔 것이였습니다. 그런 곳에 사용할 수 있는 특화된 ForkJoinPool이 Application context안에 들어갈 것이라고 했습니다.
 

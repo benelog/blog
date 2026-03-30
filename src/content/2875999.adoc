@@ -51,13 +51,13 @@ image:img/web-server/winstone.jpg[title="winstone.jpg"]
 그외의 다양한 옵션은 Winstone의 사이트(http://winstone.sourceforge.net/[http://winstone.sourceforge.net/] )에 자세히 나와 있습니다.
 
 == 웹애플리케이션을 jar파일 하나로 실행되도록 패키징
-앞선 hudson의 사례처럼, 별도의 WAS설치 없이 웹어플리션 배포 파일 자체에 WAS를 내장하는 방식입니다.
+앞선 hudson의 사례처럼, 별도의 WAS설치 없이 웹어플리케이션 배포 파일 자체에 WAS를 내장하는 방식입니다.
 
 Jetty를  애플리케이션 안에서 직접 심어서(Embedding) 실행시켜도 같은 효과가 있습니다. 제가 간단하게 만들었던, http://blog.benelog.net/2874354[dumper]라는 도구에서도 그 방식을 활용했습니다.
 
 * https://github.com/benelog/dumper/blob/master/src/main/java/Start.java
 
-Jetty를 war파일 안에 패키징해서 독립적을 실행가능한 방식도 있습니다. 아래 자료에 설명되어 있습니다.
+Jetty를 war파일 안에 패키징해서 독립적으로 실행가능한 방식도 있습니다. 아래 자료에 설명되어 있습니다.
 
 * http://eclipsesource.com/blogs/2009/10/02/executable-wars-with-jetty/[http://eclipsesource.com/blogs/2009/10/02/executable-wars-with-jetty/]
 * http://www.jowisoftware.de/blog/archives/26-Creating-runnable-wars-with-Maven-and-Jetty.html[http://www.jowisoftware.de/blog/archives/26-Creating-runnable-wars-with-Maven-and-Jetty.html]
@@ -101,7 +101,7 @@ mvn net.sf.alchim:winstone-maven-plugin:embed
 위 프로젝트를 받고서 mvn package를 하면 target 폴더 아래에 uploader.jar가 생기는데 `java -jar uploader.jar` 만 하면 웹애플리케이션이 실행되는 것이죠.
 
 == 어디에 쓸까?
-직접 서비스 운영과 서버관리를 담당하는 일반적인 웹애플리션에서는 Winstone을 쓸 일이 그다지 많아보이지는 않습니다. 다만 Huson처럼 패키징해서 배포하고, 여러 가지 옵션을 제공하는 패키지성 웹애플리케이션에서는 고려해볼만도 합니다. 유사하게 Lucene바탕의 API서버인 Solr(http://lucene.apache.org/solr/)에서는 Jetty를 이용한 stand-alone 실행모드를 제공합니다. 그리고 간단히 소수의 인원이 쓰는 관리도구나, Desktop application 성격의 프로그램이라도 Swing, AWT대신 Web의 UI 기술을 이용하고 싶을 때도 Winstone할 포함한 패키징을 고려해볼만도 합니다.
+직접 서비스 운영과 서버관리를 담당하는 일반적인 웹애플리케이션에서는 Winstone을 쓸 일이 그다지 많아보이지는 않습니다. 다만 Huson처럼 패키징해서 배포하고, 여러 가지 옵션을 제공하는 패키지성 웹애플리케이션에서는 고려해볼만도 합니다. 유사하게 Lucene바탕의 API서버인 Solr(http://lucene.apache.org/solr/)에서는 Jetty를 이용한 stand-alone 실행모드를 제공합니다. 그리고 간단히 소수의 인원이 쓰는 관리도구나, Desktop application 성격의 프로그램이라도 Swing, AWT대신 Web의 UI 기술을 이용하고 싶을 때도 Winstone을 포함한 패키징을 고려해볼만도 합니다.
 
 하지만 비슷한 용도의 Jetty와 비교해볼 때  winstone이  유망하다고 생각하지는 않습니다.  2008년도 이후에는 프로젝트 업데이트가 안 되고 있어서 앞으로의 전망이 어두워보입니다. 계속 이런 상태라면 Hudson에서도 언젠가는 Jetty로 갈아타지 않을까하는 생각도 듭니다. 별도로 클래스를 만들지 않아도 되는 장점등도 언젠가는 Jetty에서도 제공될수 있어 보입니다. 그리고 jsp를 쓰는 프로젝트에서는 따로 라이브러리를 지정해야 하는 것도 다소 번거롭습니다.
 

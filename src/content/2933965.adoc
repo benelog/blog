@@ -7,7 +7,7 @@
 :idprefix:
 
 == 스레드 안전성을 어떻게 문서에 표기할까?
-Javadoc에서는 메소드 선언에 synchronized가 있는지 표시하지 않습니다. 그 이유는 동기화 여부는 세부 구현 방식이기 때문에 문서에까지 그것을 노출하지 하는 것은 적절하지 않기 때문이라고 합니다.
+Javadoc에서는 메소드 선언에 synchronized가 있는지 표시하지 않습니다. 그 이유는 동기화 여부는 세부 구현 방식이기 때문에 문서에까지 그것을 노출하지 않는 것은 적절하지 않기 때문이라고 합니다.
 
 선언부에 synchronized가 있는 메소드도 메소드 안의 모든 블럭이 synchronized(this)와 감싸진 코드와 의미입니다. 즉 아래의 코드는
 
@@ -35,7 +35,7 @@ void run(){
 
 결국 현재 javadoc의 규약으로는 어떤 메소드가 멀티스레드에서의 안전한지 여부를 표시해야 하는 강제성은 없다는 이야기입니다.
 
-Effective Java 2nd Edition에서는 스레드 안정성을 다음 4자리 분류로 구분해서 문서화하라고 권장합니다.
+Effective Java 2nd Edition에서는 스레드 안정성을 다음 4가지 분류로 구분해서 문서화하라고 권장합니다.
 
 * Immutable
 ** 상태가 없습니다. 당연히 Thread-safe합니다.
@@ -102,7 +102,7 @@ public class DefaultHttpClient extends AbstractHttpClient {
 public class SingleClientConnManager implements ClientConnectionManager {
 ----
 
-이 애노테이션들은 원래의 JCIP 애노테이션의 패키지인 net.jcip.annotations 대신에 org.apache.http.annotation 패키지에 들어가 있기는 합니다.그런데 이 패키지에 있는 http://www.docjar.com/docs/api/org/apache/http/annotation/ThreadSafe.html[@ThreadSafe]등의 javadoc를 봐도이 애노테이션들은 JCIP책에서 유례하였다고 설명합니다.
+이 애노테이션들은 원래의 JCIP 애노테이션의 패키지인 net.jcip.annotations 대신에 org.apache.http.annotation 패키지에 들어가 있기는 합니다.그런데 이 패키지에 있는 http://www.docjar.com/docs/api/org/apache/http/annotation/ThreadSafe.html[@ThreadSafe]등의 javadoc를 봐도이 애노테이션들은 JCIP책에서 유래하였다고 설명합니다.
 
 http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/org/apache/http/impl/client/DefaultHttpClient.html[이 애노테이션이 붙어 있는 클래스의 avadoc]에서는 클래스 설명 단락의 위 쪽에 이 애노테이션을 보여줍니다.
 
@@ -149,7 +149,7 @@ Findbugs의 자세한 설명방법은 아래 포스트를 참고하시기 바랍
 == 정리
 Java에서 어떤 클래스가 멀티스레드에서 의도하지 않게 사용될 때 그 부작용은 심각하지만, 문제가 되는 지점을 추적하기는 어렵습니다. 그렇게 때문에 스레드 안정성은 반드시 엄격하게 문서에 언급 되어야 합니다.그러나 기존의 클래스를 보면 제 각각의 표현 방식으로, 때로는 눈에 잘 띄지 않게 문서에 적혀 있습니다.
 
-JCIP 애노테이션은 일관된 방식으로 스레드 안정성을 문서화하는데 도움이 됩니다. 이 애토테이션은 Apache httpclient 프로젝트에 적용되었고, 강력하지는 않지만 findbugs에서 JCIP annotation이 걸린 클래스를 정적 분석을 해주기도 합니다.
+JCIP 애노테이션은 일관된 방식으로 스레드 안정성을 문서화하는데 도움이 됩니다. 이 애노테이션은 Apache httpclient 프로젝트에 적용되었고, 강력하지는 않지만 findbugs에서 JCIP annotation이 걸린 클래스를 정적 분석을 해주기도 합니다.
 
 대부분의 웹프로젝트에서는 비지니스 레이어를 상태가 없는 클래스로 멀티스레드에서도 안전하게 만드는 방식이 권장됩니다.
 그러나 때로는 스레드 안전하지 않은 클래스를 만들게 될 수도 있습니다.

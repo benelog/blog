@@ -106,7 +106,7 @@ List<Integer> range = list.subList(s, t+1);
 Collections.rotate(range, k);
 ----
 
-그런데 이렇게 하는게 이 문제의 의도는 아닐듯해서 참고구현 정도로 남겨 두었습니다. 처음 풀이에서도 Arrays.copyOfRange 메소드를 쓰기는 했지만 이 부분은 특별한 알고리즘에 없는 단순한 배열복사라서 활용했습니다.
+그런데 이렇게 하는게 이 문제의 의도는 아닐듯해서 참고구현 정도로 남겨 두었습니다. 처음 풀이에서도 Arrays.copyOfRange 메소드를 쓰기는 했지만 이 부분은 특별한 알고리즘이 없는 단순한 배열복사라서 활용했습니다.
 
 * Collections.rotate를 이용한 풀이 코드 : https://github.com/benelog/quiz/blob/master/src/main/java/net/benelog/quiz/insight/ListHandler.java[ListHandler.java]
 

@@ -96,7 +96,7 @@ FIeld 객체를 얻어올 때 field(String,String)을 쓰면 static 필드초기
 http://kenai.com/projects/btrace/forums/forum/topics/1366-Drilling-into-a-method-argument-s-properties[http://kenai.com/projects/btrace/forums/forum/topics/1366-Drilling-into-a-method-argument-s-properties]
 
 결국 `@OnMethod` 가 붙지 않는 메소드에서 호출을 할 때는 `field(classof(obj), "fieldName")` 과 같이 피해가는 방법을 썼습니다. 되도록 메소드에서 매번 호출할 필요가 없는 부분은 static 초기화를 시킬 수 있었으면 하는데, static 초기화로는 하는 것도 잘 되지 않았습니다. 직접 field(BasicDataSource.class, "fieldName)으로 를 참조하기는 것도 잘 안 되었고, field(String,String)으로는 참조가 안 되었습니다.
-이것만 아니면 좀 더 최적된 호출을 할 수 있었을 것 같습니다.
+이것만 아니면 좀 더 최적화된 호출을 할 수 있었을 것 같습니다.
 
 첨부한 파일들은 아래와 같은 다소 다른 방식이나 출력형식으로 택했습니다.
 

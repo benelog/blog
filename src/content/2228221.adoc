@@ -93,7 +93,7 @@ Maven의 resource filter기능을 이용해서 실행환경에 따라 다른 값
 ----
 
 
-실제적인 파일의 저장기능을 담당하는 클래스인 FileRepository에서는 간단하게 UIDD를 이용해서 키를 생성하고 path필드로 지정된 디렉토리에 저장을 해줍니다.
+실제적인 파일의 저장기능을 담당하는 클래스인 FileRepository에서는 간단하게 UUID를 이용해서 키를 생성하고 path필드로 지정된 디렉토리에 저장을 해줍니다.
 
 [source,java]
 ----

@@ -91,7 +91,7 @@ applicationContext를 설정하는 xml파일에서   aop: 네임스페이스를 
 
 
 === LogAspectTest.java
-드디어 LogAspect의 표현식을 테스트하는 코드입니다. @Bean으로 Aspect와 tagetObject를 모드 XML설정 대신 java로 한 파일 안에서 표현했습니다.
+드디어 LogAspect의 표현식을 테스트하는 코드입니다. @Bean으로 Aspect와 tagetObject를 모두 XML설정 대신 java로 한 파일 안에서 표현했습니다.
 
 각 테스트 메소드별로  2가지를 검증했습니다.
 
@@ -139,7 +139,7 @@ public class LogAspectTest {
 클래스 선언부분에서 @ContextConfiguration(loader=AnnotationConfigContextLoader.class) 를 붙이면 외부의 XML 대신 테스트 클래스 안에 포함된 JavaConfig로된 설정을 읽어올 수 있습니다. TestContext라는 내부 클래스에다 @Configuration을 붙여서 필요한 Bean을 등록했습니다.
 `@EnableAspectJAutoProxy` 는 <aop:aspectj-autoproxy/>와 같은 역할을 하는 애노테이션입니다.
 
-아래와 같의 ApplicationContext에 LogRepository는 mock()으로 생성한 가짜 객체를 등록했습니다.
+아래와 같이 ApplicationContext에 LogRepository는 mock()으로 생성한 가짜 객체를 등록했습니다.
 
 [source,java]
 ----

@@ -60,7 +60,7 @@ public class JDBCTest {
 ----
 
 
-commit 을 했을 뿐인데, Statement가 닫혀버리는 형상이 발생한 것이죠. 원인을 찾기 위해 Cubrid JDBC드라이버의 클래스 파일들을 역컴파일 해서 봤더니, 아래와 같은 completeAllStatements()라는 메소드가 commit 메소드 안에서 호출이 되는 것이였습니다.
+commit 을 했을 뿐인데, Statement가 닫혀버리는 현상이 발생한 것이죠. 원인을 찾기 위해 Cubrid JDBC드라이버의 클래스 파일들을 역컴파일 해서 봤더니, 아래와 같은 completeAllStatements()라는 메소드가 commit 메소드 안에서 호출이 되는 것이였습니다.
 
 [source,java]
 ----

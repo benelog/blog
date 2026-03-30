@@ -74,7 +74,7 @@ CCN이나 NCSS값의 한계 허용치는 아래와 같이 지정합니다.
 Encountered "@ SuppressWarnings ( \"unused\" ) int notUsedVariable =" at line xxx, column yyy.
 ----
 
-이 것은   http://mojo.codehaus.org/javancss-maven-plugin/[javancss-maven-plugin]  버전 2.0-beta-2가 이 의존하고 있는 JavaNCSS 버전 29.49 에서 가지고 있는 버그입니다. (http://jira.codehaus.org/browse/MJNCSS-16 참조) JavaNCSS 버전 29.50에서는 해결된 문제이고, 이 플러그인의 최신 버전인 http://mojo.codehaus.org/javancss-maven-plugin/[javancss-maven-plugin] 2.0-beta-3버전에서는 이런 문제가 발생하지 않는다고 합니다. 그런데, codehause의 Maven Repository를 뒤져보니 (http://repository.codehaus.org/org/codehaus/mojo/javancss-maven-plugin/) 아직 2.0-beta-3버전은 올라와 있지 않습니다. snapshop 버전을 찾아서 쓸 수도 있겠지만, 그것보다는plugin 설정에서 dependency설정을 덥어쓰는 편이 더 간편하게 느껴졌습니다. `pom.xml` 의 build절에 아래와같이 추가하면 됩니다.
+이 것은   http://mojo.codehaus.org/javancss-maven-plugin/[javancss-maven-plugin]  버전 2.0-beta-2가 이 의존하고 있는 JavaNCSS 버전 29.49 에서 가지고 있는 버그입니다. (http://jira.codehaus.org/browse/MJNCSS-16 참조) JavaNCSS 버전 29.50에서는 해결된 문제이고, 이 플러그인의 최신 버전인 http://mojo.codehaus.org/javancss-maven-plugin/[javancss-maven-plugin] 2.0-beta-3버전에서는 이런 문제가 발생하지 않는다고 합니다. 그런데, codehause의 Maven Repository를 뒤져보니 (http://repository.codehaus.org/org/codehaus/mojo/javancss-maven-plugin/) 아직 2.0-beta-3버전은 올라와 있지 않습니다. snapshop 버전을 찾아서 쓸 수도 있겠지만, 그것보다는plugin 설정에서 dependency설정을 덮어쓰는 편이 더 간편하게 느껴졌습니다. `pom.xml` 의 build절에 아래와같이 추가하면 됩니다.
 
 [source,xml]
 ----

@@ -19,7 +19,7 @@ Hadoop의 http://hadoop.apache.org/core/docs/current/api/org/apache/hadoop/mapre
 
 아뭏든 지금까지 현재 공개된 API만으로는 Hadoop의 DB연결 지원 클래스들은 빈약해 보이고, API도 좋은 설계요건을 갖추었다고 느껴지지는 않습니다. 아무래도 포털 등에서 대용량 데이터를 처리하는 곳에 쓰이다보니 DB와 함께 연결되는 쓰임새가 그리 많지는 않았나봅니다. 더군다나 Oracle에서는 한번도 안 돌려본 클래스가 버젓이 DB...로 시작되는 이름으로 들어간 것 보면 Oracle이 쓰이는 동네와 Hadoop이 사는 곳은 아주 멀리 떨어져 있었던 것 같습니다. 그러나, 앞으로  엔터프라이즈 환경에서도 Hadoop이 쓰이려면 DB와의 integration은 반드시 거쳐야할 다리인 것 같습니다. http://www.jaso.co.kr/283[Enterprise 시장에서의 mapreduce] 링크를 보아도 이미 그런 시도들이 시작된 것을 알 수 있습니다.
 
-한편, Hadoop의 http://hadoop.apache.org/core/docs/current/api/org/apache/hadoop/mapred/FileInputFormat.html[FileInputFormat]가 Spring batch의 http://static.springsource.org/spring-batch/apidocs/org/springframework/batch/item/file/FlatFileItemReader.html[FlatFileItemReader]와 유사한 것 등이나 Spring batch도 2.0에서 아직 분산, 동시처리 등을 지원하기 시작했다는 점은 두 프레임웍의 겹치는 지점이 늘어날 수도 있다는 생각도 듭니다. 뭐 아직 Spring batch의 분산지원은 걸음마 단계이기는 합니다만, DB에서 HDFS에 들어가는 파일을 쓸 때 Spring batch의 API를 활용하는 것 깉은 활용법은 시도해 볼만하다고 생각됩니다.
+한편, Hadoop의 http://hadoop.apache.org/core/docs/current/api/org/apache/hadoop/mapred/FileInputFormat.html[FileInputFormat]가 Spring batch의 http://static.springsource.org/spring-batch/apidocs/org/springframework/batch/item/file/FlatFileItemReader.html[FlatFileItemReader]와 유사한 것 등이나 Spring batch도 2.0에서 아직 분산, 동시처리 등을 지원하기 시작했다는 점은 두 프레임웍의 겹치는 지점이 늘어날 수도 있다는 생각도 듭니다. 뭐 아직 Spring batch의 분산지원은 걸음마 단계이기는 합니다만, DB에서 HDFS에 들어가는 파일을 쓸 때 Spring batch의 API를 활용하는 것 같은 활용법은 시도해 볼만하다고 생각됩니다.
 
 
 == 소스

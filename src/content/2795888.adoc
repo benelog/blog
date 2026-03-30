@@ -34,7 +34,7 @@ application context 파일 선언만으로 특정 빈의 속성에 서버 이름
 <bean id="localHost" class="java.net.InetAddress" factory-method="getLocalHost"/>
 ----
 
-SPel이 잘 먹는지는 다음와 같이 테스트 할 수 있습니다.
+SPel이 잘 먹는지는 다음과 같이 테스트 할 수 있습니다.
 
 [source,java]
 ----

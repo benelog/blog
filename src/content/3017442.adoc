@@ -6,7 +6,7 @@
 :jbake-tags: android,test,행사후기
 :idprefix:
 
-지난 2013/04/13일, 종로 페럼타회에서 열렸던 '구글 개발자와 함께하는 GDG Korea Android 컨퍼런스 '에서 공유된 내용입니다
+지난 2013/04/13일, 종로 페럼타워에서 열렸던 '구글 개발자와 함께하는 GDG Korea Android 컨퍼런스 '에서 공유된 내용입니다
 
 == 발표 자료
 * 발표 자료 : http://goo.gl/1WyAz
@@ -16,7 +16,7 @@
 
 제가 핵심으로 기억하는 내용은 아래와 같습니다.
 
-* 앱이 기능이 점점 추가되고 복잡해져 가면서 코드가 점점 누더기가 되어갔다. 수정에 대한 부작용을 파악하기기 어려워져 갔다. 그래서 테스트의 필요성이 느껴졌다.
+* 앱이 기능이 점점 추가되고 복잡해져 가면서 코드가 점점 누더기가 되어갔다. 수정에 대한 부작용을 파악하기 어려워져 갔다. 그래서 테스트의 필요성이 느껴졌다.
 * Android의 기본 Test Framework는 너무 느려서 포기했다. 한번 실행에 30~40초가 걸렸다.
 * Robolectric도 검토했으나, 없는 기능이 많고 라이브러리 충돌 때문에 포기했다.
 ** 테스트가 실패할 때 Robolectric의 버그인지 앱의 버그인지 확인하기 어려워서 디버깅에 시간이 걸렸다.
@@ -69,7 +69,7 @@ Android-annotations를 쓰면 @Background가 붙은 메소드는 BackgroundExecu
 
 BackgroundExecutor.setExecutor(new RobolectricBackgroundExecutorService());
 ----
-참고로 구조적으로 Thread의 Executor를 바꿔치기 하기 힘든 경우에는 https://code.google.com/p/awaitility/[Awaitility]라는 라이브러리도를 사용해볼만도 합니다.
+참고로 구조적으로 Thread의 Executor를 바꿔치기 하기 힘든 경우에는 https://code.google.com/p/awaitility/[Awaitility]라는 라이브러리도 사용해볼만도 합니다.
 
 
 그리고 SDK버전에 따라서 다르게 돌아가는 코드가 있다면 Robolectric에서 아래와 같이 조작을 할 수 있습니다. (물론 PowerMock을 써도 같은 일을 할 수 있기는 합니다.)
