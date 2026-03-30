@@ -97,7 +97,7 @@ SessionStart hook ──→ check-quota-switch.sh
                           │
                   시간 비교: 현재 >= 초기화 시간?
                           │
-                     Yes ──┤
+                    Yes ──┤
                           │
                   credentials 삭제 + 세션 블로킹
                           │
@@ -469,4 +469,4 @@ Claude Code는 실행 환경의 OS를 인식합니다. macOS에서 같은 요청
 이 외에도 macOS에서는 다음 차이가 있습니다:
 
 * `grep -oP` (PCRE)가 macOS 기본 grep에서 지원되지 않습니다. `brew install grep` 후 `ggrep`을 사용하거나, 정규식을 POSIX 호환으로 변경해야 합니다.
-* macOS에서 Claude Code의 credentials는 https://docs.anthropic.com/en/docs/claude-code/security#credential-storage[macOS Keychain에 저장]됩니다. `~/.claude/.credentials.json` 파일이 존재하지 않으므로, `check-quota-switch.sh`에서 파일을 삭제하는 방식이 동작하지 않습니다. macOS에서 프롬프트를 내리면 `security delete-generic-password` 명령으로 Keychain에서 credentials를 삭제하는 스크립트가 생성됩니다.
+* macOS에서 Claude Code의 credentials는 https://docs.anthropic.com/en/docs/claude-code/security#credential-storage[macOS Keychain에 저장]됩니다. `~/.claude/.credentials.json` 파일이 존재하지 않으므로, ``check-quota-switch.sh``에서 파일을 삭제하는 방식이 동작하지 않습니다. macOS에서 프롬프트를 내리면 `security delete-generic-password` 명령으로 Keychain에서 credentials를 삭제하는 스크립트가 생성됩니다.
