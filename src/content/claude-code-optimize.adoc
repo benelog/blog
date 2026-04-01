@@ -1,0 +1,592 @@
+= Claude Code 비용 최적화를 위한 지표 수집
+정상혁
+2026-04-01
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: claude-code, AI
+:description: Claude Code의 사용 패턴을  분석하고 개인별 개선 권고를 만들기 위해, Hook과 OpenTelemetry로 어떤 지표를 수집하고 활용할 수 있는지 정리합니다.
+:toc:
+:sectnums:
+:idprefix:
+
+Claude Code를 효율적으로 사용하고 있는지 개인적으로나 팀 차원에서 자주 돌아보고 개선 시도를 한다면, 같은 작업을 더 적은 비용으로 할 수 있습니다.
+이 글에서는 Claude Code의 Hook과 OpenTelemetry를 활용하여 사용 지표를 수집하고, 수집된 데이터로 개인별 개선 권고 리포트를 만드는 방법을 정리합니다.
+
+== 수집해야 할 지표
+
+비용 최적화 관점에서 의미 있는 지표는 크게 네 영역으로 나뉩니다.
+
+=== 컨텍스트 관리 효율성
+
+컨텍스트가 가득 차서 자동 압축(autocompact)이 발생하면, 그만큼 한 세션에서 많은 토큰을 소비했다는 신호입니다.
+
+[cols="2,3", options="header"]
+|===
+|지표 |의미
+
+|세션 시작 유형 (`source`)
+|`startup`(신규), `resume`(재개), `compact`(압축 후), `clear`(`/clear` 후) 비율로 사용 습관을 파악
+
+|자동 압축 빈도
+|세션당 autocompact 횟수가 많으면 작업 단위를 더 작게 분리할 필요가 있음
+
+|압축 간격
+|압축 사이 시간이 짧을수록 컨텍스트를 빠르게 소진하고 있다는 의미
+|===
+
+=== 도구 사용 패턴
+
+Claude Code는 파일 읽기, 편집, 명령 실행 등 도구를 호출할 때마다 API 호출이 발생합니다.
+도구 사용 방식에 따라 같은 작업의 토큰 소비량이 크게 달라집니다.
+
+[cols="2,3", options="header"]
+|===
+|지표 |의미
+
+|도구별 호출 빈도
+|어떤 도구를 주로 쓰는지 파악. `Bash`로 `cat`, `grep`을 반복 호출하면 전용 도구(`Read`, `Grep`)보다 토큰을 더 소비
+
+|도구 호출 실패율
+|실패 후 재시도는 토큰 낭비. 반복 실패 패턴은 사용자 교육이 필요한 영역
+
+|서브에이전트 생성 빈도
+|`Agent` 도구로 서브에이전트를 생성하면 추가 API 호출이 발생. 불필요한 서브에이전트 생성은 비용 증가 요인
+|===
+
+=== 세션 수명 주기
+
+[cols="2,3", options="header"]
+|===
+|지표 |의미
+
+|세션 길이 (시작~종료 시간)
+|세션이 길수록 컨텍스트가 누적되어 턴당 입력 토큰이 증가 footnote:[턴당 입력 토큰의 이차 증가에 대해서는 link:claude-code-cost.html[Claude Code 토큰 비용과 프롬프트 캐싱]을 참고]
+
+|세션 종료 사유
+|정상 종료, 비정상 종료, rate limit 등의 비율
+|===
+
+=== API 호출과 비용
+
+가장 직접적인 비용 지표입니다.
+
+[cols="2,3", options="header"]
+|===
+|지표 |의미
+
+|API 호출 횟수
+|세션당, 프롬프트당 API 호출 수
+
+|호출당 토큰 수
+|입력/출력/캐시 읽기/캐시 쓰기 토큰
+
+|호출당 비용 (USD)
+|모델별 단가 적용된 실제 비용
+
+|모델별 사용 비율
+|Opus vs Sonnet vs Haiku. Opus는 Sonnet 대비 5배 비용
+
+|캐시 히트율
+|캐시 읽기 토큰 비율이 높을수록 비용 효율적
+|===
+
+== 지표별 수집 방법
+
+수집 방법은 크게 두 가지입니다. **Hook**은 사용 행동 패턴을, **OpenTelemetry**는 정확한 비용 데이터를 수집합니다.
+
+=== Hook으로 수집하는 지표
+
+Claude Code의 https://docs.anthropic.com/en/docs/claude-code/hooks[Hook]은 특정 이벤트 발생 시 셸 스크립트를 실행하는 기능입니다. 비용 데이터에는 직접 접근할 수 없지만, 사용 행동 패턴을 기록하는 데 적합합니다.
+
+[cols="1,2,2", options="header"]
+|===
+|Hook 이벤트 |수집 가능한 지표 |비고
+
+|`SessionStart`
+|세션 시작 유형(`source`), 사용 모델(`model`)
+|`source` 값: `startup`, `resume`, `compact`, `clear`
+
+|`SessionEnd`
+|세션 종료 시각, 종료 사유
+|세션 시작 시각과 조합하면 세션 길이 산출
+
+|`PreCompact`
+|압축 발생 시각, 자동/수동 여부
+|`matcher: auto`로 자동 압축만 필터링 가능
+
+|`PreToolUse`
+|도구 이름, 호출 시각
+|고빈도 이벤트이므로 성능 영향 고려 필요
+
+|`PostToolUseFailure`
+|실패한 도구, 에러 내용
+|반복 실패 패턴 분석용
+
+|`SubagentStart`
+|서브에이전트 생성 시각
+|불필요한 서브에이전트 생성 패턴 분석
+|===
+
+==== 수집 스크립트 예시
+
+하나의 스크립트에서 이벤트 유형별로 분기하여 JSONL 형식으로 기록합니다.
+
+[source,bash]
+.~/.claude/scripts/log-usage.sh
+----
+#!/bin/bash
+INPUT=$(cat)
+EVENT=$(echo "$INPUT" | jq -r '.hook_event_name')
+SESSION=$(echo "$INPUT" | jq -r '.session_id')
+TIMESTAMP=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+USER=$(whoami)
+
+LOG_DIR="$HOME/.claude/usage-logs"
+mkdir -p "$LOG_DIR"
+
+case "$EVENT" in
+  SessionStart)
+    SOURCE=$(echo "$INPUT" | jq -r '.source')
+    MODEL=$(echo "$INPUT" | jq -r '.model')
+    echo "{\"ts\":\"$TIMESTAMP\",\"user\":\"$USER\",\"event\":\"session_start\",\"session\":\"$SESSION\",\"source\":\"$SOURCE\",\"model\":\"$MODEL\"}" \
+      >> "$LOG_DIR/events.jsonl"
+    ;;
+  SessionEnd)
+    echo "{\"ts\":\"$TIMESTAMP\",\"user\":\"$USER\",\"event\":\"session_end\",\"session\":\"$SESSION\"}" \
+      >> "$LOG_DIR/events.jsonl"
+    ;;
+  PreCompact)
+    echo "{\"ts\":\"$TIMESTAMP\",\"user\":\"$USER\",\"event\":\"compact\",\"session\":\"$SESSION\"}" \
+      >> "$LOG_DIR/events.jsonl"
+    ;;
+  PreToolUse)
+    TOOL=$(echo "$INPUT" | jq -r '.tool_name')
+    echo "{\"ts\":\"$TIMESTAMP\",\"user\":\"$USER\",\"event\":\"tool_use\",\"session\":\"$SESSION\",\"tool\":\"$TOOL\"}" \
+      >> "$LOG_DIR/events.jsonl"
+    ;;
+  PostToolUseFailure)
+    TOOL=$(echo "$INPUT" | jq -r '.tool_name')
+    echo "{\"ts\":\"$TIMESTAMP\",\"user\":\"$USER\",\"event\":\"tool_fail\",\"session\":\"$SESSION\",\"tool\":\"$TOOL\"}" \
+      >> "$LOG_DIR/events.jsonl"
+    ;;
+  SubagentStart)
+    echo "{\"ts\":\"$TIMESTAMP\",\"user\":\"$USER\",\"event\":\"subagent\",\"session\":\"$SESSION\"}" \
+      >> "$LOG_DIR/events.jsonl"
+    ;;
+esac
+----
+
+==== settings.json 설정
+
+[source,json]
+.~/.claude/settings.json
+----
+{
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [{ "type": "command", "command": "~/.claude/scripts/log-usage.sh" }] }
+    ],
+    "SessionEnd": [
+      { "hooks": [{ "type": "command", "command": "~/.claude/scripts/log-usage.sh" }] }
+    ],
+    "PreCompact": [
+      { "matcher": "auto",
+        "hooks": [{ "type": "command", "command": "~/.claude/scripts/log-usage.sh" }] }
+    ],
+    "PreToolUse": [
+      { "hooks": [{ "type": "command", "command": "~/.claude/scripts/log-usage.sh" }] }
+    ],
+    "PostToolUseFailure": [
+      { "hooks": [{ "type": "command", "command": "~/.claude/scripts/log-usage.sh" }] }
+    ],
+    "SubagentStart": [
+      { "hooks": [{ "type": "command", "command": "~/.claude/scripts/log-usage.sh" }] }
+    ]
+  }
+}
+----
+
+=== OpenTelemetry로 수집하는 지표
+
+Hook에서는 API 호출 횟수, 토큰 수, 비용 같은 핵심 비용 데이터에 접근할 수 없습니다.
+이 데이터는 Claude Code의 OpenTelemetry 연동을 통해 수집할 수 있습니다.
+
+Claude Code는 `claude_code.api_request` 이벤트를 OTLP로 내보냅니다. 이 이벤트에는 다음 필드가 포함됩니다.
+
+[cols="1,2", options="header"]
+|===
+|필드 |설명
+
+|`model`
+|사용된 모델 (예: `claude-sonnet-4-6`)
+
+|`cost_usd`
+|해당 API 호출의 비용 (USD)
+
+|`input_tokens`
+|입력 토큰 수
+
+|`output_tokens`
+|출력 토큰 수
+
+|`cache_read_tokens`
+|캐시에서 읽은 토큰 수
+
+|`cache_creation_tokens`
+|캐시에 새로 쓴 토큰 수
+
+|`duration_ms`
+|API 응답 시간
+
+|`event.sequence`
+|세션 내 API 호출 순번 (순서 보장용)
+
+|`prompt.id`
+|사용자 프롬프트 단위 UUID (한 프롬프트에서 여러 API 호출이 발생할 수 있음)
+|===
+
+==== 활성화 방법
+
+환경 변수를 설정하면 Claude Code가 OTLP 프로토콜로 텔레메트리를 전송합니다.
+
+[source,bash]
+----
+export CLAUDE_CODE_ENABLE_TELEMETRY=1
+export OTEL_LOGS_EXPORTER=otlp
+export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
+----
+
+개발자 PC의 셸 프로파일(`~/.bashrc`, `~/.zshrc` 등)에 추가하거나, 전사 dotfiles 관리 도구로 배포할 수 있습니다.
+
+=== 수집 방법 요약
+
+[cols="2,1,1", options="header"]
+|===
+|지표 |Hook |OpenTelemetry
+
+|세션 시작/종료, 압축 빈도
+|O
+|
+
+|도구 사용 패턴, 실패율
+|O
+|
+
+|API 호출 횟수
+|
+|O
+
+|토큰 수 (입력/출력/캐시)
+|
+|O
+
+|호출당 비용 (USD)
+|
+|O
+
+|모델별 사용 비율
+|O
+|O
+|===
+
+== 개인 분석: 로컬 로그로 셀프 리포트 만들기
+
+전사 수집 인프라가 없더라도, 앞서 설명한 Hook 스크립트로 로컬에 쌓인 `~/.claude/usage-logs/events.jsonl` 파일만으로 개인 사용 패턴을 분석할 수 있습니다.
+
+=== 분석 스크립트 예시
+
+`jq`와 셸 명령만으로 주요 지표를 산출하는 스크립트입니다.
+
+[source,bash]
+.~/.claude/scripts/self-report.sh
+----
+#!/bin/bash
+LOG="$HOME/.claude/usage-logs/events.jsonl"
+
+if [ ! -f "$LOG" ]; then
+  echo "로그 파일이 없습니다: $LOG"
+  exit 1
+fi
+
+# 분석 기간 (기본: 최근 7일)
+SINCE=$(date -u -d '7 days ago' '+%Y-%m-%dT00:00:00Z' 2>/dev/null \
+     || date -u -v-7d '+%Y-%m-%dT00:00:00Z')  # macOS 호환
+DATA=$(jq -c --arg since "$SINCE" 'select(.ts >= $since)' "$LOG")
+
+echo "=== 셀프 사용 리포트 (최근 7일) ==="
+echo ""
+
+# 세션 수
+SESSIONS=$(echo "$DATA" | jq -r 'select(.event=="session_start") | .session' | sort -u | wc -l)
+echo "[세션 요약]"
+echo "  세션 수: $SESSIONS"
+
+# 세션 시작 유형 비율
+echo "  시작 유형:"
+echo "$DATA" | jq -r 'select(.event=="session_start") | .source' \
+  | sort | uniq -c | sort -rn | while read count source; do
+    echo "    $source: $count"
+  done
+
+# autocompact 횟수
+COMPACTS=$(echo "$DATA" | jq -r 'select(.event=="compact")' | wc -l)
+echo "  자동 압축 횟수: $COMPACTS (세션당 평균: $(echo "scale=1; $COMPACTS / $SESSIONS" | bc 2>/dev/null || echo "N/A"))"
+echo ""
+
+# 도구 사용 패턴
+echo "[도구 사용]"
+TOTAL_TOOLS=$(echo "$DATA" | jq -r 'select(.event=="tool_use")' | wc -l)
+echo "  총 도구 호출: $TOTAL_TOOLS"
+echo "  상위 도구:"
+echo "$DATA" | jq -r 'select(.event=="tool_use") | .tool' \
+  | sort | uniq -c | sort -rn | head -10 | while read count tool; do
+    pct=$(echo "scale=0; $count * 100 / $TOTAL_TOOLS" | bc 2>/dev/null || echo "?")
+    echo "    $tool: $count (${pct}%)"
+  done
+
+# Bash로 cat/grep/find 호출 비율 (도구 이름만으로는 Bash 내부 명령을 알 수 없으므로 Bash 비율만 표시)
+BASH_COUNT=$(echo "$DATA" | jq -r 'select(.event=="tool_use" and .tool=="Bash")' | wc -l)
+if [ "$TOTAL_TOOLS" -gt 0 ]; then
+  BASH_PCT=$(echo "scale=0; $BASH_COUNT * 100 / $TOTAL_TOOLS" | bc 2>/dev/null || echo "?")
+  echo "  Bash 도구 비율: ${BASH_PCT}% (30% 이상이면 전용 도구 활용 권장)"
+fi
+
+# 실패율
+FAILS=$(echo "$DATA" | jq -r 'select(.event=="tool_fail")' | wc -l)
+if [ "$TOTAL_TOOLS" -gt 0 ]; then
+  FAIL_PCT=$(echo "scale=1; $FAILS * 100 / $TOTAL_TOOLS" | bc 2>/dev/null || echo "?")
+  echo "  도구 호출 실패: $FAILS (실패율: ${FAIL_PCT}%)"
+fi
+
+# 서브에이전트
+SUBAGENTS=$(echo "$DATA" | jq -r 'select(.event=="subagent")' | wc -l)
+echo "  서브에이전트 생성: $SUBAGENTS (세션당 평균: $(echo "scale=1; $SUBAGENTS / $SESSIONS" | bc 2>/dev/null || echo "N/A"))"
+echo ""
+
+# 간단한 권고
+echo "[자동 권고]"
+COMPACT_AVG=$(echo "scale=1; $COMPACTS / $SESSIONS" | bc 2>/dev/null || echo "0")
+if [ "$(echo "$COMPACT_AVG >= 3" | bc 2>/dev/null)" = "1" ]; then
+  echo "  ⚠ 세션당 autocompact가 ${COMPACT_AVG}회입니다. 작업을 더 작은 단위로 분리하세요."
+fi
+if [ "$(echo "$BASH_PCT >= 30" | bc 2>/dev/null)" = "1" ]; then
+  echo "  ⚠ Bash 도구 비율이 ${BASH_PCT}%입니다. Read, Grep, Glob 전용 도구를 활용하세요."
+fi
+if [ "$(echo "$FAIL_PCT > 15" | bc 2>/dev/null)" = "1" ]; then
+  echo "  ⚠ 도구 호출 실패율이 ${FAIL_PCT}%입니다. 반복 실패하는 도구의 사용법을 점검하세요."
+fi
+SUBAGENT_AVG=$(echo "scale=1; $SUBAGENTS / $SESSIONS" | bc 2>/dev/null || echo "0")
+if [ "$(echo "$SUBAGENT_AVG > 5" | bc 2>/dev/null)" = "1" ]; then
+  echo "  ⚠ 세션당 서브에이전트가 평균 ${SUBAGENT_AVG}회입니다. 간단한 검색은 직접 도구를 호출하세요."
+fi
+echo "  (비용 관련 권고는 OpenTelemetry 데이터가 필요합니다)"
+----
+
+스크립트 실행 결과 예시:
+
+----
+=== 셀프 사용 리포트 (최근 7일) ===
+
+[세션 요약]
+  세션 수: 15
+  시작 유형:
+    startup: 10
+    resume: 3
+    compact: 2
+  자동 압축 횟수: 5 (세션당 평균: 0.3)
+
+[도구 사용]
+  총 도구 호출: 312
+  상위 도구:
+    Read: 89 (28%)
+    Edit: 67 (21%)
+    Bash: 58 (18%)
+    Grep: 45 (14%)
+    Glob: 32 (10%)
+    Write: 12 (3%)
+    Agent: 9 (2%)
+  Bash 도구 비율: 18% (30% 이상이면 전용 도구 활용 권장)
+  도구 호출 실패: 8 (실패율: 2.5%)
+  서브에이전트 생성: 9 (세션당 평균: 0.6)
+
+[자동 권고]
+  (비용 관련 권고는 OpenTelemetry 데이터가 필요합니다)
+----
+
+이 스크립트는 별도의 인프라 없이도 개인이 즉시 실행하여 자신의 사용 습관을 점검할 수 있습니다. 팀 평균과의 비교가 필요 없는 개인 수준의 개선에는 이것만으로 충분합니다.
+
+== 수집 데이터 저장소
+
+다수 사용자의 데이터를 분석하려면 중앙 저장소가 필요합니다. 조직 규모와 기존 인프라에 따라 선택지가 달라집니다.
+
+=== 저장소 구성
+
+----
+개발자 PC                         중앙 수집                    분석/리포트
+┌──────────────┐                ┌─────────────────┐         ┌──────────────┐
+│ Claude Code  │                │                 │         │              │
+│  ├ Hook      │── JSONL 전송 ─▶│  저장소          │────────▶│  분석 파이프  │
+│  └ OTel      │── OTLP ──────▶│                 │         │  라인        │
+└──────────────┘                └─────────────────┘         └──────────────┘
+----
+
+=== 저장소 선택지
+
+[cols="1,2,2,1", options="header"]
+|===
+|방식 |장점 |단점 |적합한 규모
+
+|파일 기반 (JSONL + S3)
+|구축 비용 최소, 별도 인프라 불필요
+|실시간 쿼리 어려움, 분석 시 별도 로딩 필요
+|소규모 (10명 이하)
+
+|OpenTelemetry Collector + Clickhouse
+|OTLP 네이티브 수집, 대량 시계열 데이터에 강점
+|Clickhouse 운영 부담
+|중규모 (10~100명)
+
+|Grafana + Loki/Tempo
+|기존 모니터링 인프라 활용 가능, 대시보드 내장
+|학습 곡선, 커스텀 리포트 생성이 번거로움
+|모니터링 인프라가 이미 있는 조직
+
+|BigQuery / Athena
+|SQL로 자유로운 분석, 대규모 데이터 처리
+|클라우드 비용, 초기 파이프라인 구축
+|대규모 (100명 이상)
+|===
+
+=== Hook 데이터 중앙 수집
+
+Hook은 기본적으로 개발자 PC의 로컬 파일에 기록합니다. 중앙으로 모으려면 추가 처리가 필요합니다. 몇 가지 방법이 있습니다.
+
+* **cron + rsync/scp**: 주기적으로 로컬 JSONL을 중앙 서버나 S3로 전송
+* **Hook 스크립트에서 직접 전송**: `curl`로 수집 API에 POST (단, Hook 실행 시간이 세션 성능에 영향을 줄 수 있으므로 백그라운드 전송 권장)
+* **Fluentd/Fluent Bit**: 로컬 JSONL 파일을 tail하여 중앙 저장소로 전송
+
+OpenTelemetry 데이터는 OTLP 엔드포인트를 중앙 Collector로 지정하면 별도 처리 없이 수집됩니다.
+
+== 권고 가이드 생성 로직
+
+수집된 데이터를 분석하여 개인별 개선 권고를 생성하는 로직입니다.
+
+=== 컨텍스트 관리 권고
+
+[cols="2,2,2", options="header"]
+|===
+|조건 |판정 |권고
+
+|세션당 autocompact >= 3회
+|컨텍스트 과다 사용
+|"작업을 더 작은 단위로 분리하세요. 한 세션에서 하나의 목적만 달성하는 것이 비용 효율적입니다."
+
+|compact 간격 < 10분
+|빠른 컨텍스트 소진
+|"프롬프트를 더 간결하게 작성하거나, 불필요한 파일 읽기를 줄여보세요."
+
+|`source=resume` 비율 < 10%
+|세션 재개를 활용하지 않음
+|"이전 세션을 재개(`claude --resume`)하면 컨텍스트를 처음부터 다시 구성하지 않아도 됩니다."
+|===
+
+=== 도구 사용 권고
+
+[cols="2,2,2", options="header"]
+|===
+|조건 |판정 |권고
+
+|Bash로 `cat`/`grep`/`find` 호출 비율 > 30%
+|전용 도구 미활용
+|"Bash 대신 Read, Grep, Glob 등 전용 도구를 사용하면 토큰을 절약할 수 있습니다."
+
+|도구 호출 실패율 > 15%
+|비효율적 도구 사용
+|"도구 호출 실패가 잦습니다. 에러 메시지를 확인하고 사용법을 점검해보세요."
+
+|세션당 서브에이전트 > 5회
+|서브에이전트 남용 가능성
+|"서브에이전트 생성을 줄이고, 간단한 검색은 직접 도구를 호출하는 것이 비용 효율적입니다."
+|===
+
+=== 모델 선택 권고
+
+[cols="2,2,2", options="header"]
+|===
+|조건 |판정 |권고
+
+|Opus 사용 비율 > 50%
+|고비용 모델 과다 사용
+|"단순 편집이나 검색 작업에는 Sonnet을 사용하세요. Opus는 Sonnet 대비 5배 비용입니다."
+
+|서브에이전트에서 Opus 사용
+|서브에이전트 비용 과다
+|"서브에이전트는 Sonnet이나 Haiku로 충분한 경우가 많습니다."
+|===
+
+=== 비용 효율 권고
+
+이 항목은 OpenTelemetry 데이터가 있어야 산출 가능합니다.
+
+[cols="2,2,2", options="header"]
+|===
+|조건 |판정 |권고
+
+|캐시 히트율 < 50%
+|캐시 활용 부족
+|"세션 중간에 모델을 전환하거나 CLAUDE.md를 수정하면 캐시가 무효화됩니다. 한 세션에서는 하나의 모델을 유지하세요." footnote:[Prompt Caching의 상세 원리는 link:claude-code-cost.html[Claude Code 토큰 비용과 프롬프트 캐싱]을 참고]
+
+|프롬프트당 API 호출 > 20회
+|한 프롬프트에 과도한 작업 요청
+|"하나의 프롬프트에 여러 작업을 한꺼번에 요청하면 API 호출이 급증합니다. 작업을 나누어 요청하세요."
+
+|일일 비용이 팀 평균의 2배 이상
+|비용 이상치
+|개별 상담 대상. 사용 패턴 상세 분석 필요
+|===
+
+=== 리포트 예시
+
+위의 로직을 조합하면 다음과 같은 개인별 주간 리포트를 생성할 수 있습니다.
+
+----
+=== 주간 사용 리포트 (2026-03-24 ~ 2026-03-30) ===
+사용자: hong
+
+[요약]
+  세션 수: 23
+  총 API 호출: 847
+  총 비용: $42.30
+  주요 모델: Sonnet 68%, Opus 32%
+
+[개선 권고]
+  1. 컨텍스트 관리
+     - 세션당 평균 autocompact: 3.2회 (팀 평균: 1.1회)
+     → 작업을 더 작은 단위로 분리하세요.
+
+  2. 도구 사용
+     - Bash로 grep/cat 호출: 전체 도구 사용의 41%
+     → Read, Grep 전용 도구를 직접 사용하면 토큰을 절약할 수 있습니다.
+
+  3. 모델 선택
+     - Opus 사용 비율: 32% (팀 평균: 15%)
+     → 단순 작업에서는 Sonnet으로 전환을 권장합니다.
+     → 예상 절감: 주당 ~$8.50
+
+[잘하고 있는 점]
+  - 캐시 히트율 87% (팀 평균: 72%)
+  - 도구 호출 실패율 3% (팀 평균: 8%)
+----
+
+== 주의할 점
+
+* **PreToolUse는 고빈도 이벤트**입니다. Hook 스크립트의 실행 시간이 길면 세션 응답 속도에 영향을 줄 수 있습니다. 스크립트를 가볍게 유지하거나, 샘플링을 적용하거나, 백그라운드로 기록하는 방식을 고려해야 합니다.
+* **전사 배포가 필요**합니다. Hook 설정과 환경 변수를 각 개발자 PC에 배포해야 합니다. Enterprise managed config, dotfiles 저장소, 또는 온보딩 스크립트를 활용할 수 있습니다.
+* **Hook으로는 정확한 토큰 수와 비용을 알 수 없습니다**. 비용 분석이 목적이라면 OpenTelemetry는 필수입니다. Hook만으로는 사용 행동 패턴 분석에 한정됩니다.
+* **개인정보 고려**가 필요합니다. 프롬프트 내용이나 코드를 수집하는 것이 아니라 메타데이터(이벤트 유형, 도구 이름, 타임스탬프)만 수집하지만, 수집 목적과 범위를 사전에 공유하고 동의를 구하는 것이 바람직합니다.
+
+== 참고 자료
+
+* https://docs.anthropic.com/en/docs/claude-code/hooks[Claude Code Hooks - Anthropic Docs]
+* https://docs.anthropic.com/en/docs/claude-code/monitoring-usage[Monitoring Usage - Anthropic Docs]
+* https://opentelemetry.io/docs/collector/[OpenTelemetry Collector]
