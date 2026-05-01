@@ -5,6 +5,7 @@
 :jbake-status: published
 :jbake-tags: llm, modal, hermes, telegram
 :description: Hermes 에이전트와 Modal 서버리스, Telegram webhook, LLM provider를 조합해 AI 챗봇을 무료로 운영한 기록을 정리합니다.
+:jbake-og: {"image": "img/chat-bot/telegram-chat-bot.png"}
 :toc:
 :sectnums:
 :idprefix:
