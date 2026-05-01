@@ -66,11 +66,11 @@ long polling을 하기 위해서는 서버가 계속 켜져 있어야 하기에 
 
 == 챗봇 앱의 핵심 코드
 
-Modal로 실행하는 파이썬 앱의 구현과 세부 설계는 Claude Code의 도움을 받았습니다. 최소 비용이라는 목적을 설명하니 구체적인 설정을 작성해주었습니다.
+전체 소스는 link:https://github.com/benelog/hermes-modal[`benelog/hermes-modal`] 저장소에 있습니다. 이 글에서는 그중 설계 의도를 보여주는 코드 조각만 발췌해 설명합니다. Modal로 실행하는 파이썬 앱의 설계와 구현은 Claude Code의 도움을 받았습니다.
 
 === 최소 재현 절차
 
-처음부터 같은 구성을 따라 하려면 아래 순서로 접근하는 편이 덜 헷갈립니다.
+처음부터 같은 구성을 따라 하려면 아래 순서로 접근하는 편이 시행 착오가 적습니다.
 
 . Telegram bot token, LLM provider 인증 정보, GitHub token을 준비합니다.
 . Modal의 Secret과 Volume을 생성합니다.
