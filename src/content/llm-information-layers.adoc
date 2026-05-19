@@ -10,7 +10,7 @@
 :toclevels: 1
 :idprefix:
 
-LLM에 정보를 전달하는 방법을 정리할 때 저는 보통 **모델 가중치 vs. 프롬프트**의 2계층으로 나눠 생각해 왔습니다.
+LLM(Large Language Model)에 정보를 전달하는 방법을 정리할 때 저는 보통 **모델 가중치 vs. 프롬프트**의 2계층으로 나눠 생각해 왔습니다.
 "파라미터에 새기는가, 컨텍스트에 띄우는가"의 구분입니다. 최근 몇 년 사이 그 사이를 비집고 들어온 기법들이 늘었습니다.
 
 == 모델 레이어 — 파라미터에 정보를 새기는 방법
@@ -22,11 +22,17 @@ LLM에 정보를 전달하는 방법을 정리할 때 저는 보통 **모델 가
 * **Pre-training**: 가장 근본적인 정보 주입. 코퍼스의 분포가 곧 모델의 세계관이 됩니다.
 * **Continued pre-training (도메인 적응)**: 의료/법률/코드 등 특정 도메인 코퍼스로 추가 학습. 파인튜닝보다 광범위한 분포 이동을 노립니다.
 * **Supervised fine-tuning (SFT)**: 입출력 페어로 행동을 맞춥니다. 지식 주입보다 형식/스타일/태스크 수행에 효과적입니다.
-* **선호 학습 (RLHF, DPO, KTO, IPO 등)**: "어떤 응답이 더 나은가"를 가중치에 새깁니다. 사실 지식이 아니라 **가치/취향** 주입이라는 점에서 결이 다릅니다.
-* **검증 가능한 보상을 통한 RL (RLVR)**: 수학 정답, 코드 실행 결과처럼 자동 채점 가능한 신호로 강화학습. o1, DeepSeek-R1 계열 추론 모델이 이 방식입니다. 사람의 선호가 아니라 **풀이 능력 자체**를 새긴다는 점에서 RLHF와 구분됩니다.
-* **Model editing (ROME, MEMIT, MEND 등)**: 특정 사실 하나를 가중치 차원에서 직접 수정. "에펠탑은 로마에 있다"로 바꾸는 수술 같은 기법입니다. 본격적 학습이 아니어서 회색지대로 보기도 합니다.
+* **선호 학습 (RLHF(Reinforcement Learning from Human Feedback), DPO(Direct Preference Optimization), KTO(Kahneman-Tversky Optimization), IPO(Identity Preference Optimization) 등)**: "어떤 응답이 더 나은가"를 가중치에 새깁니다. 사실 지식이 아니라 **가치/취향** 주입이라는 점에서 결이 다릅니다.
+* **검증 가능한 보상을 통한 강화학습(RL, Reinforcement Learning) — RLVR(Reinforcement Learning with Verifiable Rewards)**: 수학 정답, 코드 실행 결과처럼 자동 채점 가능한 신호로 강화학습. o1, DeepSeek-R1 계열 추론 모델이 이 방식입니다. 사람의 선호가 아니라 **풀이 능력 자체**를 새긴다는 점에서 RLHF와 구분됩니다.
+* **Model editing**: 특정 사실 하나를 가중치 차원에서 직접 수정. "에펠탑은 로마에 있다"로 바꾸는 수술 같은 기법입니다. 본격적 학습이 아니어서 회색지대로 보기도 합니다.
+** ROME(Rank-One Model Editing): 해당 사실을 저장한 MLP 가중치에 rank-1 업데이트를 가해 사실 하나를 갈아끼움
+** MEMIT(Mass-Editing Memory In a Transformer): ROME을 다중 레이어로 확장해 수천 개의 사실을 동시에 편집
+** MEND(Model Editor Networks with Gradient Decomposition): 메타 학습된 보조 네트워크가 편집용 그라디언트로 변환해 빠르게 적용
 * **Knowledge distillation**: 큰 모델의 지식을 작은 모델의 가중치로 압축.
-* **Merging (TIES, DARE, SLERP 등)**: 여러 파인튜닝 결과의 가중치를 평균/합성. 학습 없이 "정보를 섞는다"는 점에서 새로운 결입니다.
+* **Merging**: 여러 파인튜닝 결과의 가중치를 평균/합성. 학습 없이 "정보를 섞는다"는 점에서 새로운 결입니다.
+** TIES(TrIm, Elect Sign & Merge): 변화가 작은 파라미터는 잘라내고, 부호 충돌을 다수결로 정한 뒤 평균
+** DARE(Drop And REscale): 파인튜닝 델타의 대부분을 무작위로 버리고 남은 값을 재스케일링해 머지
+** SLERP(Spherical Linear intERPolation): 두 모델 가중치를 단위 구면상 호로 보간
 
 == 프롬프트 레이어 — 컨텍스트에 정보를 띄우는 방법
 
@@ -34,22 +40,22 @@ LLM에 정보를 전달하는 방법을 정리할 때 저는 보통 **모델 가
 
 * 시스템 프롬프트 / 페르소나 지시
 * Few-shot 예시 (in-context learning)
-* Chain-of-Thought, ReAct, self-consistency 같은 reasoning 패턴 유도
+* Chain-of-Thought, ReAct(Reasoning + Acting), self-consistency 같은 reasoning 패턴 유도
 * Tool use / function calling의 결과를 컨텍스트로 되먹임
-* RAG로 검색해 온 문서 청크
+* RAG(Retrieval-Augmented Generation)로 검색해 온 문서 청크
 * 외부 메모리 시스템에서 불러온 과거 대화 (Claude의 memory 같은 것)
 * 구조화된 출력 강제 (스키마, XML 태그)
-* MCP/connector를 통해 들어오는 외부 데이터
+* MCP(Model Context Protocol)/connector를 통해 들어오는 외부 데이터
 
 공통점은 **inference time에 토큰으로 입력된다**는 것입니다. 모델 입장에서는 출처를 구분할 방법이 없습니다.
 
 == 회색지대
 
-**PEFT 계열 (LoRA, QLoRA, adapters, prefix tuning, prompt tuning, P-tuning)**:
+**PEFT(Parameter-Efficient Fine-Tuning) 계열 (LoRA(Low-Rank Adaptation), QLoRA(Quantized LoRA), adapters, prefix tuning, prompt tuning, P-tuning)**:
 가중치를 학습시키니 형식상 모델 레이어지만, 베이스 모델은 두고 작은 어댑터만 붙였다 뗐다 합니다.
 특히 **prefix tuning / prompt tuning**은 학습 가능한 "가상 토큰"을 컨텍스트 앞에 붙이는 방식이라 **소프트 프롬프트(soft prompt)** 라 불릴 만큼 프롬프트 레이어의 사촌입니다.
 
-**KV cache 주입 / cache steering**:
+**KV(Key-Value) cache 주입 / cache steering**:
 특정 컨텍스트로 만든 KV cache를 저장해 두고 추론 시 재사용. 매번 프롬프트로 넣지 않지만 효과는 같습니다.
 원래 비용 최적화 용도지만 "캐시된 페르소나"처럼 쓰면 준영구적 상태가 됩니다.
 
@@ -67,7 +73,7 @@ LLM에 정보를 전달하는 방법을 정리할 때 저는 보통 **모델 가
 위의 2계층 분류는 **정보가 어디에 저장되는가** 기준입니다. 다른 축도 있습니다.
 
 **아키텍처 레이어**:
-모델 구조 자체. MoE로 전문가를 분리하거나, retrieval head를 내장하거나(REALM, RETRO), 메모리 토큰 슬롯을 두는 식.
+모델 구조 자체. MoE(Mixture of Experts)로 전문가를 분리하거나, retrieval head를 내장하거나(REALM(Retrieval-Augmented Language Model pre-training), RETRO(Retrieval-Enhanced TRansfOrmer)), 메모리 토큰 슬롯을 두는 식.
 가중치 학습 이전에 "**어떤 형태로 정보를 담을 것인가**"를 정합니다.
 
 **표현 / 활성값 레이어**:
