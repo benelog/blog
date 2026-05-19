@@ -6,7 +6,7 @@
 :jbake-tags: spring,보안
 :idprefix:
 
-=== 취약점의 조건
+== 취약점의 조건
 
 아래 조건을 모두 충족시킨다면 코드는 치명적인 Remote code execution 취약성이 존재할 여지가 있습니다.
 

@@ -41,9 +41,9 @@ image:img/sts-reload/1_new-server.jpg[1_new-server.jpg]
 
 1. Ctrl +N을 누르고 "Spring Template Project"를 선택한다.
 ** image:img/sts-reload/9_new-spring-template.jpg[9_new-spring-template.jpg]
-2."Spring MVC project"를 선택한다.
+2. "Spring MVC project"를 선택한다.
 ** image:img/sts-reload/10_new-spring-mvc-project.jpg[10_new-spring-mvc-project.jpg]
-3.프로젝트명과 상위 패키지이름을 적는다.
+3. 프로젝트명과 상위 패키지이름을 적는다.
 ** image:img/sts-reload/11_new-spring-mvc-project.jpg[11_new-spring-mvc-project.jpg]
 4. 생성된 프로젝트를 Run AS-> Run On Server로 실행한다.
 ** image:img/sts-reload/12_run-on-the-server.jpg[12_run-on-the-server.jpg]
