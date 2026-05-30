@@ -3,7 +3,7 @@
 2007-07-10
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: sybase
+:jbake-tags: database
 :idprefix:
 
 sa 계정으로 로그인해서,
