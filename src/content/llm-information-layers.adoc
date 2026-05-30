@@ -30,7 +30,7 @@ image::img/llm-information-layers/mindmap.drawio.png[LLM에 정보를 전달하�
 ** DPO(Direct Preference Optimization): 별도의 보상 모델과 강화학습 루프 없이, 선호 쌍(채택/기각)으로부터 정책을 직접 최적화해 RLHF를 단순화
 ** KTO(Kahneman-Tversky Optimization): 쌍 비교 대신 응답 하나가 "좋다/나쁘다"는 단일 라벨만으로 학습. 전망 이론(prospect theory)의 효용 함수를 차용
 ** IPO(Identity Preference Optimization): DPO가 선호 데이터에 과적합되는 경향을 막도록 목적 함수에 정규화 항을 더한 변형
-* **검증 가능한 보상을 통한 강화학습(RL, Reinforcement Learning) — RLVR(Reinforcement Learning with Verifiable Rewards)**: 수학 정답, 코드 실행 결과처럼 자동 채점 가능한 신호로 강화학습. o1, DeepSeek-R1 계열 추론 모델이 이 방식입니다. 사람의 선호가 아니라 **풀이 능력 자체**를 새긴다는 점에서 RLHF와 구분됩니다.
+* **RLVR(Reinforcement Learning with Verifiable Rewards)**: 수학 정답, 코드 실행 결과처럼 자동 채점 가능한 신호로 강화학습. DeepSeek-R1 계열은 이 방식이고, o1도 강화학습 기반 추론 모델로 알려져 있지만 보상 설계의 세부는 공개되지 않았습니다. 사람의 선호가 아니라 **풀이 능력 자체**를 새긴다는 점에서 RLHF와 구분됩니다. Cursor의 Composer 2.5는 이를 에이전트 환경으로 확장한 예로, 도구(편집·검색·테스트 실행)를 호출하는 멀티스텝 롤아웃에서 **테스트 통과 여부**를 검증 가능한 보상으로 씁니다.
 * **Model editing**: 특정 사실 하나를 가중치 차원에서 직접 수정. "에펠탑은 로마에 있다"로 바꾸는 수술 같은 기법입니다. 본격적 학습이 아니어서 회색지대로 보기도 합니다.
 ** ROME(Rank-One Model Editing): 해당 사실을 저장한 MLP 가중치에 rank-1 업데이트를 가해 사실 하나를 갈아끼움
 ** MEMIT(Mass-Editing Memory In a Transformer): ROME을 다중 레이어로 확장해 수천 개의 사실을 동시에 편집
@@ -51,10 +51,10 @@ image::img/llm-information-layers/mindmap.drawio.png[LLM에 정보를 전달하�
 * Tool use / function calling의 결과를 컨텍스트로 되먹임
 * RAG(Retrieval-Augmented Generation)로 검색해 온 문서 청크
 * 외부 메모리 시스템에서 불러온 과거 대화 (Claude의 memory 같은 것)
-* 구조화된 출력 강제 (스키마, XML 태그)
+* 구조화된 출력 지시 (XML 태그, JSON 형식 지시)
 * MCP(Model Context Protocol)/connector를 통해 들어오는 외부 데이터
 
-공통점은 **inference time에 토큰으로 입력된다**는 것입니다. 모델 입장에서는 출처를 구분할 방법이 없습니다.
+공통점은 **inference time에 토큰으로 입력된다**는 것입니다. 모델은 최종적으로 토큰과 role/구조 신호를 보고 처리하며, 외부 데이터의 원천 신뢰도를 직접 검증하지는 않습니다.
 
 == 회색지대
 
@@ -64,10 +64,11 @@ image::img/llm-information-layers/mindmap.drawio.png[LLM에 정보를 전달하�
 ** LoRA(Low-Rank Adaptation) / QLoRA(Quantized LoRA): 가중치 변화를 저차원 행렬로 근사해 학습. QLoRA는 베이스 모델을 양자화해 메모리를 더 절약
 ** adapters: 트랜스포머 레이어 사이에 작은 학습 모듈을 끼워 넣고 그 부분만 학습
 ** prefix tuning / prompt tuning / P-tuning: 학습 가능한 "가상 토큰"을 컨텍스트 앞에 붙이는 방식이라 **소프트 프롬프트(soft prompt)** 라 불릴 만큼 프롬프트 레이어의 사촌
-* **KV(Key-Value) cache 주입 / cache steering**: 특정 컨텍스트로 만든 KV cache를 저장해 두고 추론 시 재사용. 매번 프롬프트로 넣지 않지만 효과는 같습니다. 원래 비용 최적화 용도지만 "캐시된 페르소나"처럼 쓰면 준영구적 상태가 됩니다.
+* **KV(Key-Value) cache 주입 / cache steering**: 특정 컨텍스트로 만든 KV cache를 저장해 두고 추론 시 재사용. 매번 프롬프트로 넣지는 않지만, 이미 계산된 컨텍스트를 다시 붙이는 효과가 있습니다. 일반적으로는 비용 최적화용 런타임 상태이며, 모델 가중치나 장기 메모리와는 구분됩니다.
 * **Activation steering / representation engineering**: 추론 중 특정 레이어의 활성값에 벡터를 더해 행동을 바꿉니다. 가중치도 프롬프트도 건드리지 않는 완전히 새로운 결입니다.
 * **Decoding 제어**: 출력 확률 분포를 직접 조작. "주입"보다 **출력 제한**에 가깝지만, 도메인 지식을 grammar로 강제하면 사실상 정보 주입입니다.
 ** constrained decoding / guided generation: 정해진 문법(grammar)·스키마를 따르도록 토큰 선택을 제한해 출력 형식을 강제
+** structured outputs: JSON Schema 같은 스키마를 입력으로 주되, strict 모드에서는 서버/런타임의 constrained decoding과 결합되어 프롬프트 레이어와 디코딩 레이어에 걸침
 ** logit bias: 특정 토큰의 로짓에 값을 가감해 등장 확률을 직접 조절
 ** speculative decoding: 작은 드래프트 모델로 여러 토큰을 미리 뽑고 본 모델로 한 번에 검증. 정보 주입이 아니라 속도 최적화에 가까움
 * **Tool use의 양면성**: 도구 호출 자체는 프롬프트 레이어지만, 도구가 외부 세계의 상태를 바꾼다면 "LLM에 정보를 주는 것"이 아니라 "LLM이 정보를 만들어내는 것"입니다. 경계가 모호합니다.
@@ -77,8 +78,8 @@ image::img/llm-information-layers/mindmap.drawio.png[LLM에 정보를 전달하�
 위의 2계층 분류는 **정보가 어디에 저장되는가** 기준입니다. 다른 축도 있습니다.
 
 **아키텍처 레이어**:
-모델 구조 자체. MoE(Mixture of Experts)로 전문가를 분리하거나, retrieval head를 내장하거나, 메모리 토큰 슬롯을 두는 식.
-가중치 학습 이전에 "**어떤 형태로 정보를 담을 것인가**"를 정합니다. retrieval head를 내장한 예:
+모델 구조 자체. MoE(Mixture of Experts)로 전문가를 분리하거나, 검색 모듈을 구조에 통합하거나, 메모리 토큰 슬롯을 두는 식.
+가중치 학습 이전에 "**어떤 형태로 정보를 담을 것인가**"를 정합니다. retrieval-augmented architecture/pretraining의 예:
 
 * REALM(Retrieval-Augmented Language Model pre-training): 사전학습 단계부터 retriever를 함께 학습해 외부 코퍼스 검색을 모델에 통합
 * RETRO(Retrieval-Enhanced TRansfOrmer): 트랜스포머 블록에 검색된 청크의 chunked cross-attention을 끼워 넣어 작은 모델로 큰 효과
