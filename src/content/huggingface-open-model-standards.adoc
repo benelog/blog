@@ -1,0 +1,119 @@
+= Hugging Face 오픈 모델의 호환성을 만드는 사실상의 표준들
+정상혁
+2026-06-07
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: llm, AI
+:description: Hugging Face에서 받은 오픈 모델을 누가 학습했든 다운로드해서 바로 실행할 수 있는 배경에는 Safetensors 가중치 포맷, transformers의 config 규약, 소수 아키텍처로의 수렴이라는 사실상의 표준이 맞물려 있습니다.
+:toc:
+:sectnums:
+:toclevels: 1
+:idprefix:
+
+link:llm-information-layers.html[모델 레이어를 다룬 글]에서 모델이 "아는 것"은 가중치(weight)라는 숫자값에 압축돼 있다고 정리했습니다. 그 가중치는 결국 파일로 저장되어 Hugging Face에서 공유됩니다. Hugging Face는 오픈 모델과 데이터셋, 데모를 올리고 내려받는 중심 플랫폼으로, 흔히 "머신러닝계의 GitHub"에 비유됩니다. 그런데 이렇게 공유된 모델은 누가 어떤 환경에서 학습했든, 다운로드해서 바로 실행할 수 있는 경우가 많습니다. 이 글은 그 호환성의 토대가 되는 사실상의 표준(de facto standard)들을 정리합니다.
+
+크게 **모델 가중치 포맷**, **모델 아키텍처 규약**, **메타데이터/설정 표준** 세 층위로 나눠 볼 수 있습니다.
+
+== 모델 가중치 저장 포맷
+
+[cols="1,3", options="header"]
+|===
+|포맷 |특징
+
+|**Safetensors**
+|현재 사실상 표준. 메모리 매핑footnote:[파일을 통째로 읽어 들이지 않고, 디스크의 내용을 필요한 부분만 메모리 주소에 바로 연결해 다루는 방식. 큰 모델도 빠르게 로드할 수 있습니다.]이 가능하고, pickle(Python 기본 직렬화 방식)을 쓰지 않아 역직렬화 시 임의 코드가 실행되는 보안 취약점이 없습니다.
+
+|**GGUF**
+|llama.cpp 생태계의 표준. 양자화footnote:[가중치를 더 적은 비트로 표현해(예: 16비트를 4비트로) 모델 용량과 메모리 사용량을 줄이는 기법. 약간의 정확도를 내주고 크기를 줄입니다.] 정보를 파일 자체에 포함하며, CPU·엣지를 비롯한 다양한 환경의 추론에 강합니다.
+
+|**PyTorch (`.bin`/`.pt`)**
+|pickle 기반의 레거시 포맷. 여전히 많이 쓰이지만 역직렬화 과정에 보안 우려가 있습니다.
+|===
+
+신경망의 가중치는 **텐서(tensor)**, 즉 숫자가 여러 차원으로 늘어선 배열에 담깁니다. 스칼라(0차원)·벡터(1차원)·행렬(2차원)을 임의 차원으로 일반화한 것으로, 각 레이어의 가중치 하나하나가 이런 텐서입니다. 텐서마다 배열의 형태(shape, 예: 4096 × 4096)와 각 숫자의 자료형(dtype, 예: `float16`·`bfloat16`)이 정해져 있습니다.
+
+**Safetensors**는 이 텐서의 이름(key)과 shape, dtype, 바이너리 데이터를 단순한 헤더+바이너리 구조로 저장합니다. 그래서 어떤 프레임워크든 쉽게 읽을 수 있습니다.
+
+다국어 지원 능력도 이 가중치 안에 들어 있습니다. 학습 시 Common Crawl, Wikipedia 등에서 수집한 수십~수백 개 언어의 텍스트 패턴이 신경망 파라미터 전체에 걸쳐 **분산 표현(distributed representation)** 으로 인코딩됩니다. "한국어 사전" 같은 별도 파일이 있는 게 아니라, embedding layer와 attention/FFN layer의 수치 값들에 각 언어의 문법·어휘·의미가 녹아들어 있습니다. 그래서 특정 언어만 빼거나 넣기가 쉽지 않습니다.
+
+== 모델 아키텍처 규약: transformers 라이브러리의 역할
+
+Hugging Face `transformers`는 수많은 모델 아키텍처를 통일된 인터페이스로 불러오고 실행하게 해주는 오픈소스 Python 라이브러리입니다. Transformer 아키텍처에서 이름을 따왔지만 지금은 그 밖의 구조도 폭넓게 지원하며, 모델을 불러오는 방식의 사실상 표준 역할을 합니다. 모델을 어떻게 읽고 실행할지는 가중치 파일 옆에 놓인 설정 파일들이 정의합니다.
+
+* **`config.json`** — 모델 구조 정의 (`model_type`, `hidden_size`, `num_attention_heads` 등)
+* **`tokenizer.json` / `tokenizer_config.json`** — 토크나이저 정의. BPE(Byte Pair Encoding) 같은 알고리즘으로 다국어 텍스트를 토큰으로 분리하는 토큰 사전(vocabulary, 보통 3만~25만 토큰)을 담습니다. 한국어 "안녕하세요"도, 영어 "hello"도 이 사전의 토큰 조합으로 표현됩니다.
+* **`generation_config.json`** — 생성 파라미터
+
+[source,json]
+.config.json 예시
+----
+{
+  "model_type": "llama",
+  "hidden_size": 4096,
+  "num_attention_heads": 32,
+  "num_hidden_layers": 32,
+  "vocab_size": 32000
+}
+----
+
+`model_type`이 `"llama"`이면, 라이브러리가 `LlamaForCausalLM` 클래스를 자동으로 선택해 가중치를 로드합니다. 그래서 Llama 아키텍처 기반 모델은 누가 학습했든 동일한 코드로 실행됩니다.
+
+== 추론 엔진 간 호환성
+
+같은 Hugging Face 모델 하나(safetensors + config.json)를 여러 추론 엔진(학습된 모델을 받아 실제로 실행하고 응답을 생성하는 런타임)이 받아 실행할 수 있습니다. 일부는 파일을 그대로 읽고, 일부는 포맷 변환을 거칩니다.
+
+* **transformers**: Hugging Face 표준 Python 라이브러리
+* **vLLM**: 고성능 서빙에 특화
+* **TGI(Text Generation Inference)**: Hugging Face 자체 서빙 엔진
+* **Ollama / llama.cpp**: GGUF로 변환해 CPU/엣지에서 실행
+* **ONNX Runtime**: ONNX(Open Neural Network Exchange) 포맷으로 변환해 실행
+
+이것이 가능한 이유는 **아키텍처가 표준화**되어 있기 때문입니다. 대부분의 오픈 모델이 소수의 아키텍처(Llama, Mistral, Qwen, Gemma 등)를 따르고, 각 추론 엔진이 이 아키텍처들을 미리 구현해 둡니다.
+
+== 앞 글의 레이어 분류와 겹쳐 보기
+
+link:llm-information-layers.html[앞 글]에서는 LLM에 정보가 들어가는 자리를 모델 레이어와 프롬프트 레이어로 나누고, 아키텍처·디코딩 같은 축을 덧붙였습니다. Hugging Face 모델 저장소의 파일 구성을 그 분류에 겹쳐 보면 거의 일대일로 대응합니다.
+
+[cols="1,1,2", options="header"]
+|===
+|파일 |대응하는 레이어 |담는 것
+
+|`model.safetensors`
+|모델 레이어
+|학습으로 결정된 가중치(텐서) 그 자체
+
+|`config.json` (`model_type`)
+|아키텍처 레이어
+|"어떤 형태로 정보를 담을 것인가" — 레이어 수, 헤드 수, 아키텍처 종류
+
+|`tokenizer.json`
+|프롬프트 레이어 (토큰화)
+|컨텍스트로 들어갈 텍스트를 토큰으로 쪼개는 규칙
+
+|`generation_config.json`
+|디코딩/샘플링 레이어
+|temperature, top-p 같은 출력 제어 기본값
+|===
+
+바꾸려는 대상에 따라 손대는 파일이 갈립니다. 지식 자체를 바꾸려면 `model.safetensors`를, 샘플링이나 출력 길이 같은 생성 기본값만 바꾸려면 `generation_config.json`을 건드립니다. 앞 글이 "정보가 어디에 저장되는가"의 지도였다면, 이 파일 구성은 그 지도가 디스크에 실제로 어떻게 놓이는지를 보여줍니다.
+
+== 핵심 정리
+
+공식적인 "표준 기구"가 정한 스펙이라기보다는, 다음 세 가지가 맞물린 결과입니다.
+
+. **Safetensors** — 텐서를 저장하는 단순하고 안전한 바이너리 포맷
+. **transformers의 config 규약** — `config.json`의 `model_type`으로 아키텍처를 식별
+. **소수 아키텍처로의 수렴** — 대부분의 모델이 Llama/Mistral 계열 아키텍처를 채택
+
+이 세 가지가 맞물려 "누가 학습했든 다운받으면 바로 돌릴 수 있는" 생태계가 만들어졌습니다. ISO 같은 공식 표준이 아니라 사실상의 표준(de facto standard)입니다.
+
+== 참고 자료
+
+* https://github.com/huggingface/safetensors[Safetensors (GitHub)]
+* https://huggingface.co/docs/transformers/index[Hugging Face Transformers 문서]
+* https://huggingface.co/docs/transformers/model_doc/auto[Auto Classes — `model_type` 기반 자동 로딩]
+* https://huggingface.co/docs/hub/gguf[GGUF — Hugging Face Hub 문서]
+
+'''
+
+이 포스트는 Claude Code와 정상혁이 함께 작성했습니다.

@@ -25,7 +25,7 @@ image::img/llm-information-layers/mindmap.drawio.png[LLM에 정보를 전달하�
 * **Pre-training**: 가장 근본적인 정보 주입. 코퍼스의 분포가 곧 모델의 세계관이 됩니다.
 * **Continued pre-training (도메인 적응)**: 의료/법률/코드 등 특정 도메인 코퍼스로 추가 학습. 파인튜닝보다 광범위한 분포 이동을 노립니다.
 * **Supervised fine-tuning (SFT)**: 입출력 페어로 행동을 맞춥니다. 지식 주입보다 형식/스타일/태스크 수행에 효과적입니다.
-* **선호 학습 (preference learning)**: "어떤 응답이 더 나은가"를 가중치에 새깁니다. 사실 지식이 아니라 **가치/취향** 주입이라는 점에서 결이 다릅니다.
+* **선호 학습 (preference learning)**: "어떤 응답이 더 나은가"를 가중치에 새깁니다. 지식이 아니라 **가치/취향** 주입이라는 점에서 결이 다릅니다.
 ** RLHF(Reinforcement Learning from Human Feedback): 사람이 매긴 선호로 보상 모델을 학습한 뒤, 그 보상을 최대화하도록 PPO 등 강화학습으로 정책을 업데이트하는 고전적 방식
 ** DPO(Direct Preference Optimization): 별도의 보상 모델과 강화학습 루프 없이, 선호 쌍(채택/기각)으로부터 정책을 직접 최적화해 RLHF를 단순화
 ** KTO(Kahneman-Tversky Optimization): 쌍 비교 대신 응답 하나가 "좋다/나쁘다"는 단일 라벨만으로 학습. 전망 이론(prospect theory)의 효용 함수를 차용
@@ -61,7 +61,7 @@ image::img/llm-information-layers/mindmap.drawio.png[LLM에 정보를 전달하�
 모델 레이어와 프롬프트 레이어 어디에도 깔끔하게 들어가지 않는 기법들입니다.
 
 * **PEFT(Parameter-Efficient Fine-Tuning) 계열**: 가중치를 학습시키니 형식상 모델 레이어지만, 베이스 모델은 두고 작은 어댑터만 붙였다 뗐다 합니다.
-** LoRA(Low-Rank Adaptation) / QLoRA(Quantized LoRA): 가중치 변화를 저차원 행렬로 근사해 학습. QLoRA는 베이스 모델을 양자화해 메모리를 더 절약
+** LoRA(Low-Rank Adaptation) / QLoRA(Quantized LoRA): 파인튜닝으로 생기는 가중치 변화(ΔW)를 두 작은 행렬의 곱(B·A)인 저랭크(low-rank) 행렬로 근사해, 원래 가중치는 동결하고 이 작은 행렬만 학습. 가중치 변화가 실은 소수의 지배적인 방향만으로 충분히 표현된다(intrinsic rank가 낮다)는 가정에 기댑니다. 고차원 데이터를 분산이 큰 몇 개의 주성분으로 압축하는 **PCA/SVD의 저랭크 근사와 같은 발상**으로, 다만 ΔW를 SVD로 직접 분해하는 대신 두 행렬을 경사하강법으로 학습한다는 점이 다릅니다. QLoRA는 여기에 베이스 모델 양자화(정밀도 축소)를 더해, **랭크 축소(LoRA)와 정밀도 축소(양자화)라는 직교하는 두 압축 축을 함께 쓰는 셈**입니다
 ** adapters: 트랜스포머 레이어 사이에 작은 학습 모듈을 끼워 넣고 그 부분만 학습
 ** prefix tuning / prompt tuning / P-tuning: 학습 가능한 "가상 토큰"을 컨텍스트 앞에 붙이는 방식이라 **소프트 프롬프트(soft prompt)** 라 불릴 만큼 프롬프트 레이어의 사촌
 * **KV(Key-Value) cache 주입 / cache steering**: 특정 컨텍스트로 만든 KV cache를 저장해 두고 추론 시 재사용. 매번 프롬프트로 넣지는 않지만, 이미 계산된 컨텍스트를 다시 붙이는 효과가 있습니다. 일반적으로는 비용 최적화용 런타임 상태이며, 모델 가중치나 장기 메모리와는 구분됩니다.
