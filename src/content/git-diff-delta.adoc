@@ -19,13 +19,16 @@ image::img/git-diff-delta/img-00-plain.png[기본 git diff 화면]
 
 `남긴다 → 기록한다`, `덕분에 → 이 있어서`, `방식 → 방법`, `흔하게 → 흔히`. 네 군데가 바뀌었는데 위 화면만 보고는 바로 알기 어렵습니다.
 
-이 글은 터미널에서 이 문제를 해결한 설정을 정리한 것입니다. Ubuntu 24.04 + zsh + git 2.43 + scm_breeze 환경에서 확인했습니다.
+이 글에서는 이 문제를 해결한 설정을 공유합니다.
+Ubuntu 24.04 + zsh + git 2.43 + scm_breeze 환경에서 확인했습니다.
 
-== delta 설치
+== delta 설치와 설정
 
-https://github.com/dandavison/delta[delta]는 git의 pager를 대체하는 도구입니다. 구문 강조, 줄 번호, 그리고 **줄 안에서 바뀐 부분만 강조하는 기능**을 제공합니다.
+https://github.com/dandavison/delta[delta]는 git의 pager를 대체하는 도구입니다. pager는 `git diff`나 `git log`의 긴 출력을 한 화면씩 넘겨 보여주는 프로그램으로, 기본값은 `less`입니다. delta는 이 자리를 대신하면서 구문 강조, 줄 번호, 그리고 **줄 안에서 바뀐 부분만 강조하는 기능**을 제공합니다.
 
-apt에도 `git-delta`가 있지만 Ubuntu 24.04 기준 0.16.5로 낡았습니다. sudo 없이 최신 바이너리를 받는 편이 낫습니다.
+=== 설치
+
+apt에도 `git-delta`가 있지만 Ubuntu 24.04에 들어 있는 버전은 2023년 6월에 나온 0.16.5입니다. 최신 버전은 2026년 3월에 나온 0.19.2로 약 3년의 차이가 있습니다. sudo 없이 최신 바이너리를 받는 편이 낫습니다.
 
 [source,bash]
 ----
@@ -39,7 +42,7 @@ delta --version
 
 macOS는 `brew install git-delta`, Arch는 `pacman -S git-delta`로 받으면 됩니다.
 
-== ~/.gitconfig 설정
+=== ~/.gitconfig 설정
 
 [source,ini]
 .~/.gitconfig
@@ -77,7 +80,7 @@ image::img/git-diff-delta/img-01-delta.png[delta 통합 뷰]
 
 바뀐 줄은 은은한 배경색, 그 줄에서 **실제로 달라진 부분**은 진한 배경색으로 두 단계로 구분됩니다. GitHub의 diff 화면과 같은 방식입니다.
 
-== 한글 사용자에게 핵심은 word-diff-regex
+=== word-diff-regex
 
 위 설정에서 가장 중요한 줄은 `word-diff-regex`입니다. 이 줄을 빼면 아래처럼 나옵니다.
 
@@ -100,7 +103,35 @@ fatal: invalid regular expression: [가-힣]|[A-Za-z0-9_]+
 git 쪽에서는 대신 `[^[:space:]]`(공백이 아닌 모든 문자)를 쓰면 됩니다. 아래 인라인 word-diff 절에서 씁니다.
 ====
 
-== 인라인 word-diff: 한 줄에 겹쳐 보기
+=== 같이 켜면 좋은 설정
+
+위 `~/.gitconfig`에 끼워 둔 나머지 항목도 짧게 설명합니다.
+
+[cols="2,3", options="header"]
+|===
+|설정 |효과
+
+|`interactive.diffFilter = delta --color-only`
+|`git add -p`에서도 같은 강조가 적용됩니다
+
+|`diff.colorMoved = default`
+|내용은 그대로고 위치만 옮긴 블록을 별도 색으로 표시합니다. 절이나 함수 순서를 바꿀 때 유용합니다
+
+|`diff.algorithm = histogram`
+|문단·함수를 옮겼을 때 diff 덩어리가 더 깔끔하게 묶입니다
+
+|`merge.conflictStyle = zdiff3`
+|충돌 시 양쪽뿐 아니라 공통 조상 내용까지 보여줍니다
+
+|`delta.navigate = true`
+|pager에서 `n` / `N`으로 파일 사이를 건너뜁니다
+|===
+
+== 상황별 diff 보기
+
+delta 통합 뷰가 기본이지만, 보는 목적에 따라 다른 방식이 더 편할 때가 있습니다.
+
+=== 인라인 word-diff: 한 줄에 겹쳐 보기
 
 delta는 삭제 줄과 추가 줄을 위아래로 나란히 보여줍니다. 문장 교열처럼 **한 줄 안의 변화만 확인**하고 싶을 때는 git 내장 `--word-diff`가 더 편합니다. 삭제와 추가가 한 줄에 겹쳐 나오므로 문장을 두 번 읽지 않아도 됩니다.
 
@@ -115,7 +146,7 @@ image::img/git-diff-delta/img-03-worddiff.png[인라인 word-diff]
 
 delta는 `--word-diff` 출력 형식을 이해하지 못해 색이 깨집니다. 그래서 이 명령은 pager를 `less`로 되돌려야 합니다.
 
-== 좌우 2단 분할
+=== 좌우 2단 분할
 
 넓은 화면에서 코드를 볼 때는 2단 분할이 낫습니다.
 
@@ -164,30 +195,6 @@ scm_breeze를 안 쓴다면 `~/.gitconfig`에 alias로 넣어도 됩니다.
 	wd = "!git -c core.pager=less diff --word-diff=color --word-diff-regex='[^[:space:]]' "
 	sd = "!git -c delta.side-by-side=true diff "
 ----
-
-== 같이 켜면 좋은 설정
-
-위 `~/.gitconfig`에 끼워 둔 나머지 항목도 짧게 설명합니다.
-
-[cols="2,3", options="header"]
-|===
-|설정 |효과
-
-|`interactive.diffFilter = delta --color-only`
-|`git add -p`에서도 같은 강조가 적용됩니다
-
-|`diff.colorMoved = default`
-|내용은 그대로고 위치만 옮긴 블록을 별도 색으로 표시합니다. 절이나 함수 순서를 바꿀 때 유용합니다
-
-|`diff.algorithm = histogram`
-|문단·함수를 옮겼을 때 diff 덩어리가 더 깔끔하게 묶입니다
-
-|`merge.conflictStyle = zdiff3`
-|충돌 시 양쪽뿐 아니라 공통 조상 내용까지 보여줍니다
-
-|`delta.navigate = true`
-|pager에서 `n` / `N`으로 파일 사이를 건너뜁니다
-|===
 
 == 정리
 
