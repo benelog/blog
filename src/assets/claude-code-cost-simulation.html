@@ -470,7 +470,7 @@ input[type="range"]::-moz-range-thumb {
 
 .summary-grid-cost {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
 }
 
@@ -619,7 +619,7 @@ input[type="range"]::-moz-range-thumb {
         </div>
         <div class="cost-legend-item">
           <div class="cost-dot cache-miss"></div>
-          <div><strong>Cache Miss</strong><br><span style="color:var(--text-muted);font-size:0.8rem">캐시 TTL(5분) 만료, 모델 전환, 또는 프롬프트 변경 시 캐시 적중 실패 → Cache Write 비용으로 재저장</span></div>
+          <div><strong>Cache Miss</strong><br><span style="color:var(--text-muted);font-size:0.8rem">캐시 TTL(기본 5분, Plan·환경에 따라 다름) 만료, 모델 전환, 또는 프롬프트 변경 시 캐시 적중 실패 → Cache Write 비용으로 재저장</span></div>
         </div>
       </div>
       <div class="source-link"><a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching" target="_blank" rel="noopener">Anthropic Prompt Caching →</a></div>
@@ -632,9 +632,11 @@ input[type="range"]::-moz-range-thumb {
           <tr><th>모델</th><th>Input</th><th>Output</th><th>Cache Write</th><th>Cache Read</th></tr>
         </thead>
         <tbody>
-          <tr><td class="model-name">Sonnet 4/4.6</td><td>$3</td><td>$15</td><td>$3.75</td><td>$0.30</td></tr>
-          <tr><td class="model-name">Opus 4/4.6</td><td>$15</td><td>$75</td><td>$18.75</td><td>$1.50</td></tr>
-          <tr><td class="model-name">Haiku 4.5</td><td>$0.80</td><td>$4</td><td>$1.00</td><td>$0.08</td></tr>
+          <tr><td class="model-name">Fable 5</td><td>$10</td><td>$50</td><td>$12.50</td><td>$1.00</td></tr>
+          <tr><td class="model-name">Opus 5/4.8</td><td>$5</td><td>$25</td><td>$6.25</td><td>$0.50</td></tr>
+          <tr><td class="model-name">Sonnet 5</td><td>$2</td><td>$10</td><td>$2.50</td><td>$0.20</td></tr>
+          <tr><td class="model-name">Sonnet 4.6</td><td>$3</td><td>$15</td><td>$3.75</td><td>$0.30</td></tr>
+          <tr><td class="model-name">Haiku 4.5</td><td>$1</td><td>$5</td><td>$1.25</td><td>$0.10</td></tr>
         </tbody>
       </table>
       <div class="source-link"><a href="https://docs.anthropic.com/en/docs/about-claude/models" target="_blank" rel="noopener">Anthropic Models &amp; Pricing →</a></div>
@@ -649,7 +651,7 @@ input[type="range"]::-moz-range-thumb {
           <li><span class="tag pro">유리</span> 실행 턴은 Sonnet으로 비용 절감</li>
           <li><span class="tag con">불리</span> 모델 전환 시 캐시가 격리되어 rebuild 필요</li>
           <li><span class="tag con">불리</span> 전환 직후 턴은 캐시 히트율 0% → 비용 급증</li>
-          <li><span class="tag con">불리</span> Opus output/thinking 토큰은 Sonnet의 5배 가격</li>
+          <li><span class="tag con">불리</span> Opus 5 output/thinking 토큰은 Sonnet 5의 2.5배 가격 (이전 세대의 5배보다는 격차 축소)</li>
         </ul>
       </div>
     </div>
@@ -739,15 +741,21 @@ input[type="range"]::-moz-range-thumb {
     <div class="summary-row-label">모델별 비용 (캐시 적용)</div>
     <div class="summary-grid-cost">
       <div class="summary-card">
-        <div class="label">Sonnet 4/4.6</div>
-        <div class="value" id="costSonnet">-</div>
-        <div class="sub" id="savingsSonnet"></div>
+        <div class="label">Fable 5</div>
+        <div class="value" id="costFable">-</div>
+        <div class="sub" id="savingsFable"></div>
+        <div class="sub" id="fableMultiplier" style="margin-top:0.25rem"></div>
       </div>
       <div class="summary-card">
-        <div class="label">Opus 4/4.6</div>
+        <div class="label">Opus 5/4.8</div>
         <div class="value" id="costOpus">-</div>
         <div class="sub" id="savingsOpus"></div>
         <div class="sub" id="opusMultiplier" style="margin-top:0.25rem"></div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Sonnet 5</div>
+        <div class="value" id="costSonnet">-</div>
+        <div class="sub" id="savingsSonnet"></div>
       </div>
       <div class="summary-card">
         <div class="label">Haiku 4.5</div>
@@ -799,9 +807,10 @@ input[type="range"]::-moz-range-thumb {
 
 <script>
 const MODELS = {
-  sonnet: { name: 'Sonnet 4/4.6', input: 3, output: 15, cacheWrite: 3.75, cacheRead: 0.30 },
-  opus:   { name: 'Opus 4/4.6',   input: 15, output: 75, cacheWrite: 18.75, cacheRead: 1.50 },
-  haiku:  { name: 'Haiku 4.5',    input: 0.80, output: 4, cacheWrite: 1.00, cacheRead: 0.08 }
+  fable:  { name: 'Fable 5',      input: 10, output: 50, cacheWrite: 12.50, cacheRead: 1.00 },
+  opus:   { name: 'Opus 5/4.8',   input: 5, output: 25, cacheWrite: 6.25, cacheRead: 0.50 },
+  sonnet: { name: 'Sonnet 5',     input: 2, output: 10, cacheWrite: 2.50, cacheRead: 0.20 },
+  haiku:  { name: 'Haiku 4.5',    input: 1, output: 5, cacheWrite: 1.25, cacheRead: 0.10 }
 };
 
 function getConfig() {
@@ -969,6 +978,7 @@ function getChartColors() {
     opusplan: dark ? '#a78bfa' : '#7c3aed',
     opusonly: dark ? '#fb923c' : '#ea580c',
     haiku: dark ? '#34d399' : '#059669',
+    fable: dark ? '#fb7185' : '#e11d48',
   };
 }
 
@@ -1024,6 +1034,7 @@ function createCharts() {
         { label: 'Sonnet', data: [], borderColor: c.sonnet, backgroundColor: c.sonnet + '18', borderWidth: 2.5, pointRadius: 2, pointHoverRadius: 5, fill: true, tension: 0.2 },
         { label: 'Opus', data: [], borderColor: c.opusonly, borderWidth: 2.5, pointRadius: 2, pointHoverRadius: 5, fill: false, tension: 0.2 },
         { label: 'Haiku', data: [], borderColor: c.haiku, borderWidth: 2.5, pointRadius: 2, pointHoverRadius: 5, fill: false, tension: 0.2 },
+        { label: 'Fable', data: [], borderColor: c.fable, borderWidth: 2.5, pointRadius: 2, pointHoverRadius: 5, fill: false, tension: 0.2 },
         { label: 'Opusplan', data: [], borderColor: c.opusplan, borderWidth: 2.5, pointRadius: 2, pointHoverRadius: 5, fill: false, tension: 0.2, hidden: true }
       ]
     },
@@ -1084,6 +1095,7 @@ function update() {
   const sonnetData = computeTurnData(cfg, 'sonnet');
   const opusData = computeTurnData(cfg, 'opus');
   const haikuData = computeTurnData(cfg, 'haiku');
+  const fableData = computeTurnData(cfg, 'fable');
   const labels = sonnetData.map(d => 'T' + d.n);
 
   // Token totals (same regardless of model)
@@ -1109,12 +1121,18 @@ function update() {
   const sonnetCost = modelCostSummary(sonnetData, 'costSonnet', 'savingsSonnet');
   const opusCost = modelCostSummary(opusData, 'costOpus', 'savingsOpus');
   const haikuCost = modelCostSummary(haikuData, 'costHaiku', 'savingsHaiku');
+  const fableCost = modelCostSummary(fableData, 'costFable', 'savingsFable');
 
-  // Show Opus cost multiplier vs Sonnet and Haiku
+  // Show Opus/Fable cost multipliers vs Sonnet and Haiku
   const mulEl = document.getElementById('opusMultiplier');
   const vsSonnet = sonnetCost.cached > 0 ? (opusCost.cached / sonnetCost.cached).toFixed(1) : '-';
   const vsHaiku = haikuCost.cached > 0 ? (opusCost.cached / haikuCost.cached).toFixed(1) : '-';
   mulEl.textContent = 'Sonnet의 ' + vsSonnet + '배 · Haiku의 ' + vsHaiku + '배';
+
+  const fableMulEl = document.getElementById('fableMultiplier');
+  const fableVsSonnet = sonnetCost.cached > 0 ? (fableCost.cached / sonnetCost.cached).toFixed(1) : '-';
+  const fableVsOpus = opusCost.cached > 0 ? (fableCost.cached / opusCost.cached).toFixed(1) : '-';
+  fableMulEl.textContent = 'Sonnet의 ' + fableVsSonnet + '배 · Opus의 ' + fableVsOpus + '배';
 
   // Token chart (use Sonnet as reference for token breakdown)
   tokenChart.data.labels = labels;
@@ -1124,15 +1142,17 @@ function update() {
   tokenChart.data.datasets[3].data = sonnetData.map(d => d.totalInput);
 
   // Cost chart - per-model cumulative lines
-  let sonnetCum = 0, opusCum = 0, haikuCum = 0;
+  let sonnetCum = 0, opusCum = 0, haikuCum = 0, fableCum = 0;
   const sonnetCumArr = sonnetData.map(d => { sonnetCum += d.turnCostCached; return sonnetCum; });
   const opusCumArr = opusData.map(d => { opusCum += d.turnCostCached; return opusCum; });
   const haikuCumArr = haikuData.map(d => { haikuCum += d.turnCostCached; return haikuCum; });
+  const fableCumArr = fableData.map(d => { fableCum += d.turnCostCached; return fableCum; });
 
   costChart.data.labels = labels;
   costChart.data.datasets[0].data = sonnetCumArr;
   costChart.data.datasets[1].data = opusCumArr;
   costChart.data.datasets[2].data = haikuCumArr;
+  costChart.data.datasets[3].data = fableCumArr;
 
   // Opusplan
   if (cfg.opusplan) {
@@ -1165,10 +1185,10 @@ function update() {
     }
     document.getElementById('rebuildTurns').textContent = switches + '회 모델 전환';
 
-    costChart.data.datasets[3].hidden = false;
-    costChart.data.datasets[3].data = opplanCumArr;
+    costChart.data.datasets[4].hidden = false;
+    costChart.data.datasets[4].data = opplanCumArr;
   } else {
-    costChart.data.datasets[3].hidden = true;
+    costChart.data.datasets[4].hidden = true;
   }
 
   tokenChart.update('none');
@@ -1195,7 +1215,8 @@ isDark.addEventListener('change', () => {
   costChart.data.datasets[0].backgroundColor = c.sonnet + '18';
   costChart.data.datasets[1].borderColor = c.opusonly;
   costChart.data.datasets[2].borderColor = c.haiku;
-  costChart.data.datasets[3].borderColor = c.opusplan;
+  costChart.data.datasets[3].borderColor = c.fable;
+  costChart.data.datasets[4].borderColor = c.opusplan;
   costChart.options.scales.x.ticks.color = c.text;
   costChart.options.scales.y.ticks.color = c.text;
   costChart.options.scales.y.grid.color = c.grid;
