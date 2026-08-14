@@ -37,8 +37,71 @@ src/
 ├── templates/     # FreeMarker(.ftl) 템플릿
 ├── assets/        # CSS, JS, 폰트, 이미지 등 정적 자원
 └── jbake.properties  # 사이트 설정
+examples/          # 글에서 인용하는 예제 코드
 output/            # 빌드 결과물 (gitignore)
 ----
+
+== 예제 코드와 글의 연결 관계
+
+글에서 인용하는 예제 코드 중 순수 예제 성격의 저장소는 이 저장소의 `examples/` 하위 폴더로 병합했고(커밋 이력 보존), 독자적인 정체성이 있는 프로젝트는 별도 저장소로 유지합니다.
+
+=== 이 저장소의 `examples/` 폴더
+
+[cols="1,2"]
+|===
+|예제 |관련 글
+
+|link:examples/beanutils-test/[beanutils-test]
+|https://blog.benelog.net/2626007.html[BeanUtils 성능비교 - Apache commons, Opensymphony, Spring]
+
+|link:examples/java-date-time/[java-date-time]
+|https://blog.benelog.net/3120317.html[시간대 DB에서 우리나라 시간의 오류]
+
+a|link:examples/jackson-experiment/[jackson-experiment]
+a|
+* https://blog.benelog.net/jackson-with-constructor.html[Jackson으로 파싱한 JSON 속성값을 생성자로 전달하기]
+* https://blog.benelog.net/missing-readme.html[필독 개발자 온보딩 가이드]
+
+a|link:examples/btrace-scripts/[btrace-scripts]
+a|
+* https://blog.benelog.net/btrace-jdbc-monitoring.html[BTrace로 MySQL JDBC 드라이버의 내부 동작 측정하기]
+* https://blog.benelog.net/2855201.html[Btrace로 DBCP의 connection정보를 모니터링 하기]
+|===
+
+=== 별도 저장소로 유지하는 예제
+
+[cols="1,2"]
+|===
+|저장소 |관련 글
+
+|https://github.com/benelog/multiline[multiline]
+|https://blog.benelog.net/2999108.html[Java에서 여러줄에 걸친 문자열 선언을 편하게 하는 @Multiline]
+
+|https://github.com/benelog/one-ftpserver[one-ftpserver]
+|https://blog.benelog.net/2930401.html[초간단한 FTP server, One-FTPServer]
+
+|https://github.com/benelog/egloos-migration[egloos-migration]
+|https://blog.benelog.net/migration-to-static-site.html[정적 사이트로 블로그 마이그레이션]
+
+|https://github.com/benelog/hermes-modal[hermes-modal]
+|https://blog.benelog.net/hermes-modal-telegram-bot.html[Hermes와 Modal로 AI agent 챗봇을 0원에 운영하기]
+
+a|https://github.com/benelog/quiz[quiz] (비공개)
+a|
+* https://blog.benelog.net/2960128.html[문제로 풀어보는 알고리즘 0.3 생각해보기 풀이]
+* https://blog.benelog.net/2962391.html[코딩 인터뷰 완전 분석 210쪽 17.3 변형 문제 풀이]
+
+a|https://github.com/benelog/uploader[uploader]
+a|
+* https://blog.benelog.net/2864739.html[간단하게 서버에 파일을 올리기 + MockMultipartFile을 이용한 테스트]
+* https://blog.benelog.net/2875999.html[Winstone, 경량 Servlet container]
+* https://blog.benelog.net/2930401.html[초간단한 FTP server, One-FTPServer]
+
+a|https://github.com/benelog/dumper[dumper]
+a|
+* https://blog.benelog.net/2874354.html[Java Stack dump 다운로드를 편하게]
+* https://blog.benelog.net/2875999.html[Winstone, 경량 Servlet container]
+|===
 
 == 포스트 작성
 
