@@ -51,7 +51,7 @@ public void shouldGetAfterOneHour() {
     assertThat(after1Hour).isEqualTo("1988.05.08 01:00");}
 ----
 
-(자세한 설명은 http://helloworld.naver.com/helloworld/645609[Java의 날짜와 시간 API],전체 소스는 https://github.com/benelog/java-date-time/blob/master/jdk7-date-time/src/test/java/com/nbp/weblab/date/OldJdkDateTest.java[OldJdkDateTest.java)] 참조)
+(자세한 설명은 http://helloworld.naver.com/helloworld/645609[Java의 날짜와 시간 API],전체 소스는 https://github.com/benelog/blog/blob/master/examples/java-date-time/jdk7-date-time/src/test/java/com/nbp/weblab/date/OldJdkDateTest.java[OldJdkDateTest.java)] 참조)
 
 
 시간대 변경에 대한 정보는 윈도우즈, 안드로이드, OSX, 리눅스, Java, 오라클 등 거의 모든 플랫폼에서 Internet Assigned Numbers Authority (IANA)라는 조직에서 관리하는 시간대 데이터베이스를 원천으로 참조합니다. 처음에는 이 타임존 데이터베이스의 오류일지 아니면 다른 이유가 있을지 확신을 하지 못했습니다.
@@ -137,7 +137,7 @@ Rule ROK 1987 1988 - May Sun>=8    0:00 1:00 DRule ROK 1987 1988 - Oct Sun>=8   
 IANA쪽에서 이 수정을 받아준 Paul Eggert은 제가 섬머타임 변경의 근거로 보낸 http://ko.wikipedia.org/wiki/한국_표준시[위키페이디아의 '한국표준시'페이지]를 보고 우리나라의 시간대 변경시점에 대한 오류도 추가로 수정을 했습니다.
 
 == 시간대 변경시점의 오류
-처음에 보낸 패치에는 포함되지 못했지만 섬머타임 외에도 우리나라 시간대 변경에 대한 의문도 있었습니다. "yyyy.MM.dd HH:mm (Z)"을 포멧으로 해서, 1954년, 1961년, 1968년의 특정시간과 그 때와 UTC와의 차이를 출력해보면, 아래와 같이 나옵니다. (소스는 https://github.com/benelog/java-date-time/blob/master/jdk7-date-time/src/main/java/com/nbp/weblab/date/TimeZoneChangePoint.java[TimeZoneChangePoint.java] 참조 )
+처음에 보낸 패치에는 포함되지 못했지만 섬머타임 외에도 우리나라 시간대 변경에 대한 의문도 있었습니다. "yyyy.MM.dd HH:mm (Z)"을 포멧으로 해서, 1954년, 1961년, 1968년의 특정시간과 그 때와 UTC와의 차이를 출력해보면, 아래와 같이 나옵니다. (소스는 https://github.com/benelog/blog/blob/master/examples/java-date-time/jdk7-date-time/src/main/java/com/nbp/weblab/date/TimeZoneChangePoint.java[TimeZoneChangePoint.java] 참조 )
 
 [source]
 ----

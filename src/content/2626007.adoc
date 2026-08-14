@@ -9,7 +9,7 @@
 .수정이력
 
 * 2019.04.14
-** 테스트한 코드를 https://github.com/benelog/beanutils-test 로 올림
+** 테스트한 코드를 https://github.com/benelog/blog/tree/master/examples/beanutils-test 로 올림
 * 2010.06.21
 ** http://colus.egloos.com/[EP]님의 지적으로 Apache commons Beanutils에서도 http://commons.apache.org/beanutils/api/org/apache/commons/beanutils/PropertyUtils.html#getPropertyDescriptor(java.lang.Object,%20java.lang.String)[PropertyUtils.getPropertyDescriptor]를 사용한 방식으로 비교해봤습니다.
 ** http://www.tuning-java.com/[이상민님]의 지적으로 직접 Bean의 setter를 호출하는 방식의 자료도 추가
@@ -113,7 +113,7 @@ Opensymphony쪽은 70배이상 더 느린데, 제가 구현한 방식이 문제�
 
 
 == 소스
-https://github.com/benelog/beanutils-test
+https://github.com/benelog/blog/tree/master/examples/beanutils-test
 
 [source,java]
 .Apache commons BeanUtils의 BeanUtils.populate 활용

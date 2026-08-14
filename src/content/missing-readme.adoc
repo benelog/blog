@@ -9,8 +9,8 @@
 :idprefix:
 :toc:
 :toclevels: 1
-:source-repo: https://github.com/benelog/jackson-experiment
-:source-link-base: {source-repo}/tree/master
+:source-repo: https://github.com/benelog/blog/tree/master/examples/jackson-experiment
+:source-link-base: {source-repo}
 
 image::https://image.yes24.com/goods/119108069/XL[Cover]
 
