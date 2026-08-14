@@ -1,0 +1,337 @@
+= Dell XPS 13 웹캠을 살린 커널 모듈 한 줄 패치
+정상혁
+2026-08-14
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: linux
+:description: Dell XPS 13 9350(Lunar Lake)에서 웹캠이 동작하지 않던 원인을 한 달간 추적해서 Intel CVS 드라이버의 한 줄 버그를 찾아 DKMS로 패치하고, 업스트림에 반영되기까지의 과정을 정리합니다.
+:toc:
+:sectnums:
+:idprefix:
+
+Dell XPS 13 9350(Lunar Lake)에 Ubuntu 24.04를 설치한 이후로 웹캠이 동작하지 않았습니다.
+link:installing-ubuntu-24.04.html[Ubuntu 24.04 설치]와 link:oem-kernel.html[Ubuntu에서의 OEM 커널 설치] 글에서 언급했던 그 문제입니다.
+2026년 3월 6일부터 4월 10일까지 약 한 달간 원인을 추적한 끝에, Intel CVS 드라이버의 한 줄 버그가 원인임을 찾아 DKMS 패치로 해결했습니다.
+이후 업스트림에 PR을 보냈고 2026년 5월에 머지되었습니다.
+이 글에서는 그 과정에서 알게 된 Lunar Lake의 카메라 아키텍처, 잘못 짚었던 가설, 진짜 원인을 찾은 방법, 그리고 버그가 만들어진 업스트림 커밋 이력을 정리합니다.
+
+== Lunar Lake의 카메라 아키텍처
+
+원인을 이해하려면 먼저 이 플랫폼의 카메라 구조를 알아야 합니다.
+
+=== 전통적인 노트북 카메라 구조
+
+일반적인 노트북 카메라는 단순한 경로를 따릅니다.
+
+[source]
+----
+센서(OV02C10) ──MIPI CSI-2──→ ISP(IPU) ──→ V4L2 ──→ 앱
+       ↑
+  INT3472 (전원 관리: GPIO로 dvdd/avdd 제어)
+----
+
+INT3472 컨트롤러가 GPIO를 통해 센서에 전원을 공급하고, 센서는 MIPI CSI-2 레인으로 ISP(Image Signal Processor)에 직접 연결됩니다.
+드라이버 스택이 성숙해서 대부분의 Linux 배포판에서 잘 동작합니다.
+
+=== Lunar Lake의 Connected Camera(CVS) 모드
+
+Intel Core Ultra 200V(Lunar Lake)는 Computer Vision Sensing(CVS)이라는 새로운 카메라 서브시스템을 도입했습니다.
+AI 비전 처리를 위한 저전력 전용 컨트롤러가 추가된 구조입니다.
+
+[source]
+----
+센서(OV02C10) ──MIPI CSI-2──→ IPU7 ISP ──→ Camera HAL ──→ 앱
+       ↑                          ↑
+  CVS 컨트롤러(INTC10DE)          │
+       ↑                     소유권 이전
+  USBIO 브리지(INTC10B5)    (GPIO 핸드셰이크)
+       ↑
+    USB I2C
+----
+
+CVS 모드에서는 세 가지가 달라집니다.
+
+. 전원 경로가 다릅니다. 센서는 INT3472가 아닌 CVS 컨트롤러 경로로 전원을 받습니다.
+. 소유권 협상이 필요합니다. CVS 컨트롤러가 먼저 센서를 초기화하고, I2C 프로토콜 협상을 마친 뒤, GPIO 핸드셰이크로 IPU7에 센서 소유권을 넘깁니다.
+. 프로토콜 버전 협상이 있습니다. CVS 컨트롤러와 센서 펌웨어 간에 매직 넘버(`0xCAFEB0BA`)로 프로토콜 버전(1.0 vs 2.0+)을 식별합니다.
+
+=== 이 머신의 구성
+
+ACPI 테이블을 직접 읽어서 확인한 이 머신의 카메라 구성은 다음과 같습니다.
+
+[cols="1,1,3", options="header"]
+|===
+|ACPI 속성 |값 |의미
+
+|`LCHS`
+|`1`
+|Connected Camera 모드 활성
+
+|`L1CL`
+|`0xFF`
+|OVTI02C1은 INT3472에 의존하지 않음
+
+|`LNK1._DEP`
+|`{CVSS, VIC1}`
+|CVS 컨트롤러 + USB I2C 브리지에 의존
+|===
+
+이 설정에서 OVTI02C1(OV02C10 센서)은 전원과 초기화를 전적으로 CVS 경로에 의존합니다.
+CVS probe가 실패하면 센서에 전원이 공급되지 않고, 그 뒤의 모든 단계가 멈춥니다.
+
+== 증상과 실패 체인
+
+웹캠이 동작하지 않는 상태에서 `/dev/video0` 은 v4l2loopback 가상 디바이스일 뿐, 실제 카메라 디바이스는 없었습니다.
+dmesg에는 다음의 에러가 남았습니다.
+
+[source]
+----
+Intel CVS driver i2c-INTC10DE:00: magic number in dev response not supported
+Intel CVS driver i2c-INTC10DE:00: cvs_find_magic_num_support:Device protocol is 1.0
+Intel CVS driver i2c-INTC10DE:00: cvs_common_probe:set_host_identifier cmd failed
+Intel CVS driver i2c-INTC10DE:00: probe with driver Intel CVS driver failed with error -5
+ov02c10 i2c-OVTI02C1:00: failed to find sensor: -6
+----
+
+실패의 연쇄를 따라가면 다음과 같습니다.
+
+. CVS probe가 시작되고, `cvs_find_magic_num_support()` 함수가 이 장치의 펌웨어를 "프로토콜 1.0"으로 판정합니다(`magic_num_support = false`).
+. 그런데도 드라이버는 `cvs_write_i2c(SET_HOST_IDENTIFIER, NULL, 0)` 명령을 무조건 호출합니다.
+. 프로토콜 1.0 펌웨어는 이 명령을 이해하지 못해서 ``-EIO``를 반환하고, CVS probe가 실패합니다.
+. 센서 소유권 이전이 일어나지 않아 센서에 전원이 공급되지 않습니다.
+. ov02c10 드라이버가 I2C로 센서 접근을 시도하지만 전원이 없어 ``-ENXIO``로 실패하고, 웹캠을 쓸 수 없게 됩니다.
+
+근본 원인은 한 줄입니다. **프로토콜 1.0 장치에 프로토콜 2.0+ 전용 명령(`SET_HOST_IDENTIFIER`)을 무조건 보내는 것**입니다.
+
+== 잘못 짚었던 가설
+
+처음부터 이 원인을 찾은 것은 아닙니다.
+dmesg에는 CVS 에러와 함께 `int3472-discrete: GPIO type 0x02 unknown` 이라는 에러도 있었습니다.
+처음에는 이 INT3472 GPIO 에러를 원인으로 보고, `discrete.c` 에 'OVTI02C1 + 0x02 → DOVDD' 매핑을 추가하는 DKMS 패치를 작성했습니다.
+빌드와 설치까지 했으나 재부팅 후에도 증상이 그대로였습니다.
+
+이후 ACPI NVS 메모리를 직접 읽고 나서야 두 가지를 알게 되었습니다.
+
+* `GPIO type 0x02 unknown` 에러는 이 노트북에 함께 달려 있는 다른 센서(HIMX1092)에 대한 것이었고, OVTI02C1과는 무관했습니다.
+* `LCHS=1` (Connected Camera 모드)에서 OVTI02C1은 INT3472가 아닌 Intel CVS 경로로 전원을 받습니다.
+
+에러 메시지가 여러 개 보일 때, 눈에 먼저 띄는 에러가 내 문제의 원인이라는 보장이 없다는 교훈을 얻었습니다.
+INT3472 패치는 폐기하고 CVS 드라이버 분석으로 방향을 바꿨습니다.
+
+그 외에도 시도했다가 막힌 경로들이 있었습니다.
+
+[cols="2,3", options="header"]
+|===
+|시도 |결과
+
+|커널 6.11/6.14로 다운그레이드
+|동일한 원인으로 동일한 증상
+
+|`media-ctl` + `v4l2-ctl --stream-mmap` 직접 캡처
+|`STREAMON` 실패 (IPU7은 PSys 경유가 필요)
+
+|`libcamera` (`cam --list`)
+|IPU7 pipeline handler가 아직 없음
+|===
+
+== 버그가 만들어진 과정
+
+Intel이 공개한 https://github.com/intel/vision-drivers[intel/vision-drivers] 저장소의 커밋 이력을 추적하면 버그가 만들어진 과정이 보입니다.
+
+[cols="1,1,2,2", options="header"]
+|===
+|날짜 |커밋 |내용 |SET_HOST_IDENTIFIER 상태
+
+|2024-10-22
+|https://github.com/intel/vision-drivers/commit/93244d7[`93244d7`]
+|SET_HOST_IDENTIFIER 명령 최초 추가
+|`if (!i2c_shared)` 가드 (부분적 보호)
+
+|2024-11-26
+|https://github.com/intel/vision-drivers/commit/23f3733[`23f3733`]
+|`magic_num_support` 필드 도입, 매직 넘버 검증 추가
+|변경 없음
+
+|2025-03-12
+|https://github.com/intel/vision-drivers/commit/69d20a1[`69d20a1`]
+|코드 정리 중 `i2c_shared` 가드 제거
+|무조건 호출로 변경
+
+|2025-06-04
+|https://github.com/intel/vision-drivers/commit/14d0181[`14d0181`]
+|"Fix I2C read for protocol 1.0 firmware"
+|`cvs_get_device_cap` 만 가드, SET_HOST_IDENTIFIER 누락
+|===
+
+버그는 두 단계에 걸쳐 만들어졌습니다.
+
+첫 번째 단계는 https://github.com/intel/vision-drivers/commit/69d20a1[`69d20a1`] (2025-03-12)입니다.
+"Remove LJCA WA | Code Cleanup"이라는 커밋에서 코드 정리를 하면서 `i2c_shared` 조건 분기를 제거했습니다.
+
+[source,diff]
+----
+-  if (!icvs->i2c_shared) {
+-      ret = cvs_write_i2c(SET_HOST_IDENTIFIER, NULL, 0);
+-      ...
+-  }
++  ret = cvs_write_i2c(SET_HOST_IDENTIFIER, NULL, 0);
+----
+
+원래 ``i2c_shared``는 완벽한 가드는 아니었지만, 일부 장치에서 SET_HOST_IDENTIFIER 호출을 건너뛸 수 있게 해줬습니다.
+이 제거로 SET_HOST_IDENTIFIER가 모든 장치에서 무조건 실행되게 바뀌었습니다.
+
+두 번째 단계는 https://github.com/intel/vision-drivers/commit/14d0181[`14d0181`] (2025-06-04)입니다.
+"Fix I2C read for protocol 1.0 firmware"라는 제목으로 프로토콜 1.0 지원을 추가한 커밋입니다.
+`cvs_find_magic_num_support()` 함수를 만들어 프로토콜 버전을 감지하고, `cvs_get_device_cap()` 호출은 `magic_num_support` 조건으로 감쌌습니다.
+하지만 바로 아래의 `SET_HOST_IDENTIFIER` 호출은 같은 조건으로 감싸는 것을 빠뜨렸습니다.
+
+[source,diff]
+----
++  ret = cvs_find_magic_num_support(icvs);
++  if (ret)
++      goto exit;
++
++  if (icvs->magic_num_support) {
++      ret = cvs_get_device_cap(&icvs->cv_fw_capability);
++      if (ret)
++          goto exit;
++  }
++
+   ret = cvs_write_i2c(SET_HOST_IDENTIFIER, NULL, 0);  // ← 가드 없음
+----
+
+같은 함수 안에서, 같은 패턴의 가드가 필요한 두 호출 중 하나만 수정한 전형적인 누락입니다.
+
+== 패키지 업데이트로는 해결되지 않는 이유
+
+Ubuntu의 `linux-modules-vision-*-oem` 패키지는 Intel 업스트림의 특정 시점 스냅샷을 빌드한 것입니다.
+당시 설치되어 있던 `6.17.0-1017.17` 패키지는 업스트림 HEAD를 기반으로 했지만, 업스트림 자체에 버그가 있으므로 패키지를 아무리 업데이트해도 수정되지 않는 상황이었습니다.
+
+패키지 모듈에 수정이 포함되었는지는 바이너리 역어셈블(`objdump`)로 확인했습니다.
+Ubuntu 패키지의 ``intel_cvs.ko``와 패치를 적용한 DKMS 빌드의 `cvs_common_probe` 함수를 비교하면, `SET_HOST_IDENTIFIER` 호출(`mov edi, 0x805`) 직전에 `magic_num_support` 검사와 조건 점프가 있는지가 다릅니다.
+이 확인 기법은 link:linux-binary-disassembly.html[Linux 바이너리 역어셈블로 커널 모듈 패치 확인하기] 글에서 따로 정리했습니다.
+
+== 해결 방법
+
+=== 한 줄 패치
+
+수정 자체는 한 줄의 `if` 문 추가입니다.
+기존 `cvs_get_device_cap()` 가드와 완전히 동일한 패턴입니다.
+
+[source,diff]
+----
+-		ret = cvs_write_i2c(SET_HOST_IDENTIFIER, NULL, 0);
+-		if (ret) {
+-			dev_err(cvs->dev, "%s:set_host_identifier cmd failed", __func__);
+-			goto exit;
++		if (icvs->magic_num_support) {
++			ret = cvs_write_i2c(SET_HOST_IDENTIFIER, NULL, 0);
++			if (ret) {
++				dev_err(cvs->dev, "%s:set_host_identifier cmd failed", __func__);
++				goto exit;
++			}
+ 		}
+----
+
+=== DKMS로 패키지 모듈 오버라이드
+
+업스트림 소스에 위의 패치를 적용하고 DKMS(`vision-driver/1.0.0`)로 빌드해서 설치했습니다.
+DKMS 모듈은 `/lib/modules/<커널 버전>/updates/dkms/` 경로에 설치되는데, 이 경로가 패키지 모듈 경로(`ubuntu/vision/`)보다 우선 로드됩니다.
+패키지를 건드리지 않고 모듈만 바꿔치기할 수 있고, 커널이 업데이트되어도 DKMS가 자동으로 다시 빌드해줍니다.
+
+[source,bash]
+.install-vision-dkms.sh
+----
+#!/bin/bash
+set -e
+
+SRC="$HOME/work/vision-drivers"  # 패치 적용한 소스 위치
+DEST="/usr/src/vision-driver-1.0.0"
+
+sudo cp -r "$SRC" "$DEST"
+sudo rm -rf "$DEST/.git"
+
+sudo dkms add vision-driver/1.0.0
+sudo dkms build vision-driver/1.0.0
+sudo dkms install vision-driver/1.0.0
+----
+
+재부팅 후 실제 로드된 모듈이 DKMS 빌드인지 확인합니다.
+
+[source,bash]
+----
+modinfo intel_cvs | grep filename
+# OK:   /lib/modules/.../updates/dkms/intel_cvs.ko.zst
+# FAIL: /lib/modules/.../ubuntu/vision/intel_cvs.ko.zst (패키지 원본)
+
+journalctl -k -b 0 --no-pager | grep -E "cvs|CVS|INTC10DE" | head -10
+# "Transfer of ownership success" 확인
+----
+
+=== 권한 설정과 캡처 확인
+
+패치만으로는 부족하고 권한 설정도 필요했습니다.
+사용자를 video 그룹에 추가하고, IPU7 PSys 장치의 권한을 udev 규칙으로 지정합니다.
+
+[source,bash]
+----
+sudo usermod -aG video $USER
+
+echo 'SUBSYSTEM=="intel-ipu7-psys", MODE="0660", GROUP="video"' \
+  | sudo tee /etc/udev/rules.d/50-ipu7.rules
+----
+
+IPU7은 아직 libcamera pipeline handler가 없어서 `cam --list` 에 표시되지 않습니다.
+Intel Camera HAL(`libcamhal-ipu7x`)과 GStreamer의 `icamerasrc` 플러그인으로 캡처를 확인했습니다.
+
+[source,bash]
+----
+gst-launch-1.0 icamerasrc device-name=ov02c10-uf num-buffers=3 \
+  ! "video/x-raw,format=NV12" ! jpegenc ! filesink location=/tmp/test.jpg
+----
+
+이 세 가지를 모두 적용한 뒤에 1920x1080 캡처에 성공했습니다.
+
+== 왜 전에는 됐다가 안 됐을까
+
+Dell이 이 모델을 출시할 때는 당연히 카메라가 동작하는 상태로 테스트했을 것입니다.
+무엇이 바뀌었을까요?
+
+가장 유력한 추정은 Ubuntu OEM 커널의 vision-drivers 스냅샷 시점입니다.
+Ubuntu OEM 커널 패키지가 빌드되는 시점에 따라 포함되는 vision-drivers 버전이 달라집니다.
+Dell 출하 시점의 Ubuntu는 SET_HOST_IDENTIFIER가 추가되기 전이거나 `i2c_shared` 가드가 있던 버전의 vision-drivers를 사용했을 가능성이 높습니다.
+이후 OEM 커널 업데이트로 새 스냅샷이 적용되면서, `i2c_shared` 가드가 제거된(https://github.com/intel/vision-drivers/commit/69d20a1[`69d20a1`] 이후) 버전이 들어온 것으로 보입니다.
+
+센서 펌웨어 업데이트나 모듈 로드 순서 변경 같은 다른 가능성도 검토했지만, 펌웨어를 업데이트한 이력이 없고 에러의 성격도 달라서 가능성이 낮다고 판단했습니다.
+
+== 왜 널리 보고되지 않았을까
+
+이 버그가 광범위하게 보고되지 않은 이유도 짐작해볼 수 있습니다.
+
+. Lunar Lake 자체가 새로운 플랫폼입니다. 2024년 하반기에 출시되어 Linux 사용자 기반이 아직 작습니다.
+. CVS 모드는 일부 구성에서만 활성화됩니다. 같은 Lunar Lake라도 `LCHS=0` (전통 모드)이면 CVS 드라이버를 거치지 않습니다.
+. 프로토콜 1.0이 구형입니다. 최신 CVS 펌웨어는 프로토콜 2.0+를 지원하므로 SET_HOST_IDENTIFIER가 성공합니다. Dell XPS 13 9350의 OV02C10은 프로토콜 1.0 펌웨어를 사용하는, 상대적으로 드문 조합입니다.
+. Windows에서는 드라이버 스택이 다릅니다. Intel은 Windows용 드라이버를 별도로 관리하므로, Linux 전용 업스트림 저장소의 버그가 Windows에서는 나타나지 않습니다.
+
+Intel 내부 개발팀이 주로 프로토콜 2.0+ 장치로 테스트하기 때문에, 프로토콜 1.0 장치에서만 발생하는 이 문제를 발견하지 못한 것으로 추정됩니다.
+
+== 업스트림 반영
+
+로컬 DKMS 패치는 커널 업데이트 때마다 유지보수 부담이 남습니다.
+근본적인 해결을 위해 2026년 4월 10일에 https://github.com/intel/vision-drivers/pull/35[intel/vision-drivers#35]로 수정 PR을 제출했습니다.
+이후 같은 수정에 인접한 수정 두 건(`cvs_init()` 에러 전파, `find_oem_prod_id` 에서의 `ACPI_HANDLE()` 사용)을 묶은 https://github.com/intel/vision-drivers/pull/38[#38]로 정리해서 다시 올렸고, 2026년 5월 7일에 머지되었습니다.
+
+업스트림에 머지된 수정이 Ubuntu의 vision-drivers 스냅샷 갱신을 거쳐 OEM 커널 패키지로 릴리스되면 DKMS 모듈은 제거할 수 있습니다.
+패키지 모듈에 수정이 포함되었는지는 앞서 소개한 역어셈블 방법이나 `strings` 명령으로 확인할 수 있습니다.
+
+== 참고 자료
+
+* https://github.com/intel/vision-drivers[intel/vision-drivers] — Intel CVS 드라이버 업스트림 저장소
+* https://github.com/intel/vision-drivers/pull/38[intel/vision-drivers#38] — 이 문제를 수정한 PR
+* https://wiki.ubuntu.com/IntelMIPICamera[Intel MIPI Camera — Ubuntu Wiki]
+* link:linux-binary-disassembly.html[Linux 바이너리 역어셈블로 커널 모듈 패치 확인하기] — 패키지 모듈과 DKMS 모듈의 바이너리 비교 기법
+* link:oem-kernel.html[Ubuntu에서의 OEM 커널 설치] — OEM 커널과 HWE 커널의 차이
+
+'''
+
+이 포스트는 Claude Code와 정상혁이 함께 작성했습니다.

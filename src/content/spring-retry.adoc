@@ -1,0 +1,892 @@
+= Spring Retry로 구현하는 재시도와 서킷 브레이커
+정상혁
+2026-08-14
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: java, spring, test
+:description: Spring Retry의 RetryTemplate과 @Retryable, @Recover, @CircuitBreaker로 재시도, 리커버, 서킷 브레이커 정책을 적용하고 테스트 코드로 검증하는 방법을 정리합니다.
+:toc:
+:sectnums:
+:idprefix:
+
+원격 호출처럼 일시적으로 실패할 수 있는 작업에는 재시도가 필요합니다.
+https://github.com/spring-projects/spring-retry[Spring Retry]는 재시도 정책과 실행 구조를 제공하는 모듈입니다.
+Spring Batch, Spring Integration 내부에서 재시도를 위해 쓰이던 모듈이었고, 독립적으로도 사용할 수 있습니다.
+이 글에서는 `RetryTemplate` 을 직접 호출하는 방법과 애노테이션 기반의 AOP를 이용하는 방법으로 재시도, 리커버, 서킷 브레이커 정책을 적용해보고, 그 동작을 테스트 코드로 확인합니다.
+
+[NOTE]
+====
+Spring Framework 7.0부터는 재시도 기능이 Spring Core 모듈로 흡수되었습니다.
+최신 버전에서의 유효한 사용법은 https://docs.spring.io/spring-framework/reference/core/resilience.html[Resilience Features] 문서를 참고할 수 있습니다.
+이 글에 소개된 ``@Recover``와 ``@CircuitBreaker``는 Spring Framework 7.0의 재시도 기능에서는 지원되지 않습니다.
+====
+
+== 실습 프로젝트 초기 설정
+
+이 실습에서는 Spring Retry의 기능들을 테스트 코드를 통해 확인해보겠습니다.
+IDE에서 새로운 Gradle 프로젝트를 생성합니다.
+프로젝트 이름은 'retry' 등으로 편하게 붙입니다.
+필요한 의존성 선언 등을 담은 `build.gradle` 파일은 다음과 같이 작성합니다.
+
+[source,groovy]
+.build.gradle
+----
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.1'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'net.benelog.retry'
+version = '1.0-SNAPSHOT'
+repositories {
+    mavenCentral()
+}
+
+java {
+    sourceCompatibility = '21'
+}
+
+dependencies {
+    implementation 'org.springframework.retry:spring-retry' // <1>
+    implementation 'ch.qos.logback:logback-classic'
+    implementation 'org.springframework:spring-core'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+test {
+    useJUnitPlatform()
+}
+----
+<1> 이 실습의 핵심인 spring-retry 모듈 의존성입니다.
+
+이 글의 예제에서 스프링 부트의 기능을 활용한 요소는 없습니다.
+그럼에도 라이브러리 버전을 편리하게 지정하기 위해 Gradle의 스프링 부트 플러그인과 `spring-boot-starter-test` 모듈을 추가했습니다.
+테스트에서도 꼭 필요한 의존성만을 명시하고 싶다면 JUnit5와 AssertJ를 직접 추가해도 됩니다.
+
+아래와 같이 정의한 `NotificationService` 인터페이스를 재시도 대상으로 삼겠습니다.
+
+[source,java]
+.NotificationService.java
+----
+public interface NotificationService {
+  boolean send(String message);
+}
+----
+
+'src/main/' 폴더 하위에 `NotificationService.java` 파일을 추가합니다.
+패키지는 `net.benelog.retry` 등 편리한 대로 지정합니다.
+실제 알림을 보내는 기능은 실습 대상이 아닙니다.
+이 인터페이스에 맞추어 알림을 보내기 위해 원격 호출을 하는 구현 클래스가 있다고 상상만 합니다.
+
+실제로 원격 호출을 하지 않고 의도적으로 지정한 횟수만큼 실패하는 클래스를 ``UnstableNotificationService``라는 이름으로 만들겠습니다.
+테스트 용도의 클래스이므로 'src/test/' 폴더 하위에 패키지를 만들어서 추가합니다.
+`send(String)` 메서드를 호출했을 때 지정된 횟수만큼은 예외를 내도록 구현합니다.
+
+[source,java]
+.UnstableNotificationService.java
+----
+public class UnstableNotificationService implements NotificationService {
+	private final Logger logger = LoggerFactory.getLogger(UnstableNotificationService.class);
+	private final int failures;
+	private int tryCount = 0;
+
+	public UnstableNotificationService(int failures) { // <1>
+		this.failures = failures;
+	}
+
+	@Override
+	public boolean send(String message) {
+		this.tryCount++;
+		if (this.tryCount <= this.failures) { // <2>
+			throw new RuntimeException("실패 : " + tryCount);
+		}
+		logger.info("성공 : {}, {}", this.tryCount, message);
+		return true;
+	}
+
+	public int getTryCount() {
+		return this.tryCount; // <3>
+	}
+}
+----
+<1> 의도적으로 실패할 횟수를 생성자 파라미터로 받습니다.
+<2> 의도한 횟수보다 작거나 같으면 예외를 발생시킵니다.
+<3> `send(String)` 메서드가 실제로 몇 번 호출되었는지 알려줍니다.
+
+`send(String)` 메서드 호출을 재시도하는 코드를 이어지는 단락에서 작성하겠습니다.
+
+== RetryTemplate과 정책 클래스 활용
+
+=== RetryTemplate과 RetryPolicy, BackOffPolicy
+
+`RetryTemplate` 은 Spring Retry의 핵심 기능을 구현한 클래스입니다.
+이 클래스는 4개의 `execute()` 메서드를 제공하는데, 모두 `RetryCallback` 인터페이스 타입을 파라미터로 받습니다.
+이 메서드들은 `RetryOperations` 라는 인터페이스로도 따로 정의되어 있습니다.
+
+[source,java]
+.RetryTemplate.execute() 메서드
+----
+  public final <T, E extends Throwable> T execute(RetryCallback<T, E> retryCallback) throws E {
+  }
+----
+
+``RetryCallback``은 아래와 같이 하나의 메서드만 정의된 인터페이스로, 재시도 대상이 되는 작업을 구현하는 용도입니다.
+
+[source,java]
+.RetryCallback 인터페이스
+----
+public interface RetryCallback<T, E extends Throwable> {
+  T doWithRetry(RetryContext context) throws E;
+}
+----
+
+앞 단락의 `NotificationService.send(String)` 메서드를 재시도하는 클래스를 `NotificationRetryDecorator` 라는 이름으로 만들어보겠습니다.
+디자인 패턴 중 Decorator 패턴을 응용한 클래스임을 이름으로 표현했습니다.
+Decorator는 기존 객체를 감싸는 방식으로 유연하게 책임을 추가하는 패턴입니다.
+``RetryTemplate``이 꼭 Decorator 패턴을 통해 적용되어야 하는 것은 아닙니다.
+`RetryCallback` 안에서 호출하는 재시도 대상은 내부 `private` 메서드나 직접 기술한 긴 로직 등 무엇이든 될 수 있습니다.
+
+구현하려는 재시도 요구사항은 다음과 같습니다.
+
+* 최대 시도 횟수는 `NotificationRetryDecorator` 클래스의 생성자 파라미터로 전달받는다.
+* 재시도 사이에는 200ms에서 시작해 2배씩 늘어나는 시간 간격을 둔다. 600ms를 최대 간격으로 한다.
+
+'src/main/' 디렉터리 아래 `NotificationService` 인터페이스와 같은 패키지에 `NotificationRetryDecorator.java` 파일을 추가합니다.
+요구사항대로 ``RetryTemplate``을 생성해주는 private 메서드부터 먼저 만들겠습니다.
+
+[source,java]
+.NotificationRetryDecorator.java에서 RetryTemplate을 생성하는 메서드
+----
+import java.util.Map;
+
+import org.springframework.retry.RetryOperations;
+import org.springframework.retry.backoff.ExponentialBackOffPolicy;
+import org.springframework.retry.policy.SimpleRetryPolicy;
+import org.springframework.retry.support.RetryTemplate;
+
+public class NotificationRetryDecorator {
+	private RetryOperations buildRetryOperations(int maxAttempts) { // <1>
+		var retryPolicy = new SimpleRetryPolicy( // <2>
+			maxAttempts,
+			Map.of(RuntimeException.class, true)
+		);
+		var backOffPolicy = new ExponentialBackOffPolicy(); // <3>
+		backOffPolicy.setInitialInterval(200L);
+		backOffPolicy.setMultiplier(2d);
+		backOffPolicy.setMaxInterval(600L);
+
+		var retryTemplate = new RetryTemplate(); // <4>
+		retryTemplate.setRetryPolicy(retryPolicy);
+		retryTemplate.setBackOffPolicy(backOffPolicy);
+		return retryTemplate;
+	}
+}
+----
+<1> `RetryTemplate` 클래스가 구현한 인터페이스인 ``RetryOperations``를 반환합니다.
+<2> ``RuntimeException``이 발생하면 'maxAttempts' 값으로 지정된 횟수만큼 재시도하도록 정책을 정의합니다.
+<3> 이어지는 세터 호출을 통해 최초 200ms, 이후 2배씩, 최대 600ms까지만 재시도 간격을 늘리는 정책을 정의합니다.
+<4> 앞서 정의한 `RetryPolicy`, ``BackOffPolicy``를 참조할 ``RetryTemplate``의 인스턴스를 생성합니다.
+
+반환형으로 `RetryOperations` 인터페이스를 활용했기에 `buildRetryOperations(int)` 메서드를 호출해서 사용하는 쪽에서는 `RetryTemplate` 클래스 레벨에서만 정의된 `setBackOffPolicy(..)` 같은 초기 설정 메서드를 호출할 수 없게 됩니다.
+``RetryOperations``만 의존하는 코드에서는 `execute(...)` 메서드만 신경 쓰면 됩니다.
+혹시 모를 실수를 막고, IDE 자동 완성의 추천 대상도 줄어든다는 장점이 있습니다.
+
+여러 클래스에서 ``RetryTemplate``을 동일한 정책으로 쓴다면 애플리케이션 컨텍스트에 등록하고 재시도가 필요한 클래스에서 주입받는 방식도 가능합니다.
+그럴 경우에도 이를 참조해서 쓰는 쪽에서 `RetryOperations` 인터페이스에만 의존한다면 여러 클래스에서 공유되는 정책이 수정되지 않도록 방어됩니다.
+
+`NotificationRetryDecorator` 실습을 이어가겠습니다.
+Decorator 패턴을 구현하기 위해 `NotificationService` 인터페이스를 이 클래스가 구현합니다.
+생성자에서는 재시도 대상 객체와 재시도 횟수를 주입받고, 앞선 예제의 `buildRetryOperations(...)` 메서드를 호출하는 등 재시도에 필요한 구성요소를 만들어 갑니다.
+
+[source,java]
+.NotificationRetryDecorator.java
+----
+import org.springframework.retry.RetryCallback;
+import org.springframework.retry.RetryContext;
+
+public class NotificationRetryDecorator implements NotificationService { // <1>
+	private final Logger logger = LoggerFactory.getLogger(NotificationRetryDecorator.class);
+	private final NotificationService target;
+	private final RetryOperations retryOperations;
+
+	public NotificationRetryDecorator(NotificationService target, int maxAttempts) { // <2>
+		this.target = target;
+		this.retryOperations = buildRetryOperations(maxAttempts); // <3>
+	}
+
+	@Override
+	public boolean send(String message) {
+		RetryCallback<Boolean, RuntimeException> retryCallback = (RetryContext context) -> { // <4>
+			logger.info("{}", context);
+			return target.send(message);
+		};
+		return this.retryOperations.execute(retryCallback);
+	}
+    // buildRetryOperations(...) 메서드 생략
+}
+----
+<1> `NotificationService` 인터페이스를 구현함으로써 재시도 기능이 없었던 기존의 사용처에도 바로 적용할 수 있습니다.
+<2> 재시도의 대상 객체와 재시도 횟수를 생성자의 파라미터로 받습니다.
+<3> 생성자를 통해 받은 횟수만큼 재시도하는 ``RetryOperations`` 객체를 생성합니다.
+<4> 재시도 대상이 되는 동작을 람다 표현식으로 정의했습니다.
+
+위의 예제에서는 파라미터 타입을 더 명확히 드러내고자 'retryCallback'을 로컬 변수로 할당하고, 실행 여부를 인지하기 쉽도록 콜백 안에서 로깅을 하는 코드도 넣었습니다.
+실무에서는 아래와 같이 람다 표현식을 더 간결하게 쓰는 방법도 고려할 수 있습니다.
+
+[source,java]
+.RetryCallback 객체를 더 간결하게 정의
+----
+	@Override
+	public boolean send(String message) {
+		return this.retryOperations.execute((context) -> target.send(message));
+	}
+----
+
+`RetryTemplate` 클래스는 `builder()` 메서드도 제공합니다.
+직접 `RetryPolicy`, ``BackOffPolicy``를 지정해서 ``RetryTemplate``을 생성했던 `buildRetryOperations(int)` 메서드는 아래와 같이 대체될 수 있습니다.
+
+[source,java]
+.builder()를 이용한 정책 지정 간소화
+----
+		this.retryOperations = RetryTemplate.builder()
+			.retryOn(RuntimeException.class)
+			.maxAttempts(maxAttempts)
+			.exponentialBackoff(200L, 2d, 600L)
+			.build();
+----
+
+``builder()``를 쓰면서도 `.customPolicy(RetryPolicy)`, `.customBackOff(BackOffPolicy)` 메서드를 통해 직접 Policy 구현 클래스를 지정할 수도 있습니다.
+
+테스트 코드를 통해 재시도가 지정한 정책대로 되었는지 확인해보겠습니다.
+앞에서 만든 테스트 전용 클래스인 ``UnstableNotificationService``로 의도적으로 실패할 횟수를 지정하고, 이 횟수를 넘어선 재시도로 결국에는 성공함을 테스트 코드로 표현합니다.
+
+[source,java]
+.NotificationRetryDecoratorTest.java
+----
+class NotificationRetryDecoratorTest {
+	@Test
+	void successByRetry() {
+		var target = new UnstableNotificationService(3); // <1>
+		var decorator = new NotificationRetryDecorator(target, 4); // <2>
+
+		boolean success = decorator.send("hello");
+
+		assertThat(success).isTrue();
+		assertThat(target.getTryCount()).isEqualTo(4); // <3>
+	}
+}
+----
+<1> 최초 3회 호출은 예외를 내는 ``UnstableNotificationService`` 인스턴스를 만듭니다.
+<2> 대상 객체를 총 4회까지 재시도하도록 decorator를 생성합니다.
+<3> 총 4회까지 `UnstableNotificationService.send(String)` 메서드가 호출되었음이 확인됩니다.
+
+위의 테스트 코드를 실행하면 `UnstableNotificationService.send(String)` 호출이 3번 실패하고 4번째에 성공하는 과정이 콘솔의 로그로도 확인됩니다.
+
+[source]
+.NotificationRetryDecoratorTest가 실행될 때의 콘솔 로그
+----
+INFO net.benelog.retry.NotificationRetryDecorator -- [RetryContext: count=0, lastException=null, exhausted=false]
+INFO net.benelog.retry.NotificationRetryDecorator -- [RetryContext: count=1, lastException=java.lang.RuntimeException: 실패 : 1, exhausted=false]
+INFO net.benelog.retry.NotificationRetryDecorator -- [RetryContext: count=2, lastException=java.lang.RuntimeException: 실패 : 2, exhausted=false]
+INFO net.benelog.retry.NotificationRetryDecorator -- [RetryContext: count=3, lastException=java.lang.RuntimeException: 실패 : 3, exhausted=false]
+INFO net.benelog.retry.UnstableNotificationService -- 성공 : 4, hello
+----
+
+로그 메시지에서 ``RetryContext``가 가진 재시도 횟수(`count`), 마지막으로 발생한 예외(`lastException`)도 확인됩니다.
+각각 `RetryContext.getRetryCount()`, `RetryContext.getLastThrowable()` 메서드로 참조할 수 있는 값입니다.
+필요하다면 `RetryCallback.doWithRetry(RetryContext)` 메서드를 구현한 메서드나 람다 표현식에서 이를 활용할 수도 있습니다.
+
+=== Recover 동작 정의
+
+재시도를 했음에도 마지막 시도까지 실패했을 때 다른 동작을 실행할 수도 있습니다.
+``RetryTemplate``은 `execute(RetryCallback, RecoveryCallback)` 메서드를 통해 이를 지원합니다.
+재시도할 동작은 ``RetryCallback``에, 최종 실패 시의 동작은 ``RecoveryCallback``에 담아서 넘기는 형식입니다.
+`RecoveryCallback` 인터페이스도 메서드 1개만 단순하게 정의되어 있습니다.
+
+[source,java]
+.RecoveryCallback 인터페이스
+----
+public interface RecoveryCallback<T> {
+  T recover(RetryContext context) throws Exception;
+}
+----
+
+``NotificationRetryDecorator``에서도 이를 활용해보겠습니다.
+
+[source,java]
+.NotificationRetryDecorator.send(String) 메서드에서 RecoveryCallback 지정
+----
+	@Override
+	public boolean send(String message) {
+		return retryOperations.execute(
+			(context) -> this.target.send(message),
+			(context) -> recover(context.getLastThrowable(), message) // <1>
+		);
+	}
+
+	private boolean recover(Throwable error, String message) { // <2>
+		logger.warn("메시지 전송 최종 실패 후 recover : {}", message, error);
+		return false;
+	}
+----
+<1> 같은 클래스의 `recover(...)` 메서드를 호출하도록 ``RecoveryCallback``을 람다 표현식으로 정의했습니다.
+<2> 추가한 메서드입니다. 전송을 요청한 메시지와 예외를 로깅하고 `false` 값을 반환합니다.
+
+``NotificationRetryDecoratorTest``에 메서드를 추가하여 `recover(...)` 메서드가 의도대로 실행됨을 확인합니다.
+
+[source,java]
+.recover 동작 수행 테스트
+----
+	@Test
+	void recover() {
+		var target = new UnstableNotificationService(2); // <1>
+		var decorator = new NotificationRetryDecorator(target, 2); // <2>
+
+		boolean success = decorator.send("hello");
+
+		assertThat(success).isFalse(); // <3>
+		assertThat(target.getTryCount()).isEqualTo(2);
+	}
+----
+<1> 처음 2번째 호출까지는 예외를 내는 ``NotificationService``를 생성합니다.
+<2> 2번까지 재시도하도록 'decorator'를 만듭니다. 결과적으로 모든 시도가 예외로 실패합니다.
+<3> 마지막 시도가 실패했어도 예외가 발생하지 않고 `recover(...)` 메서드가 실행되어 `false` 값이 반환되었습니다.
+
+추가한 테스트 메서드를 실행하면 로그 메시지를 통해서도 `recover(...)` 메서드가 실행되었음이 확인됩니다.
+
+``RecoveryCallback``으로 유도한 실행 흐름은 마치 `try - catch` 구문의 `catch` 블럭과 비슷한 역할을 합니다.
+작업을 멈추는 것보다 차선의 기능으로 대체하는 것이 나은 동작이 있다면 이 구조를 활용해볼 만합니다.
+예를 들면 사용자의 프로필 이미지를 HTTP 호출로 읽어오는 동작이 실패했을 때 디폴트 이미지로 대체하는 기능 같은 것들입니다.
+
+=== CircuitBreakerRetryPolicy
+
+`RetryPolicy` 구현체 중 하나인 `CircuitBreakerRetryPolicy` 클래스는 실패하는 요청을 계속하지 않도록 하여 장애 확산을 방어하는 서킷 브레이커 개념을 지원합니다.
+특정 시간 내에 특정 횟수의 시도가 실패하면 '차단기'가 열려서 한동안은 실제 동작을 수행하는 메서드를 호출하지 않습니다.
+
+예제를 통해 다음 정책을 구현해보겠습니다.
+
+* 200ms 동안 지정된 횟수 이상 메서드 호출이 실패하면 차단기가 열린다. 차단기가 열려 있는 동안은 실제 기능을 수행하는 메서드를 호출하지 않고 리커버 동작만 수행한다.
+* 차단기는 300ms 동안 유지되고, 해당 시간이 지나면 닫힌다.
+
+서킷 브레이커가 열리고 다시 닫히는 시간이 정책에 들어갑니다.
+앞에서 했던 단순히 횟수를 지정하는 정책과 다르게 호출이 실패한 시간 정보 등이 기록되어야 합니다.
+``RetryTemplate``에서는 내부적으로 `RetryContextCache` 라는 인터페이스를 통해 상태 정보를 저장합니다.
+기본값으로는 메모리에 상태를 저장하는 `MapRetryContextCache` 구현체가 쓰입니다.
+여러 서버 간에 재시도 기준 정보를 공유하고 싶다면 ``RetryContextCache``를 직접 구현해서 Redis 같은 글로벌 캐시에 저장하는 것도 가능합니다.
+
+이러한 상태 정보를 관리하는 데 필요한 키값 등은 `RetryState` 인터페이스를 통해 전달됩니다.
+기본 구현체로 `DefaultRetryState` 클래스가 제공되고 이를 통해 다음의 속성을 전달합니다.
+
+* key : 재시도 상태를 관리하는 기준이 되는 키
+* forceRefresh : 완전히 새로운 상태로 시도할 경우 true
+* rollbackClassifier : 트랜잭션 롤백을 위해 특정 예외를 전파할지를 결정하는 역할을 합니다. `org.springframework.classify.Classifier` 인터페이스를 파라미터 타입으로 씁니다.
+
+`RetryTemplate` 클래스와 `RetryOperations` 인터페이스에는 ``RetryState``를 포함하는 `execute(...)` 메서드가 있습니다.
+서킷 브레이커 정책을 적용하기 위해서는 이 메서드를 호출해야 합니다.
+
+[source,java]
+.RetryState가 파라미터에 포함된 execute(...) 메서드
+----
+	<T, E extends Throwable> T execute(RetryCallback<T, E> retryCallback, RecoveryCallback<T> recoveryCallback,
+			RetryState retryState) throws E;
+----
+
+위의 메서드를 활용하여 서킷 브레이커 정책을 적용하는 예제도 Decorator 패턴으로 먼저 구현해보겠습니다.
+앞선 실습의 `NotificationRetryDecorator` 클래스와 구조가 거의 비슷하므로 복사해서 만들어도 좋습니다.
+먼저 ``RetryTemplate``을 생성하는 `buildRetryOperations()` 메서드부터 정의하겠습니다.
+
+[source,java]
+.NotificationCircuitDecorator.java에서 RetryTemplate을 생성하는 메서드
+----
+public class NotificationCircuitDecorator implements NotificationService {
+	// 중간 생략
+
+	private RetryOperations buildRetryOperations(int maxAttempts) {
+		var simplePolicy = new SimpleRetryPolicy(
+			maxAttempts,
+			Map.of(RuntimeException.class, true)
+		);
+		var circuitBreakerPolicy = new CircuitBreakerRetryPolicy(simplePolicy); // <1>
+		circuitBreakerPolicy.setOpenTimeout(200L); // <2>
+		circuitBreakerPolicy.setResetTimeout(300L); // <3>
+
+		var retryTemplate = new RetryTemplate();
+		retryTemplate.setRetryPolicy(circuitBreakerPolicy); // <4>
+		return retryTemplate;
+	}
+}
+----
+<1> 서킷 브레이커의 발동 조건이 되는 대상 예외와 발동 전 최대 호출 횟수는 ``SimpleRetryPolicy``로 정의해서, `CircuitBreakerRetryPolicy` 내부에서 참조하도록 생성자의 인자로 전달합니다.
+<2> 200ms 동안 ``SimpleRetryPolicy``에서 지정된 횟수의 시도가 실패하면 서킷 브레이커가 발동합니다.
+<3> 300ms가 지나면 서킷 브레이커가 닫혀서 다시 원래의 대상 메서드를 호출합니다.
+<4> 앞에서 구성한 정책을 ``RetryTemplate``에 넣습니다.
+
+``NotificationCircuitDecorator``의 나머지 부분도 완성합니다.
+
+[source,java]
+.NotificationCircuitDecorator.java
+----
+public class NotificationCircuitDecorator implements NotificationService {
+
+	private final Logger logger = LoggerFactory.getLogger(NotificationCircuitDecorator.class);
+	private final NotificationService target;
+	private final RetryOperations retryOperations;
+	private final RetryState state; // <1>
+
+	public NotificationCircuitDecorator(NotificationService target, int maxAttempts) {
+		this.target = target;
+		this.retryOperations = buildRetryOperations(maxAttempts);
+		String stateKey = "NotificationService.send"; // <2>
+		var rollbackClassifier = new BinaryExceptionClassifier(false); // <3>
+		this.state = new DefaultRetryState(stateKey, rollbackClassifier);
+	}
+
+	@Override
+	public boolean send(String message) {
+		return this.retryOperations.execute(
+			(context) -> this.target.send(message),
+			(context) -> recover(context.getLastThrowable(), message),
+			this.state // <4>
+		);
+	}
+	// recover 메서드는 NotificationRetryDecorator의 것과 동일
+}
+----
+<1> `NotificationRetryDecorator` 클래스 대비 추가된 멤버 변수입니다.
+<2> 재시도를 위한 상태 정보의 키를 재시도할 메서드의 이름으로 썼습니다.
+<3> 원래의 메서드를 호출해서 생기는 예외를 다시 전파하지 않도록 합니다.
+<4> 상태를 유지하는 재시도를 위해 여러 `execute(...)` 메서드 중 ``RetryState``를 파라미터로 받는 것을 호출합니다.
+
+테스트 코드로 서킷 브레이커가 잘 동작하는지 확인합니다.
+
+[source,java]
+.NotificationCircuitDecoratorTest.java
+----
+class NotificationCircuitDecoratorTest {
+	UnstableNotificationService target = new UnstableNotificationService(2); // <1>
+	NotificationCircuitDecorator decorator = new NotificationCircuitDecorator(target, 2); // <2>
+
+	private void callAndAssert(boolean expectedResult, int expectedTryCount) { // <3>
+		boolean success = decorator.send("Hello!");
+		assertThat(success).isEqualTo(expectedResult);
+		assertThat(target.getTryCount()).isEqualTo(expectedTryCount);
+	}
+
+	@Test
+	void recoveredWithCircuit() throws InterruptedException {
+		callAndAssert(false, 1); // <4>
+		callAndAssert(false, 2);
+		callAndAssert(false, 2); // <5>
+		TimeUnit.MILLISECONDS.sleep(310); // <6>
+		callAndAssert(true, 3); // <7>
+	}
+}
+----
+<1> 처음 2번은 예외를 내는 target 객체를 만듭니다.
+<2> 2번 호출이 실패하면 서킷이 열리는 decorator 객체를 만듭니다.
+<3> 반복되는 호출과 검증 동작을 private 메서드로 추출했습니다. 첫 번째 파라미터는 `decorator.send(...)` 메서드의 기대 결과값이고, 두 번째는 `target.send(String)` 메서드가 실제 호출된 누적 횟수입니다.
+<4> 첫 호출에도 리커버 메서드가 호출되어서 `decorator.send(...)` 메서드에서는 ``false``를 반환했습니다.
+<5> 세 번째 시도이지만 서킷이 열려서 `target.send(String)` 메서드의 실제 호출 횟수는 2에서 더 증가하지 않았습니다.
+<6> 서킷이 닫히는 상태가 될 때까지 대기합니다. `circuitBreakerPolicy.setResetTimeout(300L)` 코드로 지정한 시간보다 긴 310ms를 기다립니다.
+<7> 다시 ``target.send(String)``가 실행되어 누적 호출 횟수가 3으로 증가했습니다.
+
+특정 횟수를 단순히 재시도했던 ``SimpleRetryPolicy``와는 최대 호출 횟수와 리커버 동작의 실행 시점 등 전체적인 흐름이 다르다는 것을 알 수 있습니다.
+
+== 애노테이션과 AOP를 이용한 재시도
+
+직접 ``RetryTemplate``을 호출하지 않고도 애노테이션과 AOP를 이용해서 재시도를 할 수 있습니다.
+`@Retryable`, `@Recover`, ``@CircuitBreaker``가 여기에 쓰이는 애노테이션입니다.
+이를 통해 앞에서 만든 Decorator 클래스들로 구성한 재시도 정책을 동일하게 적용하면서도 더 짧은 코드로 구현해보겠습니다.
+
+먼저 ``build.gradle``의 `dependencies` 단락에 다음과 같이 `spring-aspects` 모듈을 추가합니다.
+
+[source,groovy]
+.build.gradle에서 spring-aspects 모듈 의존성 추가
+----
+    implementation 'org.springframework:spring-aspects'
+----
+
+Spring Retry의 AOP 관련 기능이 `aspectjweaver` 모듈을 런타임에 의존하고 있기 때문입니다.
+위 선언이 없으면 이어질 실습을 진행할 때 `org.aspectj.lang.annotation.Pointcut` 클래스를 찾을 수 없다는 에러가 나옵니다.
+
+=== @Retryable
+
+``@Retryable``을 붙인 인터페이스를 ``NotificationRetryService``로 정의하겠습니다.
+앞 단락의 예제를 보존하기 위해서 ``NotificationService``를 상속한 인터페이스를 따로 만들었습니다.
+``NotificationService``와 같은 패키지에 추가합니다.
+
+[source,java]
+.@Retryable을 활용한 NotificationRetryService.java
+----
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+
+interface NotificationRetryService extends NotificationService {
+	@Retryable(
+		retryFor = RuntimeException.class, maxAttempts = 4,
+		backoff = @Backoff(delay = 200L, multiplier = 2d, maxDelay = 600L)
+	)
+	boolean send(String message);
+}
+----
+
+`RetryTemplate.builder()` 로 했을 때와 유사하게 애노테이션의 속성으로 대상이 되는 예외, 재시도 횟수와 BackOff 정책을 정의했습니다.
+`@Retryable` 애노테이션은 구현 클래스에 직접 붙일 수도 있습니다.
+이 실습 프로젝트에서는 실제 원격 호출로 알림을 전송하는 구현 클래스가 상상 속에만 존재하기 때문에 인터페이스에 붙였습니다.
+테스트용 구현체인 `UnstableNotificationService` 클래스에 직접 ``@Retryable``을 붙이는 것도 자연스럽지 않습니다.
+인터페이스를 따로 정의했기에 이를 구현한 여러 클래스에 동일한 재시도 정책을 적용할 수 있다는 장점이 생겼습니다.
+
+테스트를 위해서 아래와 같이 ``UnstableNotificationService``가 구현하는 인터페이스를 ``NotificationRetryService``로 바꿉니다.
+
+[source,java]
+.UnstableNotificationService의 implements 절 변경
+----
+public class UnstableNotificationService implements NotificationRetryService {
+----
+
+의도대로 재시도가 되는지 다시 테스트 코드로 확인하겠습니다.
+원래의 `UnstableNotificationService` 클래스의 생성자로 바로 만든 객체가 아닌, 스프링의 AOP에 의해서 재시도 기능이 덧붙여진 객체를 만들어야 합니다.
+Spring Retry에서 제공하는 `@EnableRetry` 애노테이션이 이를 위해 필요합니다.
+그리고 ``UnstableNotificationService``를 애플리케이션 컨텍스트에 등록해서 스프링 컨테이너가 이 클래스에 AOP를 적용할 기회를 주어야 합니다.
+이를 위해 테스트 전용 애플리케이션 컨텍스트를 구성하는 `TestServiceConfig.java` 파일을 'src/test/java' 디렉터리의 하위 경로에 추가합니다.
+실제 운영에 쓰일 코드도 동일한 방식으로 적용이 가능합니다.
+
+[source,java]
+.AOP 테스트를 위한 애플리케이션 컨텍스트 정의
+----
+@Configuration
+@EnableRetry(proxyTargetClass = true) // <1>
+public class TestServiceConfig {
+	@Bean
+	public UnstableNotificationService fail3Service() {
+		return new UnstableNotificationService(3); // <2>
+	}
+}
+----
+<1> `@Retryable` 애노테이션이 붙은 클래스가 애플리케이션 컨텍스트에 등록되면 재시도 기능을 추가한 프록시 객체를 만들어줍니다.
+<2> 3번째 시도까지 예외를 내는 테스트용 객체를 생성합니다.
+
+위의 예제에서는 `proxyTargetClass = true` 속성을 통해서 인터페이스가 아닌 클래스를 확장한 프록시 객체로 AOP가 적용되도록 유도했습니다.
+테스트에서 `UnstableNotificationService` 클래스 수준에서 정의된 `getTryCount()` 메서드를 활용하기 위해서입니다.
+이 속성이 없으면 인터페이스 기반의 JDK 다이내믹 프록시가 생성되어, 인터페이스에 정의되지 않은 메서드는 프록시 객체에서 호출할 수 없습니다.
+
+``TestServiceConfig``에서 정의한 애플리케이션 컨텍스트를 올려서 AOP가 적용된 ``UnstableNotificationService``를 테스트하는 코드를 만들어보겠습니다.
+`NotificationRetryServiceTest.java` 파일로 이름을 붙였습니다.
+
+[source,java]
+.NotificationRetryServiceTest에서 AOP가 적용된 객체를 대상으로 테스트
+----
+@SpringJUnitConfig(TestServiceConfig.class) // <1>
+class NotificationRetryServiceTest {
+	@Test
+	void retry(@Qualifier("fail3Service") UnstableNotificationService fail3Service) { // <2>
+		boolean success = fail3Service.send("Hello!");
+		assertThat(fail3Service.getTryCount()).isEqualTo(4); // <3>
+		assertThat(success).isTrue();
+	}
+}
+----
+<1> 앞서 만든 테스트용 애플리케이션 컨텍스트를 참조합니다.
+<2> 이후에 같은 타입으로 여러 개의 빈(bean)을 등록할 계획이 있기에 ``@Qualifier``로 이름을 명시했습니다.
+<3> `send(String)` 메서드를 테스트에서 직접 호출한 것은 1번이지만 재시도가 3번 되어서 총 4번 실행되었습니다.
+
+위의 결과를 보면 `implements NotificationRetryService` 선언만으로, `NotificationRetryDecorator` 클래스에서 직접 ``RetryTemplate``을 써서 재시도 정책을 정의한 것과 동일한 효과를 낸다는 것을 알 수 있습니다.
+Decorator 클래스를 Spring Retry 모듈이 실행 시점에 자동으로 만들어준다고 이해할 수 있습니다.
+Spring Retry 안의 `RetryOperationsInterceptor` 클래스가 내부적으로 그런 역할을 합니다.
+
+=== @Recover
+
+`RecoveryCallback` 안에 담겨서 호출될 메서드도 `@Recover` 애노테이션으로 지정할 수 있습니다.
+`NotificationRetryService` 인터페이스에 ``false`` 값을 반환하는 디폴트 메서드를 추가하고 그 위에 ``@Recover``를 붙입니다.
+
+[source,java]
+.NotificationRetryService에 @Recover 메서드 추가
+----
+	Logger logger = LoggerFactory.getLogger(NotificationRetryService.class);
+
+	@Recover // <1>
+	default boolean recover(Throwable error, String message) { // <2>
+		logger.warn("메시지 전송 최종 실패 후 recover : {}", message, error);
+		return false;
+	}
+----
+<1> 최종 재시도가 실패할 시 대신 호출될 메서드로 지정합니다.
+<2> 마지막 재시도에서 발생한 예외와, 재시도 대상 메서드로 넘어왔던 파라미터의 값들을 전달받습니다.
+
+`@Recover` 가 붙은 메서드의 첫 번째 파라미터를 `Throwable` 타입으로 선언하면 `@Retryable` 이 붙은 메서드에서 발생한 에러 객체를 전달받을 수 있습니다.
+이후의 파라미터들은 `@Retryable` 이 붙은 메서드의 파라미터를 순서대로 선언하면 같은 값을 넘겨받을 수 있습니다.
+
+``@Recover``를 붙인 메서드가 의도대로 호출되는지 테스트로 확인해보겠습니다.
+앞서 `NotificationRetryService.send(String)` 메서드는 `@Retryable` 선언으로 총 4번까지 시도를 하므로, 호출이 4번까지 실패해야 `recover(...)` 메서드가 호출됩니다.
+이 테스트 시나리오를 위해 일부러 4번까지 예외를 내는 ``UnstableNotificationService``를 애플리케이션 컨텍스트에 등록합니다. ``TestServiceConfig.java``에 메서드를 추가하면 됩니다.
+
+[source,java]
+.TestServiceConfig.java에서 4번 실패하는 UnstableNotificationService 등록
+----
+	@Bean
+	public UnstableNotificationService fail4Service() {
+		return new UnstableNotificationService(4);
+	}
+----
+
+``NotificationRetryServiceTest``에서 위에서 만든 'fail4Service'를 호출해서 4번 재시도되는 결과를 확인합니다.
+
+[source,java]
+.NotificationRetryServiceTest에 recover까지 검증하는 테스트 추가
+----
+	@Test
+	void retryAndRecover(@Qualifier("fail4Service") UnstableNotificationService fail4Service) {
+		boolean success = fail4Service.send("Hello!");
+		assertThat(fail4Service.getTryCount()).isEqualTo(4);
+		assertThat(success).isFalse(); // <1>
+	}
+----
+<1> 예외 대신 `recover(...)` 메서드의 결과인 `false` 값이 반환됩니다.
+
+테스트를 실행하면 로그 메시지 중에서도 '메시지 전송 최종 실패 후 recover'라는 문자열이 보일 것입니다.
+
+=== @CircuitBreaker
+
+마지막으로 `@CircuitBreaker` 애노테이션을 알아보겠습니다.
+앞에 나왔던 ``CircuitBreakerRetryPolicy``를 활용했던 `NotificationCircuitDecorator` 예제와 동일한 기능을 더 간결한 코드로 만들 수 있습니다.
+``NotificationCircuitService``라는 새로운 인터페이스를 정의해서 ``@CircuitBreaker``의 속성으로 대상 예외와 타임아웃 시간 등을 지정합니다.
+
+[source,java]
+.@CircuitBreaker를 붙인 NotificationCircuitService 인터페이스
+----
+interface NotificationCircuitService {
+
+	@CircuitBreaker(
+		retryFor = RuntimeException.class, // <1>
+		maxAttempts = 2, openTimeout = 200L, resetTimeout = 300L // <2>
+	)
+	boolean sendOnCircuit(String message); // <3>
+}
+----
+<1> ``RuntimeException``이 발생한 경우를 서킷 브레이커가 발동될 대상으로 합니다.
+<2> 최대 2회 시도 후 실패하면 서킷이 열리고, 300ms가 지나면 서킷이 닫혀서 다시 실제 재시도 대상 메서드가 호출됩니다.
+<3> 메서드명도 앞선 예제와 구분하기 위해 ``sendOnCircuit(String)``으로 다르게 붙였습니다.
+
+테스트로 이 동작을 확인해볼 ``FragileService``라는 클래스를 만들겠습니다.
+``UnstableNotificationService``와 동일한 동작을 하는 클래스가 필요한데, 앞선 예제를 보존하기 위해 클래스를 하나 더 만듭니다.
+메서드의 구현부는 동일하므로 실습 예제의 간결함을 위해 `UnstableNotificationService` 클래스를 상속하겠습니다.
+
+[source,java]
+.FragileService.java
+----
+public class FragileService extends UnstableNotificationService implements NotificationCircuitService {
+	public FragileService(int failures) {
+		super(failures);
+	}
+
+	@Override
+	public boolean sendOnCircuit(String message) {
+		return super.send(message);
+	}
+}
+----
+
+AOP가 적용되도록 앞선 실습에서 만들어 둔 `TestServiceConfig` 클래스에서 `FragileService` 클래스의 인스턴스를 ``@Bean``으로 등록합니다.
+
+[source,java]
+.FragileService를 bean으로 등록
+----
+    @Bean
+    public FragileService fail2Service() {
+      return new FragileService(2); // <1>
+    }
+----
+<1> 두 번은 의도적인 에러를 내도록 ``FragileService``의 인스턴스를 생성합니다.
+
+애플리케이션 컨텍스트가 로딩되는 순간 'fail2Service' 객체를 감싼, 서킷 브레이커 정책이 적용된 객체가 자동으로 생성됩니다.
+Spring Retry 내부의 `StatefulRetryOperationsInterceptor` 클래스가 그 역할을 합니다.
+
+Decorator로 서킷 브레이커를 적용했던 ``NotificationCircuitDecoratorTest``와 동일한 시나리오로 테스트를 해보겠습니다.
+
+[source,java]
+.NotificationCircuitServiceTest.java
+----
+@SpringJUnitConfig(TestServiceConfig.class) // <1>
+class NotificationCircuitServiceTest {
+
+	@Autowired
+	FragileService fail2Service;
+
+	private void callAndAssert(boolean expectedResult, int expectedTryCount) { // <2>
+		boolean success = fail2Service.sendOnCircuit("Hello!");
+		assertThat(success).isEqualTo(expectedResult);
+		assertThat(fail2Service.getTryCount()).isEqualTo(expectedTryCount);
+	}
+
+	@Test
+	void recoveredWithCircuit() throws InterruptedException {
+		callAndAssert(false, 1); // <3>
+		callAndAssert(false, 2);
+		callAndAssert(false, 2); // <4>
+		TimeUnit.MILLISECONDS.sleep(310); // <5>
+		callAndAssert(true, 3); // <6>
+	}
+}
+----
+<1> AOP가 적용된 ``FragileService``를 참조할 수 있도록 애플리케이션 컨텍스트를 로딩합니다.
+<2> `NotificationCircuitDecoratorTest` 예제의 것과 동일한 메서드입니다.
+<3> 실제 `sendOnCircuit(String)` 메서드 호출에서는 예외가 났지만 `recover(...)` 가 실행되어서 반환값은 ``false``가 나옵니다.
+<4> 차단기가 열린 이후부터는 더 이상 원래의 `sendOnCircuit(String)` 메서드가 호출되지 않아서 호출 횟수가 증가하지 않습니다.
+<5> ``@CircuitBreaker``의 `resetTimeout` 속성값보다 큰 시간이 지나갑니다. 이후로는 차단기가 닫힙니다.
+<6> 더 이상 호출이 차단되지 않아서 원래의 `sendOnCircuit(String)` 메서드가 실행되고 실행 횟수가 증가합니다. 의도한 2번의 예외가 발생한 이후이므로 호출도 성공합니다.
+
+== RetryListener
+
+``RetryListener``를 ``RetryTemplate``에 지정하면 재시도 과정의 각 시점에 개입할 수 있습니다.
+
+`RetryListener` 인터페이스에는 다음과 같이 정의되어 있습니다.
+
+[source,java]
+.RetryListener 인터페이스
+----
+package org.springframework.retry;
+
+public interface RetryListener {
+  default <T, E extends Throwable> boolean open(RetryContext context, RetryCallback<T, E> callback) {}
+  default <T, E extends Throwable> void onError(RetryContext context, RetryCallback<T, E> callback, Throwable throwable) {}
+  default <T, E extends Throwable> void close(RetryContext context, RetryCallback<T, E> callback, Throwable throwable) {}
+  default <T, E extends Throwable> void onSuccess(RetryContext context, RetryCallback<T, E> callback, T result) {}
+}
+----
+
+이 메서드들을 활용하면 재시도 사이클이 시작되는 시점, 재시도 중 에러가 나는 시점, 성공하는 시점, 재시도가 끝나는 시점에 개입하여 확장된 기능을 넣을 수 있습니다.
+예를 들면 특정 조건에 따라서 재시도를 하지 않거나 멈추는 것도 가능합니다.
+`RetryListener.open(...)` 메서드에서 ``false``를 반환하거나 `onError(...)` 안에서 `RetryContext.setExhaustedOnly()` 메서드를 호출하면 재시도는 더 이상 진행되지 않습니다.
+
+``RetryListener``의 메서드가 호출되는 시점을 확인하는 예제를 만들어보겠습니다.
+`RetryLoggingListener` 라는 이름으로 각 메서드에서 로그 메시지를 남기는 클래스를 구현합니다.
+
+[source,java]
+.RetryLoggingListener.java
+----
+import org.springframework.retry.RetryCallback;
+import org.springframework.retry.RetryContext;
+import org.springframework.retry.RetryListener;
+
+public class RetryLoggingListener implements RetryListener {
+	private final Logger logger = LoggerFactory.getLogger(RetryLoggingListener.class);
+
+	@Override
+	public <T, E extends Throwable> boolean open(RetryContext context, RetryCallback<T, E> callback) {
+		logger.info("open : {}", context);
+		return true;
+	}
+
+	@Override
+	public <T, E extends Throwable> void onError(RetryContext context, RetryCallback<T, E> callback,
+		Throwable throwable) {
+		logger.warn("onError: {}", context, throwable);
+	}
+
+	@Override
+	public <T, E extends Throwable> void close(RetryContext context, RetryCallback<T, E> callback,
+		Throwable throwable) {
+		logger.info("close : {}", context);
+	}
+
+	@Override
+	public <T, E extends Throwable> void onSuccess(RetryContext context, RetryCallback<T, E> callback, T result) {
+		logger.info("onSuccess : {}", result);
+	}
+}
+----
+
+이번 글에서 만든 ``NotificationRetryDecorator``에 위의 리스너를 추가합니다.
+
+[source,java]
+.NotificationRetryDecorator에서 리스너 추가
+----
+	public NotificationRetryDecorator(NotificationService target, int maxAttempts) {
+		this.target = target;
+		this.retryOperations = RetryTemplate.builder()
+            // 중략
+			.withListener(new RetryLoggingListener()) // 추가된 라인
+			.build();
+	}
+----
+
+`RetryTemplate.setListeners(...)` 메서드를 호출하는 방법으로도 리스너를 지정할 수 있습니다.
+
+여러 상황을 비교하기 위해 ``NotificationRetryDecoratorTest``에 실패 없이 바로 성공하는 테스트 메서드도 추가합니다.
+
+[source,java]
+.NotificationRetryDecoratorTest에서 한 번에 성공하는 테스트 케이스 추가
+----
+	@Test
+	void successOnFirstTry() {
+		NotificationService target = (message) -> {
+			System.out.println("Message : " + message);
+			return true;
+		};
+		var decorator = new NotificationRetryDecorator(target, 2);
+
+		boolean success = decorator.send("hello");
+		assertThat(success).isTrue();
+	}
+----
+
+위의 테스트를 실행하면 콘솔에서 ``RetryLoggingListener``가 남기는 로그 메시지가 보일 것입니다.
+이를 통해 ``RetryContext``가 어떤 정보를 담고 있는지도 대략 알 수 있습니다.
+
+``NotificationRetryDecoratorTest``의 여러 메서드를 통해서 다음을 확인해볼 수 있습니다.
+한 번에 타깃 메서드 호출이 성공하는 경우는 다음과 같이 ``RetryListener``의 메서드가 호출됩니다.
+(`NotificationRetryDecoratorTest.successOnFirstTry()`)
+
+1. `RetryListener.open(...)`
+2. 재시도 대상 호출
+3. `RetryListener.onSuccess(...)`
+4. `RetryListener.close(...)`
+
+한 번 이상 실패했지만 재시도로 성공한 경우의 호출 순서는 다음과 같습니다.
+(`NotificationRetryDecoratorTest.successByRetry()`)
+
+1. `RetryListener.open(...)`
+2. 재시도 대상 메서드 호출했으나 실패
+3. `RetryListener.onError(...)`
+4. 2 ~ 3번 과정을 성공할 때까지 반복
+5. `RetryListener.onSuccess(...)`
+6. `RetryListener.close(...)`
+
+재시도를 했어도 최종 실패하고 리커버 메서드가 실행되면 다음과 같습니다.
+(`NotificationRetryDecoratorTest.recover()`)
+
+1. `RetryListener.open(...)`
+2. 재시도 대상 메서드 호출했으나 실패
+3. `RetryListener.onError(...)`
+4. 2 ~ 3번 과정을 최대 재시도 허용 횟수까지 반복
+5. 리커버 메서드 실행
+6. `RetryListener.close(...)`
+
+[NOTE]
+====
+Spring Batch에서도 ``StepBuilder.faultTolerant()``와 ``listener(RetryListener)``를 호출해서 재시도 리스너를 가진 스텝을 구성할 수 있습니다.
+그런 스텝에서 참조되는 ``RetryListener``의 메서드는 `ItemProcessor`, ``ItemWriter``의 호출 전후에 2번 호출된다는 점도 유의해야 합니다.
+====
+
+== 정리
+
+이 글에서는 ``RetryTemplate``을 직접 호출하는 방식과 AOP를 통한 방식, 두 가지 방법으로 재시도와 리커버, 서킷 브레이커 정책을 적용해보았습니다.
+AOP가 편리한 면이 있지만 트랜잭션 등 다른 AOP와 함께 적용되면 적용 순서 등도 신경 써야 합니다.
+재시도를 명시적인 코드로 표현하기 위해 직접 ``RetryTemplate``을 호출하는 방법도 유용할 때가 있습니다.
+AOP를 쓰더라도 ``RetryTemplate``과 그와 연관된 콜백 인터페이스, 재시도 정책 구현체를 잘 알고 있으면 의도대로 정책이 적용되지 않을 때 문제를 빠르게 파악할 수 있습니다.
+Spring Retry 내부에서 재시도가 적용되는 프록시 객체를 만들어주는 `RetryOperationsInterceptor`, `StatefulRetryOperationsInterceptor` 클래스에 브레이크 포인트를 걸어서 'retryOperations' 멤버 변수에 어떤 정책이 어떤 속성으로 지정되었는지 추적해보는 문제 해결 방법도 유용합니다.
+
+실패 후 재시도 등의 동작이 의도대로 동작하는지를 확인하는 테스트도 중요합니다.
+평소가 아닌 문제나 장애가 발생할 때를 대비한 코드이므로, 의식적으로 실패 상황을 만들지 않는다면 제대로 동작할지 알 수 없습니다.
+검증되지 않은 방어 코드는 실제 상황에서 오히려 문제를 더 심각하게 만들기도 합니다.
+다양한 방법으로 테스트를 해야겠지만, 이 글에서 소개한 테스트용 가짜 객체를 만드는 방법도 선택지 중의 하나입니다.
+
+== 참고 자료
+
+* https://github.com/spring-projects/spring-retry[Spring Retry GitHub 저장소]
+* https://docs.spring.io/spring-framework/reference/core/resilience.html[Spring Framework Resilience Features] — Spring Framework 7.0에 흡수된 재시도 기능 문서
+
+'''
+
+이 포스트는 Claude Code와 정상혁이 함께 작성했습니다.
