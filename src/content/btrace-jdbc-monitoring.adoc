@@ -1,0 +1,123 @@
+= BTrace로 MySQL JDBC 드라이버의 내부 동작 측정하기
+정상혁
+2026-08-14
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: btrace, jdbc, monitoring, java
+:description: 실행 중인 JVM에 붙어서 MySQL Connector/J 내부 메소드의 호출 횟수와 평균 실행 시간을 집계하는 BTrace 스크립트 예제를 설명합니다.
+:idprefix:
+:toc:
+:source-repo: https://github.com/benelog/blog/tree/master/examples/btrace-scripts
+:source-link-base: {source-repo}
+
+예전에 쓰던 BTrace 스크립트를 모아둔 저장소를 이 블로그 저장소의 {source-repo}[examples/btrace-scripts]로 옮겼습니다. 저장소에 README가 없어서 어떤 스크립트인지 이 글로 설명을 남깁니다. 이 스크립트는 실행 중인 애플리케이션에 붙어서 MySQL JDBC 드라이버(Connector/J) 내부 메소드의 호출 횟수와 평균 실행 시간을 집계합니다.
+
+== BTrace 소개
+
+BTrace는 실행 중인 JVM에 붙어서(attach) 지정한 메소드에 계측 코드를 끼워 넣는 동적 트레이싱 도구입니다. 애플리케이션 소스를 수정하거나 서버를 재시작하지 않아도 됩니다. 추적할 지점과 수집할 값은 Java 문법으로 작성한 스크립트에 애노테이션으로 선언합니다.
+
+이 블로그에서는 예전에 link:2855201.html[Btrace로 DBCP의 connection정보를 모니터링 하기]에서 소개한 적이 있습니다. 이번 예제는 같은 도구로 Connection pool 대신 JDBC 드라이버 내부를 들여다봅니다.
+
+== 무엇을 측정하는가
+
+link:{source-link-base}/src/main/java/ConnectionMonitor.java[ConnectionMonitor.java]는 MySQL Connector/J 5.1의 내부 메소드 4개를 추적합니다.
+
+[cols="2,3", options="header"]
+|===
+|추적 대상 |의미
+
+|`ConnectionImpl.prepareStatement()`
+|`PreparedStatement` 생성. 드라이버의 `cachePrepStmts` 옵션의 효과를 확인할 수 있습니다.
+
+|`ConnectionImpl.setAutoCommit()`
+|autoCommit 변경. 옵션에 따라 DB 서버와의 통신이 발생하는 지점입니다.
+
+|`PreparedStatement.executeInternal()`
+|`PreparedStatement` 실행이 공통적으로 거치는 내부 메소드입니다.
+
+|`ConnectionImpl.execSQL()`
+|드라이버가 실제로 SQL을 서버에 전송하는 내부 메소드입니다.
+|===
+
+각 메소드의 호출 횟수와 평균 실행 시간을 모으면, 드라이버 튜닝 옵션(`cachePrepStmts`, `useLocalSessionState` 등)을 바꿨을 때 내부 호출이 실제로 줄어드는지 수치로 확인할 수 있습니다. 애플리케이션 코드 계층에서는 보이지 않는 드라이버 내부의 동작이라서 BTrace 같은 도구가 유용합니다.
+
+== 스크립트 구조
+
+핵심 부분만 옮기면 아래와 같습니다.
+
+[source,java]
+.ConnectionMonitor.java
+----
+@BTrace
+public class ConnectionMonitor {
+	private static Aggregation prepareDuration = Aggregations.newAggregation(AggregationFunction.AVERAGE);
+	private static Aggregation prepareCount = Aggregations.newAggregation(AggregationFunction.COUNT);
+
+	@OnMethod(clazz = "com.mysql.jdbc.ConnectionImpl", method = "prepareStatement", location = @Location(Kind.RETURN))
+	public static void statementPrepare(@Duration long duration) {
+		Aggregations.addToAggregation(prepareDuration, duration / 1000);
+		Aggregations.addToAggregation(prepareCount, 1);
+	}
+
+	@OnEvent
+	public static void summary() {
+		println("## com.mysql.jdbc.ConnectionImp.prepareStatement()");
+		Aggregations.printAggregation("- call count : ", prepareCount);
+		Aggregations.printAggregation("- average duration(microseconds) :", prepareDuration);
+		Sys.exit(0);
+	}
+}
+----
+
+사용한 BTrace 기능은 세 가지입니다.
+
+* `@OnMethod` + `@Location(Kind.RETURN)` : 지정한 클래스·메소드가 리턴하는 시점에 핸들러를 실행합니다. 메소드 실행 시간을 담는 `@Duration` 파라미터는 `Kind.RETURN` 위치에서만 쓸 수 있습니다. 값의 단위는 나노초라서 1000으로 나눠 마이크로초로 기록했습니다.
+* `Aggregation` : 호출마다 값을 출력하면 부하도 크고 읽기도 어려우므로, `COUNT`와 `AVERAGE` 집계 함수로 요약값만 유지합니다.
+* `@OnEvent` : BTrace 클라이언트에서 이벤트를 보내면 실행되는 핸들러입니다. 여기서 집계 결과를 출력하고 `Sys.exit(0)`으로 세션을 끝냅니다.
+
+저장소에는 `PrintQuery.java`도 있는데, 실행 쿼리 출력용으로 만들려다 만 것인지 `ConnectionMonitor.java`와 내용이 같은 사본입니다.
+
+== 실행 방법
+
+BTrace 클라이언트로 대상 JVM의 pid를 지정해서 실행합니다.
+
+[source]
+----
+btrace <pid> ConnectionMonitor.java
+----
+
+측정을 끝내고 싶을 때 클라이언트에서 Ctrl+C를 누르면 이벤트 전송 여부를 묻는 메뉴가 나옵니다. 이벤트를 보내면 `@OnEvent` 핸들러가 실행되어 아래처럼 요약이 출력됩니다.
+
+[source]
+----
+## com.mysql.jdbc.ConnectionImp.prepareStatement()
+- call count :  128
+- average duration(microseconds) : 42
+## com.mysql.jdbc.ConnectionImpl.setAutoCommit()
+- call count :  64
+- average duration(microseconds) : 120
+...
+----
+
+link:{source-link-base}/pom.xml[pom.xml]에 선언한 `btrace-client` 의존성은 빌드용이 아니라 IDE에서 BTrace API의 자동완성과 컴파일 검증을 받기 위한 것입니다. 실제 실행은 위처럼 BTrace 클라이언트가 스크립트 파일을 직접 받아서 처리합니다.
+
+== 지금 다시 쓴다면
+
+이 스크립트는 BTrace 1.2와 Connector/J 5.1 시절에 작성했습니다. 지금 같은 작업을 한다면 달라지는 점이 있습니다.
+
+* BTrace는 java.net(kenai) 시절을 지나 현재 https://github.com/btraceio/btrace[GitHub의 btraceio/btrace]에서 개발됩니다. 2.x 버전부터는 패키지가 `com.sun.btrace`에서 `org.openjdk.btrace`로 바뀌어 이 스크립트를 그대로 쓸 수는 없습니다.
+* Connector/J도 6.0부터 패키지가 `com.mysql.jdbc`에서 `com.mysql.cj`로 바뀌어 추적 대상 클래스명을 바꿔야 합니다.
+* 메소드 단위 계측이 목적이라면 지금은 https://github.com/alibaba/arthas[Arthas]의 `monitor`/`trace` 명령이 스크립트 작성 없이 같은 일을 해줍니다. 전체적인 프로파일링이라면 JDK에 내장된 JFR(Java Flight Recorder)이나 https://github.com/async-profiler/async-profiler[async-profiler]가 우선 선택지입니다.
+* SQL 실행 관찰이 목적이라면 https://github.com/jdbc-observations/datasource-proxy[datasource-proxy]나 https://github.com/p6spy/p6spy[p6spy]처럼 JDBC 계층을 감싸는 라이브러리도 있습니다.
+
+그래도 "재시작할 수 없는 JVM에서, 라이브러리 내부의 특정 메소드만 골라서 조건껏 집계한다"는 용도에서는 BTrace 방식의 스크립트가 여전히 유효합니다.
+
+== 참고 자료
+
+* {source-repo}[예제 저장소 (examples/btrace-scripts)]
+* https://github.com/btraceio/btrace[BTrace (btraceio/btrace)]
+* link:2855201.html[Btrace로 DBCP의 connection정보를 모니터링 하기] — 이 블로그의 이전 BTrace 글
+
+'''
+
+이 포스트는 Claude Code와 정상혁이 함께 작성했습니다.

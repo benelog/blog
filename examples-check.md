@@ -29,6 +29,12 @@
    - 딥링크가 가리키는 파일이 병합된 폴더에 실제로 존재하는 것 확인
 3. `origin/master`에 push 완료, GitHub에 `examples/` 반영 확인
 
+### 추가 작업 (2026-08-14, 2차)
+
+- `btrace-scripts`도 같은 방식(`git subtree add`)으로 `examples/btrace-scripts/`에 병합
+  - 블로그 미인용 저장소였으나, 설명 글(`btrace-jdbc-monitoring.adoc`)을 새로 작성해 예제로 인용
+- 원본 https://github.com/benelog/btrace-scripts 도 아래 수동 삭제 대상에 추가
+
 ### 남은 작업: 원본 저장소 수동 삭제
 
 `gh` 토큰에 `delete_repo` 권한이 없어 삭제는 수동으로 진행하기로 함. 삭제 대상:
@@ -36,6 +42,9 @@
 - https://github.com/benelog/beanutils-test
 - https://github.com/benelog/java-date-time
 - https://github.com/benelog/jackson-experiment
+- https://github.com/benelog/benchmark
+  - blog `examples/`로 병합하지 않고 gist로 이전: https://gist.github.com/benelog/a9db4ac3018d6222baea32d5c2f783b5 (이전 완료)
+  - `delete_repo` 권한 승인 대기 중, 승인되면 `gh repo delete benelog/benchmark --yes`로 삭제
 
 삭제 방법: GitHub 웹 (Settings → Danger Zone → Delete this repository) 또는
 `gh auth refresh -h github.com -s delete_repo` 후 `gh repo delete benelog/<이름> --yes`
