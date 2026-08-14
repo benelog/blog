@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+	<!--  외부 연동 환경 설정 -->
+    <util:properties id="api" location="classpath:/api-urls.xml" />
+    <util:properties id="config" location="classpath:/config.xml" />
+    <util:properties id="link" location="classpath:/link-urls.xml" />
+    <util:properties id="ftp" location="classpath:/ftp.xml" />
+    <util:properties id="smtp" location="classpath:/smtp.xml" />
+    <util:properties id="security" location="classpath:/security.xml" />
+     
+    <!-- 어플리케이션 에서는 Controller 를 제외한 컴포넌트 스캔 -->
+    <!-- Controller 설정은 mvc-config.xml -->
+    <context:component-scan base-package="com.samsung.chs.wps">
+        <context:exclude-filter expression="org.springframework.stereotype.Controller"
+            type="annotation" />
+    </context:component-scan>
+    <import resource="applicationContext-persistent.xml" />
+    
+    
+
+</beans>

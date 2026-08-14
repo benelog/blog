@@ -1,0 +1,37 @@
+<%@ page contentType="text/html; charset=utf-8"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="sp"%>
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Samsung Apps : Web Widget</title>
+<link rel="stylesheet" type="text/css" href="/css/apps.css" />
+</head>
+<body class="section_ergr <sp:message code="css.locale"/>">
+
+<div id="wrap">
+	<div class="ergr_area">
+		<div class="ergr">
+			<h1>Samsung Apps</h1>
+			<strong><sp:message code="error.sessionTimedOut"/></strong>
+			<p><sp:message code="error.pleaseLogInToSASO"/><br><sp:message code="error.reconnectPlease"/><br><sp:message code="error.signClickButton"/></p>
+			<span class="btn2 btn_login"><a href="#" onclick="gotoLogin('<sp:eval expression='@link.samsungAppsLogin' />')">Samsung Apps Seller Office Login<span class="ico"></span></a></span>
+		</div>
+		<div class="shdw"></div>
+	</div>
+</div>
+<script type="text/javascript">
+function gotoLogin(url){
+	if(opener && !opener.closed) {
+		opener.location.href = url;
+	} else {
+		window.open(url);
+	}
+
+	window.open('', '_self','');
+	window.close();
+}
+</script>
+
+</body>
+</html>

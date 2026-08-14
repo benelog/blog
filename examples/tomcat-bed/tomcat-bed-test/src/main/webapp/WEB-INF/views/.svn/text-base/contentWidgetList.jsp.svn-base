@@ -1,0 +1,115 @@
+<%@ page contentType="text/html; charset=utf-8"%>
+			<div class="section_lst _section" id="contentWidgetList" style="height:700px;">
+			<span class="btn4 btn_alllst"><button id="btnAllList"><sp:message code="label.AllListBtn"/></button></span>
+				<div class="search_form" id="searchForm">
+					<form>
+					<fieldset>
+					<legend><sp:message code="label.searchWidgetForm"/></legend>
+					<label class="input_txt _placeholder">
+						<em><sp:message code="label.searchWidget"/></em>
+						<span></span>
+						<input type="text" autocomplete="off" id="inputAC">
+					</label>
+					<button type="submit" class="btn_search"><span><sp:message code="label.search"/></span></button>
+					</fieldset>
+					</form>
+					<div class="suggest" style="display:none" id="layerAC">
+					<ul id="resultAC">
+					</ul>
+					</div>
+				</div>
+				<div class="table_t1">
+				<table border="0">
+				<col width="60">
+				<col width="*">
+				<col width="140">
+				<col width="140">
+				<caption>Published List<caption>
+				<thead>
+				<tr>
+				<th class="th_first">
+					<div><sp:message code="label.no"/><span></span></div>
+				</th>
+				<th class="" id="btnSortByName">
+					<!-- [D] 버튼 btn_desc(내림차순) Sort by Descending, btn_asc(오름차순), Sort by Ascending -->
+					<div><span><sp:message code="label.appName2"/></span><button>Sort by Ascending</button><span></span></div>
+				</th>
+				<th class="" id="btnSortByStatus">
+					<div><span><sp:message code="label.status"/></span> <button>Sort by Ascending</button><span></span></div>				
+				</th>
+				<th class="th_last asc" id="btnSortByDate">
+					<div><span><sp:message code="label.lastModified"/></span><button>Sort by Descending</button><span></span></div>
+				</th>
+				</tr>
+				</thead>
+				<tbody id="widgetListContainer">
+<script id="_tplWidget" type="text/x-jquery-tmpl">					
+				<tr data-widgetid="\${widgetId}">
+				<td>\${widgetId}</td>
+				<td class="name">
+					<div class="name_wrap">
+						<a href="#" class="_appName tit">{{html appNameStr}}</a>
+						<div class="popup_detail \${layerPosClass}" style="display:none">
+							<dl>
+							<dt>
+								<em>\${displayAppName}</em> <span class="blind"><sp:message code="label.detailInfomation"/></span>
+							</dt>
+							<dd>
+								<p>
+									<strong><sp:message code="label.device"/></strong> : \${deviceText}<br>
+									<strong><sp:message code="label.size"/></strong> : \${sizeTxt}<br>
+									<br>
+									<strong><sp:message code="label.refreshOption"/></strong> : \${refreshIntervalHours}<sp:message code="label.hours"/><br>
+									<strong><sp:message code="label.cachingOption"/></strong> : \${maxCacheMbText}<br>
+									<br>
+									<strong><sp:message code="label.statusBarOption"/></strong>  : \${barVisibilityText}<br>
+									<strong><sp:message code="label.statusBarType"/></strong> : \${barTypeText}<br>
+									<br>
+									<strong><sp:message code="label.status"/></strong> : \${statusText}
+									<!-- [D] ld_area : 기본 클래스
+										로딩바 추가시 : ld 클래스 추가
+										텍스트 완전 숨김 : blind 클래스 추가
+										서버에서 받는 텍스트는 두번째 span 에 넣어 주세요 -->
+									<span class="ld_area"><span><strong><sp:message code="label.sellerStatus"/></strong> :&nbsp;</span><span class="ellipsis _sellerStatusText"></span></span>
+									<br>
+									<strong><sp:message code="label.version"/> : \${versionName}</strong><br>
+									<br>
+									<strong><sp:message code="label.sellerMemo"/> : </strong> {{html memoText}}
+								</p>
+							</dd>
+							</dl>
+							<div class="screen_shot"><img src="\${previewUrl}" width="274" height="253" alt=""></div>
+							<!-- [D] store 상태에 따라 버튼 비활성화(btn1 dsb) -->
+							<div class="btns">
+								<!-- [D] ld_area2 : 기본 클래스
+									로딩 메시지 보이게 : ld 클래스 추가
+									에러메시지 보이게 : dsb 클래스 추가 -->
+								<div class="ld_area2 _modifyBtnWrap">
+									<span class="btn1 \${modifyBtnClass}"><a href="#" data-widgetid="\${widgetId}" class="_btn_modify"><sp:message code="label.modify"/></a></span>
+									<em class="_loadingMsg"></em>
+									<p><sp:message code="label.cannotModifyDuringOperation"/></p>
+								</div>
+								<span class="btn1 \${downloadBtnClass}"><a href="\${downloadUrl}" class="_btnDownload"><sp:message code="label.download"/></a></span>
+								<span class="btn1 \${emailBtnClass}"><a href="#" data-widgetid="\${widgetId}" class="_btn_send_mail"><sp:message code="label.sendEmail"/></a></span>
+							</div>
+							<button class="btn_close"><sp:message code="label.close"/></button>
+						</div>
+					</div>
+				</td>
+				<td class="status">\${statusText}</td>
+				<td>\${modifiedTimeText}</td>
+				</tr>
+</script>
+				</tbody>
+				</table>
+				</div>
+				<div class="paginate">
+					<a href="javascript:" class="btn_first" id="_first_page"><sp:message code="label.first"/></a>
+					<a href="javascript:" class="btn_prev" id="_prev_page"><sp:message code="label.previous"/></a>
+					<span id="_page_list">
+						<a href="#" class="on">1</a>
+					</span>
+					<a href="javascript:" class="btn_next" id="_next_page"><sp:message code="label.next"/></a>
+					<a href="javascript:" class="btn_last" id="_last_page"><sp:message code="label.last"/></a>			
+				</div>			
+			</div>

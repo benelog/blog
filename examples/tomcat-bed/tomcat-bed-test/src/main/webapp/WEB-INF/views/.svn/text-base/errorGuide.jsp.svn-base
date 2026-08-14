@@ -1,0 +1,24 @@
+<%@ page contentType="text/html; charset=utf-8"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="sp"%>
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Samsung Apps Web widget</title>
+<link rel="stylesheet" type="text/css" href="/css/apps.css" />
+</head>
+<body class="section_ergr <sp:message code="css.locale"/>">
+
+<div id="wrap">
+	<div class="ergr_area">
+		<div class="ergr">
+			<h1>Samsung Apps</h1>
+			<strong><sp:message code="error.systemErrorOccurred"/></strong>
+			<em><sp:message code="error.pageNotAvailable"/></em><p><sp:message code="error.problemExecutingRequest"/><br><sp:message code="error.apologizeInconvenience"/><br><sp:message code="error.checkYourLink"/></em>
+			<span class="btn2 btn_login"><a href="/">Return to the WPS Widget List page<span class="ico"></span></a></span>
+		</div>
+		<div class="shdw"></div>
+	</div>
+</div>
+</body>
+</html>

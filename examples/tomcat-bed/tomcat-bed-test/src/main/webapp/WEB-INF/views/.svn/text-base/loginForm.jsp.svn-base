@@ -1,0 +1,74 @@
+<%@ page contentType="text/html; charset=utf-8"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="sp"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+
+<!DOCTYPE HTML>
+<html lang="ko-KR">
+<head>
+	<meta charset="UTF-8">
+	<title>Login</title>
+	<link href="/css/bootstrap.css" rel="stylesheet"></link>
+	<style>
+	body {
+	padding-top: 60px;
+	/* 60px to make the container go all the way to the bottom of the topbar */
+}
+</style>
+</head>
+
+<body class="<sp:message code="css.locale"/>">
+	<div class="container">
+		<h1> Test Login </h1>
+		<form:form name="form" method="post"  target="popup_wps"  action="/testLogin" autocomplete="off"
+		 onsubmit="javascript:window.open('', 'popup_wps', 'width=1024, height=768, resizable= yes, scrollbars= yes, toolbar=no, status=no, menubar=no');"
+		commandName="user">
+
+
+	  		<div class="control-group">
+		    	<label class="control-label" for="inputEmail">
+		    		User id
+		    	</label>
+		    	<div class="controls">
+		      		<form:input path="uid" placeholder="uid for test" value="aaiisjdx3x"/>
+		    	</div>
+	  		</div>
+	  		<div class="control-group">
+		    	<label class="control-label" for="inputEmail">
+		    		Email
+		    	</label>
+		    	<div class="controls">
+		      		<form:input path="email" placeholder="email for test" value="chs_seller_test_01_stg@yopmail.com"/>
+		    	</div>
+	  		</div>
+	  		<div class="control-group">
+		    	<label class="control-label">
+		    		Name
+		    	</label>
+		    	<div class="controls">
+		      		<form:input path="name" placeholder="name for test" value="James Test"/>
+		    	</div>
+	  		</div>
+	  		<div class="control-group">
+	    		<label class="control-label" for="inputPassword">
+	    	    		Password
+	    		</label>
+		    	<div class="controls">
+			      	<form:password path="password" placeholder="Password"/>
+		    	</div>
+	  		</div>
+	  		<div class="control-group">
+	    		<div class="controls">
+		      		<input type="submit" class="btn"/>
+	    		</div>
+  			</div>
+  			<input type="hidden" name="ssoToken" value="testSso"/>
+		</form:form>
+	</div>
+	<hr/>
+  	<div class="container" align="center">
+    		<a href="?locale=ko"><sp:message code="label.korean"/> </a> | 
+    		<a href="?locale=en"><sp:message code="label.english"/> </a> | 
+    		<a href="?locale=zh"><sp:message code="label.chinese"/> </a>
+    </div>    	
+</body>
+</html>

@@ -1,0 +1,456 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Samsung Apps Web widget</title>
+<script type="text/javascript" src="./js/jquery-1.8.0.min.js"></script>
+<script type="text/javascript" src="./js/jquery.easing.1.3.js"></script>
+<script type="text/javascript" src="./js/layout.js"></script>
+<script type="text/javascript" src="./js/test.js"></script>
+<link rel="stylesheet" type="text/css" href="./css/apps.css" />
+</head>
+<body>
+
+<div id="wrap">
+	<a href="#content" class="blind">Skip to Menu.</a>
+	<div id="header">
+		<div class="sta">
+			<h1><a href="#" class="h_sp h_logo">Samsung Apps Web widget</a></h1>
+		</div>
+		<div class="login_area"></div>
+		<div class="gnb">
+			<span class="btn3"><a href="#" class="on">Create New widget</a></span>
+			<ul>
+			<li class="wdglst"><a href="#"><span>widget List</span></a></li>
+			</ul>
+		</div>
+	</div>
+	<div id="container">
+		<div class="spot">
+			<h2 class="h_sp h_publishedlist">PUBLISHED LIST</h2>
+		</div>
+		<div id="content">
+			<div class="section_lst">
+				<div class="search_form">
+					<form action="#">
+					<fieldset>
+					<legend>Search Widget Form</legend>
+					<label class="input_txt">
+						<em>Search Widget</em>
+						<span></span>
+						<input type="text">
+					</label>
+					<button class="btn_search"><span>search</span></button>
+					</fieldset>
+					</form>
+					<div class="suggest" style="display:block">
+					<ul>
+					<li><a href="#">S<i>Na</i>ver News1</a></li>	
+					<li><a href="#"><i>Na</i>ver News2</a></li>
+					<li><a href="#"><i>Na</i>ver News3</a></li>	
+					<li><a href="#">S<i>Na</i>ver News4</a></li>
+					</ul>
+					</div>
+				</div>
+				<div class="table_t1">
+				<table border="0">
+				<col width="60">
+				<col width="*">
+				<col width="120">
+				<col width="180">
+				<caption>Published List<caption>
+				<thead>
+				<tr>
+				<th class="th_first">
+					<div>No.<span></span></div>
+				</th>
+				<th>
+					<!-- [D] 버튼 btn_desc(내림차순) Sort by Descending, btn_asc(오름차순), Sort by Ascending -->
+					<div>Name <button class="btn_asc">Sort by Ascending</button><span></span></div>
+				</th>
+				<th>
+					<div>Status <button class="btn_asc">Sort by Ascending</button><span></span></div>
+				</th>
+				<th class="th_last">
+					<div>Last Modified <button class="btn_desc">Sort by Descending</button><span></span></div>
+				</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+				<td>102</td>
+				<td class="name">
+					<div class="name_wrap">
+						<!-- [D] 클릭 후 팝업 활성화시 selected 클래스 추가 -->
+						<a href="#">yahoo sports</a>
+						<!-- [D] 상세정보는 리스트에서 모두 가지고 있는 형식으로 처리, 
+							링크 클릭 시 popup_detail 토글 처리 
+							클릭 시점에 스크롤의 위치를 파악, 위로 토글할 것인지 아래로 할 것인지 판단.
+							링크 위로 출력되어야 할땐 popup_detail_top 클래스로 변경
+						//-->
+						<div class="popup_detail" style="display:block">
+							<dl>
+							<dt>
+								yahoo sports <span class="blind">Detail Infomation</span>
+							</dt>
+							<dd>
+								<p>
+									Device : phone<br>
+									size : 4X3<br>
+									<br>
+									Refresh Option : 6hours<br>
+									Caching Option : 500KB<br>
+									<br>
+									Refresh Bar Type : static<br>
+									Refresh Bar Option : Always Show bar<br>
+									<br>
+									Status : In Certification
+								</p>
+								<!-- [D] store 상태에 따라 버튼 비활성화(btn1 dsb) -->
+								<span class="btn1"><button>Modify</button></span>
+							</dd>
+							</dl>
+							<div class="screen_shot"><span>Screen Shot</span><img src="" width="274" height="253" alt=""></div>
+							<button class="btn_close">close</button>
+						</div>
+					</div>
+				</td>
+				<td>Published</td>
+				<td>2012.09.13 17:30</td>
+				</tr>
+				<tr>
+				<td>101</td>
+				<td class="name">
+					<div class="name_wrap">
+						<a href="#" class="selected">naver news</a>
+						<div class="popup_detail">
+							<dl>
+							<dt>
+								yahoo sports2 <span class="blind">Detail Infomation</span>
+							</dt>
+							<dd>
+								<p>
+									Device : phone<br>
+									size : 4X3<br>
+									<br>
+									Refresh Option : 6hours<br>
+									Caching Option : 500KB<br>
+									<br>
+									Refresh Bar Type : static<br>
+									Refresh Bar Option : Always Show bar<br>
+									<br>
+									Status : In Certification
+								</p>
+								<span class="btn1 dsb"><button>Modify</button></span>
+							</dd>
+							</dl>
+							<div class="screen_shot"><span>Screen Shot</span></div>
+							<button class="btn_close">close</button>
+						</div>
+					</div>
+				</td>
+				<td>Published</td>
+				<td>2012.09.13 17:30</td>
+				</tr>
+				<tr>
+				<td>100</td>
+				<td class="name">
+					<div class="name_wrap">
+						<a href="#">yahoo sports2</a>
+						<div class="popup_detail">
+							<dl>
+							<dt>
+								yahoo sports2 <span class="blind">Detail Infomation</span>
+							</dt>
+							<dd>
+								<p>
+									Device : phone<br>
+									size : 4X3<br>
+									<br>
+									Refresh Option : 6hours<br>
+									Caching Option : 500KB<br>
+									<br>
+									Refresh Bar Type : static<br>
+									Refresh Bar Option : Always Show bar<br>
+									<br>
+									Status : In Certification
+								</p>
+								<span class="btn1"><button>Modify</button></span>
+							</dd>
+							</dl>
+							<div class="screen_shot"><span>Screen Shot</span><img src="" width="274" height="253" alt=""></div>
+							<button class="btn_close">close</button>
+						</div>
+					</div>
+				</td>
+				<td>Unpublished</td>
+				<td>2012.09.13 17:30</td>
+				</tr>
+				<tr>
+				<td>99</td>
+				<td class="name">
+					<div class="name_wrap">
+						<a href="#">yahoo sports2</a>				
+						<div class="popup_detail">
+							<dl>
+							<dt>
+								yahoo sports2 <span class="blind">Detail Infomation</span>
+							</dt>
+							<dd>
+								<p>
+									Device : phone<br>
+									size : 4X3<br>
+									<br>
+									Refresh Option : 6hours<br>
+									Caching Option : 500KB<br>
+									<br>
+									Refresh Bar Type : static<br>
+									Refresh Bar Option : Always Show bar<br>
+									<br>
+									Status : In Certification
+								</p>
+								<span class="btn1"><button>Modify</button></span>
+							</dd>
+							</dl>
+							<div class="screen_shot"><span>Screen Shot</span><img src="" width="274" height="253" alt=""></div>
+							<button class="btn_close">close</button>
+						</div>
+					</div>
+				</td>
+				<td>Unpublished</td>
+				<td>2012.09.13 17:30</td>
+				</tr>
+				<tr>
+				<td>98</td>
+				<td class="name">
+					<div class="name_wrap">
+						<a href="#">yahoo sports2</a>				
+						<div class="popup_detail">
+							<dl>
+							<dt>
+								yahoo sports2 <span class="blind">Detail Infomation</span>
+							</dt>
+							<dd>
+								<p>
+									Device : phone<br>
+									size : 4X3<br>
+									<br>
+									Refresh Option : 6hours<br>
+									Caching Option : 500KB<br>
+									<br>
+									Refresh Bar Type : static<br>
+									Refresh Bar Option : Always Show bar<br>
+									<br>
+									Status : In Certification
+								</p>
+								<span class="btn1"><button>Modify</button></span>
+							</dd>
+							</dl>
+							<div class="screen_shot"><span>Screen Shot</span><img src="" width="274" height="253" alt=""></div>
+							<button class="btn_close">close</button>
+						</div>
+					</div>
+				</td>
+				<td>Unpublished</td>
+				<td>2012.09.13 17:30</td>
+				</tr>
+				<tr>
+				<td>97</td>
+				<td class="name">
+					<div class="name_wrap">
+						<a href="#">yahoo sports2</a>				
+						<div class="popup_detail">
+							<dl>
+							<dt>
+								yahoo sports2 <span class="blind">Detail Infomation</span>
+							</dt>
+							<dd>
+								<p>
+									Device : phone<br>
+									size : 4X3<br>
+									<br>
+									Refresh Option : 6hours<br>
+									Caching Option : 500KB<br>
+									<br>
+									Refresh Bar Type : static<br>
+									Refresh Bar Option : Always Show bar<br>
+									<br>
+									Status : In Certification
+								</p>
+								<span class="btn1"><button>Modify</button></span>
+							</dd>
+							</dl>
+							<div class="screen_shot"><span>Screen Shot</span><img src="" width="274" height="253" alt=""></div>
+							<button class="btn_close">close</button>
+						</div>
+					</div>
+				</td>
+				<td>Unpublished</td>
+				<td>2012.09.13 17:30</td>
+				</tr>
+				<tr>
+				<td>96</td>
+				<td class="name">
+					<div class="name_wrap">
+						<a href="#">yahoo sports2</a>				
+						<div class="popup_detail">
+							<dl>
+							<dt>
+								yahoo sports2 <span class="blind">Detail Infomation</span>
+							</dt>
+							<dd>
+								<p>
+									Device : phone<br>
+									size : 4X3<br>
+									<br>
+									Refresh Option : 6hours<br>
+									Caching Option : 500KB<br>
+									<br>
+									Refresh Bar Type : static<br>
+									Refresh Bar Option : Always Show bar<br>
+									<br>
+									Status : In Certification
+								</p>
+								<span class="btn1"><button>Modify</button></span>
+							</dd>
+							</dl>
+							<div class="screen_shot"><span>Screen Shot</span><img src="" width="274" height="253" alt=""></div>
+							<button class="btn_close">close</button>
+						</div>
+					</div>
+				</td>
+				<td>Unpublished</td>
+				<td>2012.09.13 17:30</td>
+				</tr>
+				<tr>
+				<td>95</td>
+				<td class="name">
+					<div class="name_wrap">
+						<a href="#">yahoo sports2</a>				
+						<div class="popup_detail">
+							<dl>
+							<dt>
+								yahoo sports2 <span class="blind">Detail Infomation</span>
+							</dt>
+							<dd>
+								<p>
+									Device : phone<br>
+									size : 4X3<br>
+									<br>
+									Refresh Option : 6hours<br>
+									Caching Option : 500KB<br>
+									<br>
+									Refresh Bar Type : static<br>
+									Refresh Bar Option : Always Show bar<br>
+									<br>
+									Status : In Certification
+								</p>
+								<span class="btn1"><button>Modify</button></span>
+							</dd>
+							</dl>
+							<div class="screen_shot"><span>Screen Shot</span><img src="" width="274" height="253" alt=""></div>
+							<button class="btn_close">close</button>
+						</div>
+					</div>
+				</td>
+				<td>Unpublished</td>
+				<td>2012.09.13 17:30</td>
+				</tr>
+				<tr>
+				<td>94</td>
+				<td class="name">
+					<div class="name_wrap">
+						<a href="#">yahoo sports2</a>				
+						<div class="popup_detail popup_detail_down">
+							<dl>
+							<dt>
+								yahoo sports2 <span class="blind">Detail Infomation</span>
+							</dt>
+							<dd>
+								<p>
+									Device : phone<br>
+									size : 4X3<br>
+									<br>
+									Refresh Option : 6hours<br>
+									Caching Option : 500KB<br>
+									<br>
+									Refresh Bar Type : static<br>
+									Refresh Bar Option : Always Show bar<br>
+									<br>
+									Status : In Certification
+								</p>
+								<span class="btn1"><button>Modify</button></span>
+							</dd>
+							</dl>
+							<div class="screen_shot"><span>Screen Shot</span><img src="" width="274" height="253" alt=""></div>
+							<button class="btn_close">close</button>
+						</div>
+					</div>
+				</td>
+				<td>Unpublished</td>
+				<td>2012.09.13 17:30</td>
+				</tr>
+				<tr>
+				<td>93</td>
+				<td class="name">
+					<div class="name_wrap">
+						<a href="#">yahoo sports2</a>				
+						<div class="popup_detail popup_detail_down">
+							<dl>
+							<dt>
+								yahoo sports2 <span class="blind">Detail Infomation</span>
+							</dt>
+							<dd>
+								<p>
+									Device : phone<br>
+									size : 4X3<br>
+									<br>
+									Refresh Option : 6hours<br>
+									Caching Option : 500KB<br>
+									<br>
+									Refresh Bar Type : static<br>
+									Refresh Bar Option : Always Show bar<br>
+									<br>
+									Status : In Certification
+								</p>
+								<span class="btn1"><button>Modify</button></span>
+							</dd>
+							</dl>
+							<div class="screen_shot"><span>Screen Shot</span><img src="" width="274" height="253" alt=""></div>
+							<button class="btn_close">close</button>
+						</div>
+					</div>
+				</td>
+				<td>Unpublished</td>
+				<td>2012.09.13 17:30</td>
+				</tr>
+				</tbody>
+				</table>
+				</div>
+				<div class="paginate">
+					<a href="#" class="btn_first">first</a>
+					<a href="#" class="btn_prev">previous</a>
+					<span>
+						<a href="#">1</a>
+						<a href="#">2</a>
+						<a href="#">3</a>
+						<a href="#">4</a>
+						<strong>5</strong>
+						<a href="#">6</a>
+						<a href="#">7</a>
+						<a href="#">8</a>
+						<a href="#">9</a>
+						<a href="#">10</a>
+					</span>
+					<a href="#" class="btn_next">next</a>
+					<a href="#" class="btn_last">last</a>			
+				</div>			
+			</div>
+		</div>
+	</div>
+	<div id="footer">
+		<address>All Contents Copyright &copy; Samsung Electronics Co., Ltd.</address>
+	</div>
+</div>
+</body>
+</html>

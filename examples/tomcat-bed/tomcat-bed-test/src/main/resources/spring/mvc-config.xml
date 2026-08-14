@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+	<!-- Configures support for @Controllers -->
+	<mvc:annotation-driven>
+		<mvc:message-converters>
+			<bean id="jsonConverter" class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+			   <property name="supportedMediaTypes" value="application/json" />
+			</bean>
+			<bean id="xmlConverter" class="org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter">
+			   <property name="supportedMediaTypes" value="application/xml" />
+			</bean>
+			<bean id="resourceConverter" class="org.springframework.http.converter.ResourceHttpMessageConverter"/>
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+
+	<mvc:default-servlet-handler/>
+
+	<context:component-scan base-package="net.benelog.tomcatbed.test.presentation">
+		<context:include-filter expression="org.springframework.stereotype.Controller"
+			type="annotation" />
+	</context:component-scan>
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+	
+	<mvc:view-controller path="/" view-name="home"/>
+	<mvc:view-controller path="/zipCodeForm" view-name="/zipCodeForm"/>
+	
+</beans>

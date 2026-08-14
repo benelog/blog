@@ -1,0 +1,14 @@
+<%@ page contentType="text/html; charset=utf-8"%>
+
+		<div class="spot" id="spotCreateWidget" style="display:none">
+			<h2 class="h_sp h_create" id="_widget_title">Create Web-Widget</h2>
+			<!-- <h2 class="h_sp h_modify">MODIFY WIDGET</h2> -->
+			<div class="step">
+				<ol>
+				<li class="n1"><span></span><em><sp:message code="step.basicInformation"/></em><span>01</span></li>
+				<li class="n2"><span></span><em><sp:message code="step.generalSetting"/></em><span>02</span></li>
+				<li class="n3"><span></span><em><sp:message code="step.contentEditing"/></em><span>03</span></li>
+				<li class="n4"><span></span><em><sp:message code="step.verifyAndPublish"/></em><span>04</span></li>
+				</ol>
+			</div>
+		</div>

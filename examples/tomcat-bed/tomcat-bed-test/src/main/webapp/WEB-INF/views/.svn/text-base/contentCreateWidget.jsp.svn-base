@@ -1,0 +1,485 @@
+<%@ page contentType="text/html; charset=utf-8"%>
+<div class="section_create _section" id="contentCreateWidget" style="display:none">
+	<!-- [D] 이동시 .form 에 .moving 추가 -->
+	<div class="form">
+		<!-- bxwrap -->
+		<div class="bxwrap">
+			<!-- step 1 -->
+			<div class="bx bx1">
+				<h3 class="txt_sp txt_wdgset"><sp:message code="label.widgetSetting"/></h3>
+				<h4><em><sp:message code="label.device"/></em></h4>
+				<ul class="lst_rdo grid3">
+				<li><label class="input_rdo"><input type="radio" name="device" value="0"><span><sp:message code="label.phone"/></span></label></li>
+				<li><label class="input_rdo"><input type="radio" name="device" value="1" disabled="disabled"><span><sp:message code="label.tablet"/></span></label></li>
+				</ul> 
+				<hr>
+				<h4><em><sp:message code="label.size"/></em></h4>
+				<ul class="lst_rdo grid4">
+					<li><label class="input_rdo"><input type="radio" name="size" value="41"><span>4x1</span></label></li>
+					<li><label class="input_rdo"><input type="radio" name="size" value="42"><span>4x2</span></label></li>
+					<li><label class="input_rdo"><input type="radio" name="size" value="43"><span>4x3</span></label></li>
+					<li><label class="input_rdo"><input type="radio" name="size" value="44" checked="checked"><span>4x4</span></label></li>
+					<!-- <li><label class="input_rdo"><input type="radio" name="size" value="45"><span>4x5</span></label></li> -->
+					<li class="option">
+						<label class="input_rdo">
+							<input type="radio" name="size" value="custom">
+							<span><sp:message code="label.customSize"/></span>
+						</label>
+						<label>
+							<select name="custom_widget_size">
+							<option value="11" selected="selected">1x1</option>
+							<option value="12">1x2</option>
+							<option value="13">1x3</option>
+							<option value="14">1x4</option>
+							<!-- <option value="15">1x5</option>-->
+							<option value="21">2x1</option>
+							<option value="22">2x2</option>
+							<option value="23">2x3</option>
+							<option value="24">2x4</option>
+							<!-- <option value="25">2x5</option>-->
+							<option value="31">3x1</option>
+							<option value="32">3x2</option>
+							<option value="33">3x3</option>
+							<option value="34">3x4</option>
+							<!-- <option value="35">3x5</option>-->
+							</select>
+						</label>
+					</li>
+				</ul>
+				<hr>
+				<h4><em>Resize Option</em></h4>
+				<ul class="lst_rdo grid2">
+					<li><label class="input_rdo"><input type="radio" name="resize_option" value="0" checked="checked"><span>Both Resizable</span></label></li>
+					<li><label class="input_rdo"><input type="radio" name="resize_option" value="1"><span>Horizontal Resizable</span></label></li>
+					<li><label class="input_rdo"><input type="radio" name="resize_option" value="2"><span>Vertical Resizable</span></label></li>
+					<li><label class="input_rdo"><input type="radio" name="resize_option" value="3"><span>Both Fixed</span></label></li>
+				</ul>
+				<hr class="v2">
+				<h3 class="txt_sp txt_winfo"><sp:message code="label.widgetInfo"/></h3>
+				<h4>
+					<em><sp:message code="label.appName"/></em>
+					<!-- [D] .tip 에 마우스 오버시 안의 div.ly_tip 토글 -->
+					<span class="tip ic_tip">
+						<div class="ly_tip" style="display:none;">
+							<span></span>
+							<img src="img/img_exam.png" width="262" height="172" alt="Widget name">
+						</div>
+					</span>
+				</h4>
+				<!-- [D] .input_txt 에 포커스 가면 .focus 추가 / 에러상황에서는 .err 추가 -->
+				<label class="input_txt _placeholder"><em><sp:message code="label.enterTheName"/></em><span></span><input type="text" name="app_name" class="_widget_name" maxlength="25"></label>
+				<!-- [D] 에러 메시지는 기본 display:none -->
+				<p class="err _name_err"><sp:message code="label.minChars" arguments="4"/></p>
+				<p class="err _name_err2"><sp:message code="label.notAvailableAppName"/></p>
+				<hr>
+				<h4>
+					<em><sp:message code="label.memo"/></em>
+					<span class="tip ic_tip">
+						<div class="ly_tip" style="display:none;">
+							<span></span>
+							<img src="img/img_widget_<sp:message code="css.locale"/>.png" width="261" height="166" alt="Widget information">
+						</div>
+					</span>
+				</h4>
+				<div class="txt_area _placeholder">
+					<em><label for="txt_memo"><sp:message code="label.enterAMemo"/>
+						<br><sp:message code="label.thisNote"/><br></label>
+					</em>
+					<textarea cols="20" rows="10" id="txt_memo" class="_description"></textarea>
+				</div>
+					<p class="err _memo_err"><sp:message code="label.minChars" arguments="4"/></p>
+				<p class="dsc_txt_area _description_stat"><span class="_char_count_wrap"><span>\${nCharCnt}</span> / <span>\${nCharCntMax}</span></span> <sp:message code="label.characters"/> </p>
+				<hr class="v2">
+				<span class="btn2 btn_next _btn_basic_next"><button type="button"><sp:message code="label.nextStep"/><span class="ico"></span></button></span>
+			</div>
+			<!-- //step 1 -->
+			<!-- step 2 -->
+			<div class="bx bx2">
+				<h3 class="txt_sp txt_logo"><sp:message code="label.logoSetting"/></h3>
+				<h4>
+					<em><sp:message code="label.linkTo"/></em>
+					<span class="tip ic_tip">
+						<div class="ly_tip" style="display:none;">
+							<span></span>
+							<p><sp:message code="label.whenITouch"/></p>
+						</div>
+					</span>
+				</h4>
+				<!-- [D] 로딩 아이콘이 필요한 label.input_txt 에는 마지막 자식으로 span.ic_ld 추가, 활성화시키려면 label.input_txt 에 .ld 추가 -->
+				<label class="input_txt _placeholder"><em><sp:message code="label.enterLinkOnLogo"/></em><span></span><input type="text" class="_logo_link_url" maxlength="200"><span class="ic_ld"></span></label>
+				<p class="err _link_url_err"><sp:message code="label.urlIsInvalid"/></p>
+				<p class="err _link_url_err2"><sp:message code="label.pageNotFound"/></p>
+				<hr>
+				<h4>
+					<em><sp:message code="label.image"/></em>
+					<span class="tip ic_tip">
+						<div class="ly_tip" style="display:none;">
+							<span></span>
+							<img src="img/img_dscimage.png" width="261" height="166" alt="logo image">
+						</div>
+					</span>
+				</h4>
+				<dl class="image">
+				<!-- [D] dt 에 클래스 추가
+					dt.st_logo : img.logo 가 보이는 상태
+					dt.st_upload : div.upload 가 보이는 상태
+					dt.st_change : div.change 가 보이는 상태
+					dt.st_loading : div.loading 이 보이는 상태 -->
+				<dt class="st_upload _logo_wrap outer_ly">
+					<div class="inner_ly">
+						<img src="img/b.gif" alt="LOGO" class="logo _logo_preview">
+						<div class="dimm"></div>
+						<div class="upload">
+							<span class="btn_upload input_file"><button type="button"><sp:message code="label.uploadImage"/></button><div><input type="file" class="_logo_upload_form" name="imageFile" data-url="/uploadLogo.do"></div></span>
+							<p><sp:message code="label.uploadImage"/></p>
+						</div>
+						<div class="change">
+							<span class="btn1 noshade input_file"><button type="button"><sp:message code="label.changeImage"/></button><div><input type="file" class="_logo_upload_form" name="imageFile" data-url="/uploadLogo.do"></div></span>
+						</div>
+						<div class="loading2"><p><sp:message code="label.uploading"/></p></div>
+					</div>
+				</dt>
+				<dd class="both"><span>-</span><span><sp:message code="label.logoImageFormat"/></span></dd>
+				</dl>
+				<!-- [D] 로고 이미지 URL전달을 위한 hidden 박스 -->
+				<input type="hidden" name="logoUrl" class="_logo_url">
+				<hr class="v2">
+				<h3 class="txt_sp txt_gset"><sp:message code="label.generalSetting"/></h3>
+				<h4>
+					<em><sp:message code="label.refreshOption"/></em>
+					<span class="tip ic_tip">
+						<div class="ly_tip" style="display:none;">
+							<span></span>
+							<p><sp:message code="label.selectOptionsYouWant"/></p>
+						</div>
+					</span>
+				</h4>
+				<ul class="lst_rdo grid3">
+				<li><label class="input_rdo"><input type="radio" name="refreshOption" value="3" checked="checked"><span>3 <sp:message code="label.hours"/></span></label></li>
+				<li><label class="input_rdo"><input type="radio" name="refreshOption" value="6"><span>6 <sp:message code="label.hours"/></span></label></li>
+				<li><label class="input_rdo"><input type="radio" name="refreshOption" value="12"><span>12 <sp:message code="label.hours"/></span></label></li>
+				<li><label class="input_rdo"><input type="radio" name="refreshOption" value="24"><span>24 <sp:message code="label.hours"/></span></label></li>
+				<li><label class="input_rdo"><input type="radio" name="refreshOption" value="48"><span>48 <sp:message code="label.hours"/></span></label></li>
+				<li class="option option2">
+					<label class="input_rdo"><input type="radio" name="refreshOption" value="manual"><span><sp:message code="label.manual"/></span></label>					<div class="dsb _manual_value_wrap">
+						<label class="input_txt err _placeholder" style="width:25px"><span></span><input type="text" class="_refresh_option_value" value="1" maxlength="2"></label>
+						<span class="dsc" style="float:right">- <sp:message code="label.maxiumHours" arguments="48"/></span>
+					</div>
+					<p class="err _refresh_option_err"><sp:message code="label.enterValueBetween" arguments="1,48"/></p>
+				</li>
+				</ul>
+				<!-- Push UI 스펙 정의 전 주석처리
+				<hr class="v2">
+				<h3 class="txt_sp txt_pshset"><sp:message code="label.pushSettings"/></h3>
+				<h4>
+					<em><sp:message code="label.pushUseOption"/></em>
+					<span class="tip ic_tip">
+						<div class="ly_tip" style="display:none">
+							<span></span>
+							<p><sp:message code="label.pushGuide"/></p>
+						</div>
+					</span>
+				</h4>
+				<ul class="lst_rdo grid">
+				<li><label class="input_rdo"><input type="radio" name="pushSettings" checked="checked" value="0"><span><sp:message code="label.pushNone"/></span></label></li>
+				<li><label class="input_rdo"><input type="radio" name="pushSettings" value="1" disabled="disabled"><span><sp:message code="label.pushUse"/></span></label></li>
+				</ul>
+				-->
+				<!-- [D] div.dsb_pos 는 기본 클래스, 디서블할때 dsb 클래스 추가 -->
+				<!--  Push UI 스펙 정의 전 주석처리
+				<div class="dsb_pos dsb _push_use_wrap">
+					<dl class="lst_dl grid4">
+					<dt><span>- <sp:message code="label.appId"/></span></dt>
+					<dd><label class="input_txt _placeholder"><em><sp:message code="label.enterAppId"/></em><span></span><input type="text" class="_app_id"></label></dd>
+					<dd class="err _app_id_err"><sp:message code="label.enterAValidAppId"/></dd>
+					<dt><span>- <sp:message code="label.appSecret"/></span></dt>
+					<dd><label class="input_txt _placeholder"><em><sp:message code="label.enterAppSecretNo"/></em><span></span><input type="text" class="_app_secret"></label></dd>
+					<dd class="err _app_secret_err"><sp:message code="label.enterAValidAppSecret"/></dd>
+					</dl>
+					<div class="ly"></div>
+				</div>
+				 -->
+				<hr class="v2">
+				<h3 class="txt_sp txt_caching"><sp:message code="label.cachingSetting"/></h3>
+				<h4>
+					<em><sp:message code="label.cachingOption"/></em>
+					<span class="tip ic_tip">
+						<div class="ly_tip" style="display:none;">
+							<span></span>
+							<p class="cut"><sp:message code="label.whatsCachingOption"/><br><sp:message code="label.whatsCachingOption2"/></p>
+						</div>
+					</span>
+				</h4>
+								<ul class="lst_rdo">
+				<li><label class="input_rdo"><input type="radio" name="cachingOption" value="false" checked="checked"><span><sp:message code="label.cacheNone"/></span></label></li>
+				<li class="option option2">
+					<label class="input_rdo"><input type="radio" name="cachingOption" value="true"><span><sp:message code="label.enableCached"/></span></label>
+					<div class="dsb _spinbox _maximum_cache">
+						<label class="input_txt _placeholder" style="width:18px"><span></span><input type="text" class="_caching_value _spinValue" value="1.0" maxlength="3"></label><span class="txt">MB</span>
+						<span class="dsc">- <sp:message code="label.maximumCache"/></span>
+					</div>
+					<p class="err _maximum_cache_err2"><sp:message code="label.enterValueBetween" arguments="0.1, 5.0"/></p>
+				</li>
+				</ul>
+				<h5>- <sp:message code="label.cacheSubUrls"/></h5>
+				<!-- [D] div.dsb_pos 는 기본 클래스, 디서블할때 dsb 클래스 추가 -->
+				<div class="dsb_pos _caching_sub_url_wrap dsb">
+					<span class="btn4 rgtbtn"><button type="button" id="_btn_sub_url_add"><sp:message code="lable.addSubUrlBtn"/></button></span>
+					<!-- [D] 로딩 아이콘이 필요한 label.input_txt 에는 마지막 자식으로 span.ic_ld 추가, 활성화시키려면 label.input_txt 에 .ld 추가 -->
+					<label class="input_txt input_txt2 _placeholder"><em><sp:message code="label.addSubUrl"/></em><span></span><input type="text" id="_caching_sub_url_input" class="_caching_sub_url_input" maxlength="200"><span class="ic_ld"></span></label>
+					<div class="lst_url outer_ly ly_arw _caching_sub_url_list_wrap">
+						<span class="ic_arw"></span>
+						<div class="inner_ly">
+							<ul class="_caching_sub_url_list">
+							</ul>
+						</div>
+					</div>
+					<div class="ly"></div>
+				</div>
+				<hr class="v2">
+				<span class="btn2 btn_prev _btn_general_prev"><button type="button"><span class="ico"></span><sp:message code="label.previousStep"/></button></span>
+				<span class="btn2 btn_next _btn_general_next"><button type="button"><sp:message code="label.nextStep"/><span class="ico"></span></button></span>
+			</div>
+			<!-- //step 2 -->
+			<!-- step 3 -->
+			<div class="bx bx3">
+				<h3 class="txt_sp txt_url"><sp:message code="label.inputWebContent"/></h3>
+				<h4><em><sp:message code="label.widgetUrl"/></em></h4>
+				<!-- [D] 로딩 아이콘이 필요한 label.input_txt 에는 마지막 자식으로 span.ic_ld 추가, 활성화시키려면 label.input_txt 에 .ld 추가 -->
+				<label class="input_txt _placeholder"><em><sp:message code="label.enterAUrl"/></em><span></span><input type="text" class="_widget_url" maxlength="200"><span class="ic_ld"></span></label>				
+				<p class="err _widget_url_err1"><sp:message code="label.urlIsInvalid"/></p>
+				<p class="err _widget_url_err2"><sp:message code="label.pageNotFound"/></p>
+				<!-- [D] 주황색 UI 나와야 하는 상황에는 .lst_widgeturl2 클래스 추가. Button to click 텍스트 자동추가 -->
+				<div class="lst_widgeturl outer_ly ly_arw _widget_content_type_parent">
+					<span class="ic_arw"></span>
+					<div class="inner_ly">
+						<ul class="_widget_content_type_wrap">
+						<li>
+							<label>
+								<input type="radio" name="widgetUrlAndWeb" checked="checked" value="0">
+								<span class="ic_full txt"><sp:message code="label.bringsTheWhole"/></span>
+							</label>
+							<span class="btn1 _btn_scrap"><button type="button"><sp:message code="label.scrap"/></button></span>
+						</li>
+						<li class="dsb">
+							<label>
+								<input type="radio" name="widgetUrlAndWeb" value="1">
+								<span class="ic_crop txt"><sp:message code="label.bringsToThePart"/></span>
+							</label>
+							<span class="btn1 _btn_slice"><button type="button"><sp:message code="label.crop"/></button></span>
+						</li>
+						</ul>
+					</div>
+					<p class="err2"><sp:message code="label.clickTheButton"/></p>
+				</div>
+				<input type="text" class="_slice_left blind">
+				<input type="text" class="_slice_top blind">
+				<input type="text" class="_slice_width blind">
+				<input type="text" class="_slice_height blind">
+				<hr class="v2">
+				<h3 class="txt_sp txt_rfsh"><sp:message code="label.refreshBar"/></h3>
+				<h4><em><sp:message code="label.option"/></em></h4>
+				<ul class="lst_rdo grid2">
+				<li><label class="input_rdo"><input type="radio" name="barOption" value="0" checked="checked"><span><sp:message code="label.alwayShowBar"/></span></label></li>
+				<li><label class="input_rdo"><input type="radio" name="barOption" value="1"><span><sp:message code="label.neverShowBar"/></span></label></li>
+				
+				<!-- 
+				<li class="option">
+					<label class="input_rdo"><input type="radio" name="barOption" value="2"><span>Hide bar when</span></label>
+					<div class="added dsb _bar_option_wrap">
+						<ul class="lst_chk grid3">
+						<li><label class="input_chk"><input type="checkbox" name="barOptionValue" value="43" disabled="true"><span>4x3</span></label></li>
+						<li><label class="input_chk"><input type="checkbox" name="barOptionValue" value="42" disabled="true"><span>4x2</span></label></li>
+						<li><label class="input_chk"><input type="checkbox" name="barOptionValue" value="41" disabled="true"><span>4x1</span></label></li>
+						</ul>
+					</div>
+				</li>
+				-->
+				</ul>
+				<hr>
+				<h4><em><sp:message code="label.barType"/></em></h4>
+				<ul class="lst_rdo grid2">
+				<li><label class="input_rdo"><input type="radio" name="barType" value="0" checked="checked"><span><sp:message code="label.static"/></span></label></li>
+				<li><label class="input_rdo"><input type="radio" name="barType" value="1"><span><sp:message code="label.transparent"/></span></label></li>
+				</ul>
+				<hr class="v2">
+				<h3 class="txt_sp txt_trst"><sp:message code="label.selectPageTransitionType"/></h3>
+				<h4><em><sp:message code="label.pageTransitionType"/></em></h4>
+				<div class="trst_preview">
+					<ul class="lst_rdo grid">
+					<li><label class="input_rdo"><input type="radio" name="pageTransitionType" value="1"><span><sp:message code="label.wholePageTurn"/></span></label></li>
+					<li><label class="input_rdo"><input type="radio" name="pageTransitionType" value="2"><span><sp:message code="label.wholePageMove"/></span></label></li>
+					<li><label class="input_rdo"><input type="radio" name="pageTransitionType" value="3"><span><sp:message code="label.halfPageTurn"/></span></label></li>
+					<li><label class="input_rdo"><input type="radio" name="pageTransitionType" value="4"><span><sp:message code="label.cubeTurn"/></span></label></li>
+					<li><label class="input_rdo"><input type="radio" name="pageTransitionType" value="5"><span><sp:message code="label.pageBlend"/></span></label></li>
+					<li><label class="input_rdo"><input type="radio" name="pageTransitionType" value="0" checked="checked"><span><sp:message code="label.none"/></span></label></li>
+					</ul>
+					<div class="preview_area">
+						<span><sp:message code="label.transitionPreview"/></span>
+						<!-- [D] eff1 ~ eff5 까지 클래스 변경. (클래스 없을 때는 none) -->
+						<div class="_page_transition_preview"></div>
+					</div>
+				</div>
+				<hr>
+				<h4><em><sp:message code="label.circulation"/></em></h4>
+				<div class="dsb">
+					<ul class="lst_rdo grid2">
+						<li><label class="input_rdo"><input type="radio" name="circulationCode" value="1" checked="checked" disabled="true"><span><sp:message code="label.enabled"/></span></label></li>
+						<li><label class="input_rdo"><input type="radio" name="circulationCode" value="0" disabled="true"><span><sp:message code="label.disabled"/></span></label></li>
+					</ul>
+				</div>				
+				<hr class="v2">
+				<h3 class="txt_sp txt_imgset"><sp:message code="label.imageSetting"/></h3>
+				<h4>
+					<em><sp:message code="label.icon"/></em>
+					<span class="tip ic_tip">
+						<div class="ly_tip" style="display:none;">
+							<span></span>
+							<p><sp:message code="label.setDeviceImage"/></p>
+						</div>
+					</span>
+				</h4>
+				<dl class="image type2">
+				<!-- [D] dt 에 클래스 추가
+					dt.st_logo : img.logo 가 보이는 상태
+					dt.st_upload : div.upload 가 보이는 상태
+					dt.st_change : div.change 가 보이는 상태
+					dt.st_loading : div.loading 이 보이는 상태 -->
+				<dt class="st_upload _icon_wrap outer_ly">
+					<div class="inner_ly">
+						<img src="img/b.gif" alt="LOGO" class="logo _icon_preview">
+						<div class="dimm"></div>
+						<div class="upload">
+							<span class="btn_upload input_file"><button type="button"><sp:message code="label.uploadImage"/></button><div><input type="file" class="_icon_upload_form" name="imageFile" data-url="/uploadIcon.do"></div></span>
+							<p><sp:message code="label.uploadImage"/></p>
+						</div>
+						<div class="change">
+							<span class="btn1 noshade input_file"><button type="button"><sp:message code="label.changeImage"/></button><div><input type="file" class="_icon_upload_form" name="imageFile" data-url="/uploadIcon.do"></div></span>
+						</div>
+						<div class="loading2"><p><sp:message code="label.uploading"/></p></div>
+					</div>
+				</dt>
+				<dd class="both"><span>-</span><span><sp:message code="label.iconImageFormat"/></dd>
+				</dl>
+				<!-- [D] 아이콘 이미지 URL전달을 위한 hidden 박스 -->
+				<input type="hidden" name="iconUrl" class="_icon_url">
+				<hr>
+				<h4>
+					<em><sp:message code="label.screenShot"/></em>
+					<span class="tip ic_tip">
+						<div class="ly_tip" style="display:none;">
+							<span></span>
+							<p><sp:message code="label.setWidgetImage"/></p>
+						</div>
+					</span>
+				</h4>
+				<dl class="image type3">
+				<!-- [D] dt 에 클래스 추가
+					dt.st_logo : img.logo 가 보이는 상태
+					dt.st_upload : div.upload 가 보이는 상태
+					dt.st_change : div.change 가 보이는 상태
+					dt.st_loading : div.loading 이 보이는 상태 -->
+				<dt class="st_upload _preview_wrap outer_ly">
+					<div class="inner_ly">
+						<img src="" alt="LOGO" class="logo _preview_preview">
+						<div class="dimm"></div>
+						<div class="upload">
+							<span class="btn_upload input_file"><button type="button"><sp:message code="label.uploadImage"/></button><div><input type="file" class="_preview_upload_form" name="imageFile" data-url="/uploadPreview.do"></div></span>
+							<p><sp:message code="label.uploadImage"/></p>
+						</div>
+						<div class="change">
+							<span class="btn1 noshade input_file"><button type="button"><sp:message code="label.changeImage"/></button><div><input type="file" class="_preview_upload_form" name="imageFile" data-url="/uploadPreview.do"></div></span><br>
+							<span class="btn1 noshade"><a href="#" class="_btnViewOrgImage"><sp:message code="label.viewOriginalImage"/></a></span>
+						</div>
+						<div class="loading2"><p><sp:message code="label.uploading"/></p></div>
+					</div>
+				</dt>
+				<dd class="clear"><span>-</span><span><sp:message code="label.jpgOrPngOnly"/></span></dd>
+				</dl>
+				<!-- [D] 프리뷰 이미지 URL전달을 위한 hidden 박스 -->
+				<input type="hidden" name="previewUrl" class="_preview_url">
+				<hr>
+				<h4>
+					<em><sp:message code="label.previewImage"/></em>
+					<span class="tip ic_tip">
+						<div class="ly_tip" style="display:none;">
+							<span></span>
+							<p><sp:message code="label.setListImage"/></p>
+						</div>
+					</span>
+				</h4>
+				<dl class="image type3">
+				<!-- [D] dt 에 클래스 추가
+					dt.st_logo : img.logo 가 보이는 상태
+					dt.st_upload : div.upload 가 보이는 상태
+					dt.st_change : div.change 가 보이는 상태
+					dt.st_loading : div.loading 이 보이는 상태 -->
+				<dt class="st_upload outer_ly _banner_wrap">
+					<div class="inner_ly">
+						<img src="" alt="LOGO" class="logo _banner_preview">
+						<div class="dimm"></div>
+						<div class="upload">
+							<span class="btn_upload input_file"><button type="button"><sp:message code="label.uploadImage"/></button><div><input type="file" class="_banner_upload_form" name="imageFile" data-url="/uploadBanner.do"></div></span>
+							<p><sp:message code="label.uploadImage"/></p>
+						</div>
+						<div class="change">
+							<span class="btn1 noshade input_file"><button type="button"><sp:message code="label.changeImage"/></button><div><input type="file" class="_banner_upload_form" name="imageFile" data-url="/uploadBanner.do"></div></span><br>
+							<span class="btn1 noshade"><a href="#" class="_btnViewOrgImage"><sp:message code="label.viewOriginalImage"/></a></span>
+						</div>
+						<div class="loading2"><p><sp:message code="label.uploading"/></p></div>
+					</div>
+				</dt>
+				<dd class="clear"><span>-</span><span><sp:message code="label.bannerImageFormat"/></span></dd>
+				</dl>
+				<!-- [D] 프리뷰 이미지 URL전달을 위한 hidden 박스 -->
+				<input type="hidden" name="bannerUrl" class="_banner_url">
+				<hr class="v2">
+				<span class="btn2 btn_prev _btn_content_prev"><button type="button"><span class="ico"></span><sp:message code="label.previousStep"/></button></span>
+				<span class="btn2 btn_next _btn_apk_create"><button type="button"><sp:message code="label.apkCreate"/><span class="ico"></span></button></span>
+			</div>
+			<!-- //step 3 -->
+			<!-- step 4 -->
+			<div class="bx bx4">
+				<h3 class="txt_sp txt_verify"><sp:message code="label.verifyContentOwnerShip"/></h3>
+				<strong>&quot; <sp:message code="label.webWidgetProduced"/> &quot;</strong>
+				<div class="result_area">
+					<dl class="lst_lftdl">
+					<dt><sp:message code="label.appName3"/> : </dt>
+					<dd id="compAppName"> - </dd>
+					<dt><sp:message code="label.version"/> : </dt>
+					<dd id="compVersion"> - </dd>
+					</dl>
+					<p><sp:message code="label.downloadWidget"/></p>
+					<span class="btn1"><a href="#" id="btnDownload"><sp:message code="label.download"/></a></span>
+					<span class="btn1"><a href="#" id="_publish_send_email"><sp:message code="label.sendEmail"/></a></span>
+				</div>
+				<hr class="v2">
+				<span class="btn2 btn_prev _btn_publish_prev"><button type="button"><span class="ico"></span><sp:message code="label.previousStep"/></button></span>
+				<span class="btn2 strong btn_next"><a href="#" id="_btn_publish" target="_blank"><sp:message code="label.create"/></a></span>
+			</div>
+			<!-- //step 4 -->
+		</div>
+		<!-- //bxwrap -->
+	</div>
+	<div class="preview">
+		<div class="obj_device obj_phone">
+			<!-- [D] div#widget 에 사용 가능한 옵션 (클래스)
+				가로사이즈 - .w1 : 1*n / .w2 : 2*n / .w3 : 3*n / .w4 : 4*n
+				세로사이즈 - .h1 : n*1 / .h1 : n*2 / .h3 : n*3 / .h4 : n*4
+				단계 - .widget 클래스 있을때만 widget 노출 (없을때는 점선 노출)
+				상태바 - .bar 클래스 있을때만 bar 노출
+			-->
+			<div id="widget" class="w4 h4 widget bar tr_bar">
+				<div id="_widget_preview_container" class="widget_wrap">
+					<p class="dsc_wdg"><sp:message code="label.contentArea"/></p>
+					<div id="_widget_slice_area" class="widget_ct">
+					</div>
+				</div>
+				<div class="bar_area">
+					<img src="img/b.gif" alt="" class="logo _logo_preview">
+					<span class="rfsh"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

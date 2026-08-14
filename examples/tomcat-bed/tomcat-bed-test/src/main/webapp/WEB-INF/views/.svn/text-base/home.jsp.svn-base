@@ -1,0 +1,272 @@
+<%@ page contentType="text/html; charset=utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="sp"%>
+<!DOCTYPE HTML>
+<html lang="ko-KR">
+<head>
+<!-- 
+
+ -->
+<c:set var="jsMerge"><sp:eval expression="@config['jsMergeMode']" /></c:set>
+<c:set var="cssMerge"><sp:eval expression="@config['cssMergeMode']" /></c:set>
+<c:set var="defaultWPSMode"><sp:eval expression="@config['defaultWPSMode']" /></c:set>
+<c:set var="timestamp"><sp:eval expression="@randomStamp" /></c:set>
+<title>Samsung Apps : Web Widget</title>
+<script type="text/javascript" src="/js/lib/jquery/jquery-1.8.0.min.js"></script>
+<script type="text/javascript" src="/js/lib/jquery/jquery.easing.1.3.js"></script>
+<script type="text/javascript" src="/js/lib/jquery/jquery-ui-1.8.23.custom.min.js"></script>
+<link href="/js/lib/jquery/jquery-ui.css" rel="stylesheet" type="text/css"/>
+
+<!-- 플러그인 코드 -->
+<script type="text/javascript" src="/js/lib/jquery/jquery.cookie.js"></script>
+<script type="text/javascript" src="/js/lib/jquery/jquery.tmpl.min.js"></script>
+<script type="text/javascript" src="/js/lib/jquery/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="/js/lib/jquery/jquery.iframe-transport.js"></script>
+<script type="text/javascript" src="/js/lib/jquery/jquery.fileupload.js"></script>
+<script type="text/javascript" src="/js/lib/jquery/jquery.history.js"></script>
+<script type="text/javascript" src="/js/lib/class.js?${timestamp}"></script>
+
+<!-- 소스 코드 -->
+<script type="text/javascript" src="/js/lib/lang/<sp:message code='file.message'/>?${timestamp}"></script>
+
+<c:choose>
+	<c:when test="${(param.WPSMode == 'BOTH' || param.WPSMode == 'OnlyJS' || defaultWPSMode == 'BOTH') && jsMerge == 'mergeAndNoMerge'}">
+		<script type="text/javascript" src="/js/src/nts.common.js?${timestamp}"></script>
+		<script type="text/javascript" src="/js/src/nts.load.js?${timestamp}"></script>
+		<script type="text/javascript" src="/js/src/nts.history.js?${timestamp}"></script>
+		<script type="text/javascript" src="/js/src/nts.CHS.GNBClass.js?${timestamp}"></script>
+		<script type="text/javascript" src="/js/src/nts.CHS.CHSMainClass.js?${timestamp}"></script>
+		<script type="text/javascript" src="/js/src/nts.CHS.WidgetClass.js?${timestamp}"></script>
+		<script type="text/javascript" src="/js/src/nts.CHS.WidgetManagerClass.js?${timestamp}"></script>
+		<script type="text/javascript" src="/js/src/nts.CHS.RequestClass.js?${timestamp}"></script>
+		<script type="text/javascript" src="/js/src/nts.CHS.BasicInfoClass.js?${timestamp}"></script>
+		<script type="text/javascript" src="/js/src/nts.CHS.GeneralClass.js?${timestamp}"></script>
+		<script type="text/javascript" src="/js/src/nts.CHS.ContentEditClass.js?${timestamp}"></script>
+		<script type="text/javascript" src="/js/src/nts.CHS.SpinBoxClass.js?${timestamp}"></script>
+		<script type="text/javascript" src="/js/src/nts.CHS.WidgetManagerClass.js?${timestamp}"></script>
+		<script type="text/javascript" src="/js/src/nts.CHS.WidgetClass.js?${timestamp}"></script>
+		<script type="text/javascript" src="/js/src/nts.CHS.PublishClass.js?${timestamp}"></script>
+		<script type="text/javascript" src="/js/src/nts.CHS.SimulatorClass.js?${timestamp}"></script>
+		<script type="text/javascript" src="/js/src/nts.CHS.ListMainClass.js?${timestamp}"></script>
+		<script type="text/javascript" src="/js/src/nts.CHS.ListClass.js?${timestamp}"></script>
+		<script type="text/javascript" src="/js/src/nts.CHS.AutoCompleteClass.js?${timestamp}"></script>
+		<script type="text/javascript" src="/js/src/nts.CHS.PageClass.js?${timestamp}"></script>
+	</c:when>
+	<c:otherwise>
+		<script type="text/javascript" src="/js-release/src/home.all.js?${timestamp}"></script>
+	</c:otherwise>
+</c:choose>
+<c:choose>
+	<c:when test="${(param.WPSMode == 'BOTH' || param.WPSMode == 'OnlyCSS' || defaultWPSMode == 'BOTH' ) && cssMerge == 'mergeAndNoMerge'}">
+		<link rel="stylesheet" type="text/css" href="/css/apps.css?${timestamp}" />
+	</c:when>
+	<c:otherwise>
+		<link rel="stylesheet" type="text/css" href="/css-release/apps.css?${timestamp}" />
+	</c:otherwise>
+</c:choose>
+
+
+</head>
+<body class="<sp:message code="css.locale"/>">
+<div id="Mtest"></div>
+<div id="wrap">
+	<a href="#content" class="blind"><sp:message code="label.goContent"/></a>
+	<div id="header">
+		<div class="sta">
+			<h1><a href="/" class="h_sp h_logo">Samsung Apps Web widget</a></h1>
+		</div>
+		<div class="login_area">
+			<p class="date"><sp:message code="label.today"/> : <fmt:formatDate value='${today}'  dateStyle="medium" /></p>
+			<div class="pic_info">
+				<img src="img/@login_pic.png" width="65" height="60" alt="사용자이미지">
+			</div>
+			<span class="seller_info"><sp:message code="label.partnerSeller"/></span>
+			<em class="name_info">${sessionScope.name}</em>
+			<span class="email_info">${sessionScope.email}</span>
+		</div>
+		<div class="gnb">
+			<ul>
+			<li class="crtwdg"><a href="#" class="_gnbBtn" id="createWidget"><span>Create Web-Widget</span></a></li>
+			<li class="wdglst"><a href="#" class="_gnbBtn on" id="widgetList"><span>widget List</span></a></li>
+			</ul>
+		</div>
+		<a href="http://wps-img.seller.samsungapps.com/demo/guide/" target="_blank" class="h_sp h_opn_guide">A GUIDE FOR Web-Widget PRODUCTION</a>
+	</div>
+	<div id="container">
+		<%@ include file="./spotWidgetList.jsp" %>
+		<%@ include file="./spotCreateWidget.jsp" %>
+
+		<div id="content">			
+			<%@ include file="./contentWidgetList.jsp" %>
+			<%@ include file="./contentCreateWidget.jsp" %>
+		</div>
+	</div>
+
+	<div id="footer">
+		<address>All Contents Copyright &copy; Samsung Electronics Co., Ltd.</address>
+	</div>
+</div>
+
+<!-- [D] 상황에 따라 .ly_dim 에 클래스를 추가합니다.
+	.on_ttrl : 튜토리얼
+	.on_loading : 로딩
+	.on_progress : 프로그레스
+	.on_alert : 얼럿 레이어
+	.on_orgimg : 오리지널 이미지
+-->
+<div class="ly_dim" id="_loader_wrap">
+	<!-- dimmed -->
+	<div class="ly dim"></div>
+	<!-- //dimmed -->
+	<!-- progress -->
+	<div class="ly progress" id="createLoading">
+		<h2><sp:message code="label.progressTitleCreate"/></h2>
+		<div class="progress_bar"></div>
+	</div>
+	<!-- //progress -->
+	<!-- loading -->
+	<div class="ly loading" id="Loading"><img src="img/img_loading.gif" width="130" height="140" alt=""><span><sp:message code="label.pageLoading"/>...</span></div>
+	<!-- //loading -->
+	<!-- alert -->
+	<div class="ly alert">
+		<h5><sp:message code="label.fail"/></h5>
+		<p><sp:message code="label.callus"/></p>
+		<p>tel : <strong>1588-3366</strong></p>
+		<div class="btns">
+			<span class="btn1"><button><sp:message code="label.confirm"/></button></span>
+		</div>
+	</div>
+	<!-- //alert -->
+	<!-- View Original Image -->
+	<div class="ly orgimg">
+		<dl>
+		<dt>
+			<em><sp:message code="poph.previewImages"/></em>
+		</dt>
+		<dd>
+			<div class="ld" id="orgImgLoading"><span><img src="img/b.gif" alt="" id="orgImage"></span></div>
+		</dd>
+		</dl>
+		<button class="btn_close" id="orgImgClose"><sp:message code="label.close"/></button>
+	</div>
+	<!-- //View Original Image -->
+	<!-- tutorial -->
+	<div class="ly ttrl" id="_scroll_spy">
+		<div class="ttrl_header">
+			<div class="ttrl_sta"><h2 class="h_sp h_wpsguide">WPS Guide</h2></div>
+			<button type="button" title="Close" class="btn_clse _btn_close_tutorial"><span class="blind"><sp:message code="label.close"/></span></button>
+			<ul class="_scroll_spy_menu_wrap">
+				<li><a href="#"><span><sp:message code="guide.whatIsWps"/></span></a></li>
+				<li><a href="#"><span><sp:message code="guide.basicInformation"/></span></a></li>
+				<li><a href="#"><span><sp:message code="guide.generalSetting"/></span></a></li>
+				<li><a href="#"><span><sp:message code="guide.contentEditing"/></span></a></li>
+				<li><a href="#"><span><sp:message code="guide.verifyAndPublish"/></span></a></li>
+				<li><a href="#"><span><sp:message code="guide.widgetManagement"/></span></a></li>
+			</ul>
+		</div>
+		<div class="ttrl_container _scroll_spy_content_wrap">
+			<div class="ttrl_content">
+				<!-- step -->
+				<div class="tct odd">
+					<h3>01. <sp:message code="guide.whatIsWps"/></h3>
+					<p><sp:message code="label.guidetxt"/></p>
+					<div class="dsc_img ttr1">
+						<ol>
+						<li><sp:message code="guide.basicInformation"/></li>
+						<li><sp:message code="guide.generalSetting"/></li>
+						<li><sp:message code="guide.contentEditing"/></li>
+						<li><sp:message code="guide.verifyAndPublish"/></li>
+						<li><sp:message code="guide.widgetManagement"/></li>
+						</ol>
+					</div>
+				</div>
+				<div class="tct">
+					<h3>02. <sp:message code="guide.basicInformation"/></h3>
+					<p><sp:message code="label.guidetxt2"/></p>
+					<div class="dsc_img ttr2">
+						<ol>
+						<li><sp:message code="sub.t21"/></li>
+						<li><sp:message code="sub.t22"/></li>
+						<li><sp:message code="sub.t23"/></li>
+						<li><sp:message code="sub.t24"/></li>
+						<li><sp:message code="sub.t25"/></li>
+						</ol>
+					</div>
+				</div>
+				<div class="tct odd">
+					<h3>03. <sp:message code="guide.generalSetting"/></h3>
+					<p><sp:message code="label.guidetxt3"/></p>
+					<div class="dsc_img ttr3">
+						<ol>
+						<li><sp:message code="sub.t31"/></li>
+						<li><sp:message code="sub.t32"/></li>
+						<li><sp:message code="sub.t33"/></li>
+						<li><sp:message code="sub.t34"/></li>
+						<li><sp:message code="sub.t35"/></li>
+						<li><sp:message code="sub.t36"/></li>
+						<li><sp:message code="sub.t37"/></li>
+						</ol>
+					</div>
+				</div>
+				<div class="tct">
+					<h3>04. <sp:message code="guide.contentEditing"/></h3>
+					<p><sp:message code="label.guidetxt4"/></p>
+					<div class="dsc_img ttr4">
+						<ol>
+						<li><sp:message code="sub.t401"/></li>
+						<li><sp:message code="sub.t402"/></li>
+						<li><sp:message code="sub.t403"/></li>
+						<li><sp:message code="sub.t404"/></li>
+						<li><sp:message code="sub.t405"/></li>
+						<li><sp:message code="sub.t406"/></li>
+						<li><sp:message code="sub.t407"/></li>
+						<li><sp:message code="sub.t408"/></li>
+						<li><sp:message code="sub.t409"/></li>
+						<li><sp:message code="sub.t410"/></li>
+						</ol>
+					</div>
+				</div>
+				<div class="tct odd">
+					<h3>05. <sp:message code="guide.verifyAndPublish"/></h3>
+					<p><sp:message code="label.guidetxt5"/></p>
+					<div class="dsc_img ttr5">
+						<ol>
+						<li><sp:message code="sub.t51"/></li>
+						<li><sp:message code="sub.t52"/></li>
+						<li><sp:message code="sub.t53"/></li>
+						<li><sp:message code="sub.t54"/></li>
+						<li><sp:message code="sub.t55"/></li>
+						</ol>
+					</div>
+				</div>
+				<div class="tct">
+					<h3>06. <sp:message code="guide.widgetManagement"/></h3>
+					<p><sp:message code="label.guidetxt6"/></p>
+					<div class="dsc_img ttr6">
+						<ol>
+						<li><sp:message code="sub.t61"/></li>
+						<li><sp:message code="sub.t62"/></li>
+						<li><sp:message code="sub.t63"/></li>
+						</ol>
+					</div>
+				</div>
+				<!-- //step -->
+			</div>
+		</div>
+		<div class="ttrl_footer">
+			<label><input type="checkbox" name="_no_tutorial" value="1"><span><sp:message code="label.dontShow"/> </span></label><a href="#" class="_btn_close_tutorial">[ <sp:message code="label.close"/> ]</a>
+		</div>
+	</div>
+	<!-- //tutorial -->
+</div>
+<!-- Seller Refresh -->
+<img src="<sp:eval expression="@link.samsungAppsRefresh" />" id="_seller_frame" style="display:none">
+
+
+<script type="text/javascript" src="/js/src/nts.util.js?${timestamp}"></script>
+<!-- 레이아웃 사이즈 조절 -->
+<script type="text/javascript" src="/js/src/nts.initialize.js?${timestamp}"></script>
+
+</body>
+</html>

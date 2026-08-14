@@ -1,0 +1,90 @@
+<%@ page contentType="text/html; charset=utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="sp"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Web Crop - Samsung Apps Web widget</title>
+<c:set var="jsMerge"><sp:eval expression="@config['jsMergeMode']" /></c:set>
+<c:set var="cssMerge"><sp:eval expression="@config['cssMergeMode']" /></c:set>
+<c:set var="defaultWPSMode"><sp:eval expression="@config['defaultWPSMode']" /></c:set>
+<c:set var="timestamp"><sp:eval expression="@randomStamp" /></c:set>
+
+<script type="text/javascript" src="/js/lib/jquery/jquery-1.8.0.min.js"></script>
+<script type="text/javascript" src="/js/lib/jquery/jquery-ui-1.8.23.custom.min.js"></script>
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+
+<!-- 플러그인 코드 -->
+<script type="text/javascript" src="/js/lib/jquery/jquery.tmpl.min.js"></script>
+
+<!-- 소스 코드 -->
+<script>
+if(typeof window.nts=='undefined'){window.nts = {};}
+nts.CHS = {};
+
+var console = console || {
+    log:function(){},
+    warn:function(){},
+    error:function(){},
+    dir:function(){}
+};
+
+var isIE = $.browser.msie;
+var isIE6 = $.browser.msie && ($.browser.version == "6.0");
+var isIE7 = $.browser.msie && ($.browser.version == "7.0");
+var isIE9 = $.browser.msie && ($.browser.version == "9.0");
+
+</script>
+<script type="text/javascript" src="/js/lib/class.js"></script>
+
+<!-- 다국어 코드 -->
+<script type="text/javascript" src="/js/lib/lang/<sp:message code='file.message'/>?${timestamp}"></script>
+
+<c:choose>
+	<c:when test="${(param.WPSMode == 'BOTH' || param.WPSMode == 'OnlyCSS' || defaultWPSMode == 'BOTH' ) && cssMerge == 'mergeAndNoMerge'}">
+		<link rel="stylesheet" type="text/css" href="/css/apps.css?${timestamp}" />
+	</c:when>
+	<c:otherwise>
+		<link rel="stylesheet" type="text/css" href="/css-release/apps.css?${timestamp}" />
+	</c:otherwise>
+</c:choose>
+</head>
+<body class="<sp:message code="css.locale"/>" style="background:#fff">
+<!-- [D] 폰일 때는 slice_phone / 태블릿일 때는 slice_tablet 클래스 추가 -->
+<div id="slice" class="slice_phone">
+	<!-- [D]
+		가로사이즈 - .w1 : 1*n / .w2 : 2*n / .w3 : 3*n / .w4 : 4*n
+		세로사이즈 - .h1 : n*1 / .h1 : n*2 / .h3 : n*3 / .h4 : n*4
+	-->
+	<!-- [D] 사이즈 지정 : size1 ~ size4 -->
+	<div id="_slice_area" class="slice_area w1 h1">
+		<div id="_preview_area" class="preview_area"></div>
+		<!-- <em><span class="_size_text">4x1</span></em> -->
+		<strong><sp:message code="label.scrollArea"/></strong>
+		<div class="scroll"></div>
+		<div class="sel"><sp:message code="label.scrollAreaSelect"/></div>
+		<span class="btn3 btn_cfrm _btn_choose_area"><button><sp:message code="label.select"/></button></span>
+	</div>
+	<img src="" alt="" id="_target_img" />
+</div>
+<c:choose>
+	<c:when test="${(param.WPSMode == 'BOTH' || param.WPSMode == 'OnlyJS' || defaultWPSMode == 'BOTH') && jsMerge == 'mergeAndNoMerge'}">
+	
+		<script type="text/javascript" src="/js/src/nts.CHS.WebSliceClass.js?${timestamp}"></script>
+		<!-- 
+		<script type="text/javascript" src="/js/src/nts.initialize.js?${timestamp}"></script>
+		-->
+	</c:when>
+	<c:otherwise>
+		<script type="text/javascript" src="/js-release/src/slice.all.js?${timestamp}"></script>
+	</c:otherwise>
+</c:choose>
+
+<script>
+
+var oWebSlice = new nts.CHS.WebSliceClass();
+</script>
+</body>
+</html>

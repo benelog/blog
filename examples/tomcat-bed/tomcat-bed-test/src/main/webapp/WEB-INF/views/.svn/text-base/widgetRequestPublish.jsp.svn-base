@@ -1,0 +1,46 @@
+<%@ page contentType="text/html; charset=utf-8"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core"   prefix="c" %> 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="sp"%>
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Samsung Apps Web widget</title>
+<link rel="stylesheet" type="text/css" href="/css/apps.css" />
+</head>
+<body class="section_ergr">
+
+<div id="wrap<sp:message code="css.locale"/>">
+	<div class="ergr_area">
+		<div class="ergr ld_area">
+			<h1>Samsung Apps</h1>
+			<strong class="type2">Go to the Samsung Apps Seller Office page.</strong>
+			<p class="ld"><img src="/img/img_loading3.gif" width="76" height="10" alt="now loading"></p>
+		</div>
+		<div class="shdw"></div>
+	</div>
+	<form:form name="reqForm" id="reqForm" method="POST" action="${samsungAppsSellerRegisterUrl}" commandName="widget">
+		<input style="display:none" type="submit">
+		<c:if test="${widget.contentId!= null}">
+			<form:hidden path="contentId"/>
+			<input type="hidden" name="modificationType" value="M" />
+		</c:if>
+		<form:hidden path="userId"/>
+		<form:hidden path="widgetId"/>
+		<form:hidden path="apkPackageId"/>
+		<form:hidden path="apkFileName"/>
+		<input type="hidden" name="deviceCode" value="0" /> <!-- always phone -->
+		<input type="hidden" name="apkCreateTime" value="<fmt:formatDate value='${widget.apkCreateTime}' pattern='yyyy/MM/dd HH:mm:ss' />" />
+		<input type="hidden" name="apkContent" value="${apkContent}" />
+		<input type="hidden" name="previewImage" value="${previewImage}" />
+
+	</form:form>
+	<script type="text/javascript">
+		document.getElementById("reqForm").submit();
+	</script>
+
+</div>
+</body>
+</html>
