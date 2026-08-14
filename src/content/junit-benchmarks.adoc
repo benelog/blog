@@ -1,0 +1,109 @@
+= junit-benchmarks로 HTTP API의 응답 시간 측정하기
+정상혁
+2026-08-14
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: java, junit, test, performance
+:description: JUnit 4 확장인 junit-benchmarks로 HTTP API에 동시 요청을 보내 응답 시간을 측정하던 2012년경의 예제를 설명하고, 지금 같은 일을 한다면 어떤 도구를 쓸지 정리합니다.
+:idprefix:
+:toc:
+:source-repo: https://gist.github.com/benelog/a9db4ac3018d6222baea32d5c2f783b5
+
+예전 예제 저장소들을 정리하면서 `benelog/benchmark` 저장소를 {source-repo}[gist]로 옮겼습니다. README가 없어서 어떤 코드인지 이 글로 설명을 남깁니다. 이 예제는 JUnit 4 확장 라이브러리인 junit-benchmarks로 HTTP API에 동시 요청을 보내 응답 시간을 측정합니다. 2012년경 사내 API 서버가 동시 요청을 받았을 때의 응답 시간을 확인하려고 작성했습니다.
+
+== junit-benchmarks 소개
+
+https://github.com/carrotsearch/junit-benchmarks[junit-benchmarks]는 Carrot Search에서 만든 JUnit 4 확장입니다. 평범한 JUnit 테스트 메소드에 애노테이션만 붙여서 벤치마크로 바꿔줍니다.
+
+* `@BenchmarkOptions` : 반복 횟수(`benchmarkRounds`), 워밍업 횟수(`warmupRounds`), 동시 실행 스레드 수(`concurrency`)를 지정합니다.
+* `@BenchmarkMethodChart` : 메소드별 실행 시간을 HTML 차트로 생성합니다. 결과를 H2 DB에 누적해서 차트를 그리는 방식이라, 예제의 link:{source-repo}#file-pom-xml[pom.xml]에 `h2` 의존성이 들어 있는 이유이기도 합니다.
+
+전용 부하 테스트 도구를 준비할 정도는 아니고, 개발 중에 IDE나 `mvn test`로 바로 돌려볼 간단한 측정이 필요할 때 편했습니다.
+
+== 예제 구조
+
+link:{source-repo}#file-samplebenchmarktest-java[SampleBenchmarkTest.java]가 핵심입니다. 핵심 부분만 옮기면 아래와 같습니다.
+
+[source,java]
+.SampleBenchmarkTest.java
+----
+@BenchmarkMethodChart(filePrefix = "benchmark-sample")
+public class SampleBenchmarkTest extends AbstractBenchmark {
+
+	@Test
+	@BenchmarkOptions(benchmarkRounds = 8, warmupRounds = 0, concurrency = 8)
+	public void testCreateApk() throws ClientProtocolException, IOException, InterruptedException {
+		String requestUrl = "http://localhost/create";
+		HttpPost request = new HttpPost(requestUrl);
+		request.setEntity(createEntity());
+
+		HttpResponse response = httpClient.execute(request);
+
+		int statusCode = response.getStatusLine().getStatusCode();
+		assertThat(statusCode, is(200));
+	}
+}
+----
+
+구성 요소별로 보면 이렇습니다.
+
+* `AbstractBenchmark` 상속 : junit-benchmarks의 측정 Rule이 적용된 기반 클래스입니다. 이 클래스를 상속하면 `@Test` 메소드가 벤치마크 대상이 됩니다.
+* `@BenchmarkOptions(benchmarkRounds = 8, warmupRounds = 0, concurrency = 8)` : 총 8회 호출을 8개 스레드로 나눠 실행합니다. 즉 동시에 8건의 요청이 서버로 나갑니다. 측정 대상이 JVM 내부 코드가 아니라 외부 HTTP 서버라서 워밍업은 0으로 두었습니다.
+* 요청 내용 : 로컬 서버의 APK 생성 API(`/create`)에 `versionCode` 파라미터를 담아 POST를 보내고, 응답 코드가 200인지 확인합니다.
+
+HTTP 호출에는 Apache HttpClient 4.1을 사용했습니다. 동시 요청 8건이 커넥션을 기다리며 막히지 않도록, `ThreadSafeClientConnManager`로 커넥션 풀의 최대치를 스레드 수보다 큰 9로 잡았습니다.
+
+[source,java]
+.SampleBenchmarkTest.java
+----
+private static void createHttpClient(int connectTimeoutMilsec, int readTimeoutMilsec) {
+	connManager = new ThreadSafeClientConnManager();
+	connManager.setMaxTotal(9);
+	connManager.setDefaultMaxPerRoute(9);
+
+	HttpClient client = new DefaultHttpClient(connManager);
+	client.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, connectTimeoutMilsec);
+	client.getParams().setIntParameter(CoreConnectionPNames.SO_TIMEOUT, readTimeoutMilsec);
+	httpClient = client;
+}
+----
+
+같이 들어 있는 link:{source-repo}#file-simplerequesttest-java[SimpleRequestTest.java]는 벤치마크 없이 GET 요청 한 번을 보내는 단순 테스트입니다. 다만 지금 보면 `BasicHttpParams`에 `query` 값을 넣어 `request.setParams()`로 전달하는 부분은 의도대로 동작하지 않는 코드입니다. `HttpParams`는 타임아웃 같은 클라이언트 실행 옵션을 담는 자리라서, 이렇게 넣은 값은 URL 쿼리 스트링으로 전송되지 않습니다.
+
+== 실행 방법
+
+`mvn test`나 IDE에서 일반 JUnit 테스트처럼 실행하면 콘솔에 라운드별 실행 시간의 평균과 표준편차가 아래 형태로 출력됩니다.
+
+[source]
+----
+SampleBenchmarkTest.testCreateApk: [measured 8 out of 8 rounds, threads: 8 (concurrent)]
+ round: 0.52 [+- 0.06], round.block: 0.01 [+- 0.02], round.gc: 0.00 [+- 0.00],
+ GC.calls: 0, GC.time: 0.00, time.total: 0.61, time.warmup: 0.00, time.bench: 0.61
+----
+
+`@BenchmarkMethodChart`의 HTML 차트까지 받으려면 결과를 H2 DB에 쌓도록 시스템 프로퍼티를 추가합니다.
+
+[source,bash]
+----
+mvn test -Djub.consumers=CONSOLE,H2 -Djub.db.file=.benchmarks
+----
+
+== 지금 다시 쓴다면
+
+이 예제는 JUnit 4.8, HttpClient 4.1, junit-benchmarks 0.3 시절에 작성했습니다. 지금 기준으로는 구성 요소 전부가 세대교체되었습니다.
+
+* junit-benchmarks는 2013년의 0.7.2 릴리스를 끝으로 개발이 중단되었고, 제작사도 JVM 마이크로벤치마크 용도로는 https://github.com/openjdk/jmh[JMH]를 권합니다. 다만 JMH는 JVM 내부 코드 측정에 특화된 도구라, 이 예제처럼 외부 HTTP 서버에 부하를 거는 용도와는 초점이 다릅니다.
+* HTTP 부하 테스트가 목적이라면 지금은 https://k6.io/[k6], https://gatling.io/[Gatling], https://jmeter.apache.org/[JMeter] 같은 전용 도구가 우선 선택지입니다. 이 예제 수준의 간단한 측정이라면 https://github.com/rakyll/hey[hey]나 wrk 같은 CLI 도구가 코드 작성 없이 더 빠릅니다.
+* HttpClient 4.1의 `DefaultHttpClient`와 `ThreadSafeClientConnManager`는 4.3에서 deprecated 되었습니다. Java에서 직접 호출 코드를 짠다면 HttpClient 5.x의 `PoolingHttpClientConnectionManager`나, JDK 11부터 표준으로 들어온 `java.net.http.HttpClient`를 씁니다.
+* "동시 요청 시에도 응답이 정상인지"를 회귀 테스트로 유지하고 싶다면, 응답 시간 측정과 기능 검증을 분리해서 후자만 CI에 두는 편이 안정적입니다. 응답 시간은 실행 환경에 따라 흔들려서 테스트 통과 기준으로 삼으면 거짓 실패가 잦습니다.
+
+== 참고 자료
+
+* {source-repo}[예제 gist (benchmark-test)]
+* https://github.com/carrotsearch/junit-benchmarks[junit-benchmarks (carrotsearch/junit-benchmarks)]
+* https://github.com/openjdk/jmh[JMH (Java Microbenchmark Harness)]
+* https://hc.apache.org/[Apache HttpComponents]
+
+'''
+
+이 포스트는 Claude Code와 정상혁이 함께 작성했습니다.

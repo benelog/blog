@@ -101,6 +101,9 @@ a|https://github.com/benelog/dumper[dumper]
 a|
 * https://blog.benelog.net/2874354.html[Java Stack dump 다운로드를 편하게]
 * https://blog.benelog.net/2875999.html[Winstone, 경량 Servlet container]
+
+|https://gist.github.com/benelog/a9db4ac3018d6222baea32d5c2f783b5[benchmark-test (gist)]
+|https://blog.benelog.net/junit-benchmarks.html[junit-benchmarks로 HTTP API의 응답 시간 측정하기]
 |===
 
 == 포스트 작성
