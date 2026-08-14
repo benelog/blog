@@ -103,21 +103,43 @@ btrace <pid> ConnectionMonitor.java
 
 link:{source-link-base}/pom.xml[pom.xml]에 선언한 `btrace-client` 의존성은 빌드용이 아니라 IDE에서 BTrace API의 자동완성과 컴파일 검증을 받기 위한 것입니다. 실제 실행은 위처럼 BTrace 클라이언트가 스크립트 파일을 직접 받아서 처리합니다.
 
-== 지금 다시 쓴다면
+== 지금 다시 쓴다면 (JDK 25 기준)
 
-이 스크립트는 BTrace 1.2와 Connector/J 5.1 시절에 작성했습니다. 지금 같은 작업을 한다면 달라지는 점이 있습니다.
+이 스크립트는 BTrace 1.2와 Connector/J 5.1, JDK 6~8 시절에 작성했습니다. 최신 LTS인 JDK 25 기준으로는 상황이 꽤 다릅니다.
 
-* BTrace는 java.net(kenai) 시절을 지나 현재 https://github.com/btraceio/btrace[GitHub의 btraceio/btrace]에서 개발됩니다. 2.x 버전부터는 패키지가 `com.sun.btrace`에서 `org.openjdk.btrace`로 바뀌어 이 스크립트를 그대로 쓸 수는 없습니다.
+=== BTrace를 계속 쓴다면
+
+* BTrace는 java.net(kenai) 시절을 지나 현재 https://github.com/btraceio/btrace[GitHub의 btraceio/btrace]에서 관리됩니다. 다만 마지막 릴리스가 2023년 11월의 v2.2.6으로 활동이 뜸합니다.
+* 2.x 버전부터 패키지가 `com.sun.btrace`에서 `org.openjdk.btrace`로 바뀌어 이 스크립트를 그대로 쓸 수는 없습니다.
 * Connector/J도 6.0부터 패키지가 `com.mysql.jdbc`에서 `com.mysql.cj`로 바뀌어 추적 대상 클래스명을 바꿔야 합니다.
-* 메소드 단위 계측이 목적이라면 지금은 https://github.com/alibaba/arthas[Arthas]의 `monitor`/`trace` 명령이 스크립트 작성 없이 같은 일을 해줍니다. 전체적인 프로파일링이라면 JDK에 내장된 JFR(Java Flight Recorder)이나 https://github.com/async-profiler/async-profiler[async-profiler]가 우선 선택지입니다.
-* SQL 실행 관찰이 목적이라면 https://github.com/jdbc-observations/datasource-proxy[datasource-proxy]나 https://github.com/p6spy/p6spy[p6spy]처럼 JDBC 계층을 감싸는 라이브러리도 있습니다.
+* JDK 21부터는 https://openjdk.org/jeps/451[JEP 451]에 따라 실행 중인 JVM에 에이전트를 동적으로 붙일 때 경고가 출력됩니다. JDK 25에서도 아직 허용되지만, 경고 없이 쓰려면 대상 JVM을 `-XX:+EnableDynamicAgentLoading` 옵션으로 시작해야 합니다. BTrace처럼 attach에 의존하는 도구 전반에 해당하는 변화입니다.
 
-그래도 "재시작할 수 없는 JVM에서, 라이브러리 내부의 특정 메소드만 골라서 조건껏 집계한다"는 용도에서는 BTrace 방식의 스크립트가 여전히 유효합니다.
+=== JDK 25라면 JFR만으로 가능
+
+이 스크립트가 하던 "특정 메소드의 호출 횟수와 평균 실행 시간 집계"는 JDK 25부터 외부 도구 없이 JFR(Java Flight Recorder)로 할 수 있습니다. https://openjdk.org/jeps/520[JEP 520: JFR Method Timing & Tracing]이 `jdk.MethodTiming`, `jdk.MethodTrace` 이벤트를 추가했습니다.
+
+[source,bash]
+----
+java '-XX:StartFlightRecording:jdk.MethodTiming#filter=com.mysql.cj.jdbc.ConnectionImpl::prepareStatement,filename=timing.jfr' -jar app.jar
+
+jfr view method-timing timing.jfr
+----
+
+필터는 `클래스::메소드` 형식 외에 클래스 단위, 애노테이션 단위(`@com.example.Debug`)로도 지정할 수 있고, jcmd로 실행 중인 JVM에 같은 필터로 기록을 시작할 수도 있습니다. 결과는 메소드별 호출 횟수와 평균 시간 표로 출력되어, `ConnectionMonitor.java`의 요약 출력과 같은 정보를 줍니다.
+
+다만 JEP 520은 실행 시간만 기록할 뿐 메소드의 파라미터, 리턴값, 필드값은 보여주지 않습니다. link:2855201.html[이전 글]의 DBCP 스크립트처럼 객체 내부 값을 들여다보는 용도라면 여전히 BTrace나 https://github.com/alibaba/arthas[Arthas](`watch`, `monitor`, `trace` 명령) 같은 계측 도구가 필요합니다.
+
+=== 그 밖의 대안
+
+* 특정 메소드가 아닌 전체적인 프로파일링이라면 JFR 상시 기록이나 https://github.com/async-profiler/async-profiler[async-profiler]가 우선 선택지입니다.
+* SQL 실행 관찰이 목적이라면 https://github.com/jdbc-observations/datasource-proxy[datasource-proxy]나 https://github.com/p6spy/p6spy[p6spy]처럼 JDBC 계층을 감싸는 라이브러리도 있습니다.
 
 == 참고 자료
 
 * {source-repo}[예제 저장소 (examples/btrace-scripts)]
 * https://github.com/btraceio/btrace[BTrace (btraceio/btrace)]
+* https://openjdk.org/jeps/520[JEP 520: JFR Method Timing & Tracing]
+* https://openjdk.org/jeps/451[JEP 451: Prepare to Disallow the Dynamic Loading of Agents]
 * link:2855201.html[Btrace로 DBCP의 connection정보를 모니터링 하기] — 이 블로그의 이전 BTrace 글
 
 '''
