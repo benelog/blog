@@ -1,0 +1,15 @@
+= Jackson 실험실
+
+== 개발 환경
+* JDK 13 : https://blog.benelog.net/installing-jdk.html[여러 개의 JDK를 설치하고 선택해서 사용하기] 참조
+* Gradle 6.2.2
+** Gradle Wrapper 포함
+* Code formatter : https://naver.github.com/hackday-conventions-java[캠퍼스 핵데이 Java 코딩 컨벤션]에서 제공하는 것을 활용
+
+== 주요 예제
+=== JSON 파싱된 값을 생성자로 넣기
+* `@JsonCreator` 활용 : link:src/test/java/net/benelog/jackson/JsonCreatorTest.java[JsonCreatorTest.java]
+* `@ConstructorProperties` 활용 : link:src/test/java/net/benelog/jackson/ConstructorPropertiesTest.java[ConstructorPropertiesTest.java]
+** + Lombok : link:src/test/java/net/benelog/jackson/LombokTest.java[LombokTest.java], link:lombok.config[lombok.config]
+* `ParameterNameModule` 활용
+: link:src/test/java/net/benelog/jackson/ParameterNameModuleTest.java[ParameterNameModuleTest.java], link:build.gradle#L28[build.gradle]
