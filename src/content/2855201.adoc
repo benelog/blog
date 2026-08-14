@@ -100,11 +100,11 @@ http://kenai.com/projects/btrace/forums/forum/topics/1366-Drilling-into-a-method
 
 첨부한 파일들은 아래와 같은 다소 다른 방식이나 출력형식으로 택했습니다.
 
-* https://gist.github.com/1246239#file_dbcp_monitor_simple.java[DbcpMonitorSimple.java] : BasicDataSource.getConnection이 한번 호출될 때 BasicDataSource의 모든 정보와 BasicDataSource.connetionPool의 정보를 출력
-* https://gist.github.com/1246239#file_dbcp_monitor.java[DbcpMonitor.java] :  이벤트 방식은 1과 같고, BasicDataSource의 모든 필드와 BasicDataSource.connetionPool에서 _numActive 값만을 보여줌
-* https://gist.github.com/1246239#file_dbcp_active_connection_monitor.java[DbcpActiveConnectionMonitor.java] : 여러 개의 Datasource의 Active connection 갯수를 구할 때 사용. getConnection에서 URL별로 active connection 갯수를 저장해 두었다가, Btrace에서 이벤트를 날리면 출력을 해주고 종료
+* https://github.com/benelog/blog/blob/master/examples/btrace-scripts/src/main/java/DbcpMonitorSimple.java[DbcpMonitorSimple.java] : BasicDataSource.getConnection이 한번 호출될 때 BasicDataSource의 모든 정보와 BasicDataSource.connetionPool의 정보를 출력
+* https://github.com/benelog/blog/blob/master/examples/btrace-scripts/src/main/java/DbcpMonitor.java[DbcpMonitor.java] :  이벤트 방식은 1과 같고, BasicDataSource의 모든 필드와 BasicDataSource.connetionPool에서 _numActive 값만을 보여줌
+* https://github.com/benelog/blog/blob/master/examples/btrace-scripts/src/main/java/DbcpActiveConnectionMonitor.java[DbcpActiveConnectionMonitor.java] : 여러 개의 Datasource의 Active connection 갯수를 구할 때 사용. getConnection에서 URL별로 active connection 갯수를 저장해 두었다가, Btrace에서 이벤트를 날리면 출력을 해주고 종료
 
 첨부한 스크립트 중 1,2번은 getConnection이 한번 호출되고 나면 스크립트를 종료하는 구조라서 큰 부하는 없겠지만, 증가 추이 등의 통계 정보를 쌓는기능 등이 필요하다면 Field poolField = field(DS_CLASS, "connectionPool"); 같은 부분도 중복호출되지 않게 하는 처리가 필요합니다.
 
-소스는 gist에 올렸습니다. ( https://gist.github.com/1246239 )
+소스는 https://github.com/benelog/blog/tree/master/examples/btrace-scripts[examples/btrace-scripts]에 올렸습니다.
 

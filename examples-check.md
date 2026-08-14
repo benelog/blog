@@ -35,19 +35,25 @@
   - 블로그 미인용 저장소였으나, 설명 글(`btrace-jdbc-monitoring.adoc`)을 새로 작성해 예제로 인용
 - 원본 https://github.com/benelog/btrace-scripts 도 아래 수동 삭제 대상에 추가
 
-### 남은 작업: 원본 저장소 수동 삭제
+### 원본 저장소 삭제 (2026-08-14 전체 완료)
 
-`gh` 토큰에 `delete_repo` 권한이 없어 삭제는 수동으로 진행하기로 함. 삭제 대상:
+`gh auth refresh -h github.com -s delete_repo`로 권한을 추가한 뒤 `gh repo delete benelog/<이름> --yes`로 삭제.
+삭제 후 `gh repo list benelog`에서 5개 모두 사라진 것을 확인함.
 
-- https://github.com/benelog/beanutils-test
-- https://github.com/benelog/java-date-time
-- https://github.com/benelog/jackson-experiment
-- https://github.com/benelog/benchmark
-  - blog `examples/`로 병합하지 않고 gist로 이전: https://gist.github.com/benelog/a9db4ac3018d6222baea32d5c2f783b5 (이전 완료)
-  - `delete_repo` 권한 승인 대기 중, 승인되면 `gh repo delete benelog/benchmark --yes`로 삭제
+- ~~https://github.com/benelog/beanutils-test~~ → `examples/beanutils-test/`로 병합됨
+- ~~https://github.com/benelog/java-date-time~~ → `examples/java-date-time/`로 병합됨
+- ~~https://github.com/benelog/jackson-experiment~~ → `examples/jackson-experiment/`로 병합됨
+- ~~https://github.com/benelog/btrace-scripts~~ → `examples/btrace-scripts/`로 병합됨
+- ~~https://github.com/benelog/benchmark~~ → blog `examples/`로 병합하지 않고 gist로 이전: https://gist.github.com/benelog/a9db4ac3018d6222baea32d5c2f783b5
 
-삭제 방법: GitHub 웹 (Settings → Danger Zone → Delete this repository) 또는
-`gh auth refresh -h github.com -s delete_repo` 후 `gh repo delete benelog/<이름> --yes`
+### 추가 작업 (2026-08-14, 3차): gist 1246239 이동
+
+- gist https://gist.github.com/benelog/1246239 (Btrace scripts)의 스크립트 5개를 `examples/btrace-scripts/src/main/java/`로 이동
+  - gist의 `ConnectionMonitor.java`(CUBRID/Spring 대상)는 저장소의 MySQL용 `ConnectionMonitor.java`와 이름이 충돌해 `CubridConnectionMonitor.java`로 개명
+  - gist의 `pom.xml`은 의존성 선언 조각이라 제외 (저장소 `pom.xml`에 동일 의존성 있음)
+- `2855201.adoc`의 gist 딥링크 3개와 루트 링크 1개를 새 경로로 갱신
+- `btrace-jdbc-monitoring.adoc`에 옮겨온 스크립트 언급 추가
+- 남은 작업: gist 원본 수동 삭제 (`gh gist delete 1246239` 또는 웹에서)
 
 ## 현황
 

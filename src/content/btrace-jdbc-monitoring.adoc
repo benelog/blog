@@ -77,6 +77,8 @@ public class ConnectionMonitor {
 
 저장소에는 `PrintQuery.java`도 있는데, 실행 쿼리 출력용으로 만들려다 만 것인지 `ConnectionMonitor.java`와 내용이 같은 사본입니다.
 
+link:2855201.html[이전 BTrace 글]에서 소개했던 DBCP 모니터링 스크립트들(`DbcpMonitor.java`, `DbcpMonitorSimple.java`, `DbcpActiveConnectionMonitor.java`)도 gist에서 이 저장소로 옮겨 함께 두었습니다. CUBRID 드라이버와 Spring 서블릿을 추적하던 `CubridConnectionMonitor.java`, `DaoMonitor.java`도 같은 gist에서 옮긴 스크립트입니다.
+
 == 실행 방법
 
 BTrace 클라이언트로 대상 JVM의 pid를 지정해서 실행합니다.
