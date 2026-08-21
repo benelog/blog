@@ -16,7 +16,7 @@
 
 https://github.com/spring-projects/spring-loaded[Spring Loaded]는 개발 환경에서 .java 클래스를 수정했을 때 변경된 클래스 파일만 재로딩하는 도구입니다. Local PC에서 수정과 Tomcat 재시작을 반복하는 시간을 줄여 줍니다.
 
-다만 JRebel도 그러하듯이 모든 경우에 완벽한 리로딩이 되지는 않습니다. 메소드 추가·수정은 잘 반영됩니다. 그러나 아래와 같은 경우에는 자동 반영이 되지 않습니다.
+다만 JRebel도 그러하듯이 모든 경우에 완벽한 리로딩이 되지는 않습니다. 메서드 추가·수정은 잘 반영됩니다. 그러나 아래와 같은 경우에는 자동 반영이 되지 않습니다.
 
 * 상속 구조의 변경
 * Reflection 정보가 Cache된 것
@@ -26,7 +26,7 @@ https://github.com/spring-projects/spring-loaded[Spring Loaded]는 개발 환경
 
 == 다운로드
 
-참조할 디렉토리에 다운로드합니다. tomcat-maven-plugin을 사용할 예정이면 `pom.xml`이 있는 디렉토리에 받기를 권장합니다.
+참조할 디렉터리에 다운로드합니다. tomcat-maven-plugin을 사용할 예정이면 `pom.xml`이 있는 디렉터리에 받기를 권장합니다.
 
 [source,bash]
 ----
@@ -83,9 +83,9 @@ Eclipse 메뉴의 Run > Run Configurations에서 Tomcat 실행 설정을 찾은 
 
 Servers 뷰에서 Tomcat을 선택하고 Overview 탭의 Server Options란에서 'Modules auto reload by default'를 선택 해제합니다. Modules 탭의 해당 모듈 설정에서도 Auto reloading이 해제되어 있는지 확인합니다.
 
-== main 메소드를 직접 실행하는 경우
+== main 메서드를 직접 실행하는 경우
 
-Spring Boot나 Embedded Tomcat, Jetty를 이용해서 main 메소드로 직접 WAS를 띄우는 경우도 있습니다. 이때도 Run > Run Configurations의 Arguments 탭에서 VM arguments란에 같은 `-javaagent` 설정을 추가합니다.
+Spring Boot나 Embedded Tomcat, Jetty를 이용해서 main 메서드로 직접 WAS를 띄우는 경우도 있습니다. 이때도 Run > Run Configurations의 Arguments 탭에서 VM arguments란에 같은 `-javaagent` 설정을 추가합니다.
 
 == 참고 자료
 

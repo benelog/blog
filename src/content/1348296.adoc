@@ -22,7 +22,7 @@
 * 기술적 용어로서의 asepct : Advice와 point-cut을 함께 지칭하는 단어
 
 == 참고자료
-* 마이크로소프트웨어 2005/11 테크니컬 컬럼 - 객체지향을 넘어 관점지향으로 AOP (이일민)   (http://www.zdnet.co.kr/builder/dev/java/0,39031622,39147106,00.htm )
+* 마이크로소프트웨어 2005/11 테크니컬 칼럼 - 객체지향을 넘어 관점지향으로 AOP (이일민)   (http://www.zdnet.co.kr/builder/dev/java/0,39031622,39147106,00.htm )
 * 마이크로소프트웨어 2006/09 S/W로 여는 세상 - 관점지향의 개념잡기 -상황중심의 프로그래밍 (임백준) (http://www.zdnet.co.kr/builder/dev/etc/0,39031619,39154322-1,00.htm)
 * 3번 자료에 대한 반론 - http://toby.epril.com/?p=229 (이일민님의 블로그)
 * 마이크로소프트웨어 2007/03 Cover Story- OOP한계 극복패러다임 AOP (이일민,김백기,박재성, 류대원)

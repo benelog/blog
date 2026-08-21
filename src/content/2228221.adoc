@@ -67,7 +67,7 @@ web.xml에는 applicationContext 파일의 위치를 지정하고, *.do를 스�
 </html>
 ----
 
-그리고 applicationContext파일을 아래와 같이 선언합니다. `DefaultAnnotationHandlerMapping` 을 이용해서 annotation을 이용한 Controller 설정을가능하게 합니다. `<context:component-scan/>` 태그를 사용해서, 설정을 scan할 패키지를지정합니다. 그리고, 파일이 저장될 디렉토리는 `${repository.path}` 속성으로 표시했습니다.
+그리고 applicationContext파일을 아래와 같이 선언합니다. `DefaultAnnotationHandlerMapping` 을 이용해서 annotation을 이용한 Controller 설정을가능하게 합니다. `<context:component-scan/>` 태그를 사용해서, 설정을 scan할 패키지를지정합니다. 그리고, 파일이 저장될 디렉터리는 `${repository.path}` 속성으로 표시했습니다.
 Maven의 resource filter기능을 이용해서 실행환경에 따라 다른 값을 넣게 하면 편리합니다.
 
 [source,xml]
@@ -93,7 +93,7 @@ Maven의 resource filter기능을 이용해서 실행환경에 따라 다른 값
 ----
 
 
-실제적인 파일의 저장기능을 담당하는 클래스인 FileRepository에서는 간단하게 UUID를 이용해서 키를 생성하고 path필드로 지정된 디렉토리에 저장을 해줍니다.
+실제적인 파일의 저장기능을 담당하는 클래스인 FileRepository에서는 간단하게 UUID를 이용해서 키를 생성하고 path필드로 지정된 디렉터리에 저장을 해줍니다.
 
 [source,java]
 ----
@@ -125,7 +125,7 @@ public class FileRepository {
 }
 ----
 
-추가적으로 키값을 넣어주면 파일을 반환해주는 메소드나, 파일의 종류나 날짜에 따라서 하위 디렉토리를 구분해서 생성하는 기능도 넣을 수있을 것입니다. 그리고 더 확장한다면, 따로 주요 메서드를 선언한 Repository 라는 인터페이스를 정의하고, DB를저장소로 활용하는 DbRepository 와 같이 이름 붙인 구현 클래스도 만들어 볼 수 있겠습니다.
+추가적으로 키값을 넣어주면 파일을 반환해주는 메서드나, 파일의 종류나 날짜에 따라서 하위 디렉터리를 구분해서 생성하는 기능도 넣을 수있을 것입니다. 그리고 더 확장한다면, 따로 주요 메서드를 선언한 Repository 라는 인터페이스를 정의하고, DB를저장소로 활용하는 DbRepository 와 같이 이름 붙인 구현 클래스도 만들어 볼 수 있겠습니다.
 
 그리고 @Controller , @RequestMapping, @RequestParam, @Autowired의 Anntation을활용해서 Controller 클래스를 작성합니다. 업로드 후 화면에 키값만 뿌도록 해서 java.io.Writer클래스를 화면출력을 위해 사용했습니다.
 
@@ -168,7 +168,7 @@ MultipartFile 클래스를 파라미터로 받는 메서드는 http://static.spr
 
 == Spring MVC 2.5 관련 자료
 * http://www.infoq.com/articles/spring-2.5-ii-spring-mvc
-* http://chanwook.tistory.com/576[스프링 2.5 애노테이션 기반 MVC 예제]
+* http://chanwook.tistory.com/576[스프링 2.5 애너테이션 기반 MVC 예제]
 * http://springtutorial.googlecode.com/svn/trunk/moimApp/src/spring/tutorial/web/MoimController.java[http://springtutorial.googlecode.com/svn/trunk/moimApp/src/spring/tutorial/web/MoimController.java]
 * http://steelheart.kr/tc/173[Spring 2.5 Annotation기반 Controller 끄적거림]
 * http://steelheart.kr/tc/entry/using-web-argument-resolver?category=0[Annotation기반 컨트롤러에 custom argument 적용하기 (WebArgumentResolver)]

@@ -12,7 +12,7 @@ Cron expression도 테스트 코드를 짜서 검증을 해본다면 치명적�
 
 아래 예제는  ApplicationContext에 설정되어 있는 Quartz의 CronTrigger의 일정을 테스트하는 코드입니다.
 
-== ApplicationContext의 스케쥴링 설정 파일
+== ApplicationContext의 스케줄링 설정 파일
 
 [source,xml]
 ----
@@ -140,7 +140,7 @@ public class JobTriggerFactoryBean implements FactoryBean<Trigger>, Initializing
 
 == 테스트 코드
 triggers라는 bean 이름으로 List<CronTrigger> type의 객체를 가지고 와서, List안에서 지정된 trigger의 이름을 탐색한다음에 그 안에서 그 trigger의 cron e-pression을 검사했습니다.  테스트 코드를 간결하게 유지하기 위해서 Cron e-pression을 검사하는 코드는  QuartzCronExpressionTestUtils라는 클래스로 분리해서 static import로 처리했습니다.
-QuartzCronExpressionTestUtils.findTriggerByName 메소드는 List<CronTrigger> 타입의 객체가 담고 있는 여러개의 CronTrigger에서 지정된 이름의 CronTrigger를 반환해줍니다.
+QuartzCronExpressionTestUtils.findTriggerByName 메서드는 List<CronTrigger> 타입의 객체가 담고 있는 여러개의 CronTrigger에서 지정된 이름의 CronTrigger를 반환해줍니다.
 
 [source,java]
 ----

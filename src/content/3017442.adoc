@@ -27,10 +27,10 @@
 *** 실환경용 Log 랩퍼 클래스 : https://github.com/eugenelgm/AndroidForTest/blob/master/src/com/example/test/util/Logger.java[Logger.java
 ]
 *** 테스트용 Log 클래스  : https://github.com/eugenelgm/AndroidForTest/blob/master/tests/src/com/example/test/util/Logger.java[Logger.java]
-** Background Thread에 대한 테스트도 래핑 클래스를 이용. 테스트 환경에서는 테스트 코드와 같은 쓰레드에서 동기적으로 실행되도록 Runnable.run을 호출하는 래퍼클래스를 호출함.
-*** 실환경용 쓰레드 실행 클래스 : https://github.com/eugenelgm/AndroidForTest/blob/master/src/com/example/test/util/DatabaseJobQueue.java[DatabaseJobQueue.java]
+** Background Thread에 대한 테스트도 래핑 클래스를 이용. 테스트 환경에서는 테스트 코드와 같은 스레드에서 동기적으로 실행되도록 Runnable.run을 호출하는 래퍼클래스를 호출함.
+*** 실환경용 스레드 실행 클래스 : https://github.com/eugenelgm/AndroidForTest/blob/master/src/com/example/test/util/DatabaseJobQueue.java[DatabaseJobQueue.java]
 *** 테스트용 Log 클래스  : https://github.com/eugenelgm/AndroidForTest/blob/master/tests/src/com/example/test/util/DatabaseJobQueue.java[DatabaseJobQueue.java]
-** 같은 interface를 구현한 테스트용 Mock객체를 작성하고, 주입은 별도의 setter 메소드를 사용.
+** 같은 interface를 구현한 테스트용 Mock객체를 작성하고, 주입은 별도의 setter 메서드를 사용.
 ** API에 대한 테스트는 정적파일을 통해서 함. 후임자가 API의 명세를 예시로 금방 확인할 수 있는 장점도 생김
 ** Context에 대한 참조 등 Android에 대한 의존성을 제거하기 어려운 부분은 PowerMock + Mockito로 해결
 *** PowerMock + Mockto로 Context.getString(int)의 동작을 가로채는 예제 : https://github.com/eugenelgm/AndroidForTest/blob/master/tests/test/com/example/test/MainActivityTest.java[MainActivityTest.java]
@@ -59,10 +59,10 @@ ShadowLog.stream = System.out;
 Robolectric.bindShadowClass(ShadowLog.class);
 ----
 
-그리고 멀티쓰레드에 대한 테스트를 할 때도 Robolectric의 RobolectricBackgroundExecutorService를 쓰면 편할 때가 있습니다. 이 클래스도 다른 쓰레드를 생성하지 않고 호출한 쪽과 같은 쓰레드에서 Runnable 클래스를 실행해 줍니다.
+그리고 멀티스레드에 대한 테스트를 할 때도 Robolectric의 RobolectricBackgroundExecutorService를 쓰면 편할 때가 있습니다. 이 클래스도 다른 스레드를 생성하지 않고 호출한 쪽과 같은 스레드에서 Runnable 클래스를 실행해 줍니다.
 
 
-Android-annotations를 쓰면 @Background가 붙은 메소드는 BackgroundExecutor라는 클래스를 통해서 실행되는데, 이 클래스에 있는 executor라는 멤버변수를 교체하면 쓰레드의 생성 정책을 조절 할 수 있습니다. 따라서 테스트를 할 때는 아래와 같이 테스트용 Executor를 넣으면 자연스럽게 같은 쓰레드에서 동기적으로 Runnable 클래스를 실행할 수 있습니다.
+Android-annotations를 쓰면 @Background가 붙은 메서드는 BackgroundExecutor라는 클래스를 통해서 실행되는데, 이 클래스에 있는 executor라는 멤버변수를 교체하면 스레드의 생성 정책을 조절 할 수 있습니다. 따라서 테스트를 할 때는 아래와 같이 테스트용 Executor를 넣으면 자연스럽게 같은 스레드에서 동기적으로 Runnable 클래스를 실행할 수 있습니다.
 
 [source,java]
 ----
@@ -81,11 +81,11 @@ Robolectric.Reflection.setFinalStaticField(Build.VERSION.class, "SDK_INT", Build
 
 암튼 Robolectric에 빈틈이 많기에 큰 기대를 하지 말고 UI 레이어의 테스트에는 많은 욕심을 부리지 말자고 생각하지만 그래도 몇가지 매력적인 기능이 있어서 Robolectric을 아예 외면을 할 수는 없었습니다.
 
-Mockito + Powermock의 조합은 강력하지만, 구조를 고치기 어려운 레가시 코드에만 한정해서 썼으면 한다는 의견입니다. 가능하다면 Powermock이 없어도 테스트할 수 있도록 구조를 개선하는 것이 더 클래스의 역할이 명확해지고, 앞으로 기능을 추가하거나 읽기에도 좋은 코드가 되기 때문입니다. 그렇게 구조개선을 하는데는 DI 프레임워크가 많은 도움이 되기도 합니다.  DI 프레임워크를 쓰면 Context에 대한 직접 의존이나 안드로이드 기본 프레임워크의 final 메소드의 동작을 가로채야할 일이 적어져서  훨씬 테스트하기 편해집니다.
+Mockito + Powermock의 조합은 강력하지만, 구조를 고치기 어려운 레가시 코드에만 한정해서 썼으면 한다는 의견입니다. 가능하다면 Powermock이 없어도 테스트할 수 있도록 구조를 개선하는 것이 더 클래스의 역할이 명확해지고, 앞으로 기능을 추가하거나 읽기에도 좋은 코드가 되기 때문입니다. 그렇게 구조개선을 하는데는 DI 프레임워크가 많은 도움이 되기도 합니다.  DI 프레임워크를 쓰면 Context에 대한 직접 의존이나 안드로이드 기본 프레임워크의 final 메서드의 동작을 가로채야할 일이 적어져서  훨씬 테스트하기 편해집니다.
 
 Helloworld에 올라온  http://helloworld.naver.com/helloworld/342818[Android에서 @Inject, @Test] 에서 이에 대해 자세히 적었습니다.
 
 == 소감
-개인적으로 많은 고민을 했던 주제였고, 발표자께서 내리신 결론이 저와 거의 비슷했기에 무척 반가웠습니다. 저도 Android의 기본 테스트 클래스를 쓰면서 느꼈던 좌절감에 결국 JVM에서 테스트를 해야 TDD로서 의미가 있다고 느꼈습니다. UI에 대한 테스트보다는 안드로이드와 독립적인 Layer를 테스트하는 것이 ROI가 높고, 좋은 설계를 이끈다는 점도 공감이 갔습니다. 로그호출 부분이나 멀티쓰레드에 대한 테스트 등 제가 했던 고민도 보편적인 문제였다는 것도 확인했습니다. API의 호출결과를 정적 파일로 저장해두고 테스트 코드에서 파싱부터 검증하는 기법은 저도 Server to Server API클라이언트 모듈 테스트 때 많이 썼던 방법이였습니다
+개인적으로 많은 고민을 했던 주제였고, 발표자께서 내리신 결론이 저와 거의 비슷했기에 무척 반가웠습니다. 저도 Android의 기본 테스트 클래스를 쓰면서 느꼈던 좌절감에 결국 JVM에서 테스트를 해야 TDD로서 의미가 있다고 느꼈습니다. UI에 대한 테스트보다는 안드로이드와 독립적인 Layer를 테스트하는 것이 ROI가 높고, 좋은 설계를 이끈다는 점도 공감이 갔습니다. 로그호출 부분이나 멀티스레드에 대한 테스트 등 제가 했던 고민도 보편적인 문제였다는 것도 확인했습니다. API의 호출결과를 정적 파일로 저장해두고 테스트 코드에서 파싱부터 검증하는 기법은 저도 Server to Server API클라이언트 모듈 테스트 때 많이 썼던 방법이였습니다
 
 제가 편향된 생각을 가졌을지 늘 걱정이 되었는데, 같은 의견을 가지신 분이 구체적인 사례까지 공유해주셔서 많은 도움이 되었습니다.  앞으로  다른 분께도 안드로이드에서 TDD를 자신있게 권장해드릴 용기를 얻었습니다.

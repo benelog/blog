@@ -14,7 +14,7 @@ Junit4 이후의 assert나, mock library, matcher 등을 사용할 때 편리하
 
 image:img/eclipse-test/organize-imports.jpg[organize-imports.jpg]
 
-== Test 메소드와 Import에 대한 Template 설정
+== Test 메서드와 Import에 대한 Template 설정
 `Window-Preference-Java-Editors-Template` 에 자주 쓰는 템플릿을 추가한다.
 
 각각의 항목의 의미는 다음과 같다
@@ -27,9 +27,9 @@ image:img/eclipse-test/organize-imports.jpg[organize-imports.jpg]
 
 image:img/eclipse-test/templates.jpg[templates.jpg]
 
-=== Test 메소드 추가
+=== Test 메서드 추가
 
-테스트 메소드를 추가할 때 필요한 library import로 메소드 선언을 한꺼번에 해주는 템플릿이다.이름을 spec으로 지정해서 쓰고 있다.
+테스트 메서드를 추가할 때 필요한 library import로 메서드 선언을 한꺼번에 해주는 템플릿이다.이름을 spec으로 지정해서 쓰고 있다.
 
 [source,java]
 ----
@@ -46,7 +46,7 @@ public void ${specDescription}() {
 
 === Test 라이브러리 import
 
-위의 메소드 추가 template에서 해주는 일 중 import를 하는 부분만 수행해준다.
+위의 메서드 추가 template에서 해주는 일 중 import를 하는 부분만 수행해준다.
 ti라는 이름으로 지정해서 쓰고 있다.
 (http://wiki.kwonnam.pe.kr/java/junit/staticimports 에서 참조했습니다.)
 
@@ -94,8 +94,8 @@ Favorites에 등록을 추천하는 클래스
 * `org.mockito.BDDMockito.*`
 * `org.mockto.Matchers.*`
 
-== 자동생성되는 메소드에 UnsupportedOperationException 던지기 설정
-자동생성 되어서 아직 구현되지 않은 메소드를 test fail로 인식하게 함 ( http://toby.epril.com/?p=706 참고)
+== 자동생성되는 메서드에 UnsupportedOperationException 던지기 설정
+자동생성 되어서 아직 구현되지 않은 메서드를 test fail로 인식하게 함 ( http://toby.epril.com/?p=706 참고)
 
 * Preference – Java – Code Style – Code Templates 안에 Code/Method Body에 아래 코드추가
 [source,java]
@@ -128,7 +128,7 @@ image:img/eclipse-test/unsupported-operation-exception.jpg[unsupported-operation
 
 * `Alt + Shift + R` : 리팩토링 이름 바꾸기
 * `Alt + Shift + V` : 리팩토링 – 이동
-* `Alt + Shift + M` : 리팩토링 – 메소드 추출
+* `Alt + Shift + M` : 리팩토링 – 메서드 추출
 * `Alt + Shift + I` : 리팩토링 - 메서드 인라이닝 (추출의 반대)
 * `Alt + Shift+ L` : 리팩토링 local 변수 추출
 

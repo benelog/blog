@@ -13,10 +13,10 @@
 
 == junit-benchmarks 소개
 
-https://github.com/carrotsearch/junit-benchmarks[junit-benchmarks]는 Carrot Search에서 만든 JUnit 4 확장입니다. 평범한 JUnit 테스트 메소드에 애노테이션만 붙여서 벤치마크로 바꿔줍니다.
+https://github.com/carrotsearch/junit-benchmarks[junit-benchmarks]는 Carrot Search에서 만든 JUnit 4 확장입니다. 평범한 JUnit 테스트 메서드에 애너테이션만 붙여서 벤치마크로 바꿔줍니다.
 
 * `@BenchmarkOptions` : 반복 횟수(`benchmarkRounds`), 워밍업 횟수(`warmupRounds`), 동시 실행 스레드 수(`concurrency`)를 지정합니다.
-* `@BenchmarkMethodChart` : 메소드별 실행 시간을 HTML 차트로 생성합니다. 결과를 H2 DB에 누적해서 차트를 그리는 방식이라, 예제의 link:{source-repo}#file-pom-xml[pom.xml]에 `h2` 의존성이 들어 있는 이유이기도 합니다.
+* `@BenchmarkMethodChart` : 메서드별 실행 시간을 HTML 차트로 생성합니다. 결과를 H2 DB에 누적해서 차트를 그리는 방식이라, 예제의 link:{source-repo}#file-pom-xml[pom.xml]에 `h2` 의존성이 들어 있는 이유이기도 합니다.
 
 전용 부하 테스트 도구를 준비할 정도는 아니고, 개발 중에 IDE나 `mvn test`로 바로 돌려볼 간단한 측정이 필요할 때 편했습니다.
 
@@ -47,7 +47,7 @@ public class SampleBenchmarkTest extends AbstractBenchmark {
 
 구성 요소별로 보면 이렇습니다.
 
-* `AbstractBenchmark` 상속 : junit-benchmarks의 측정 Rule이 적용된 기반 클래스입니다. 이 클래스를 상속하면 `@Test` 메소드가 벤치마크 대상이 됩니다.
+* `AbstractBenchmark` 상속 : junit-benchmarks의 측정 Rule이 적용된 기반 클래스입니다. 이 클래스를 상속하면 `@Test` 메서드가 벤치마크 대상이 됩니다.
 * `@BenchmarkOptions(benchmarkRounds = 8, warmupRounds = 0, concurrency = 8)` : 총 8회 호출을 8개 스레드로 나눠 실행합니다. 즉 동시에 8건의 요청이 서버로 나갑니다. 측정 대상이 JVM 내부 코드가 아니라 외부 HTTP 서버라서 워밍업은 0으로 두었습니다.
 * 요청 내용 : 로컬 서버의 APK 생성 API(`/create`)에 `versionCode` 파라미터를 담아 POST를 보내고, 응답 코드가 200인지 확인합니다.
 

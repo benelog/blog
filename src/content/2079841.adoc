@@ -86,7 +86,7 @@ findBugsExclude.xml의 내용은 아래와 같이 설정했습니다.
 
 제외할 것을 선언하는 파일에 이렇게 적었으니 Bug code가 "Se,SnVI,Dm"에 해당하는 버그검사는 제외한다는 의미입니다. Filter의 설정 방법에 대해서는 http://mojo.codehaus.org/findbugs-maven-plugin/findbugs-mojo.html[findbugs의 매뉴얼]을 참조하시면 됩니다.
 
-버그 코드 중 Se,SnVI는 serialVersionUID에 관한 것이고 Dm은 String.toUpperCase 등의 메소드에서 Local설정을 권유하는 검사입니다.   (http://findbugs.sourceforge.net/bugDescriptions.html[버그 코드에 대한 설명 페이지] 참조)
+버그 코드 중 Se,SnVI는 serialVersionUID에 관한 것이고 Dm은 String.toUpperCase 등의 메서드에서 Local설정을 권유하는 검사입니다.   (http://findbugs.sourceforge.net/bugDescriptions.html[버그 코드에 대한 설명 페이지] 참조)
 
 이렇게 설정을 하고 `mvn findbugs:findbugs` 로 maven을 실행시키면 필요한 라이브러리들을 다운로드 받고 빌드가 실행됩니다. 실행이 성공했다면 목적지 폴더에 findbugs.xml과 findbugsXml.xml파일이 생성이 되었을 것입니다.
 

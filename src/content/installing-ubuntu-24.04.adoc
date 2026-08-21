@@ -9,7 +9,7 @@
 새 컴퓨터를 받아서 설치한 프로그램들을 정리해봅니다.
 
 * Ubuntu는 영문판으로 설치
-** `Desktop`, `Download` 같은 디렉토리가 영문으로 나오는 것이 편리해서
+** `Desktop`, `Download` 같은 디렉터리가 영문으로 나오는 것이 편리해서
 
 == 한글 설정
 `sudo apt install ibus-hangul`

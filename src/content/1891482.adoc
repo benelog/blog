@@ -17,7 +17,7 @@
 
 * RSS를 파싱하는 부분을 XML parsing API로 널리 알려진 Digester(http://commons.apache.org/digester/)를 사용했습니다. Digester의 예제 코드로 제공되는 RSS파싱모듈을 그대로 써서 짧은 코드로 파싱이 가능했습니다.
 ** API 문서 : (http://commons.apache.org/digester/commons-digester-1.5/docs/api/org/apache/commons/digester/rss/RSSDigester.html[RSSDigester] , http://commons.apache.org/digester/commons-digester-1.5/docs/api/org/apache/commons/digester/rss/Channel.html[Channel] , http://commons.apache.org/digester/commons-digester-1.5/docs/api/org/apache/commons/digester/rss/Item.html[Item])
-* 요청 파라미터를 담는 클래스를 따로 뺐습니다.  (RequestParameter.java) 이중 Target 값은 (blog, news 등 검색할 컨텐츠 유형을 선택하는 파라미터입니다.) enum으로 해서 정해진 값이 아닐 경우 compile이 안 되게 했습니다.
+* 요청 파라미터를 담는 클래스를 따로 뺐습니다.  (RequestParameter.java) 이중 Target 값은 (blog, news 등 검색할 콘텐츠 유형을 선택하는 파라미터입니다.) enum으로 해서 정해진 값이 아닐 경우 compile이 안 되게 했습니다.
 * open API key값은 필수값이므로 OpenApiClient클래스의 생성자의 파라미터로 받았습니다. 대신 키 값이 없이 이 객체가 생성될 수 없도록 default 생성자는 private으로 돌려놨습니다.
 
 첨부한 파일은 이클립스에서 Dynamic Web Project로 생성한 폴더를 압축한 것입니다. 테스트 실행 서버는 Tomcat 5.5를 사용했습니다. Eclipse WTP가 설치되어 있는 환경이면 실행이 가능합니다. 그리고 enum을 썼기에 Java5이상이어야 합니다.

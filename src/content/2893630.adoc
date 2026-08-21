@@ -8,12 +8,12 @@
 AOP에서 AspectJ표현식은 다양하고 강력한 기능을 제공합니다.
 예를 들면 Aspect가 결합될 JoinPoint를 아래와 같이 표현을 할 수 있습니다.
 
-* `execution(public void set*(..))` : 리턴 타입이 void이고 메소드 이름이 set으로 시작되고 파라미터가 0개 이상인 메소드
-* `execution(* com.benelog.ftpserver.*.*()` : com.benelog.ftpserver패키지의 파라미터가 없는 모든 메소드
-* `execution(String com.benelog.ftpserver..*.*(..)` : 리턴타입이 String이면서 com.benelog.ftpserver패키지 및 하위 패키지에 있는 파라미터가 0개 이상인 메소드
-* `execution(String com.benelog.ftpserver.Server.insert(..)` : 리턴타입이 String인 com.benelog.ftpserver.Server의 파라미터가 0개 이상인 메소드
-* `execution(* get*(*))` : get으로 이름이 시작하고 1개의 파라미터를 갖는 메소드
-* `execution(* get*(*,*))` : get으로 이름이 시작하고 2개의 파라미터를 갖는 메소드 exceution(* read*(Interger,...)) : read로 이름이 시작하고, 첫번째 파라미터 타입이 Integer이며, 1개 이상의 파라미터를 갖는 메소드
+* `execution(public void set*(..))` : 리턴 타입이 void이고 메서드 이름이 set으로 시작되고 파라미터가 0개 이상인 메서드
+* `execution(* com.benelog.ftpserver.*.*()` : com.benelog.ftpserver패키지의 파라미터가 없는 모든 메서드
+* `execution(String com.benelog.ftpserver..*.*(..)` : 리턴타입이 String이면서 com.benelog.ftpserver패키지 및 하위 패키지에 있는 파라미터가 0개 이상인 메서드
+* `execution(String com.benelog.ftpserver.Server.insert(..)` : 리턴타입이 String인 com.benelog.ftpserver.Server의 파라미터가 0개 이상인 메서드
+* `execution(* get*(*))` : get으로 이름이 시작하고 1개의 파라미터를 갖는 메서드
+* `execution(* get*(*,*))` : get으로 이름이 시작하고 2개의 파라미터를 갖는 메서드 exceution(* read*(Interger,...)) : read로 이름이 시작하고, 첫번째 파라미터 타입이 Integer이며, 1개 이상의 파라미터를 갖는 메서드
 
 그러나 다양하고 강력한 대신에 모든 문법을 다 익숙하게 쓰기는 힘들고, 컴파일 타임에 체크도 안 되기 때문에 실수할 여지도 큽니다. 조금이라도 표현식을 바꾸었을 때 유지하고 싶은 기존의 동작이 변함없이 작동되는지도 파악하기 어렵습니다.
 
@@ -28,7 +28,7 @@ https://gist.github.com/1625374
 
 == LogAspect.java
 LogAspect.java는 간단하게 로그를 저장소에 입력하는 Aspect입니다.
-`@Before("execution(void *.run())")` 라는 표현식으로 run 메소드가 실행되기 전에 로그메시지를 저장하도록 taget 객체와 결합됩니다.
+`@Before("execution(void *.run())")` 라는 표현식으로 run 메서드가 실행되기 전에 로그메시지를 저장하도록 taget 객체와 결합됩니다.
 
 [source,java]
 ----
@@ -93,10 +93,10 @@ applicationContext를 설정하는 xml파일에서   aop: 네임스페이스를 
 === LogAspectTest.java
 드디어 LogAspect의 표현식을 테스트하는 코드입니다. @Bean으로 Aspect와 tagetObject를 모두 XML설정 대신 java로 한 파일 안에서 표현했습니다.
 
-각 테스트 메소드별로  2가지를 검증했습니다.
+각 테스트 메서드별로  2가지를 검증했습니다.
 
-(1) proxyCreated() 메소드 : Proxy클래스가 생성되었는지 확인
-(2) logInserted 메소드: LogAspect에서 호출하는 LogRepository에 원하는 메시지가 저장되었는지 확인
+(1) proxyCreated() 메서드 : Proxy클래스가 생성되었는지 확인
+(2) logInserted 메서드: LogAspect에서 호출하는 LogRepository에 원하는 메시지가 저장되었는지 확인
 
 [source,java]
 ----
@@ -137,7 +137,7 @@ public class LogAspectTest {
 ----
 
 클래스 선언부분에서 @ContextConfiguration(loader=AnnotationConfigContextLoader.class) 를 붙이면 외부의 XML 대신 테스트 클래스 안에 포함된 JavaConfig로된 설정을 읽어올 수 있습니다. TestContext라는 내부 클래스에다 @Configuration을 붙여서 필요한 Bean을 등록했습니다.
-`@EnableAspectJAutoProxy` 는 <aop:aspectj-autoproxy/>와 같은 역할을 하는 애노테이션입니다.
+`@EnableAspectJAutoProxy` 는 <aop:aspectj-autoproxy/>와 같은 역할을 하는 애너테이션입니다.
 
 아래와 같이 ApplicationContext에 LogRepository는 mock()으로 생성한 가짜 객체를 등록했습니다.
 

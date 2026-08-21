@@ -6,11 +6,11 @@
 :jbake-tags: java,autoboxing
 :idprefix:
 
-아래 코드는 [프리미티브 타입과 Wrapper 클래스, 자동 Boxing, 자동 UnBoxing]이라는 글에 나오는 것을 입력해 본 것입니다. int와 java.lang.Integer객체를 "=="와 "equals()"메소드로 비교하고 있습니다.
+아래 코드는 [프리미티브 타입과 Wrapper 클래스, 자동 Boxing, 자동 UnBoxing]이라는 글에 나오는 것을 입력해 본 것입니다. int와 java.lang.Integer객체를 "=="와 "equals()"메서드로 비교하고 있습니다.
 
 image:img/java/auto-boxing-test.jpg[title="auto-boxing-test.jpg"]
 
-위의 코드에서 생성한 .class파일을 역컴파일해보면 아래와 같은 코드가 나옵니다. autoboxing과 unboxing이 어떤 방식으로 이루어 지는지 잘 확인할 수 있습니다. java.lang.Integer가 int로 바뀔 때는 intValue() 메소드, int가 java.lang.Integer로 바뀔 때는 Integer.valueOf()메소드를 사용하고 있습니다. JDK 1.4이하 버전과의 하위호환성을 위해서 이런 방식을 쓰는 것이겠죠.
+위의 코드에서 생성한 .class파일을 역컴파일해보면 아래와 같은 코드가 나옵니다. autoboxing과 unboxing이 어떤 방식으로 이루어 지는지 잘 확인할 수 있습니다. java.lang.Integer가 int로 바뀔 때는 intValue() 메서드, int가 java.lang.Integer로 바뀔 때는 Integer.valueOf()메서드를 사용하고 있습니다. JDK 1.4이하 버전과의 하위호환성을 위해서 이런 방식을 쓰는 것이겠죠.
 
 [source,java]
 ----
@@ -30,7 +30,7 @@ System.out.println((new StringBuilder("9:")).append(a == c.intValue()).toString(
 
 
 
-`new Integer()` 로 생성자를 호출하면 매로 새로 객체를 생성하는데, Integer.valueOf()메소드를 사용하면 캐쉬된 값을 사용할 수 있습니다. 이 메소드의 소스를 보면 -128부터 127까지의 static영역에 캐쉬로 쌓아두고 있습니다.
+`new Integer()` 로 생성자를 호출하면 매로 새로 객체를 생성하는데, Integer.valueOf()메서드를 사용하면 캐시된 값을 사용할 수 있습니다. 이 메서드의 소스를 보면 -128부터 127까지의 static영역에 캐시로 쌓아두고 있습니다.
 
 [source,java]
 ----

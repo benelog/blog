@@ -12,7 +12,7 @@
 원격 호출처럼 일시적으로 실패할 수 있는 작업에는 재시도가 필요합니다.
 https://github.com/spring-projects/spring-retry[Spring Retry]는 재시도 정책과 실행 구조를 제공하는 모듈입니다.
 Spring Batch, Spring Integration 내부에서 재시도를 위해 쓰이던 모듈이었고, 독립적으로도 사용할 수 있습니다.
-이 글에서는 `RetryTemplate` 을 직접 호출하는 방법과 애노테이션 기반의 AOP를 이용하는 방법으로 재시도, 리커버, 서킷 브레이커 정책을 적용해보고, 그 동작을 테스트 코드로 확인합니다.
+이 글에서는 `RetryTemplate` 을 직접 호출하는 방법과 애너테이션 기반의 AOP를 이용하는 방법으로 재시도, 리커버, 서킷 브레이커 정책을 적용해보고, 그 동작을 테스트 코드로 확인합니다.
 
 [NOTE]
 ====
@@ -493,10 +493,10 @@ class NotificationCircuitDecoratorTest {
 
 특정 횟수를 단순히 재시도했던 ``SimpleRetryPolicy``와는 최대 호출 횟수와 리커버 동작의 실행 시점 등 전체적인 흐름이 다르다는 것을 알 수 있습니다.
 
-== 애노테이션과 AOP를 이용한 재시도
+== 애너테이션과 AOP를 이용한 재시도
 
-직접 ``RetryTemplate``을 호출하지 않고도 애노테이션과 AOP를 이용해서 재시도를 할 수 있습니다.
-`@Retryable`, `@Recover`, ``@CircuitBreaker``가 여기에 쓰이는 애노테이션입니다.
+직접 ``RetryTemplate``을 호출하지 않고도 애너테이션과 AOP를 이용해서 재시도를 할 수 있습니다.
+`@Retryable`, `@Recover`, ``@CircuitBreaker``가 여기에 쓰이는 애너테이션입니다.
 이를 통해 앞에서 만든 Decorator 클래스들로 구성한 재시도 정책을 동일하게 적용하면서도 더 짧은 코드로 구현해보겠습니다.
 
 먼저 ``build.gradle``의 `dependencies` 단락에 다음과 같이 `spring-aspects` 모듈을 추가합니다.
@@ -531,8 +531,8 @@ interface NotificationRetryService extends NotificationService {
 }
 ----
 
-`RetryTemplate.builder()` 로 했을 때와 유사하게 애노테이션의 속성으로 대상이 되는 예외, 재시도 횟수와 BackOff 정책을 정의했습니다.
-`@Retryable` 애노테이션은 구현 클래스에 직접 붙일 수도 있습니다.
+`RetryTemplate.builder()` 로 했을 때와 유사하게 애너테이션의 속성으로 대상이 되는 예외, 재시도 횟수와 BackOff 정책을 정의했습니다.
+`@Retryable` 애너테이션은 구현 클래스에 직접 붙일 수도 있습니다.
 이 실습 프로젝트에서는 실제 원격 호출로 알림을 전송하는 구현 클래스가 상상 속에만 존재하기 때문에 인터페이스에 붙였습니다.
 테스트용 구현체인 `UnstableNotificationService` 클래스에 직접 ``@Retryable``을 붙이는 것도 자연스럽지 않습니다.
 인터페이스를 따로 정의했기에 이를 구현한 여러 클래스에 동일한 재시도 정책을 적용할 수 있다는 장점이 생겼습니다.
@@ -547,7 +547,7 @@ public class UnstableNotificationService implements NotificationRetryService {
 
 의도대로 재시도가 되는지 다시 테스트 코드로 확인하겠습니다.
 원래의 `UnstableNotificationService` 클래스의 생성자로 바로 만든 객체가 아닌, 스프링의 AOP에 의해서 재시도 기능이 덧붙여진 객체를 만들어야 합니다.
-Spring Retry에서 제공하는 `@EnableRetry` 애노테이션이 이를 위해 필요합니다.
+Spring Retry에서 제공하는 `@EnableRetry` 애너테이션이 이를 위해 필요합니다.
 그리고 ``UnstableNotificationService``를 애플리케이션 컨텍스트에 등록해서 스프링 컨테이너가 이 클래스에 AOP를 적용할 기회를 주어야 합니다.
 이를 위해 테스트 전용 애플리케이션 컨텍스트를 구성하는 `TestServiceConfig.java` 파일을 'src/test/java' 디렉터리의 하위 경로에 추가합니다.
 실제 운영에 쓰일 코드도 동일한 방식으로 적용이 가능합니다.
@@ -564,7 +564,7 @@ public class TestServiceConfig {
 	}
 }
 ----
-<1> `@Retryable` 애노테이션이 붙은 클래스가 애플리케이션 컨텍스트에 등록되면 재시도 기능을 추가한 프록시 객체를 만들어줍니다.
+<1> `@Retryable` 애너테이션이 붙은 클래스가 애플리케이션 컨텍스트에 등록되면 재시도 기능을 추가한 프록시 객체를 만들어줍니다.
 <2> 3번째 시도까지 예외를 내는 테스트용 객체를 생성합니다.
 
 위의 예제에서는 `proxyTargetClass = true` 속성을 통해서 인터페이스가 아닌 클래스를 확장한 프록시 객체로 AOP가 적용되도록 유도했습니다.
@@ -597,7 +597,7 @@ Spring Retry 안의 `RetryOperationsInterceptor` 클래스가 내부적으로 �
 
 === @Recover
 
-`RecoveryCallback` 안에 담겨서 호출될 메서드도 `@Recover` 애노테이션으로 지정할 수 있습니다.
+`RecoveryCallback` 안에 담겨서 호출될 메서드도 `@Recover` 애너테이션으로 지정할 수 있습니다.
 `NotificationRetryService` 인터페이스에 ``false`` 값을 반환하는 디폴트 메서드를 추가하고 그 위에 ``@Recover``를 붙입니다.
 
 [source,java]
@@ -648,7 +648,7 @@ Spring Retry 안의 `RetryOperationsInterceptor` 클래스가 내부적으로 �
 
 === @CircuitBreaker
 
-마지막으로 `@CircuitBreaker` 애노테이션을 알아보겠습니다.
+마지막으로 `@CircuitBreaker` 애너테이션을 알아보겠습니다.
 앞에 나왔던 ``CircuitBreakerRetryPolicy``를 활용했던 `NotificationCircuitDecorator` 예제와 동일한 기능을 더 간결한 코드로 만들 수 있습니다.
 ``NotificationCircuitService``라는 새로운 인터페이스를 정의해서 ``@CircuitBreaker``의 속성으로 대상 예외와 타임아웃 시간 등을 지정합니다.
 

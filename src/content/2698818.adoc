@@ -15,7 +15,7 @@
 로드존슨은 첫장에 키노트의 제목을 표시하지 않고 '여기에 제목이 들어간다'는 슬라이드 템플릿에 있을법한 문구를 그대로 보여줍니다. 나름대로 웃음을 주려고 했던 의도도 있었지만, 지난 12개월동안 스프링 세계에 어떤 일이 일어났는지를 키노트에서 정리해야 하는데, 이번에는 그것이 쉽지 않았음을 이야기 합니다. 발표가 한참 지나서야 제목이라고 할만한 내용들을 이야기하는데, 간단히 정리하면 '스프링의 성공요인이였던 Portability, Productivity, Innovation을  다음 10년에도 새로운 영역에서 이어서 가고, 개발자들이 더욱 핵심 비지니스 가치의 전달에 전념할 수 있도록 돕는다'라고 말할 수 있었습니다.
 
 == 그동안 스프링 세계에 있었던 일들..
-키노트 발표는 이번 컨퍼런스의 주요 후원자인 Accenture, Google, Saleforce.com에 대한 스폰서들에 대한 감사의 이야기로 시작되었습니다. 이번 컨퍼런스를 통해 비니지스 어플리케이션을 전통적인 데이터 센터에서 클라우드 환경으로 올리겠다는 비전을 강조할 것이라고 미리 예상을 했었고,  인터넷 업계, 시스템통합, SaaS 업계의 최강자들인 이들 세 업체가 그런 비전을 공유하고 후원업체로 전면에 나와 있다는 생각이 들었습니다.
+키노트 발표는 이번 컨퍼런스의 주요 후원자인 Accenture, Google, Saleforce.com에 대한 스폰서들에 대한 감사의 이야기로 시작되었습니다. 이번 컨퍼런스를 통해 비니지스 애플리케이션을 전통적인 데이터 센터에서 클라우드 환경으로 올리겠다는 비전을 강조할 것이라고 미리 예상을 했었고,  인터넷 업계, 시스템통합, SaaS 업계의 최강자들인 이들 세 업체가 그런 비전을 공유하고 후원업체로 전면에 나와 있다는 생각이 들었습니다.
 
 이어서 얼마전에 발표되었던 vFabric cloud platform의 그림을 보여줍니다.
 
@@ -30,7 +30,7 @@
 * Spring 3.1 : Cache abstraction, 환경에 특화된 bean 설정
 * Spring Integration 2.0 : Spring Tools Suite를 통한 plugin지원, 더 많은 Adaptor 지원
 * Spring Web flow 3.0 : Java flow Definition 지원 (https://jira.springsource.org/browse/SWF-295 이 이슈를 말한 것으로 짐작됩니다.)
-* Grails : Spring Tools Suite에 추가된 Grails 지원 기능을 Demo로 보여주었습니다. 프로젝트 생성,  Entity 생성, Grails command 입력등을 Eclipse 안에서 편하게 할 수 있고, Grails View에서 Grails에 구조에 맞는 디렉토리 구성을 더 편하게 볼 수 있었습니다.
+* Grails : Spring Tools Suite에 추가된 Grails 지원 기능을 Demo로 보여주었습니다. 프로젝트 생성,  Entity 생성, Grails command 입력등을 Eclipse 안에서 편하게 할 수 있고, Grails View에서 Grails에 구조에 맞는 디렉터리 구성을 더 편하게 볼 수 있었습니다.
 
 개인적으로 Cache abstraction에 가장 관심이 가는데, 이 주제를 다룰 내일 유겐할러의 발표를 기대해 봅니다.
 

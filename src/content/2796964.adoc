@@ -50,12 +50,12 @@ image:img/sts-reload/1_new-server.jpg[1_new-server.jpg]
 5. 실행할 서버는 Java Agent Based Reloading을 설정한 tc Server로 지정한다.
 ** image:img/sts-reload/13_run-on-the-server.jpg[13_run-on-the-server.jpg]
 
-6. 서버가 올라간 다음에 템플릿의 HomeController 클래스를 수정해보고, 메소드의 내용을 수정한 다음에  아래와 같이 전체 "Realoding..." 메시지가 보이며 applicationContext loading 없이 해당 클래스만 리로딩 되는 것을 확인한다.
+6. 서버가 올라간 다음에 템플릿의 HomeController 클래스를 수정해보고, 메서드의 내용을 수정한 다음에  아래와 같이 전체 "Realoding..." 메시지가 보이며 applicationContext loading 없이 해당 클래스만 리로딩 되는 것을 확인한다.
 image:img/sts-reload/14_modify-controller.jpg[14_modify-controller]
 
 === 테스트 결과
 * Dynamic web project가 아니고 external web module로 추가한 경우 - 잘 됨
 * Servlet만으로 된 프로젝트 - 잘됨
 * Application Context 파일 수정 - 되기도 하고 안 되기도 함
-* Spring MVC의 controller에 @RequestMapping이 달린 새로운 메소드를 추가한 것을 인식 - 잘 안 됨
+* Spring MVC의 controller에 @RequestMapping이 달린 새로운 메서드를 추가한 것을 인식 - 잘 안 됨
 

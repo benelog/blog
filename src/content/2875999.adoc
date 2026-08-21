@@ -28,7 +28,7 @@ wget benelog.net/winstone.jar
 
 받은 파일을 `java -jar` 로 간단하게 실행하면 됩니다.
 
-현재 디렉토리를 최상위 폴더로 실행하려면 아래와 같이 하면 됩니다.
+현재 디렉터리를 최상위 폴더로 실행하려면 아래와 같이 하면 됩니다.
 
 [source]
 ----
@@ -44,14 +44,14 @@ java -jar winstone.jar --webroot=. --httpPort=18080
 ----
 
 
-그런 다음 해당서버에 지정된 포트로 접근하면 디렉토리의 파일 목록이 뜹니다. FTP와는 다르게 비밀번호가 없이 접근이 되므로 보안문제가 염려된다면 외부에 공개되지 않은 포트로 띄어야 하겠습니다.
+그런 다음 해당서버에 지정된 포트로 접근하면 디렉터리의 파일 목록이 뜹니다. FTP와는 다르게 비밀번호가 없이 접근이 되므로 보안문제가 염려된다면 외부에 공개되지 않은 포트로 띄어야 하겠습니다.
 
 image:img/web-server/winstone.jpg[title="winstone.jpg"]
 
 그외의 다양한 옵션은 Winstone의 사이트(http://winstone.sourceforge.net/[http://winstone.sourceforge.net/] )에 자세히 나와 있습니다.
 
 == 웹애플리케이션을 jar파일 하나로 실행되도록 패키징
-앞선 hudson의 사례처럼, 별도의 WAS설치 없이 웹어플리케이션 배포 파일 자체에 WAS를 내장하는 방식입니다.
+앞선 hudson의 사례처럼, 별도의 WAS설치 없이 웹애플리케이션 배포 파일 자체에 WAS를 내장하는 방식입니다.
 
 Jetty를  애플리케이션 안에서 직접 심어서(Embedding) 실행시켜도 같은 효과가 있습니다. 제가 간단하게 만들었던, http://blog.benelog.net/2874354[dumper]라는 도구에서도 그 방식을 활용했습니다.
 

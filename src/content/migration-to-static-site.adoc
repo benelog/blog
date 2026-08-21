@@ -31,17 +31,17 @@ Egloos는 무난한 블로깅 플랫폼입니다. 그러나 개발과 관련된 
 앞의 요구사항을 충족시키는 다음과 같은 서비스/도구들을 선택했습니다.
 
 - 정적 사이트 생성기 : https://jbake.org/[JBake]
-- 컨텐츠 저장소 : GitHub
+- 콘텐츠 저장소 : GitHub
 - 빌드/배포 : https://www.netlify.com/[Netlify]
 - 댓글 : https://help.disqus.com/[Disqus]
 - 방문자 통계 집계 : https://analytics.google.com/analytics/web/[Google Analytics]
 
-새로운 블로그는 정적 사이트 생성기(Static Site Generator)로 Git 저장소에 있는 AsciiDoc 형식의 컨텐츠를 HTML 파일로 만들어서 배포하는 구조입니다.
+새로운 블로그는 정적 사이트 생성기(Static Site Generator)로 Git 저장소에 있는 AsciiDoc 형식의 콘텐츠를 HTML 파일로 만들어서 배포하는 구조입니다.
 덕분에 Egloos로부터의 마이그레이션 작업이 더 수월했고 더 좋은 서비스가 있을 때 쉽게 이전을 할 수 있습니다.
 
-컨텐츠 저장소는 GitHub외에도 Gitlab, Bitbucket 등의 대안이 있고, 컨텐츠 빌드 배포 플랫폼도 다양합니다.
+콘텐츠 저장소는 GitHub외에도 Gitlab, Bitbucket 등의 대안이 있고, 콘텐츠 빌드 배포 플랫폼도 다양합니다.
 필요하다면 더 좋은 기능이 있는 서비스를 유료로 사용할 수도 있습니다.
-컨텐츠 편집기도 여러가지를 사용할 수 있습니다.
+콘텐츠 편집기도 여러가지를 사용할 수 있습니다.
 
 사용할 기술을 선택하면서 했던 고민들은 아래에 정리했습니다.
 
@@ -132,7 +132,7 @@ JBake의 설정으로 HTML 확장자를 제외하는 것도 시도해보았지�
 === 편집기
 긴 글을 편집할 때는 IntelliJ Community Edition을 사용했습니다.
 평소 개발할 때의 편집방식, 단축키와 Git 저장소 연동 방식을 그대로 활용할 수 있습니다.
-`Find in Path (Ctrl + Shift + F)` , `Replace in Path (Ctrl + Shift + R)` 으로 여러 파일에 걸쳐 문자열을 검색하고 치환하는 기능은 마이그레이션 된 컨텐츠를 정리할 때 많은 도움이 되었습니다.
+`Find in Path (Ctrl + Shift + F)` , `Replace in Path (Ctrl + Shift + R)` 으로 여러 파일에 걸쳐 문자열을 검색하고 치환하는 기능은 마이그레이션 된 콘텐츠를 정리할 때 많은 도움이 되었습니다.
 
 https://plugins.jetbrains.com/plugin/7391-asciidoc[AsciiDoc plugin]을 설치하면
 HTML으로 렌더링될 모습을 동시에 보면서 편집을 할 수 있고 이미지 파일을 참조할 때는 자동완성이 되기도합니다.
@@ -151,7 +151,7 @@ image::img/blog-migration/intellij-asciidoc.png[IntelliJ로 AsciiDoc 편집]
 마이그레이션 프로그램의 소스와 사용법은 https://github.com/benelog/egloos-migration/ 을 참고하시기 바랍니다.
 이것도 제가 알고 있는 기술들을 활용해서 Kotlin + Spring 으로 작성했습니다.
 
-컨텐츠를 담은 파일을 생성할 때 Kotlin의 문자열 문법이 유용할 것으로 예상해서 언어는 Kotlin을 선택했습니다. 아래와 같은 코드입니다.
+콘텐츠를 담은 파일을 생성할 때 Kotlin의 문자열 문법이 유용할 것으로 예상해서 언어는 Kotlin을 선택했습니다. 아래와 같은 코드입니다.
 
 [source,kotlin]
 ----

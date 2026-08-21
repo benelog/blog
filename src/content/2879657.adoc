@@ -9,7 +9,7 @@
 Local 개발환경에서 WAS를 띄우는 여러가지 방식과 장단점에 대해서 정리해 봤습니다.  저는 상황에 따라서 아래 3가지 방법들을 그때 그때 골라서 씁니다.
 
 1. Eclipse WTP (+Agent based reloading) : WAS를 올린 상태에서 클래스파일을 고칠 때, class파일 1개만 리로딩하는 것이 좋을 때
-2. Maven Jetty plugin : JSP만 고칠 때나 클래스 파일을 고치면 전체 어플리케이션을 reloading을 하는 것이 유리할 때.
+2. Maven Jetty plugin : JSP만 고칠 때나 클래스 파일을 고치면 전체 애플리케이션을 reloading을 하는 것이 유리할 때.
 3. Maven Tomcat plugin : JSP만 고칠때. WTP가 뭔가 꼬인 것 같은데 같은 Tomcat에서 같은 에러가 나는지 확인해보고 싶을 때
 
 == 1. Eclipse WTP(Web Tools Platform) + Agent Based Reloading
@@ -50,7 +50,7 @@ pom.xml에 Maven jetty plugin을 설정하면 따로 별도의 WAS설치과정�
 
 아래의 Tomcat plugin도 마찬가지지만, 이런 plugin이 설정되어 있으면, Eclipse가 없어도 SVN에서 checkout한후바로 명령어 하나로 WAS를 띄워볼 수 있습니다. 그 프로젝트의 개발자가 아닌 사람이 프로젝트를 띄워보거나 가끔 들어가는 프로젝트를 실행할 때도 편합니다.
 
-대부분의 웹어플리케이션은 Servlet Spec만 따라서 개발하므로 Jetty에서 돌아가면 Tomcat에서 거의 돌아간다고 봐도 됩니다. 물론 성능테스트나 프로파일링 같은건 당연히 Tomat을 띄워서 해야겠죠.
+대부분의 웹애플리케이션은 Servlet Spec만 따라서 개발하므로 Jetty에서 돌아가면 Tomcat에서 거의 돌아간다고 봐도 됩니다. 물론 성능테스트나 프로파일링 같은건 당연히 Tomat을 띄워서 해야겠죠.
 
 다음에 소개할 Maven Tomcat plugin보다 WAS가 뜨는 속도나 리로딩 속도도 빠르다는 느낌입니다.
 "scanIntervalSeconds" 설정에 따라서 클래스 파일을 고쳐도 리로딩이 잘 됩니다.

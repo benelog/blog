@@ -16,7 +16,7 @@ Go는 언어 차원에서 코드 포맷팅 도구(`gofmt`)를 제공하고, 표�
 
 == gofmt: 코드 포맷팅
 
-Go 커뮤니티에서는 `gofmt` 이 표준 포맷터입니다.
+Go 커뮤니티에서는 `gofmt` 이 표준 포매터입니다.
 탭/스페이스, 중괄호 위치 같은 스타일 논쟁 없이 모든 Go 코드가 동일한 포맷을 따르게 됩니다.
 
 [source,bash]
@@ -106,7 +106,7 @@ v2에서는 `version: "2"`를 반드시 명시해야 합니다.
 `default: standard`로 설정하면 errcheck, govet, ineffassign, staticcheck, unused 5개 린터가 기본으로 활성화됩니다.
 추가로 필요한 린터만 `enable`에 넣으면 됩니다.
 
-v2의 또 다른 변경점은 gofmt, goimports 같은 포맷터가 `linters`가 아닌 `formatters` 섹션으로 분리된 것입니다.
+v2의 또 다른 변경점은 gofmt, goimports 같은 포매터가 `linters`가 아닌 `formatters` 섹션으로 분리된 것입니다.
 기존 v1 설정 파일이 있다면 `golangci-lint migrate` 명령으로 자동 변환할 수 있습니다.
 
 === 기본 활성화 린터 (`default: standard`)
@@ -174,5 +174,5 @@ ci: lint test
 * https://pkg.go.dev/cmd/vet[go vet - pkg.go.dev]
 * https://golangci-lint.run/[golangci-lint 공식 문서]
 
-(이 글은 개인 라이센스로 구매한 Claude Code의 도움을 받아 작성되었습니다.)
+(이 글은 개인 라이선스로 구매한 Claude Code의 도움을 받아 작성되었습니다.)
 

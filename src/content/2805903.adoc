@@ -6,7 +6,7 @@
 :jbake-tags: aop,spring,test,spring-test
 :idprefix:
 
-Spring AOP에서 동일한 target클래스에 결합되는 Aspect의 우선순위는  http://static.springsource.org/spring/docs/3.0.x/api/org/springframework/core/Ordered.html[Ordered] 인터페이스를 구현하거나 @Order 애노테이션으로 지정합니다.
+Spring AOP에서 동일한 target클래스에 결합되는 Aspect의 우선순위는  http://static.springsource.org/spring/docs/3.0.x/api/org/springframework/core/Ordered.html[Ordered] 인터페이스를 구현하거나 @Order 애너테이션으로 지정합니다.
 
 아래와 같은 방식입니다.
 
@@ -51,7 +51,7 @@ public class OrderTwoAspect implements Ordered{
 
 ----
 
-OrderOneAspect 은 애노테이션으로, OrderTwoAspect은 인터페이스로 order 값을 선언했습니다.
+OrderOneAspect 은 애너테이션으로, OrderTwoAspect은 인터페이스로 order 값을 선언했습니다.
 
 http://static.springsource.org/spring/docs/3.0.x/api/org/springframework/core/Ordered.html[Ordered] 인터페이스의  javadoc에 보면 order의 숫자 값이 작을수록 우선 순위가 높다고 적혀 있습니다.
 

@@ -43,7 +43,7 @@ public void testSchemeUnknown() throws Exception {
 
 ( Android Universal Image Loader의 https://github.com/nostra13/Android-Universal-Image-Loader/blob/master/library/test/com/nostra13/universalimageloader/core/download/BaseImageDownloaderTest.java[BaseImageDownloaderTest] )
 
-골뱅이 Test가 붙은 애노테이션으로 실행될 코드를 지정하고 assert 구문으로 기대하는 결과를 명시합니다. 이 코드는 uri를 파싱해서 Scheme (스킴)이라는 Enum(이늄)클래스를 만든 결과가 기대대로 FILE이나 UNKNOWN인지를 확인하고 있습니다. 이 코드는 오늘 이야기할 Robolectric으로 만들어졌습니다.
+골뱅이 Test가 붙은 애너테이션으로 실행될 코드를 지정하고 assert 구문으로 기대하는 결과를 명시합니다. 이 코드는 uri를 파싱해서 Scheme (스킴)이라는 Enum(이늄)클래스를 만든 결과가 기대대로 FILE이나 UNKNOWN인지를 확인하고 있습니다. 이 코드는 오늘 이야기할 Robolectric으로 만들어졌습니다.
 
 테스트를 도와주는 프레임워크도 굉장히 많습니다. 앞에서도 언급드렸듯이, 테스트를 실행하는데는 JUnit이 가장 많이 쓰입니다. 안드로이드 SDK에서도 이를 바탕으로 한 테스트 프레임워크를 제공하고 있습니다. 그리고 테스트에 쓰이는 가짜 객체를 흔히 목(Mock)이라고 부르는데, Mockito, JMock, PowerMOck과 같은 라이브러리들이 있습니다. 안드로이드를 위한 테스트 프레임워크에도 오늘 다룰 Robolectric을 비롯해 Robotium, Spoon, Robospock 등이 존재합니다.
 
@@ -55,11 +55,11 @@ public void testSchemeUnknown() throws Exception {
 
 왜 이런 테스트를 만드는지에 대한 의문을 가지실분도 있을 듯합니다. 간단히 설명드리면, 그 이유는 다음과 같습니다.
 
-첫째, 디버깅 편의성을 위해서입니다. 테스트 코드 작성에 능숙해지면 실제 어플리케이션을 실행하고 수동으로 반복 테스트하는것보다 훨씬 빠르고 정교하게 내가 짠 코드의 동작을 확인하고 오류를 수정할 수 있습니다.
+첫째, 디버깅 편의성을 위해서입니다. 테스트 코드 작성에 능숙해지면 실제 애플리케이션을 실행하고 수동으로 반복 테스트하는것보다 훨씬 빠르고 정교하게 내가 짠 코드의 동작을 확인하고 오류를 수정할 수 있습니다.
 
 둘째, 설계를 개선하기 위해서입니다. 테스트 하기에 쉬운 구조의 코드는 역할과 책임이 잘 나누어진 코드입니다. 그런 코드는 재활용하고 기능을 추가하거나 버그를 발견하기에도 편합니다. 테스트를 의식하면서 개발을 하면 그런 구조의 코드를 작성하는데 도움이 됩니다.
 
-셋째, 테스트 자체가 동작하는 예제이자 명세가 됩니다. 다른 사람이 어플리케이션이나 라이브러리의 전체를 실행시키지 않아도 코드가 실행된 결과를 이해할 수 있습니다.
+셋째, 테스트 자체가 동작하는 예제이자 명세가 됩니다. 다른 사람이 애플리케이션이나 라이브러리의 전체를 실행시키지 않아도 코드가 실행된 결과를 이해할 수 있습니다.
 
 넷째, 반복적으로 수행할 회귀테스트를 자동화합니다. 앞으로 기능을 추가하거나 코드를 개선할 때 든든한 버팀목이 되고 시간을 아껴줍니다.
 
@@ -85,7 +85,7 @@ static public class MockServiceContext extends MockContext {
 
 셋째, 기본적으로 제공되는 Instrumentation Test를 쓰는것도 배우기가 쉽지않습니다. 예를 들면 Activity를 테스트할때 ActivityTestCase, ActivityUnitTestCase, ActivityInstrumentationTestCase2의 세 가지 클래스 중 어느것을 써야할까를 하려면 많은 것을 알고 있어야합니다. 그리고 ActivityUnitTestCase에서 Dialog생성 등에 Event가 전달되면 BadToken Exception이 발생한다거나, ActivityInstrumentationTestCase2에서 Dialog 객체를 생성 후 dismiss() 메서드를 호출하지 않으면 leak window Exception이 발생하는등 부딛히는 예외상황도 많습니다.
 
-넷째, UI 테스트 본연의 어려움이 있습니다. 안드로이드 코드는 역할상 UI 생성과 이벤트를 다루는 코드의 비중이 높습니다. 이는 웹어플리케이션 등 다른 플랫폼에서도 테스트하기 어려운 분야입니다. UI 객체의 속성은 자주 바뀌고 익명 클래스 등을 통해서 처리되는 이벤트는 Mock 객체로 바꾸고 추적하기가 어렵습니다.
+넷째, UI 테스트 본연의 어려움이 있습니다. 안드로이드 코드는 역할상 UI 생성과 이벤트를 다루는 코드의 비중이 높습니다. 이는 웹애플리케이션 등 다른 플랫폼에서도 테스트하기 어려운 분야입니다. UI 객체의 속성은 자주 바뀌고 익명 클래스 등을 통해서 처리되는 이벤트는 Mock 객체로 바꾸고 추적하기가 어렵습니다.
 
 다섯째, 느린 테스트 실행 속도입니다. 단 한줄을 고쳐도 패키징 -> 설치 -> 실행 싸이클을 거칩니다. 이 부분이 테스트의 장점을 다 말아먹는 가장 치명적인 단점입니다. 요즘 PC나 단말이 많이 빨라졌고 Genymotion같은 빠른 에뮬레이터도 활용할 수 있어서 많이 나아졌지만, 그래도 실행싸이클의 특성상 개선에 한계가 있습니다.
 
@@ -182,7 +182,7 @@ public class PixelUtilsTest {
 
 ( https://github.com/naver/android-utilset/blob/master/UtilSet/test/com/navercorp/utilset/ui/PixelUtilsTest.java[PixelUtilsTest] )
 
-이 클래스의 Setter 메소드를 살펴보면 그밖에도 다양하게 테스트를 위한 가짜 객체를 설정하는 기능을 찾으실 수 있습니다.
+이 클래스의 Setter 메서드를 살펴보면 그밖에도 다양하게 테스트를 위한 가짜 객체를 설정하는 기능을 찾으실 수 있습니다.
 
 === 단말의 SDK 정보를 원하는 값으로
 

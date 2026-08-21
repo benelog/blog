@@ -43,9 +43,9 @@ Spring이나 Opensymphony의 BeanUtils는 단순히 Bean간의 데이터 복사,
 비교군은 아래와 같습니다.
 
 * By Hand : 직접 map.get과 bean의 setter를 이용해서 복사
-* Spring(property descriptor)  : Spring의 BeanUtils.getPropertyDescriptors를 사용. Spring의 BeanUtils에는 직접적으로 Map에서 Bean으로 복사해주는 메소드가 없어서 이 방식을 이용했습니다.
+* Spring(property descriptor)  : Spring의 BeanUtils.getPropertyDescriptors를 사용. Spring의 BeanUtils에는 직접적으로 Map에서 Bean으로 복사해주는 메서드가 없어서 이 방식을 이용했습니다.
 * Apache Commons(property descriptor) : 2번과 같은 방식을 사용하고, 라이브러리만 Apache commons BeanUtils의 PropertyUtils.getPropertyDescriptor를 사용
-* Apache Commons(populate) : Apache comons BeanUtils의 BeanUtils.populate 메소드를 사용
+* Apache Commons(populate) : Apache comons BeanUtils의 BeanUtils.populate 메서드를 사용
 * OpenSymphony(setValues) : Opensymphony의 BeanUtils.setValues를 사용
 
 == 실행 시간 비교 결과
@@ -109,7 +109,7 @@ while (names.hasNext()) {
 
 Opensymphony쪽은 70배이상 더 느린데, 제가 구현한 방식이 문제가 있는 건지도 모르겠습니다.
 
-아뭏든 위의 결과를 봐서는 되도록 성능이 민감한 곳에는 직접 setter를 호출해서 복사를 하고, BeanUtils.populate의 다양한 기능이 필요하지 않다면 Spring의 BeanUtils나 Apache commons PropertyUtils를 통해 캐쉬된 PropertyDescriptor를 정보를 통해 Bean에 접근하는 것이 성능에는 유리하다는 것을 알 수 있습니다.
+아뭏든 위의 결과를 봐서는 되도록 성능이 민감한 곳에는 직접 setter를 호출해서 복사를 하고, BeanUtils.populate의 다양한 기능이 필요하지 않다면 Spring의 BeanUtils나 Apache commons PropertyUtils를 통해 캐시된 PropertyDescriptor를 정보를 통해 Bean에 접근하는 것이 성능에는 유리하다는 것을 알 수 있습니다.
 
 
 == 소스

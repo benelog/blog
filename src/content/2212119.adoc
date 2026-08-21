@@ -62,7 +62,7 @@ image:img/emma/hudson-emma-config.jpg[hudson-emma-config.jpg]
 
 여기에서 Emma XML report 항목에 workspace를 기준으로 한 상대적인 경로로 coverage.xml의 위치를 지정해줍니다.
 http://hudson.gotdns.com/wiki/display/HUDSON/Emma+Plugin%20[Hudson의 위키에 있는 Emma plugin 설명페이지]에 보면 이 항목이 target/site/emma/coverage.xml으로 되어 있어서 혼동이 오기 쉬운데, trunk와 같은 Local module directory를 반드시 포함시켜줘야 합니다.
-보통 SVN을 쓸 때 프로젝트 설정에서 별도로 지정을 하지 않으면 trunk같은 SVN의 path의 마지막 디렉토리가 Local module directory로 지정됩니다.
+보통 SVN을 쓸 때 프로젝트 설정에서 별도로 지정을 하지 않으면 trunk같은 SVN의 path의 마지막 디렉터리가 Local module directory로 지정됩니다.
 
 image:img/emma/hudson-svn-config.jpg[hudson-svn-config.jpg]
 

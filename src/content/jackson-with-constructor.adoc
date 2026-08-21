@@ -190,7 +190,7 @@ Lombok을 활용한다면 이 과정을 더 편하게 할 수 있습니다.
 lombok.anyConstructor.addConstructorProperties=true
 ----
 
-`@Builder`, `@AllArgsConstructor` 와 같은 애노테이션을 클래스에 붙이면 Lombok에서는 자동으로 생성자를 만들어줍니다.
+`@Builder`, `@AllArgsConstructor` 와 같은 애너테이션을 클래스에 붙이면 Lombok에서는 자동으로 생성자를 만들어줍니다.
 이를 통해 JSON 파싱한 값을 넣을 클래스를 더 단순하게 만들 수 있습니다.
 
 [source,java]
@@ -220,7 +220,7 @@ public class AccessLog {
 * 단점
 ** JSON의 속성명과 생성자의 실제 파라미터 명이 다른 경우에는 사용하는 것이 부자연스럽습니다.
 
-만약 아래와 같이 `@ConstructorProperties` 에서는 "ip_address"로 지정한 속성이 실제 파라미터이름이 `String ip` 경우라면, 코드로는 잘 동작하지만 애노테이션의 원래 의도와는 어긋난 것이 아닌가 하는 생각이 들었습니다.
+만약 아래와 같이 `@ConstructorProperties` 에서는 "ip_address"로 지정한 속성이 실제 파라미터이름이 `String ip` 경우라면, 코드로는 잘 동작하지만 애너테이션의 원래 의도와는 어긋난 것이 아닌가 하는 생각이 들었습니다.
 
 [source,java]
 ----
@@ -240,7 +240,7 @@ jar 파일로 배포하는 클래스라면 Lombok에 대한 의존성이 부담�
 앞의 예제들을 보면 `@JsonProperty("ip")` 와 같이 지정하는 속성의 이름과 생성자의 파라미터의 이름이 동일합니다.
 `String ip` 와 같이 생성자의 파라미터의 이름을 바로 가지고 올 수 있다면 일일히 속성명을 지정하지 않을 수 있겠다는 생각이 들만합니다.
 
-그런데 JDK 8이 나오기 전까지는 Reflection만으로는 파라미터 이름을 가지고 올 수 없었고, ASM과 같은 바이트코드 조작 라이브러리를 이용해서 디버깅을 위한 정보를 이용해야만 가능했습니다. ( https://stackoverflow.com/questions/2729580/how-to-get-the-parameter-names-of-an-objects-constructors-reflection#2729907 참조) 그래서 앞서 소개한 `@java.beans.ConstructorProperties` 와 같은 애노테이션도 활용되었습니다.
+그런데 JDK 8이 나오기 전까지는 Reflection만으로는 파라미터 이름을 가지고 올 수 없었고, ASM과 같은 바이트코드 조작 라이브러리를 이용해서 디버깅을 위한 정보를 이용해야만 가능했습니다. ( https://stackoverflow.com/questions/2729580/how-to-get-the-parameter-names-of-an-objects-constructors-reflection#2729907 참조) 그래서 앞서 소개한 `@java.beans.ConstructorProperties` 와 같은 애너테이션도 활용되었습니다.
 
 JDK8 이상에서는 컴파일을 할 때 `-parameters` 라는 옵션을 붙이면 Reflection API로 파라미터 정보를 가지고 올수 있도록 컴파일된 클래스에 정보를 덧붙여 줍니다.
 Gradle을 쓰고 있다면 아래와 같이 설정할 수 있습니다.

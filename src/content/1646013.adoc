@@ -10,7 +10,7 @@
 
 같은 문제에 대한 dak99님의 풀이(http://dak99.egloos.com/3529054)를 보고 다시 다른 버전을 만들어봤어요.
 
-shuffle을 이용해도 http://java.sun.com/j2se/1.5.0/docs/api/java/util/Collections.html[Collections]의 메소드들을 불러서 쓰니 코드가 별로 안 복잡해 지는군요.
+shuffle을 이용해도 http://java.sun.com/j2se/1.5.0/docs/api/java/util/Collections.html[Collections]의 메서드들을 불러서 쓰니 코드가 별로 안 복잡해 지는군요.
 
 [source,java]
 ----

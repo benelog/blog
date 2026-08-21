@@ -46,7 +46,7 @@
 
 Navie SQL과 Hibernate가 쓰는 HQL을 모두 .xml파일 안에 선언하는 것이 가능합니다. JPA를 사용해도 마찬가지로 JPA-QL, Native SQL을 Java에서 String으로 선언할 수도 있지만, XML 파일 안에 넣어도 됩니다.
 
-Spring JDBC에서는 Jdbctemplate.execute 등의 메소드에서 SQL내용을 직접 문자열로 넘기게 되어있지만, Applicaton context 안에 쿼리를 저장해두고, 이를 사용하는 쪽에서 `java.util.Properties` 같은 객체를 Dependency Injection 받아서 사용하면 iBatis처럼 XML로 쿼리가 관리됩니다.
+Spring JDBC에서는 Jdbctemplate.execute 등의 메서드에서 SQL내용을 직접 문자열로 넘기게 되어있지만, Applicaton context 안에 쿼리를 저장해두고, 이를 사용하는 쪽에서 `java.util.Properties` 같은 객체를 Dependency Injection 받아서 사용하면 iBatis처럼 XML로 쿼리가 관리됩니다.
 
 [source,xml]
 ----
@@ -72,7 +72,7 @@ public int persistInformation(SimpleInformationEntity simpleInfo) throws Excepti
 
 (예제는 http://java.dzone.com/articles/mybatis-formerly-called-ibatis[]http://java.dzone.com/articles/mybatis-formerly-called-ibatis 에서)
 
-그런데, 이런식으로 쿼리까지 Annotation으로 지정하는 것에 대해서는 의견이 분분할 것 같고, 개인적인 생각으로는 Spring jdbc나 Hibernate처럼 필요하면 직접 메소드 시그니처에 직접 SQL을 문자열로 넘기는 방식이 훨씬 더 자연스럽다고 보여집니다.
+그런데, 이런식으로 쿼리까지 Annotation으로 지정하는 것에 대해서는 의견이 분분할 것 같고, 개인적인 생각으로는 Spring jdbc나 Hibernate처럼 필요하면 직접 메서드 시그니처에 직접 SQL을 문자열로 넘기는 방식이 훨씬 더 자연스럽다고 보여집니다.
 
 == 문제점은?
 iBatis에서는 파라미터에 따라서 SQL이 다르게 구성되는 다이나믹 쿼리를 아래와 같이 선언합니다.

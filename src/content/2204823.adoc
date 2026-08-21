@@ -108,7 +108,7 @@ image:img/javancss/hudson-javancss-menu.jpg[hudson-javancss-menu.jpg]
 
 image:img/javancss/hudson-javancss-report.jpg[hudson-javancss-report.jpg]
 
-Maven에서 mvn site명령으로 site 절(phrase)까지 들어갔다면 리포트를 모은 페이지를 따로 생성해 주기도합니다. Hudson의 프로젝트 메인화면에서 Maven-generated site 링크를 통해서 보실 수 있습니다.Hudson에서 생성해주는 페이지가 더 이쁘기는하지만, JavaNCSS의 보고서는 Maven-generated site가 더많은 정보를 제공합니다. 예를 들면 가장 주석을 제외한 라인수(NCSS)가 많은 30위까지의 클래스들, 메소드들 같은 순위등같은 것들을 확인할 수 있습니다.
+Maven에서 mvn site명령으로 site 절(phrase)까지 들어갔다면 리포트를 모은 페이지를 따로 생성해 주기도합니다. Hudson의 프로젝트 메인화면에서 Maven-generated site 링크를 통해서 보실 수 있습니다.Hudson에서 생성해주는 페이지가 더 이쁘기는하지만, JavaNCSS의 보고서는 Maven-generated site가 더많은 정보를 제공합니다. 예를 들면 가장 주석을 제외한 라인수(NCSS)가 많은 30위까지의 클래스들, 메서드들 같은 순위등같은 것들을 확인할 수 있습니다.
 
 image:img/javancss/mvn-site-reports.jpg[mvn-site-reports.jpg]
 
