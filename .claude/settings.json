@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "korean-tech-writing": {
+      "source": {
+        "source": "github",
+        "repo": "benelog/korean-tech-writing"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "korean-tech-writing@korean-tech-writing": true
+  }
+}
