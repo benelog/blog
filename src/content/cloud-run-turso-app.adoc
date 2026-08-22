@@ -458,8 +458,16 @@ Turso로 오가는 양이 예상보다 크면 리전 구성을 다시 조정하�
 
 [NOTE]
 ====
-Cloud Run 요금 문서는 무료 전송을 "북미 안에서 월 1GiB"로 설명하는데, 네트워킹 요금표에는 위처럼 목적지별로 0~1GiB 무료 구간이 표시됩니다.
-두 문서의 설명이 서로 다르므로 무료 1GiB를 기대하기보다, **한국 목적지에는 무료 구간이 없다**는 쪽만 확실한 조건으로 잡는 편이 안전합니다.
+전송 요금에서 단가와 무료 한도는 기준이 서로 다릅니다.
+단가는 위 표처럼 목적지로 갈리는데, 무료 1GB는 **출발지**에 붙습니다.
+Google Cloud Free Program 문서의 Cloud Run 항목은 "1 GB of outbound data transfer **from North America** per month"라고 적고 있습니다.
+북미에서 나가는 전송에 주어지는 할당이므로, 도쿄에서 출발하는 이 앱에는 적용되지 않습니다.
+Cloud Run 요금 문서는 같은 내용을 "within North America"로 적어 두어 표현이 조금 다르고, 네트워킹 요금표에는 목적지별로 0~1GiB 무료 구간이 표시됩니다.
+문서마다 표현이 갈리는 영역이라 실제 적용 여부는 청구서로 확인하는 편이 안전하고, **한국 목적지에는 무료 구간이 없다**는 쪽만 확실한 조건으로 잡았습니다.
+
+이 1GB를 받으려고 앱과 데이터베이스를 북미로 옮기는 선택은 하지 않았습니다.
+월 1GB는 $0.19어치이고 초과분 단가는 그대로인데, 앞의 Turso 리전 실험에서 보듯 태평양을 한 번 건널 때마다 160ms 안팎이 붙습니다.
+독자가 한국에 있는 앱에서는 남는 거래가 아닙니다.
 ====
 
 또 하나 주의할 점은 이 무료 한도들이 대부분 **결제 계정 단위**라는 것입니다.
@@ -798,6 +806,7 @@ Turso가 SQLite와 호환되고 이미지가 표준 컨테이너라서 **애플�
 * link:https://cloud.google.com/run/docs/known-issues[Cloud Run: Known issues] — 예약된 URL 경로
 * link:https://cloud.google.com/run/docs/mapping-custom-domains#adding_verified_domain[Cloud Run: 도메인 소유권 확인] — 매핑 전에 필요한 Search Console 검증
 * link:https://cloud.google.com/vpc/network-pricing[Google Cloud 네트워킹 요금] — Cloud Run에서 나가는 외부 전송에 적용되는 단가
+* link:https://cloud.google.com/free/docs/free-cloud-features[Google Cloud Free Program: Always Free] — 서비스별 상시 무료 한도. Cloud Run의 전송 무료 1GB가 북미 출발 기준이라고 적힌 곳
 * link:https://docs.turso.tech/cli/group[Turso CLI: group] — 그룹 생성과 리전 지정
 * link:https://docs.turso.tech/cli/group/create[Turso CLI: group create] — 여러 그룹을 만들 수 있는 요금제 제한
 * link:https://turso.tech/pricing[Turso 요금] — 무료 요금제의 한도
