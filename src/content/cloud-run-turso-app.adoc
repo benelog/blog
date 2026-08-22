@@ -360,7 +360,48 @@ Turso는 AWS에 있어서 Google 밖의 주소이므로, 도쿄에서 같은 도
 * **Turso로 보내는 질의**: 목적지가 도쿄(일본)라서 아시아 단가가 적용됩니다. 다만 나가는 것은 SQL 질의문이라 매우 작고, 결과 행은 들어오는 방향이라 무료입니다.
 * **사용자 브라우저로 보내는 응답**: 독자가 대부분 한국에 있으므로 무료 구간 없이 $0.19/GiB 구간에 들어갑니다. 실제로는 이쪽이 전송량의 대부분입니다.
 
+=== Netlify 프록시를 걷어내면서 나빠진 전송 조건
+
+앞의 표를 이번 전환에 대입해 보면, 프록시를 걷어낸 결정이 응답 시간에는 이득이지만 전송 요금에는 손해입니다.
+두 가지가 함께 바뀌었습니다.
+
+**목적지가 싱가포르에서 한국으로 바뀌었습니다.**
+전환 전 ``til.benelog.net``의 A 레코드는 ``13.215.239.219``였고, RDAP로 조회하면 등록명이 ``AMAZON-SIN``입니다.
+즉 Cloud Run이 응답을 건네던 상대는 한국의 사용자가 아니라 싱가포르에 있는 Netlify의 엣지였습니다.
+GCP 입장의 목적지가 싱가포르였으므로 아시아 단가 $0.12/GiB에 0~1GiB 무료 구간이 적용됐고, 싱가포르에서 한국까지의 마지막 구간은 Netlify의 대역폭이었습니다.
+직접 매핑으로 바꾼 지금은 목적지가 한국이므로 무료 구간 없이 $0.19/GiB입니다.
+
+엣지 위치를 우리가 고를 수 있는 것도 아닙니다.
+Netlify는 PoP 목록을 공식적으로 공개하지 않고, 지원 포럼에서 안내한 일반 CDN 지역에는 동아시아가 없습니다.
+PoP가 더 많은 High-Performance Edge는 Enterprise 플랜 기능이고, 리전을 지정하는 설정은 Functions에만 있습니다(Pro 이상).
+앞의 측정에서 Netlify 경유 경로의 TCP 완료가 71.7ms로 길었던 것도 이 위치와 무관하지 않아 보입니다.
+
+**응답 압축이 사라졌습니다.**
+이쪽이 단가 변화보다 영향이 큽니다.
+
+[source,bash]
+----
+# 현재: Cloud Run 직접 매핑
+$ curl -H 'Accept-Encoding: gzip, br' -D - https://til.benelog.net/static/htmx.min.js
+server: Google Frontend
+content-length: 50917          # content-encoding 헤더가 없다
+
+# 전환 전 경로: Netlify
+$ curl -H 'Accept-Encoding: gzip, br' -D - https://til-benelog.netlify.app/static/htmx.min.js
+content-encoding: br
+server: Netlify
+----
+
+Netlify는 Brotli를 자동으로 적용해 줬는데, 이 서비스에서는 Google Frontend가 Cloud Run의 응답을 대신 압축해 주지 않았습니다.
+메인 HTML도 ``Accept-Encoding``을 붙이든 붙이지 않든 같은 크기로 돌아옵니다.
+HTML·CSS·JavaScript는 보통 3~5배까지 줄어드는 자산이므로, 단가가 1.58배 오른 것과 별개로 실제로 나가는 바이트 자체가 늘었습니다.
+
+앱에 gzip 미들웨어를 넣거나 정적 파일을 미리 압축해 함께 embed하면 대부분 회복할 수 있는 문제입니다.
+그 전까지는 이 구성이 예전보다 전송 조건이 나쁘다는 점을 감안하고 봐야 합니다.
+
 Turso로 오가는 양이 예상보다 크면 계산이 달라질 수 있어서, 실제로 운영하면서 청구서에 잡히는 전송량과 금액을 확인한 뒤 리전 구성을 다시 조정할지 검토할 생각입니다.
+이 전송 조건 때문에 Netlify 프록시로 되돌리는 선택지도 열어 두고 있습니다.
+다만 직접 매핑을 실제로 운영하며 확인해 보려고 당분간은 지금 구성을 그대로 두겠습니다.
 지금은 측정된 값이 없어서 판단을 미뤄 둡니다.
 
 [NOTE]
