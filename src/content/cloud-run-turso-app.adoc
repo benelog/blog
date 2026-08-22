@@ -1,10 +1,10 @@
-= 개인 TIL 앱의 배포처와 데이터베이스 리전 선택
+= Cloud Run과 Turso로 개인 앱 배포하기
 정상혁
 2026-08-22
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: 자작도구, go, cloud-run, turso, htmx
-:description: Go와 htmx로 만든 TIL 기록장을 무료 배포처 세 곳을 거쳐 Cloud Run에 올린 과정입니다. Back4app 무료 티어의 임시 URL 만료, Cloud Run 전환에서 걸린 두 가지, 데이터베이스 리전과 Netlify 프록시가 응답 시간에 미친 영향을 실측값과 함께 정리합니다.
+:description: Go와 htmx로 만든 TIL 기록장을 Google Cloud Run(서울)과 Turso(도쿄)에 올린 과정입니다. Cloud Run 배포에서 걸린 두 가지, 데이터베이스 리전과 Netlify 프록시가 응답 시간에 미친 영향을 실측값과 함께 정리하고, 선택하지 않은 배포처도 마지막에 모아 둡니다.
 :toc:
 :sectnums:
 :toclevels: 1
@@ -16,8 +16,9 @@ Markdown으로 짧은 메모를 쌓는 TIL(Today I Learned) 기록장을 만들�
 그래서 관심은 기능이 아니라 **개인 앱 하나를 계속 띄워 두는 데 무엇을 고르는가**에 있었습니다.
 
 조건은 두 가지였습니다. 운영 비용이 들지 않아야 하고, 주소가 항상 살아 있어야 합니다.
-결과만 적으면 배포처는 Google Cloud Run(`asia-northeast3`, 서울), 저장소는 Turso(`aws-ap-northeast-1`, 도쿄), 도메인은 Netlify의 프록시입니다.
-여기까지 오는 동안 배포처를 세 번 바꿨고, 그 과정에서 확인한 사실을 정리합니다.
+고른 조합은 배포처 Google Cloud Run(`asia-northeast3`, 서울), 저장소 Turso(`aws-ap-northeast-1`, 도쿄), 도메인 Netlify 프록시입니다.
+이 글은 이 조합을 어떻게 붙였고, 붙이면서 무엇에 걸렸고, 응답 시간이 얼마나 나왔는지를 정리합니다.
+여기까지 오는 동안 시도했다가 접은 배포처들은 마지막 절에 모았습니다.
 
 소스는 link:https://github.com/benelog/til[benelog/til]에 있습니다.
 같은 시기에 만든 link:dolthub-app.html[DoltHub에 데이터를 저장하는 애플리케이션]과는 저장소 선택의 방향이 반대입니다.
@@ -65,93 +66,19 @@ gcloud run deploy til --source . --region asia-northeast3 \
 
 환경변수는 YAML 파일로 넘깁니다. 커맨드라인에 토큰이 남지 않고, 한 번 넣으면 서비스에 저장되므로 다음 배포부터는 ``--env-vars-file``을 생략해도 됩니다.
 
-== 배포처 후보 비교와 Cloud Run 선택
+== Cloud Run의 무료 한도와 결제 계정 조건
 
-처음 세운 조건은 "카드 등록 없이 상시 가동"이었습니다.
-찾아본 결과를 정리하면 아래와 같습니다.
+Cloud Run의 무료 한도는 월 2M 요청, 360,000 GiB-초, 180,000 vCPU-초입니다.
+개인 TIL 앱의 트래픽은 이 한도 근처에도 가지 않으므로 청구액은 0원입니다.
+서울 리전(``asia-northeast3``)을 쓸 수 있다는 점도 고른 이유입니다.
 
-[cols="1,2,2", options="header"]
-|===
-|후보 |무료 조건 |걸린 점
+대신 조건이 하나 붙습니다.
+무료 한도만 써도 **열려 있는 결제 계정 연결이 필수**입니다.
+결제 계정이 닫혀 있으면 API 활성화조차 되지 않습니다.
+카드를 등록하지 않겠다는 조건이면 Cloud Run은 후보에서 빠집니다.
+저는 주소가 항상 살아 있어야 한다는 조건을 우선해서, 카드 등록을 받아들이는 쪽을 택했습니다.
 
-|Google Cloud Run
-|월 2M 요청, 360,000 GiB-초, 180,000 vCPU-초
-|무료 한도만 써도 **열려 있는 결제 계정 연결이 필수**입니다. 결제 계정이 닫혀 있으면 API 활성화조차 되지 않습니다.
-
-|Back4app Containers
-|컨테이너 1개, 256MB RAM / 0.25 CPU
-|카드가 필요 없습니다. 대신 무료 요금제의 주소가 임시라 만료되면 배포가 삭제됩니다.
-
-|Render
-|Free web service, workspace당 월 750시간
-|15분 동안 요청이 없으면 컨테이너가 중지되고, 복귀에 30초에서 1분이 걸립니다.
-
-|Hugging Face Spaces
-|CPU Basic, 공개 Space 한정
-|유휴 시 중지됩니다. 데이터베이스 이름과 화면이 공개됩니다.
-
-|Northflank
-|프로젝트 1개, 서비스 2개
-|리소스를 생성할 때 카드 등록을 요구합니다. 무료 리전도 us-central과 europe-west뿐입니다.
-
-|Fly.io, Railway, Koyeb, Heroku
-|없음
-|Fly.io는 신규 조직 무료 할당을 폐지했고, Koyeb은 신규 가입자에게 무료 티어를 제공하지 않습니다.
-|===
-
-Northflank는 카드 요구로 먼저 제외했고, 다음으로 Back4app Containers를 골랐습니다.
-카드 없이 GitHub 저장소를 연결하면 Kaniko가 Dockerfile을 빌드해 배포하고, 컨테이너가 중지되지 않아 콜드스타트도 관측되지 않았습니다.
-여기까지는 조건에 맞았습니다.
-
-== Back4app Containers의 임시 URL 만료
-
-배포한 지 30분이 되지 않아 til.benelog.net이 응답하지 않았습니다.
-대시보드의 배포 로그에 원인이 그대로 남아 있었습니다.
-
-[source]
-.Back4app Containers의 배포 로그 (UTC)
-----
-2026-08-21T23:58:26Z  SYSTEM  LAUNCHING CONTAINER...
-2026-08-21T23:59:19Z  SYSTEM  CHECKING HEALTH...
-2026-08-21T23:59:20Z  SYSTEM  DEPLOYMENT READY
-2026-08-22T00:27:12Z  SYSTEM  The Back4app custom domain has expired for free plan
-2026-08-22T00:27:12Z  SYSTEM  COOLING DOWN...
-2026-08-22T00:28:12Z  SYSTEM  FINISHING CONTAINER...
-2026-08-22T00:28:12Z  SYSTEM  DEPLOYMENT DESTROYED
-----
-
-컨테이너가 고장난 것이 아니라 **무료 요금제의 임시 주소가 만료되면서 배포 자체가 삭제**됐습니다.
-그 사이 서비스는 정상이었고, 앱 로그에 `GET /` 요청이 200으로 남아 있습니다.
-대시보드에는 "URL is temporary and will be live for 60 minutes"라는 안내가 있는데, 공식 문서에는 설명이 없습니다.
-
-만료 시점은 재현하지 못했습니다.
-위 사례는 `DEPLOYMENT READY` 이후 약 28분이고, 다른 때는 65분이 지나도 같은 주소가 살아 있었습니다.
-안내문의 60분은 보장이라기보다 상한으로 보는 편이 안전하다고 판단합니다.
-
-진단이 어려웠던 이유는 따로 있습니다.
-만료된 주소가 **한 번도 존재한 적 없는 서브도메인과 똑같은 응답**을 돌려줍니다.
-
-[source,bash]
-----
-curl -sI https://til-nsh62xv6.b4a.run/healthz   # 실제로 만들었던 앱
-curl -sI https://til-zzzzzzzz.b4a.run/healthz   # 존재한 적 없는 이름
-# 둘 다: HTTP/2 404, "not found", x-cache: Error from cloudfront
-----
-
-컨테이너가 죽었다면 502나 503이 나왔을 텐데 그렇지 않았습니다.
-헤더까지 같아서 밖에서는 앱이 고장난 것인지 주소가 회수된 것인지 구분할 수 없습니다.
-대시보드의 배포 로그를 봐야 알 수 있습니다.
-
-여기에 재배포하면 주소 접미사가 바뀌는 문제가 더해집니다.
-실제로 되살릴 때마다 ``til-nsh62xv6``에서 ``til-xu9uffq7``로 바뀌었고, 그때마다 Netlify의 ``_redirects``를 고쳐야 했습니다.
-잠깐 띄워 보여 주는 용도라면 쓸 만하지만, 주소가 항상 살아 있어야 한다는 조건에는 맞지 않았습니다.
-영구 주소는 월 5달러 요금제부터입니다.
-
-카드 등록을 받아들이기로 하고 Cloud Run으로 옮겼습니다.
-개인 TIL 앱의 트래픽은 월 2M 요청 무료 한도 근처에도 가지 않으므로, 결제 계정을 연결해도 청구액은 0원입니다.
-서울 리전을 쓸 수 있다는 점도 이유였습니다.
-
-== Cloud Run 전환에서 걸린 두 가지
+== Cloud Run 배포에서 걸린 두 가지
 
 === 기본 서비스 계정의 빌드 권한 부족
 
@@ -213,7 +140,7 @@ mux.HandleFunc("GET /healthz", health)
 mux.HandleFunc("GET /health", health)
 ----
 
-== 데이터베이스 리전을 도쿄로 옮기고 잰 응답 시간
+== Turso 리전을 도쿄로 옮기고 잰 응답 시간
 
 저장소는 Turso(libSQL)입니다.
 SQLite 파일 하나 분량의 데이터를 다루는 개인 앱에 맞고, 드라이버(`libsql-client-go`)가 순수 Go라 CGO 없는 이미지에 그대로 들어갑니다.
@@ -255,7 +182,7 @@ Turso 그룹의 primary 위치는 나중에 바꿀 수 없어서, 새 그룹을 
 
 == Netlify 프록시가 더하는 지연
 
-Back4app도 Cloud Run도 커스텀 도메인은 유료이거나 별도 설정이 필요합니다.
+Cloud Run의 커스텀 도메인 매핑은 별도 설정이 필요합니다.
 그래서 til.benelog.net은 Netlify에 두고, 모든 요청을 백엔드로 넘기는 rewrite 한 줄로 붙였습니다.
 
 [source]
@@ -290,17 +217,97 @@ TCP 핸드셰이크가 71ms라는 것은 Netlify의 가장 가까운 접속 지�
 커스텀 도메인이 유료인 배포처를 쓸 때는 유용한 방법이지만, 지연이 중요하면 배포처가 제공하는 도메인 매핑을 먼저 확인하는 편이 낫습니다.
 저는 til.benelog.net 주소를 유지하는 쪽을 택했습니다. 개인 메모장이라 300ms대 응답으로도 충분하다고 판단했습니다.
 
+== 선택하지 않은 배포처: Northflank, Back4app, Render
+
+Cloud Run으로 정하기 전에 처음 세운 조건은 "카드 등록 없이 상시 가동"이었습니다.
+그 조건으로 찾아본 후보와, 각각을 접은 이유를 정리합니다.
+
+[cols="1,2,2", options="header"]
+|===
+|후보 |무료 조건 |걸린 점
+
+|Back4app Containers
+|컨테이너 1개, 256MB RAM / 0.25 CPU
+|카드가 필요 없습니다. 대신 무료 요금제의 주소가 임시라 만료되면 배포가 삭제됩니다.
+
+|Render
+|Free web service, workspace당 월 750시간
+|15분 동안 요청이 없으면 컨테이너가 중지되고, 복귀에 30초에서 1분이 걸립니다.
+
+|Hugging Face Spaces
+|CPU Basic, 공개 Space 한정
+|유휴 시 중지됩니다. 데이터베이스 이름과 화면이 공개됩니다.
+
+|Northflank
+|프로젝트 1개, 서비스 2개
+|리소스를 생성할 때 카드 등록을 요구합니다. 무료 리전도 us-central과 europe-west뿐입니다.
+
+|Fly.io, Railway, Koyeb, Heroku
+|없음
+|Fly.io는 신규 조직 무료 할당을 폐지했고, Koyeb은 신규 가입자에게 무료 티어를 제공하지 않습니다.
+|===
+
+Northflank는 카드 요구로 먼저 제외했고, 다음으로 Back4app Containers를 골랐습니다.
+카드 없이 GitHub 저장소를 연결하면 Kaniko가 Dockerfile을 빌드해 배포하고, 컨테이너가 중지되지 않아 콜드스타트도 관측되지 않았습니다.
+여기까지는 조건에 맞았습니다.
+
+=== Back4app Containers의 임시 URL 만료
+
+배포한 지 30분이 되지 않아 til.benelog.net이 응답하지 않았습니다.
+대시보드의 배포 로그에 원인이 그대로 남아 있었습니다.
+
+[source]
+.Back4app Containers의 배포 로그 (UTC)
+----
+2026-08-21T23:58:26Z  SYSTEM  LAUNCHING CONTAINER...
+2026-08-21T23:59:19Z  SYSTEM  CHECKING HEALTH...
+2026-08-21T23:59:20Z  SYSTEM  DEPLOYMENT READY
+2026-08-22T00:27:12Z  SYSTEM  The Back4app custom domain has expired for free plan
+2026-08-22T00:27:12Z  SYSTEM  COOLING DOWN...
+2026-08-22T00:28:12Z  SYSTEM  FINISHING CONTAINER...
+2026-08-22T00:28:12Z  SYSTEM  DEPLOYMENT DESTROYED
+----
+
+컨테이너가 고장난 것이 아니라 **무료 요금제의 임시 주소가 만료되면서 배포 자체가 삭제**됐습니다.
+그 사이 서비스는 정상이었고, 앱 로그에 `GET /` 요청이 200으로 남아 있습니다.
+대시보드에는 "URL is temporary and will be live for 60 minutes"라는 안내가 있는데, 공식 문서에는 설명이 없습니다.
+
+만료 시점은 재현하지 못했습니다.
+위 사례는 `DEPLOYMENT READY` 이후 약 28분이고, 다른 때는 65분이 지나도 같은 주소가 살아 있었습니다.
+안내문의 60분은 보장이라기보다 상한으로 보는 편이 안전하다고 판단합니다.
+
+진단이 어려웠던 이유는 따로 있습니다.
+만료된 주소가 **한 번도 존재한 적 없는 서브도메인과 똑같은 응답**을 돌려줍니다.
+
+[source,bash]
+----
+curl -sI https://til-nsh62xv6.b4a.run/healthz   # 실제로 만들었던 앱
+curl -sI https://til-zzzzzzzz.b4a.run/healthz   # 존재한 적 없는 이름
+# 둘 다: HTTP/2 404, "not found", x-cache: Error from cloudfront
+----
+
+컨테이너가 죽었다면 502나 503이 나왔을 텐데 그렇지 않았습니다.
+헤더까지 같아서 밖에서는 앱이 고장난 것인지 주소가 회수된 것인지 구분할 수 없습니다.
+대시보드의 배포 로그를 봐야 알 수 있습니다.
+
+여기에 재배포하면 주소 접미사가 바뀌는 문제가 더해집니다.
+실제로 되살릴 때마다 ``til-nsh62xv6``에서 ``til-xu9uffq7``로 바뀌었고, 그때마다 Netlify의 ``_redirects``를 고쳐야 했습니다.
+잠깐 띄워 보여 주는 용도라면 쓸 만하지만, 주소가 항상 살아 있어야 한다는 조건에는 맞지 않았습니다.
+영구 주소는 월 5달러 요금제부터입니다.
+
+그래서 "카드 등록 없이"라는 조건을 포기하고 Cloud Run으로 옮겼습니다.
+GitHub 연동으로 푸시할 때마다 자동 배포되던 점은 Back4app 쪽이 편했습니다.
+
 == 이 구성의 제약
 
 같은 방식을 검토하실 분을 위해 걸리는 점을 정리합니다.
 
 * **Cloud Run은 결제 계정 연결이 필수입니다.** 무료 한도 안에서만 써도 그렇습니다. 카드를 등록하지 않겠다는 조건이면 이 선택지는 빠집니다.
-* **Back4app 무료 요금제로는 상시 운영을 할 수 없습니다.** 임시 주소가 만료되면 배포가 삭제되고, 되살릴 때마다 주소 접미사가 바뀝니다.
-* **자동 배포는 따로 설정해야 합니다.** GitHub 연동으로 푸시할 때마다 배포되던 Back4app과 달리, Cloud Run은 ``gcloud run deploy``를 직접 실행합니다. Cloud Build 트리거를 붙이면 자동화할 수 있습니다.
+* **자동 배포는 따로 설정해야 합니다.** ``gcloud run deploy``를 직접 실행하는 방식이라, 푸시할 때마다 배포되게 하려면 Cloud Build 트리거를 붙여야 합니다.
 * **Netlify 프록시는 응답 시간을 200ms 이상 늘립니다.** 위의 실측값 그대로입니다.
 * **Turso 무료 요금제의 그룹 위치는 나중에 바꿀 수 없습니다.** 처음 만들 때 앱이 뜰 리전에 맞춰야 합니다.
 
-배포처를 Northflank, Back4app, Cloud Run으로 옮기는 동안 저장소 접근 코드와 Dockerfile은 한 줄도 바꾸지 않았습니다.
+배포처를 옮기는 동안 저장소 접근 코드와 Dockerfile은 한 줄도 바꾸지 않았습니다.
 Turso가 SQLite이고 이미지가 표준 컨테이너라서, 옮기는 비용이 설정 파일 몇 줄에 그쳤습니다.
 무료 요금제의 조건이 자주 바뀌는 영역에서는 이렇게 옮기기 쉬운 구성이 선택 자체보다 중요하다고 생각합니다.
 
@@ -309,9 +316,9 @@ Turso가 SQLite이고 이미지가 표준 컨테이너라서, 옮기는 비용�
 * link:https://github.com/benelog/til[benelog/til] — 이 글에서 설명한 저장소
 * link:https://cloud.google.com/run/pricing[Cloud Run 요금] — 무료 한도와 리전별 단가
 * link:https://cloud.google.com/run/docs/configuring/services/build-service-account[Cloud Run: 빌드 서비스 계정] — ``PERMISSION_DENIED``가 나올 때 확인할 문서
-* link:https://www.back4app.com/pricing/container-as-a-service[Back4app Containers 요금] — 무료 요금제의 조건
 * link:https://docs.turso.tech/cli/group[Turso CLI: group] — 그룹 생성과 리전 지정
 * link:https://docs.netlify.com/routing/redirects/rewrites-proxies/[Netlify: Rewrites and proxies] — 상태 코드 200 rewrite
+* link:https://www.back4app.com/pricing/container-as-a-service[Back4app Containers 요금] — 무료 요금제의 조건
 * link:dolthub-app.html[DoltHub에 데이터를 저장하는 애플리케이션 개발] — 같은 시기에 만든 앱. 데이터를 사용자 계정에 두는 반대 방향의 선택
 
 '''

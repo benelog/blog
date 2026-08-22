@@ -3,7 +3,7 @@
 2026-08-22
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: 자작도구, dolthub, htmx, cloudflare
+:jbake-tags: 자작도구, cloud, htmx
 :description: 습관 추적기의 데이터를 서버가 아니라 사용자의 DoltHub 저장소에 두는 구성입니다. 서버에 토큰과 기본 DB를 두지 않는 설계, htmx와 Cloudflare Pages 조합, DoltHub API로 스키마를 자동 생성한 방법과 그 과정에서 확인한 제약을 정리합니다.
 :jbake-og: {"image": "img/habit-chain/habit-chain-list.jpg"}
 :toc:
