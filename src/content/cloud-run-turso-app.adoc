@@ -393,8 +393,8 @@ DNS·TCP·TLS·TTFB는 요청을 시작한 시점부터 해당 단계까지 걸�
 |98.8ms
 |93.1 / 104.2 / 114.7ms
 
-|``til-tokyo.benelog.net`` +
-(도쿄 서비스 + 도메인 매핑, CNAME → ``ghs.googlehosted.com.``)
+|도쿄 서비스 + Cloud Run 도메인 매핑 +
+(CNAME → ``ghs.googlehosted.com.``)
 |1.5ms
 |62.9ms
 |148.4ms
@@ -402,8 +402,8 @@ DNS·TCP·TLS·TTFB는 요청을 시작한 시점부터 해당 단계까지 걸�
 |284.1ms
 |265.2 / 323.0 / 339.0ms
 
-|``til.benelog.net`` +
-(당시 운영 경로. 서울 서비스 + Netlify 프록시)
+|서울 서비스 + Netlify 프록시 +
+(당시 운영 경로)
 |1.3ms
 |71.7ms
 |153.9ms
@@ -414,7 +414,7 @@ DNS·TCP·TLS·TTFB는 요청을 시작한 시점부터 해당 단계까지 걸�
 
 서울과 도쿄 ``run.app``의 전체 중앙값 차이는 0.9ms이고 두 표본의 변동 폭보다 작습니다.
 이 결과로 어느 리전이 더 빠르다고 단정할 수 없습니다.
-도메인 매핑을 쓴 ``til-tokyo.benelog.net``은 같은 도쿄 서비스의 ``run.app``보다 전체 중앙값이 185.3ms 길었습니다.
+도메인 매핑을 거친 경로는 같은 도쿄 서비스의 ``run.app``보다 전체 중앙값이 185.3ms 길었습니다.
 Cloud Run의 커스텀 도메인 진입 경로가 더한 비용을 같은 원본 서비스끼리 비교한 값입니다.
 
 도메인 매핑 경로는 Netlify 프록시 경로보다 63.0ms 빨랐지만 ``run.app`` 수준으로 짧아지지는 않았습니다.
@@ -495,8 +495,8 @@ SAN에는 ``til.benelog.net`` 하나만 들어 있습니다.
 |98.5ms
 |92.4 / 104.6 / 141.8ms
 
-|``til.benelog.net`` +
-(전환 후 운영 경로. 도쿄 서비스 + 도메인 매핑, CNAME → ``ghs.googlehosted.com.``)
+|도쿄 서비스 + Cloud Run 도메인 매핑 +
+(전환 후 운영 경로)
 |1.3ms
 |54.2ms
 |116.0ms
