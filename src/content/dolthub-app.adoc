@@ -14,7 +14,7 @@
 
 "don't break the chain" 방식의 습관 추적기를 만들었습니다.
 웹 페이지의 달력에서 하루 칸을 클릭하면 사슬이 이어지고, 하루를 건너뛰면 사슬이 끊어지는 단순한 기능의 앱입니다.
-이런 도구는 이미 많지만, 데이터를 온전히 제가 관리할 수 있는 곳에 저장하고, 무료로 운영을 하고 싶었습니다. 그래서 사용자가 직접 DB를  생성할 수 있는 **DoltHub**를 데이터 저장소로 사용했습니다.
+이런 도구는 이미 많지만, 데이터를 온전히 제가 관리할 수 있는 곳에 저장하고, 무료로 운영을 하고 싶었습니다. 그래서 사용자가 직접 DB를  생성할 수 있는 **https://www.dolthub.com/[DoltHub]**를 데이터 저장소로 사용했습니다.
 이 글에서는 그 구성의 선택지와 제약, 구현하면서 확인한 사실을 정리합니다.
 
 소스는 link:https://github.com/benelog/habit-chain[benelog/habit-chain]에 있습니다.
@@ -23,11 +23,9 @@
 
 화면은 습관마다 카드 하나입니다. 카드 안에는 최근 5주를 요일별로 늘어놓은 격자가 있고, 체크한 날끼리는 서로 이어져 하나의 사슬로 보입니다.
 
-image::img/habit-chain/habit-chain-list.jpg[습관 카드 하나에 최근 5주 격자가 있고 8월 19일부터 22일까지 네 칸이 이어져 있다]
+image::img/habit-chain/habit-chain-list.jpg[습관 카드 하나에 최근 5주 격자가 있고 7월 22일부터 25일까지 네 칸이 이어져 있다]
 
-칸에는 날짜를 적었습니다. 사슬 모양만으로는 언제 체크했는지 셀 수 없기 때문입니다. 연결 부분은 칸 사이 여백에 그려서 숫자를 넣어도 사슬이 끊겨 보이지 않습니다.
-
-사용자가 준비할 것은 DoltHub 계정 하나입니다. 앱을 처음 열면 다음 네 단계로 연결합니다.
+사용자는 https://www.dolthub.com/[DoltHub]에 가입하고 DB를 생성해야 합니다.
 
 . DoltHub에서 빈 데이터베이스를 하나 만듭니다. 표는 만들지 않아도 됩니다.
 . DoltHub의 ``Settings → Tokens``에서 API 토큰을 발급합니다.
@@ -68,7 +66,7 @@ image::img/habit-chain/habit-chain-list.jpg[습관 카드 하나에 최근 5주 
 DoltHub는 Git처럼 커밋과 브랜치를 갖는 SQL 데이터베이스인 Dolt의 호스팅 서비스입니다. 사용자가 자기 계정에 데이터베이스를 만들고, 앱은 사용자가 발급한 토큰으로 그 데이터베이스에 접근합니다.
 체크를 한 번 할 때마다 커밋이 하나 쌓이므로, 언제 무엇을 고쳤는지가 DoltHub의 커밋 로그에 그대로 남습니다.
 
-image::img/habit-chain/dolthub-commit-log.png[DoltHub의 Commit Log 화면. 체크 추가와 습관 수정이 SQL 문장 단위의 커밋으로 나열되어 있다]
+image::img/habit-chain/dolthub-commit-log.png[DoltHub의 Commit Log 화면. 체크 추가·삭제와 습관 수정이 SQL 문장 단위의 커밋으로 나열되어 있다]
 
 이력은 Git처럼 쌓이지만 조회는 SQL로 합니다. Dolt가 커밋 로그와 행 단위 변경 이력을 시스템 표로 노출하므로, 별도 명령을 배우지 않아도 익숙한 SQL로 이력을 들여다볼 수 있습니다.
 
@@ -88,18 +86,20 @@ SELECT check_date, commit_date FROM dolt_history_checks ORDER BY commit_date DES
 
 image::img/habit-chain/dolthub-checks-table.png[DoltHub의 Database 화면. 왼쪽에 표 목록과 스키마가 있고, SELECT 질의 결과로 checks 표의 체크 기록이 나온다]
 
-== 토큰과 기본 DB가 없는 서버 구성
+== 토큰과 기본 DB가 없는 애플리케이션 서버 구성
 
 이 구성에서 서버가 하는 일은 화면을 그리고 DoltHub API를 대신 호출하는 것뿐입니다. 서버는 다음 두 가지를 갖지 않습니다.
 
-* **토큰**: 사용자가 설정에 넣은 값이 요청마다 `X-Dolt-Token` 헤더로 옵니다. 서버에는 저장하지 않습니다.
+* **DB 접근을 위한 토큰**: 사용자가 설정에 넣은 값이 요청마다 `X-Dolt-Token` 헤더로 옵니다. 서버에는 저장하지 않습니다.
 * **기본 데이터베이스**: 설정이 비어 있는 사용자에게 보여 줄 데이터베이스가 없습니다.
 
-처음에는 설정이 빈 사용자에게 제 데이터베이스를 읽어 보여 줬습니다. 그러면 화면에 뜬 사슬이 누구 것인지 알 수 없고, 체크를 눌러도 쓰기 권한이 없어 실패합니다. 지금은 설정이 비어 있으면 사슬 대신 연결 안내가 나옵니다.
+본인이 생성한 DB를 본인이 생성한 토큰을 통해서만 접근하게 됩니다.
+사용 편의성을 위해서 해당 값은 브라우저의 Local Storage에 저장하는데, 공용 PC에는 저장하지 말 것을 함께 안내했습니다.
 
-서버에 토큰이 없으니 쓰기를 막는 공유 비밀도 필요 없습니다. 자기 토큰을 넣은 사람이 자기 데이터베이스에 쓸 뿐이고, 남의 데이터베이스에는 애초에 쓸 수 없습니다.
+덕분에 조회 기능까지는 사실상 정적 페이지입니다. 첫 화면의 shell은 고정된 HTML이고, 습관 목록을 그리는 읽기는 공개 데이터베이스에 토큰 없이 보내는 GET이 전부입니다. 서버에 세션도 저장 공간도 비밀도 없으니, 같은 설정 값이면 누가 요청해도 같은 HTML이 나오고 지켜야 할 것도 없습니다. 사용자의 토큰은 쓰기에서 처음 등장합니다.
 
-htmx의 ``hx-headers``는 상속되는 속성이라, ``body``에 한 번만 선언하면 모든 요청에 붙습니다.
+헤더에 토큰값을 반복해서 저장하는 구현은 htmx에서 했습니다.
+htmx의 ``hx-headers``는 상속되는 속성이라, ``body``에 한 번만 선언하면 모든 요청에 추가됩니다.
 
 [source,html]
 .worker/src/render.ts가 만드는 shell
@@ -131,11 +131,18 @@ image::img/habit-chain/habit-chain-edit.jpg[카드 안에서 이름과 설명 �
 
 그래서 브라우저가 로컬 날짜를 `X-Local-Date` 헤더로 보내고, 서버는 그 값을 씁니다. 헤더가 없을 때만 UTC로 계산합니다. 클라이언트가 보낸 값이므로 형식은 검사합니다.
 
+체크 시각을 UTC로 저장하고 조회할 때 사용자의 시간대로 변환하는 방법도 검토했지만, 이 앱에는 맞지 않다고 판단했습니다. ``check_date``는 시각이 아니라 "그 날 했다"는 날짜이기 때문입니다.
+
+* `checks` 표의 PK인 ``(habit_id, check_date)``가 하루에 체크 하나라는 규칙을 스키마에 담고 있습니다. UTC 시각으로 저장하면 하루의 경계가 조회하는 시간대에 따라 달라지므로, 이 규칙을 DB 차원에서 표현할 수 없습니다. 체크 해제도 지금은 날짜 단위 ``DELETE`` 한 문장인데, 시각 저장이면 범위 질의가 됩니다.
+* 시간대를 옮겨서 조회하면 과거 기록이 다른 날로 재해석됩니다. 밤 11시의 체크가 다음 날로 넘어가면, 이미 이어졌던 사슬이 나중에 끊어져 보입니다.
+* 렌더링이 서버에서 일어나므로, 조회할 때 변환하려면 결국 브라우저가 시간대를 헤더로 보내야 합니다. ``X-Local-Date``와 같은 클라이언트 의존이 그대로 남고 변환 지점만 늘어납니다.
+* DoltHub 웹 화면에서 ``2026-07-25``라는 날짜는 그대로 읽히지만, UTC 시각은 시간대를 계산해야 맞는 날이 보입니다. 관리 화면을 DoltHub에 맡긴 구성과 어긋납니다.
+
+시각인 데이터는 UTC로 저장합니다. 습관의 생성 시점인 `created_at` 칼럼이 그렇습니다. 남는 트레이드오프는 브라우저가 보낸 날짜를 형식만 검사하고 신뢰한다는 점인데, 자기 토큰으로 자기 DB에만 쓰는 개인 도구라서 받아들였습니다.
+
 == DoltHub API를 사용한 스키마 자동 생성
 
-처음에는 사용자에게 스키마 SQL을 복사해 DoltHub 콘솔에 붙여 넣으라고 안내했습니다. 나중에 습관에 설명(description) 칸을 추가하면서 문제가 커졌습니다. 이미 쓰고 있던 사람은 ``ALTER TABLE``을 손으로 실행해야 했습니다.
-
-이 과정에서 DoltHub의 DDL 실행 경로가 하나가 아니라는 것을 확인했습니다.
+DoltHub의 DDL 실행 경로는 아래 3가지입니다.
 
 [cols="2,1,3", options="header"]
 |===
@@ -156,32 +163,46 @@ image::img/habit-chain/habit-chain-edit.jpg[카드 안에서 이름과 설명 �
 
 REST write 엔드포인트가 DDL을 받는다는 내용은 link:https://www.dolthub.com/docs/products/dolthub/api/v1alpha1/sql[공식 문서]에 없습니다. 2026년 8월에 빈 데이터베이스로 직접 확인한 동작이므로, 보장된 계약으로 보지 않고 실패 경로를 남겨 두었습니다.
 
-그래서 스키마 준비를 이렇게 구현했습니다.
+그래서 스키마 준비를 다음과 같이 구현했습니다.
 
 . 목록 읽기가 실패하면 그때만 ``SHOW TABLES``와 ``SHOW COLUMNS``로 데이터베이스의 상태를 확인합니다. 읽기라서 토큰이 필요 없습니다.
-. 모자란 것이 있으면 목록 자리에 **DB 준비하기** 버튼을 보여 줍니다.
-. 버튼을 누르면 서버가 상태를 다시 확인하고, 모자란 문장만 사용자의 토큰으로 실행합니다.
+. 스키마 상태가 충분하지 않으면 화면에서 **DB 준비하기** 버튼을 보여 줍니다.
+. 버튼을 누르면 서버가 상태를 다시 확인하고, 스키마를 최신 상태로 동기화하는 DDL을 실행합니다.
 
 image::img/habit-chain/habit-chain-prepare.jpg[표가 없는 데이터베이스를 연결하면 DB 준비하기 버튼과 스키마 SQL 보기 링크가 나온다]
 
-3단계에서 상태를 다시 확인하는 이유는 ``ALTER TABLE ... ADD COLUMN``이 이미 있는 칼럼에 실패하기 때문입니다. 화면이 알려 준 상태를 믿지 않고 실행 직전에 다시 보면, 버튼을 두 번 눌러도 문제가 없습니다.
+3단계에서 DB의 스키마 상태를 다시 확인하는 이유는 ``ALTER TABLE ... ADD COLUMN`` 등의 스키마 변경이 실패한 경우를 대비한 것입니다.
+
+=== 순번이 있는 마이그레이션 목록
+
+실행할 DDL은 순번이 있는 목록으로 관리합니다. 목록은 뒤에 붙기만 하고, 순번이 의존 순서를 정합니다. 실행 시점에는 적용되지 않은 문장만 순서대로 골라냅니다.
 
 [source,typescript]
 .worker/src/dolt.ts
 ----
+export const MIGRATIONS: Migration[] = [
+  { id: 1, name: "create-habits", statement: CREATE_HABITS, applied: (s) => s.habits },
+  { id: 2, name: "create-checks", statement: CREATE_CHECKS, applied: (s) => s.checks },
+  {
+    id: 3,
+    name: "habits-description",
+    statement: ADD_DESCRIPTION,
+    // Covered by create-habits on a fresh DB: the snapshot already has it.
+    applied: (s) => !s.habits || s.description,
+  },
+];
+
 export function migrations(shape: Shape): string[] {
-  const out: string[] = [];
-  if (!shape.habits) {
-    out.push(CREATE_HABITS);
-  } else if (!shape.description) {
-    out.push(ADD_DESCRIPTION);
-  }
-  if (!shape.checks) {
-    out.push(CREATE_CHECKS);
-  }
-  return out;
+  return MIGRATIONS.filter((m) => !m.applied(shape)).map((m) => m.statement);
 }
 ----
+
+이 형태는 Flyway나 link:https://github.com/golang-migrate/migrate[golang-migrate] 같은 마이그레이션 도구에서 가져왔습니다. 다만 도구를 그대로 붙일 수는 없었습니다. 이런 도구는 JDBC 같은 DB 연결을 전제하는데 DoltHub는 REST API만 노출합니다. 그리고 배포자가 자격증명을 갖고 배포 시점에 실행하는 모델인데, 이 앱에서는 사용자의 DB가 배포 이후에 생기고 마이그레이션은 그 사용자의 토큰으로 요청 시점에 돕니다. 그래서 순번 목록이라는 형태만 가져오고 두 가지를 바꿨습니다.
+
+* **버전 표를 두지 않습니다.** 마이그레이션 도구는 `schema_migrations` 같은 표에 적용된 버전을 기록합니다. 이 구성에서는 사용자가 DoltHub 웹 화면에서 스키마를 직접 만질 수 있고, write 엔드포인트에 트랜잭션이 없어 기록이 실제와 어긋날 수 있습니다. 그래서 적용 여부는 마이그레이션마다 실제 스키마를 조사한 결과(`applied`)로 판정합니다. 실제 스키마가 유일한 기록입니다.
+* **CREATE 문장은 현재 스키마의 스냅숏입니다.** 도구는 새 DB에도 과거 ``ALTER``를 순서대로 재생하지만, 여기서는 문장 하나가 커밋 하나이고 1.5초에서 2초가 걸려서 재생할수록 첫 준비가 느려집니다. 새 표는 최신 모양으로 바로 만들고, 그 마이그레이션이 뒤의 ``ALTER``까지 덮은 것으로 판정합니다. 3번의 ``applied``가 "habits 표가 없으면 적용된 것"으로 읽히는 이유입니다.
+
+내림(down) 마이그레이션도 만들지 않았습니다. 되돌리기는 Dolt의 커밋 이력이 대신합니다.
 
 === 새 데이터베이스의 branch not found 오류
 
@@ -217,6 +238,7 @@ curl "https://www.dolthub.com/api/v1alpha1/benelog/chain2/main?q=SHOW%20TABLES"
 * link:https://www.dolthub.com/blog/2026-04-24-announcing-dolthub-pro-for-5-dollars-per-month/[DoltHub Pro 요금 발표] — 비공개 데이터베이스의 무료 한도와 요금
 * link:https://developers.cloudflare.com/pages/functions/advanced-mode/[Cloudflare Pages: Advanced mode] — ``_worker.js``하나로 모든 요청을 받는 구성
 * link:https://htmx.org/attributes/hx-headers/[htmx: hx-headers] — 상속되는 속성과 ``js:``접두사
+* link:https://github.com/golang-migrate/migrate[golang-migrate] — 순번 마이그레이션 목록의 원형이 된 도구
 
 '''
 
