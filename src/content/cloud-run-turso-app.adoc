@@ -151,10 +151,12 @@ gcloud run deploy til-tokyo --source . --region asia-northeast1 \
   --allow-unauthenticated --env-vars-file /tmp/run-env.yaml
 ----
 . Google Search Console에서 ``benelog.net``의 소유권을 도메인 방식으로 확인합니다. Cloud Run은 검증된 도메인에만 매핑을 만들 수 있습니다.
-. 서비스에 커스텀 도메인을 매핑합니다. 이 기능은 도쿄처럼 지원하는 리전에서만 쓸 수 있습니다.
+. 서비스에 커스텀 도메인을 매핑합니다. 이 기능은 도쿄처럼 지원하는 리전에서만 쓸 수 있습니다. 매핑 명령은 ``beta`` 컴포넌트에 들어 있어서 없으면 먼저 설치해야 합니다. 이름이 비슷한 ``gcloud run domain-mappings``는 Cloud Run for Anthos용이라 관리형 Cloud Run에는 쓸 수 없습니다.
 +
 [source,bash]
 ----
+gcloud components install beta
+
 gcloud beta run domain-mappings create \
   --domain=til.benelog.net --service=til-tokyo \
   --region=asia-northeast1 --project=<project>
