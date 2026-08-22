@@ -3,36 +3,51 @@
 2026-08-22
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: 자작도구, go, cloud-run, turso, htmx
-:description: Go와 htmx로 만든 TIL 기록장을 Google Cloud Run(서울)과 Turso(도쿄)에 올린 과정입니다. Cloud Run 배포에서 걸린 두 가지, 데이터베이스 리전과 Netlify 프록시가 응답 시간에 미친 영향을 실측값과 함께 정리하고, 선택하지 않은 배포처도 마지막에 모아 둡니다.
+:jbake-tags: go, cloud, 자작도구, htmx
+:description: Go와 htmx로 만든 TIL 기록장을 애플리케이션 서버는 Google Cloud Run에, DB는 Turso로 배포한 과정입니다.
 :toc:
 :sectnums:
 :toclevels: 1
 :source-repo: https://github.com/benelog/til
+:jbake-og: {"image": "img/til/til-list.png"}
 :idprefix:
 
-Markdown으로 짧은 메모를 쌓는 TIL(Today I Learned) 기록장을 만들어 link:https://til.benelog.net[til.benelog.net]에 올렸습니다.
-기능은 단순합니다. 글을 쓰고, 고치고, 지웁니다.
-그래서 관심은 기능이 아니라 **개인 앱 하나를 계속 띄워 두는 데 무엇을 고르는가**에 있었습니다.
+혼자만 사용할 TIL(Today I Learned) 기록장을 만들어 link:https://til.benelog.net[til.benelog.net]에 올렸습니다.
+이 과정에서 애플리케이션 서버와 DB를 어떤 인프라 위에서 실행할지를 두고 여러 기술을 검토했습니다.
+무료로 운영할 수 있어야 한다는 점을 가장 중요시했습니다.
+처음에는 카드 등록 없이 쓸 수 있는 배포처를 찾았지만 조건에 맞는 곳이 없어서, 무료 한도 안에서 쓰는 것으로 기준을 낮춰 고른 조합이 Google Cloud Run과 Turso, Netlify입니다.
 
-조건은 두 가지였습니다. 운영 비용이 들지 않아야 하고, 주소가 항상 살아 있어야 합니다.
-고른 조합은 배포처 Google Cloud Run(`asia-northeast3`, 서울), 저장소 Turso(`aws-ap-northeast-1`, 도쿄), 도메인 Netlify 프록시입니다.
-이 글은 이 조합을 어떻게 붙였고, 붙이면서 무엇에 걸렸고, 응답 시간이 얼마나 나왔는지를 정리합니다.
-여기까지 오는 동안 시도했다가 접은 배포처들은 마지막 절에 모았습니다.
+애플리케이션 서버의 소스는 link:https://github.com/benelog/til[benelog/til]에 있습니다.
 
-소스는 link:https://github.com/benelog/til[benelog/til]에 있습니다.
-같은 시기에 만든 link:dolthub-app.html[DoltHub에 데이터를 저장하는 애플리케이션]과는 저장소 선택의 방향이 반대입니다.
-그쪽은 데이터를 사용자 계정에 두고, 이쪽은 제 계정 하나에 둡니다.
+== Cloud Run과 Turso를 고른 이유
 
-== 앱 구성과 최소 재현 절차
+애플리케이션 서버는 Cloud Run에 배포합니다.
+무료 한도가 월 2M 요청, 360,000 GiB-초, 180,000 vCPU-초라서 개인 TIL 앱의 트래픽은 이 한도 근처에도 가지 않고, 청구액은 0원입니다.
+이 한도는 서비스별이 아니라 프로젝트의 모든 서비스가 합산해서 씁니다.
+서비스 개수는 프로젝트·리전당 1,000개까지 만들 수 있으므로, 작은 앱 여러 개를 올려도 합산 사용량이 한도 안이면 계속 무료입니다.
+서울 리전(``asia-northeast3``)을 쓸 수 있다는 점도 고른 이유입니다.
+다만 무료 한도만 써도 **신용 카드가 등록된 결제 계정 연결이 필수**입니다.
+카드 등록이 없는 배포처를 먼저 시도하고 접은 과정은 뒤의 "선택하지 않은 배포처" 섹션에 정리했습니다.
+
+데이터 저장소는 Turso(libSQL)입니다.
+SQLite 파일 하나 분량의 데이터를 다루는 개인 앱에 맞고, 드라이버(`libsql-client-go`)가 순수 Go라서 Go로 만든 앱을 CGO 없이 빌드하는 구성이 그대로 유지됩니다.
+로컬 개발은 SQLite 파일을 쓰고 배포는 Turso를 쓰는데, 같은 `database/sql` 코드가 그대로 돕니다.
+
+함께 쓴 Netlify는 도메인 연결용입니다. 그 선택의 대가는 뒤의 "응답 시간을 좌우한 리전과 프록시" 섹션에서 다룹니다.
+
+== 앱 구성과 배포 설정 절차
 
 앱은 Go 표준 ``net/http``와 htmx로 만들었습니다.
 웹 프레임워크는 쓰지 않았고, 화면 갱신은 htmx가 HTML 조각을 갈아 끼우는 방식입니다.
-의존성이 전부 순수 Go라 CGO 없이 정적 바이너리로 빌드되고, distroless 이미지가 28MB입니다.
+의존성이 전부 순수 Go라 CGO 없이 정적 바이너리로 빌드되고, Docker 이미지의 크기는 28MB입니다.
 
-처음부터 끝까지 따라 하려면 다음 순서입니다.
+image::img/til/til-list.png[TIL 기록 목록 화면,width=600]
 
-. Turso에서 도쿄 리전 그룹과 데이터베이스를 만들고 토큰을 발급합니다.
+image::img/til/til-edit.png[기록 편집 화면. 마크다운 입력과 미리보기,width=600]
+
+배포를 위한 설정 과정은 다음 순서로 따라할 수 있습니다.
+
+. Turso에서 도쿄 리전 그룹과 데이터베이스를 만들고 토큰을 발급합니다. Turso가 제공하는 리전에 서울은 없어서, 가장 가까운 도쿄를 골랐습니다.
 +
 [source,bash]
 ----
@@ -62,23 +77,23 @@ gcloud projects add-iam-policy-binding <project> \
 gcloud run deploy til --source . --region asia-northeast3 \
   --allow-unauthenticated --env-vars-file run-env.yaml
 ----
-. 배포된 URL을 Netlify의 ``proxy/_redirects``에 적고 푸시합니다. 그때부터 til.benelog.net이 그 서비스를 가리킵니다.
+. 배포된 서비스 URL을 Netlify 프록시에 반영합니다. 애플리케이션과 같은 저장소를 Netlify 사이트로도 연결해 두었고, 저장소 루트의 ``netlify.toml``이 빌드 없이 ``proxy`` 디렉터리만 배포하도록 지정합니다. 도메인은 Netlify 대시보드의 **Domain management** 메뉴에서 **Add a domain**으로 til.benelog.net을 추가했습니다.
++
+[source,toml]
+.netlify.toml
+----
+[build]
+  publish = "proxy"
+  command = "echo 'proxy only - no build'"
+----
++
+앞 단계에서 출력된 URL을 ``proxy/_redirects``의 rewrite 대상 주소로 적고 푸시하면 Netlify가 자동으로 다시 배포합니다. 그때부터 til.benelog.net이 그 서비스를 가리킵니다.
 
 환경변수는 YAML 파일로 넘깁니다. 커맨드라인에 토큰이 남지 않고, 한 번 넣으면 서비스에 저장되므로 다음 배포부터는 ``--env-vars-file``을 생략해도 됩니다.
 
-== Cloud Run의 무료 한도와 결제 계정 조건
+== Cloud Run 배포의 빌드 권한과 /healthz 문제
 
-Cloud Run의 무료 한도는 월 2M 요청, 360,000 GiB-초, 180,000 vCPU-초입니다.
-개인 TIL 앱의 트래픽은 이 한도 근처에도 가지 않으므로 청구액은 0원입니다.
-서울 리전(``asia-northeast3``)을 쓸 수 있다는 점도 고른 이유입니다.
-
-대신 조건이 하나 붙습니다.
-무료 한도만 써도 **열려 있는 결제 계정 연결이 필수**입니다.
-결제 계정이 닫혀 있으면 API 활성화조차 되지 않습니다.
-카드를 등록하지 않겠다는 조건이면 Cloud Run은 후보에서 빠집니다.
-저는 주소가 항상 살아 있어야 한다는 조건을 우선해서, 카드 등록을 받아들이는 쪽을 택했습니다.
-
-== Cloud Run 배포에서 걸린 두 가지
+앞의 절차대로 하면 매끄럽게 지나가지만, 처음 배포할 때는 두 가지 문제를 만났습니다.
 
 === 기본 서비스 계정의 빌드 권한 부족
 
@@ -125,6 +140,13 @@ Google이 기본 컴퓨트 서비스 계정의 빌드 권한을 축소한 뒤 �
 
 **정확히 `/healthz` 하나만** 앞단에서 가로챕니다.
 슬래시를 붙인 ``/healthz/``는 그대로 통과하므로, 앱의 라우팅 문제가 아닙니다.
+
+``/healthz``는 Cloud Run이 요구한 경로가 아니라, 제가 관례를 따라 앱에 정한 경로입니다.
+이 관례는 Google 내부의 z-pages(``/healthz``, ``/varz``, ``/statusz``)에서 나왔습니다.
+실제 애플리케이션 경로와 충돌하지 않도록 z를 붙인 이름인데, Kubernetes의 liveness probe 예제와 여러 헬스 체크 라이브러리를 거치며 업계 표준처럼 퍼졌습니다.
+정작 Google 인프라에서는 이 경로가 여전히 내부용으로 예약되어 있어서, 관례를 따라 만든 앱과 충돌합니다.
+기본 헬스 경로가 ``/healthz``인 Streamlit도 GCP에서 같은 문제를 겪고 경로를 바꾸는 옵션을 추가했습니다.
+
 헬스 경로를 ``/healthz``로만 열어 두면 모니터링이 조용히 실패합니다.
 그래서 같은 핸들러를 ``/health``에도 등록했습니다.
 
@@ -140,18 +162,20 @@ mux.HandleFunc("GET /healthz", health)
 mux.HandleFunc("GET /health", health)
 ----
 
-== Turso 리전을 도쿄로 옮기고 잰 응답 시간
+== 응답 시간을 좌우한 리전과 프록시
 
-저장소는 Turso(libSQL)입니다.
-SQLite 파일 하나 분량의 데이터를 다루는 개인 앱에 맞고, 드라이버(`libsql-client-go`)가 순수 Go라 CGO 없는 이미지에 그대로 들어갑니다.
-로컬 개발은 SQLite 파일을 쓰고 배포는 Turso를 쓰는데, 같은 `database/sql` 코드가 그대로 돕니다.
+Cloud Run에서 배포할 리전을 서울로 골라도 데이터베이스와 프록시의 위치가 멀어지면 그 이득이 사라집니다.
+두 구간을 실제 측정한 결과를 정리합니다.
+
+=== 오하이오에서 도쿄로 옮긴 Turso 리전
 
 처음에는 데이터베이스를 `aws-us-east-2`(오하이오)에 두고 있었습니다.
 앱을 서울 리전에 올려도 이 상태면 요청마다 태평양을 건너게 됩니다.
 이 앱은 페이지 한 장을 그릴 때 질의를 한 번 보내므로, 데이터베이스 왕복이 응답 시간의 대부분입니다.
 
-그룹을 도쿄로 옮기고 같은 조건에서 다시 쟀습니다.
-앱은 제 노트북에서 실행했고, 바꾼 것은 접속할 데이터베이스뿐입니다.
+그룹을 도쿄로 옮기고 같은 조건에서 다시 측정했습니다.
+응답 시간이 5배 차이가 났습니다.
+이렇듯 애플리케이션 리전과 데이터베이스의 리전을 가까운 곳으로 지정하는 이득이 큽니다.
 
 [cols="2,1", options="header"]
 |===
@@ -164,15 +188,13 @@ SQLite 파일 하나 분량의 데이터를 다루는 개인 앱에 맞고, 드�
 |38 ~ 45ms
 |===
 
-코드도 앱의 위치도 그대로인데 5배 차이가 났습니다.
-배포처 리전을 정하기 전에 데이터베이스 리전부터 맞추는 편이 낫습니다.
 
 [NOTE]
 ====
 Turso 그룹의 primary 위치는 나중에 바꿀 수 없어서, 새 그룹을 만들어 옮겨야 합니다.
 무료(starter) 요금제의 사용량 표시가 ``groups 0/1``이라 그룹을 하나 더 만들지 못할 것처럼 보이는데, 실제로는 두 번째 그룹이 생성됐습니다.
 
-옮기는 과정에서 확인한 것을 적어 둡니다.
+옮기는 과정에서 확인된 사실을 적어 둡니다.
 
 * ``turso db create <새 이름> --group <새 그룹> --from-db <기존 DB>``는 그룹이 다르면 ``record not found``로 실패합니다.
 * ``--from-dump``는 데이터베이스만 만들어지고 덤프가 적재되지 않은 채 종료된 경우가 있었습니다. 빈 데이터베이스가 남으므로 ``select count(*)``로 확인해야 합니다.
@@ -180,7 +202,7 @@ Turso 그룹의 primary 위치는 나중에 바꿀 수 없어서, 새 그룹을 
 * 새 데이터베이스에는 토큰을 새로 발급해야 합니다.
 ====
 
-== Netlify 프록시가 더하는 지연
+=== Netlify 프록시가 더하는 응답 지연
 
 Cloud Run의 커스텀 도메인 매핑은 별도 설정이 필요합니다.
 그래서 til.benelog.net은 Netlify에 두고, 모든 요청을 백엔드로 넘기는 rewrite 한 줄로 붙였습니다.
@@ -194,7 +216,6 @@ Cloud Run의 커스텀 도메인 매핑은 별도 설정이 필요합니다.
 상태 코드 ``200``은 리다이렉트가 아니라 rewrite라서 주소창은 til.benelog.net으로 유지됩니다.
 DNS와 TLS 인증서는 Netlify가 관리하므로 백엔드를 어디로 옮겨도 이 한 줄만 고치면 됩니다.
 
-편리한 대신 지연을 냅니다.
 같은 시점에 두 주소를 번갈아 호출해 봤습니다.
 
 [cols="2,1,1", options="header"]
@@ -296,16 +317,17 @@ curl -sI https://til-zzzzzzzz.b4a.run/healthz   # 존재한 적 없는 이름
 영구 주소는 월 5달러 요금제부터입니다.
 
 그래서 "카드 등록 없이"라는 조건을 포기하고 Cloud Run으로 옮겼습니다.
+카드를 등록해야 한다는 조건이 같다면, 무료 리전이 us-central과 europe-west뿐인 Northflank보다 서울 리전과 더 큰 무료 한도가 있는 Cloud Run이 나았습니다.
 GitHub 연동으로 푸시할 때마다 자동 배포되던 점은 Back4app 쪽이 편했습니다.
 
 == 이 구성의 제약
 
 같은 방식을 검토하실 분을 위해 걸리는 점을 정리합니다.
 
-* **Cloud Run은 결제 계정 연결이 필수입니다.** 무료 한도 안에서만 써도 그렇습니다. 카드를 등록하지 않겠다는 조건이면 이 선택지는 빠집니다.
+* **Cloud Run은 무료 한도만 써도 결제 계정 연결이 필수입니다.** 카드를 등록하지 않겠다는 조건이면 이 선택지는 빠집니다.
 * **자동 배포는 따로 설정해야 합니다.** ``gcloud run deploy``를 직접 실행하는 방식이라, 푸시할 때마다 배포되게 하려면 Cloud Build 트리거를 붙여야 합니다.
 * **Netlify 프록시는 응답 시간을 200ms 이상 늘립니다.** 위의 실측값 그대로입니다.
-* **Turso 무료 요금제의 그룹 위치는 나중에 바꿀 수 없습니다.** 처음 만들 때 앱이 뜰 리전에 맞춰야 합니다.
+* **Turso 무료 요금제의 그룹 위치는 나중에 바꿀 수 없습니다.** 처음 만들 때 앱이 뜰 리전에 맞춰야 합니다. 그룹은 1개로 제한되지만 데이터베이스는 100개까지 만들 수 있고, 저장 용량 한도는 5GB입니다.
 
 배포처를 옮기는 동안 저장소 접근 코드와 Dockerfile은 한 줄도 바꾸지 않았습니다.
 Turso가 SQLite이고 이미지가 표준 컨테이너라서, 옮기는 비용이 설정 파일 몇 줄에 그쳤습니다.
@@ -315,9 +337,13 @@ Turso가 SQLite이고 이미지가 표준 컨테이너라서, 옮기는 비용�
 
 * link:https://github.com/benelog/til[benelog/til] — 이 글에서 설명한 저장소
 * link:https://cloud.google.com/run/pricing[Cloud Run 요금] — 무료 한도와 리전별 단가
+* link:https://docs.cloud.google.com/run/quotas[Cloud Run quotas] — 프로젝트·리전당 서비스 개수 한도
 * link:https://cloud.google.com/run/docs/configuring/services/build-service-account[Cloud Run: 빌드 서비스 계정] — ``PERMISSION_DENIED``가 나올 때 확인할 문서
 * link:https://docs.turso.tech/cli/group[Turso CLI: group] — 그룹 생성과 리전 지정
+* link:https://turso.tech/pricing[Turso 요금] — 무료 요금제의 한도
 * link:https://docs.netlify.com/routing/redirects/rewrites-proxies/[Netlify: Rewrites and proxies] — 상태 코드 200 rewrite
+* link:https://cloud.google.com/blog/topics/developers-practitioners/health-checking-your-grpc-servers-gke[Health checking your gRPC servers on GKE] — Google 내부 z-pages 관례가 언급된 글
+* link:https://github.com/streamlit/streamlit/issues/3028[Streamlit: Change health check endpoint name] — ``/healthz``가 GCP 예약 경로라 겪은 같은 문제
 * link:https://www.back4app.com/pricing/container-as-a-service[Back4app Containers 요금] — 무료 요금제의 조건
 * link:dolthub-app.html[DoltHub에 데이터를 저장하는 애플리케이션 개발] — 같은 시기에 만든 앱. 데이터를 사용자 계정에 두는 반대 방향의 선택
 
