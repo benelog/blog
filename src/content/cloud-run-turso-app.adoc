@@ -377,11 +377,12 @@ PoP가 더 많은 High-Performance Edge는 Enterprise 플랜 기능이고, 리�
 앞의 측정에서 Netlify 경유 경로의 TCP 완료가 71.7ms로 길었던 것도 이 위치와 무관하지 않아 보입니다.
 
 **응답 압축이 사라졌습니다.**
-이쪽이 단가 변화보다 영향이 큽니다.
+이쪽이 단가 변화보다 영향이 컸습니다.
+전환 직후 두 경로의 헤더를 비교해 보니 이렇게 나왔습니다.
 
 [source,bash]
 ----
-# 현재: Cloud Run 직접 매핑
+# 전환 직후: Cloud Run 직접 매핑
 $ curl -H 'Accept-Encoding: gzip, br' -D - https://til.benelog.net/static/htmx.min.js
 server: Google Frontend
 content-length: 50917          # content-encoding 헤더가 없다
@@ -393,16 +394,65 @@ server: Netlify
 ----
 
 Netlify는 Brotli를 자동으로 적용해 줬는데, 이 서비스에서는 Google Frontend가 Cloud Run의 응답을 대신 압축해 주지 않았습니다.
-메인 HTML도 ``Accept-Encoding``을 붙이든 붙이지 않든 같은 크기로 돌아옵니다.
-HTML·CSS·JavaScript는 보통 3~5배까지 줄어드는 자산이므로, 단가가 1.58배 오른 것과 별개로 실제로 나가는 바이트 자체가 늘었습니다.
+메인 HTML도 ``Accept-Encoding``을 붙이든 붙이지 않든 같은 크기로 돌아왔습니다.
+HTML·CSS·JavaScript는 보통 3~5배까지 줄어드는 자산이므로, 단가가 1.58배 오른 것과 별개로 실제로 나가는 바이트 자체가 늘어난 상태였습니다.
 
-앱에 gzip 미들웨어를 넣거나 정적 파일을 미리 압축해 함께 embed하면 대부분 회복할 수 있는 문제입니다.
-그 전까지는 이 구성이 예전보다 전송 조건이 나쁘다는 점을 감안하고 봐야 합니다.
+=== 앱에서 직접 응답을 압축하도록 수정
 
-Turso로 오가는 양이 예상보다 크면 계산이 달라질 수 있어서, 실제로 운영하면서 청구서에 잡히는 전송량과 금액을 확인한 뒤 리전 구성을 다시 조정할지 검토할 생각입니다.
-이 전송 조건 때문에 Netlify 프록시로 되돌리는 선택지도 열어 두고 있습니다.
-다만 직접 매핑을 실제로 운영하며 확인해 보려고 당분간은 지금 구성을 그대로 두겠습니다.
-지금은 측정된 값이 없어서 판단을 미뤄 둡니다.
+프록시가 대신 해 주던 일이므로 앱이 직접 하도록 미들웨어를 넣었습니다.
+표준 라이브러리 ``compress/gzip``만 써서 순수 Go 구성은 그대로 유지했습니다.
+
+[source,go]
+.compress.go
+----
+// 이미 압축된 응답이나 본문이 없는 응답은 그대로 통과시킨다.
+alreadyEncoded := h.Get("Content-Encoding") != ""
+noBody := w.status == http.StatusNoContent || w.status == http.StatusNotModified
+
+if alreadyEncoded || noBody || len(w.buf) < minCompressSize || !compressible(ct) {
+	w.writeHeaderNow()
+	...
+}
+----
+
+규칙은 네 가지입니다.
+
+* ``Accept-Encoding``에 gzip이 있을 때만 압축합니다. 압축 여부와 무관하게 ``Vary: Accept-Encoding``은 항상 붙입니다.
+* 512바이트 미만은 그대로 보냅니다. htmx가 갈아 끼우는 작은 조각은 압축하면 오히려 커집니다.
+* ``text/*``와 JSON·JavaScript·SVG만 압축하고 PNG처럼 이미 압축된 형식은 제외합니다.
+* **이미 ``Content-Encoding``이 붙어 있으면 손대지 않습니다.**
+
+마지막 규칙 덕분에 나중에 Netlify 프록시를 다시 앞에 두더라도 이중 압축이 되지 않습니다.
+HTTP 압축은 홉마다 ``Accept-Encoding``과 ``Content-Encoding``으로 협상하는 구조라, 프록시는 이미 인코딩된 응답을 다시 압축하지 않고 그대로 전달합니다.
+
+배포한 뒤 운영 주소에서 잰 값입니다.
+
+[cols="2,1,1,1", options="header"]
+|===
+|응답 |압축 전 |gzip 적용 후 |비율
+
+|``GET /``
+|2,918 B
+|1,220 B
+|2.4배
+
+|``/static/style.css``
+|4,606 B
+|1,610 B
+|2.9배
+
+|``/static/htmx.min.js``
+|50,917 B
+|16,435 B
+|3.1배
+|===
+
+압축을 해제한 결과가 원본과 바이트 단위로 같은지, PNG는 그대로 나가는지도 함께 확인했습니다.
+
+압축은 이렇게 되찾았지만, 목적지가 한국이라 단가가 $0.19/GiB이고 무료 구간이 없다는 조건은 그대로 남습니다.
+Netlify 프록시로 되돌리면 그 두 가지는 다시 유리해지므로 선택지로 열어 두고 있습니다.
+Turso로 오가는 양이 예상보다 크면 리전 구성을 다시 조정하는 것도 함께 검토할 생각입니다.
+다만 지금은 청구서에 잡힌 값이 없어서 판단할 근거가 없고, 직접 매핑을 실제로 운영해 보는 것 자체가 목적이기도 해서 당분간은 이 구성을 그대로 두겠습니다.
 
 [NOTE]
 ====
