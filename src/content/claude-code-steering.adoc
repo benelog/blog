@@ -1,0 +1,175 @@
+= Claude Code에서 작업 중에 보낸 프롬프트가 전달되는 시점
+정상혁
+2026-08-22
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: claude-code, AI
+:description: Claude Code가 작업 중일 때 /btw 없이 그냥 입력한 프롬프트도 잘 반영된다고 느껴서, 언제부터 그랬는지 릴리즈 노트에서 찾아봤습니다. /btw와 큐 메시지의 차이, 큐 메시지가 모델에 전달되는 시점, CHANGELOG에서 확인한 변경 이력과 확인하지 못한 부분을 정리합니다.
+:toc:
+:idprefix:
+
+Claude Code가 작업하는 중에 무언가를 덧붙이고 싶을 때 한동안 저는 ``/btw``를 썼습니다. 그냥 프롬프트를 입력하면 그 작업에 반영되지 않는다고 느꼈기 때문입니다. 그런데 어느 시점부터인가 ``/btw`` 없이 그냥 입력해도 작업 중간에 잘 반영되었습니다. 언제부터 그런지 릴리즈 노트에서 찾아봤습니다.
+
+결론부터 적으면 "이제 ``/btw`` 없이도 작업 중 프롬프트가 반영된다"고 알리는 릴리즈 노트 항목은 없습니다. 대신 두 가지를 확인했습니다. 첫째, ``/btw``와 작업 중 입력한 프롬프트는 원래 서로 다른 기능이라 대체 관계가 아닙니다. 둘째, "작업 중에 보낸 메시지를 무시하는 문제"를 고친 항목은 v2.1.20(2026년 1월 27일)에 있습니다.
+
+== ``/btw``와 큐 메시지의 차이
+
+https://docs.claude.com/en/docs/claude-code/interactive-mode[Interactive mode 문서]에 따르면 두 기능은 이렇게 다릅니다.
+
+[cols="1,2,2", options="header"]
+|===
+|항목 |`/btw` (side question) |작업 중 입력한 프롬프트 (queued message)
+
+|대화 이력 반영
+|반영되지 않음. 질문과 답변 모두 conversation history에 들어가지 않음
+|반영됨. 일반 메시지와 같은 자격으로 대화에 들어감
+
+|도구 사용
+|불가. 이미 컨텍스트에 있는 내용만으로 답함
+|가능. 파일 읽기, 명령 실행 모두 가능
+
+|진행 중인 작업에 미치는 영향
+|없음. 본 작업을 중단시키지도, 방향을 바꾸지도 않음
+|있음. 이후 작업의 방향이 바뀜
+
+|용도
+|이번 세션에서 이미 알고 있는 내용을 묻기
+|작업 방향을 바꾸거나 지시를 덧붙이기
+|===
+
+문서는 ``/btw``를 "subagent의 반대"라고 설명합니다. subagent는 대화 이력 없이 도구만 갖고 새로 알아내는 쪽이고, ``/btw``는 대화 이력을 다 보지만 도구가 없는 쪽입니다.
+
+그래서 ``/btw``로 지시를 내리면 그 지시는 진행 중인 작업에 반영되지 않습니다. 제 프롬프트 이력에도 ``/btw``로 지시를 내린 뒤 "아까 btw로 내린 명령을 수행해 줘"라고 다시 요청한 기록이 남아 있었습니다. 애초에 지시를 전달하는 용도로는 맞지 않는 명령을 썼던 것입니다.
+
+`/btw` 자체가 언제 도입되었는지는 CHANGELOG에서 확인되지 않습니다. 도입을 알리는 항목이 없고, 가장 이른 언급은 v2.1.79(2026-03-18)의 버그 수정입니다.
+
+[source]
+----
+Fixed `/btw` returning the main agent's output instead of answering
+the side question when triggered during streaming
+----
+
+== 큐에 넣은 메시지가 모델에 전달되는 시점
+
+작업 중에 프롬프트를 입력하고 Enter를 누르면 Claude Code는 턴을 중단하지 않고 큐에 넣습니다. 큐에 있는 항목이 모델에 언제 전달되는지는 문서에 이렇게 적혀 있습니다.
+
+____
+Messages: if you queue a message while Claude is running tool calls, Claude Code passes it to Claude as soon as those tool calls finish, within the same turn. When the turn ends, Claude Code sends the messages that are still queued as the next turn, each as a separate message
+____
+
+즉 도구 호출이 진행 중일 때 넣은 메시지는 그 도구 호출이 끝나는 시점에 **같은 턴 안에서** 전달됩니다. 턴이 이미 끝나 가고 있었다면 다음 턴의 첫 메시지가 됩니다. 슬래시 명령과 `!` 셸 명령은 다르게 처리되어 턴이 끝난 뒤에 하나씩 실행됩니다.
+
+바로 전달하고 싶으면 Esc로 턴을 중단하면 됩니다. 이때 큐에 있던 내용은 버려지지 않고 그대로 전달됩니다.
+
+이 동작이 언제부터 이랬는지는 문서에 나와 있지 않습니다. 이 문서는 동작이 바뀐 항목에 "Before v2.1.186", "Before v2.1.212"처럼 이전 버전 주석을 붙이는데, 큐 관련 절에는 그런 주석이 없습니다.
+
+== CHANGELOG에서 확인한 steering 관련 변경 이력
+
+작업 중 메시지 전달과 직접 관련된 항목은 세 개입니다.
+
+[cols="1,1,3", options="header"]
+|===
+|버전 |배포일 |릴리즈 노트 항목
+
+|0.2.108
+|2025-05-13
+|You can now send messages to Claude while it works to steer Claude in real-time
+
+|1.0.84
+|2025-08-18
+|Fix Claude sometimes ignoring real-time steering when wrapping up a task
+
+|2.1.20
+|2026-01-27
+|Fixed agents sometimes ignoring user messages sent while actively working on a task
+|===
+
+작업 중 메시지를 실시간으로 보내는 기능 자체는 2025년 5월에 도입되었습니다. "보낸 메시지를 무시한다"는 문제를 정면으로 고친 항목은 v2.1.20이 마지막입니다. 한 버전을 꼽으라면 이쪽입니다.
+
+그 뒤로는 기능 변경이 아니라 유실이나 표시 관련 수정이 이어졌습니다.
+
+* v2.1.97(2026-04-08): 작업 중 입력한 메시지가 transcript에 기록되지 않던 문제
+* v2.1.105(2026-04-13): 큐에 넣은 메시지에 첨부한 이미지가 버려지던 문제
+* v2.1.178(2026-06-15): subagent가 턴을 마무리하는 중에 보낸 메시지가 유실되던 문제
+* v2.1.205(2026-07-08): `--max-turns` 한도에서 턴이 끝날 때 작업 중 보낸 메시지가 조용히 사라지던 문제
+* v2.1.234(2026-08-17): 큐에 남아 있는 메시지가 프롬프트 이력에 다시 나타나던 문제
+* v2.1.239(2026-08-21): 큐에 프롬프트가 있는 상태에서 Esc를 눌렀을 때 턴이 일찍 끝나던 경합 문제
+
+== 릴리즈 노트와 체감 시점의 차이
+
+제가 변화를 느낀 시점은 v2.1.20이 나온 2026년 1월보다 한참 뒤입니다. ``~/.claude/history.jsonl``을 확인해 보니, 이 글을 쓰게 된 오늘의 질문을 빼면 ``/btw``를 마지막으로 사용한 날이 2026년 6월 14일이었습니다. 그때까지는 ``/btw``를 쓸 이유가 남아 있었다는 뜻입니다.
+
+그 사이 구간에서 눈에 띄는 변경은 릴리즈 노트의 버그 수정이 아니라 기본 모델 교체입니다.
+
+* v2.1.197(2026-06-30): Claude Sonnet 5가 Claude Code의 기본 모델이 됨
+* v2.1.219(2026-07-24): Claude Opus 5가 기본 Opus 모델이 됨
+
+작업 중에 도착한 메시지를 알아채고 방향을 바꾸는 것은 Claude Code가 메시지를 전달한 뒤 모델이 판단하는 영역입니다. 그래서 저는 제가 느낀 변화가 이 모델 교체의 영향이라고 추정합니다. 다만 이것은 추정이고, CHANGELOG는 그런 주장을 하지 않습니다.
+
+근거가 약한 부분도 밝혀 둡니다. 제 ``/btw`` 사용 기록은 전체 기간을 통틀어 세 건뿐입니다. 원래 자주 쓰던 명령이 아니라서, 마지막 사용일로 체감 시점을 날짜까지 좁히기는 어렵습니다.
+
+== 조사 방법
+
+같은 방식으로 다른 기능의 변경 시점을 찾을 때도 쓸 수 있어서 정리합니다. link:claude-code-opusplan.html[opusplan과 컨텍스트 클리어 글]에서도 같은 방식으로 기본값 변경 이력을 확인했습니다.
+
+=== CHANGELOG 검색
+
+CHANGELOG를 내려받아 키워드로 검색하되, 항목이 어느 버전에 속하는지 함께 출력하면 찾기가 쉽습니다.
+
+[source,bash]
+----
+curl -sL https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md -o CHANGELOG.md
+awk '/^## /{v=$0} /steer|queue|sent while|mid-turn/{print v" || "$0}' CHANGELOG.md
+----
+
+=== 버전별 배포 날짜 확인
+
+CHANGELOG에는 날짜가 없습니다. 그래서 npm 레지스트리의 배포 시각을 릴리즈 날짜로 사용했습니다.
+
+[source,bash]
+----
+curl -sL https://registry.npmjs.org/@anthropic-ai/claude-code | jq -r '.time["2.1.20"]'
+----
+
+=== 본인의 사용 이력 확인
+
+Claude Code는 입력한 프롬프트를 ``~/.claude/history.jsonl``에 남깁니다. 특정 명령을 언제까지 썼는지 확인할 때 쓸 수 있습니다.
+
+[source,bash]
+----
+grep -o '"display":"/btw[^"]*"' ~/.claude/history.jsonl | head
+----
+
+사용한 날짜까지 보려면 ``jq``로 `timestamp` 필드를 꺼냅니다. 밀리초 단위 epoch 값이라 1000으로 나눈 뒤 ``todate``로 변환합니다.
+
+[source,bash]
+----
+jq -r 'select((.display // "") | startswith("/btw"))
+       | "\(.timestamp/1000 | todate) \(.display[0:30])"' ~/.claude/history.jsonl
+----
+
+[source]
+----
+2026-04-15T14:23:56Z /btw 기존 파일을 덮어쓰지 말고 ...
+2026-06-14T12:29:44Z /btw AI 모델이 점점 발전함에 따라서 ...
+2026-08-22T09:16:07Z /btw 최근에는 Claude Code에서 btw를 안 ...
+----
+
+``todate``가 출력하는 시각은 UTC입니다. 세 번째 기록이 이 글을 쓰게 된 질문입니다.
+
+== 정리
+
+* ``/btw``는 진행 중인 작업에 영향을 주지 않는 곁가지 질문용입니다. 지시를 내리는 용도가 아니므로, 작업 중 지시를 전달하려면 그냥 프롬프트를 입력하는 것이 맞습니다.
+* 작업 중 입력한 프롬프트는 진행 중인 도구 호출이 끝나는 시점에 같은 턴 안에서 전달됩니다. 더 빨리 전달하려면 Esc로 턴을 중단하면 됩니다.
+* 릴리즈 노트에서 "작업 중 보낸 메시지를 무시한다"는 문제를 고친 마지막 항목은 v2.1.20(2026-01-27)입니다.
+* 2026년 여름에 체감이 달라진 이유는 릴리즈 노트로는 설명되지 않습니다. 저는 Sonnet 5와 Opus 5로의 기본 모델 교체 영향이라고 추정합니다.
+
+== 참고 자료
+
+* https://docs.claude.com/en/docs/claude-code/interactive-mode[Claude Code Interactive mode 문서] : "Queue messages while Claude works", "Side questions with /btw" 절
+* https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md[Claude Code CHANGELOG]
+* https://registry.npmjs.org/@anthropic-ai/claude-code[npm 레지스트리의 @anthropic-ai/claude-code 메타데이터] : 버전별 배포 시각
+
+'''
+
+이 포스트는 Claude Code와 정상혁이 함께 작성했습니다.
