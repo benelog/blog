@@ -22,7 +22,7 @@
 
   <rect x="440" y="112" width="220" height="76" rx="14" fill="#fdf1dc" stroke="#d09a3e" stroke-width="1.5"/>
   <text x="550" y="143" font-size="14" text-anchor="middle" fill="#7a5b1e">StringBuilder 객체</text>
-  <text x="550" y="169" font-size="15" font-family="monospace" text-anchor="middle" fill="#222222">"3333"</text>
+  <text x="550" y="169" font-size="15" font-family="monospace" text-anchor="middle" fill="#222222">"A1"</text>
 
   <line x1="212" y1="100" x2="436" y2="140" stroke="#555555" stroke-width="1.5" marker-end="url(#arrow)"/>
   <line x1="212" y1="206" x2="436" y2="168" stroke="#555555" stroke-width="1.5" marker-end="url(#arrow)"/>
@@ -43,11 +43,11 @@
 
   <rect x="440" y="368" width="220" height="76" rx="14" fill="#fdf1dc" stroke="#d09a3e" stroke-width="1.5"/>
   <text x="550" y="399" font-size="14" text-anchor="middle" fill="#7a5b1e">원래 StringBuilder 객체</text>
-  <text x="550" y="425" font-size="15" font-family="monospace" text-anchor="middle" fill="#222222">"3333"</text>
+  <text x="550" y="425" font-size="15" font-family="monospace" text-anchor="middle" fill="#222222">"A1"</text>
 
   <rect x="440" y="490" width="220" height="76" rx="14" fill="#fdf1dc" stroke="#d09a3e" stroke-width="1.5"/>
   <text x="550" y="521" font-size="14" text-anchor="middle" fill="#7a5b1e">새 StringBuilder 객체</text>
-  <text x="550" y="547" font-size="15" font-family="monospace" text-anchor="middle" fill="#222222">"!11111"</text>
+  <text x="550" y="547" font-size="15" font-family="monospace" text-anchor="middle" fill="#222222">"B2"</text>
 
   <line x1="212" y1="406" x2="436" y2="406" stroke="#555555" stroke-width="1.5" marker-end="url(#arrow)"/>
   <text x="250" y="398" font-size="13" fill="#555555">원래 객체를 그대로 가리킴</text>

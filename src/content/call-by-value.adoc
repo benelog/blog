@@ -58,15 +58,15 @@ public class ReferenceTest {
 public class ReassignTest {
     public static void main(String[] args) {
         StringBuilder sb = new StringBuilder();
-        sb.append("3333");
+        sb.append("A1");
 
         work(sb);
-        System.out.println(sb); // 3333
+        System.out.println(sb); // A1
     }
 
     static void work(StringBuilder sb) {
         sb = new StringBuilder();
-        sb.append("!11111");
+        sb.append("B2");
     }
 }
 ----
@@ -75,7 +75,7 @@ public class ReassignTest {
 
 image::img/call-by-value/java-reassign.svg[참조값이 복사된 뒤 파라미터만 새 객체를 가리키게 되는 과정,width=640]
 
-work 메서드 안에서 ``sb``에 새 객체를 대입하면 파라미터 ``sb``만 새 객체를 가리키게 되고, main 메서드의 ``sb``는 원래 객체를 그대로 가리킵니다. 그래서 출력은 ``3333``입니다.
+work 메서드 안에서 ``sb``에 새 객체를 대입하면 파라미터 ``sb``만 새 객체를 가리키게 되고, main 메서드의 ``sb``는 원래 객체를 그대로 가리킵니다. 그래서 출력은 ``A1``입니다.
 
 === 오해의 근원인 객체 상태 변경
 
@@ -84,11 +84,11 @@ work 메서드 안에서 ``sb``에 새 객체를 대입하면 파라미터 ``sb`
 [source,java]
 ----
 static void appendWork(StringBuilder sb) {
-    sb.append("111");
+    sb.append("B2");
 }
 ----
 
-main 메서드에서 ``"3333"``이 담긴 ``sb``로 ``appendWork(sb)``를 호출한 뒤 출력하면 ``3333111``이 나옵니다.
+main 메서드에서 ``"A1"``이 담긴 ``sb``로 ``appendWork(sb)``를 호출한 뒤 출력하면 ``A1B2``가 나옵니다.
 
 image::img/call-by-value/java-mutation.svg[두 변수가 같은 객체를 가리키므로 내부 상태 변경이 호출자에게도 보이는 상황,width=640]
 

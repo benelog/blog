@@ -6,7 +6,7 @@
   </defs>
   <rect x="0" y="0" width="720" height="310" fill="#ffffff"/>
 
-  <text x="20" y="34" font-size="17" font-weight="bold" fill="#222222">appendWork(sb) 안에서 sb.append("111") 실행 후</text>
+  <text x="20" y="34" font-size="17" font-weight="bold" fill="#222222">appendWork(sb) 안에서 sb.append("B2") 실행 후</text>
 
   <text x="60" y="86" font-size="12" fill="#888888">main 메서드의 지역 변수</text>
   <rect x="60" y="94" width="150" height="44" rx="4" fill="#e8f0fa" stroke="#4a6da7" stroke-width="1.5"/>
@@ -18,11 +18,11 @@
 
   <rect x="440" y="126" width="230" height="90" rx="14" fill="#fdf1dc" stroke="#d09a3e" stroke-width="1.5"/>
   <text x="555" y="157" font-size="14" text-anchor="middle" fill="#7a5b1e">같은 StringBuilder 객체</text>
-  <text x="555" y="186" font-size="15" font-family="monospace" text-anchor="middle" fill="#222222">"3333111"</text>
+  <text x="555" y="186" font-size="15" font-family="monospace" text-anchor="middle" fill="#222222">"A1B2"</text>
 
   <line x1="212" y1="116" x2="436" y2="152" stroke="#555555" stroke-width="1.5" marker-end="url(#arrow2)"/>
   <line x1="212" y1="236" x2="436" y2="196" stroke="#555555" stroke-width="1.5" marker-end="url(#arrow2)"/>
-  <text x="252" y="248" font-size="13" font-family="monospace" fill="#555555">sb.append("111")</text>
+  <text x="252" y="248" font-size="13" font-family="monospace" fill="#555555">sb.append("B2")</text>
 
   <text x="60" y="292" font-size="13" fill="#555555">두 변수가 같은 객체를 가리키므로, 변경된 내용이 main 메서드에서도 보입니다.</text>
 </svg>
