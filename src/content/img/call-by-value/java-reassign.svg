@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 620" font-family="sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#555555"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="720" height="620" fill="#ffffff"/>
+
+  <!-- ① 호출 직후 -->
+  <text x="20" y="34" font-size="17" font-weight="bold" fill="#222222">① work(sb) 호출 직후</text>
+
+  <text x="60" y="70" font-size="12" fill="#888888">main 메서드의 지역 변수</text>
+  <rect x="60" y="78" width="150" height="44" rx="4" fill="#e8f0fa" stroke="#4a6da7" stroke-width="1.5"/>
+  <text x="135" y="105" font-size="15" font-family="monospace" text-anchor="middle" fill="#222222">sb</text>
+
+  <rect x="60" y="184" width="150" height="44" rx="4" fill="#e8f0fa" stroke="#4a6da7" stroke-width="1.5"/>
+  <text x="135" y="211" font-size="15" font-family="monospace" text-anchor="middle" fill="#222222">sb</text>
+  <text x="60" y="248" font-size="12" fill="#888888">work 메서드의 파라미터</text>
+
+  <line x1="135" y1="122" x2="135" y2="180" stroke="#4a6da7" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+  <text x="148" y="157" font-size="13" fill="#4a6da7">참조값 복사</text>
+
+  <rect x="440" y="112" width="220" height="76" rx="14" fill="#fdf1dc" stroke="#d09a3e" stroke-width="1.5"/>
+  <text x="550" y="143" font-size="14" text-anchor="middle" fill="#7a5b1e">StringBuilder 객체</text>
+  <text x="550" y="169" font-size="15" font-family="monospace" text-anchor="middle" fill="#222222">"3333"</text>
+
+  <line x1="212" y1="100" x2="436" y2="140" stroke="#555555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="212" y1="206" x2="436" y2="168" stroke="#555555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="300" y="112" font-size="13" fill="#555555">같은 객체를 가리킴</text>
+
+  <line x1="20" y1="290" x2="700" y2="290" stroke="#dddddd" stroke-width="1"/>
+
+  <!-- ② 재할당 후 -->
+  <text x="20" y="330" font-size="17" font-weight="bold" fill="#222222">② work 안에서 sb = new StringBuilder() 실행 후</text>
+
+  <text x="60" y="376" font-size="12" fill="#888888">main 메서드의 지역 변수</text>
+  <rect x="60" y="384" width="150" height="44" rx="4" fill="#e8f0fa" stroke="#4a6da7" stroke-width="1.5"/>
+  <text x="135" y="411" font-size="15" font-family="monospace" text-anchor="middle" fill="#222222">sb</text>
+
+  <text x="60" y="496" font-size="12" fill="#888888">work 메서드의 파라미터</text>
+  <rect x="60" y="504" width="150" height="44" rx="4" fill="#e8f0fa" stroke="#4a6da7" stroke-width="1.5"/>
+  <text x="135" y="531" font-size="15" font-family="monospace" text-anchor="middle" fill="#222222">sb</text>
+
+  <rect x="440" y="368" width="220" height="76" rx="14" fill="#fdf1dc" stroke="#d09a3e" stroke-width="1.5"/>
+  <text x="550" y="399" font-size="14" text-anchor="middle" fill="#7a5b1e">원래 StringBuilder 객체</text>
+  <text x="550" y="425" font-size="15" font-family="monospace" text-anchor="middle" fill="#222222">"3333"</text>
+
+  <rect x="440" y="490" width="220" height="76" rx="14" fill="#fdf1dc" stroke="#d09a3e" stroke-width="1.5"/>
+  <text x="550" y="521" font-size="14" text-anchor="middle" fill="#7a5b1e">새 StringBuilder 객체</text>
+  <text x="550" y="547" font-size="15" font-family="monospace" text-anchor="middle" fill="#222222">"!11111"</text>
+
+  <line x1="212" y1="406" x2="436" y2="406" stroke="#555555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="250" y="398" font-size="13" fill="#555555">원래 객체를 그대로 가리킴</text>
+
+  <line x1="212" y1="526" x2="436" y2="528" stroke="#555555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="250" y="520" font-size="13" fill="#555555">새 객체를 가리킴</text>
+</svg>

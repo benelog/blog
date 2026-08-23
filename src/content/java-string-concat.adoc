@@ -1,0 +1,175 @@
+= Java 문자열 더하기 연산의 최적화
+정상혁
+2026-08-23
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: java, performance
+:description: String을 +로 더하는 코드가 JDK 버전에 따라 어떻게 최적화되는지 정리합니다. JDK 1.4의 StringBuffer 치환, JDK 5의 StringBuilder 치환, Java 9의 invokedynamic 도입, JDK 15의 단일 구현까지의 변화를 JDK 25에서 확인한 바이트코드와 함께 설명합니다.
+:idprefix:
+:toc:
+
+``String``을 `+` 연산자로 더하는 코드는 컴파일러와 JVM이 최적화합니다. 그 방식은 JDK 버전에 따라 달라졌습니다. JDK 1.4까지는 ``StringBuffer``를 쓰는 코드로, JDK 5부터는 ``StringBuilder``를 쓰는 코드로 컴파일 시점에 변환되었습니다. Java 9부터는 컴파일 시점에는 `invokedynamic` 명령만 남기고, 실제 결합 코드는 실행 시점에 만들어집니다. 어떤 경우에 자동으로 최적화되는지 알고 있으면 문자열 결합 코드를 더 융통성 있게 쓸 수 있습니다. 예전에 https://github.com/benelog/devnote/wiki/Java-String-concat-2[위키 메모]와 https://gist.github.com/benelog/b81b4434fb8f2220cd0e900be1634753[gist]로 나눠 적었던 내용을 이 글로 종합하고, JDK 25에서 확인한 바이트코드를 더했습니다.
+
+== 상수 문자열끼리의 결합
+
+상수 String끼리만 더하는 연산은 컴파일 시점에 합쳐진 하나의 상수 문자열로 바뀝니다. 예를 들어 아래의 두 선언은 같은 코드로 컴파일됩니다.
+
+[source,java]
+----
+String str1 = "It's" + " a string" + "....";
+String str2 = "It's a string....";
+----
+
+이 규칙은 이 글에서 다루는 모든 JDK 버전에서 같습니다. 뒤에서 소개할 JDK 25의 바이트코드에서도 두 변수가 상수 풀의 같은 항목(`ldc #7`)을 읽는 것을 확인할 수 있습니다.
+
+== 변수가 섞인 결합의 StringBuffer·StringBuilder 치환
+
+상수와 String 변수를 섞어서 더하는 연산은 JDK 8까지는 컴파일 시점에 ``StringBuffer``나 ``StringBuilder``의 `append()`, `toString()` 메서드를 호출하는 코드로 변환되었습니다. JDK 1.4 시절 ``StringBuffer``의 javadoc에는 이 동작이 아래와 같이 명시되어 있었습니다.
+
+[quote]
+____
+String buffers are used by the compiler to implement the binary string concatenation operator. For example, the code:
+x = "a" + 4 + "c"
+is compiled to the equivalent of:
+x = new StringBuffer().append("a").append(4).append("c").toString()
+which creates a new string buffer (initially empty), appends the string representation of each operand to the string buffer in turn, and then converts the contents of the string buffer to a string. Overall, this avoids creating many temporary strings.
+____
+
+JDK 5부터는 ``StringBuffer`` 대신, 동기화를 하지 않아서 단일 스레드에서 더 빠른 ``StringBuilder``로 변환되었습니다. 역컴파일 도구인 http://www.kpdus.com/jad.html[jad]로 이를 확인할 수 있습니다. 원래의 소스가 아래와 같을 때
+
+[source,java]
+----
+String str0 = "It's a string....";
+String str1 = "It's" + " a string" + "....";
+String str2 = "It's a string...." + str0 + "000";
+str2 = str0 + str1 + "1111" ;
+str2 = str2 + "1111";
+str2 += "1111";
+for (int i=0;i<10;i++){
+    str2 = str2 + "1111";
+    str2 += "1111";
+}
+----
+
+JDK 5 이상 JDK 8 이하에서 컴파일한 후 역컴파일하면 다음과 같은 결과가 나옵니다.
+
+[source,java]
+----
+String str0 = "It's a string....";
+String str1 = "It's a string....";
+String str2 = (new StringBuilder("It's a string....")).append(str0).append("000").toString();
+str2 = (new StringBuilder(String.valueOf(str0))).append(str1).append("1111").toString();
+str2 = (new StringBuilder(String.valueOf(str2))).append("1111").toString();
+str2 = (new StringBuilder(String.valueOf(str2))).append("1111").toString();
+for(int i = 0; i < 10; i++) {
+    str2 = (new StringBuilder(String.valueOf(str2))).append("1111").toString();
+    str2 = (new StringBuilder(String.valueOf(str2))).append("1111").toString();
+}
+----
+
+[NOTE]
+====
+역컴파일 도구의 옵션에 따라서는 원래의 소스와 비슷하게 복원해서 `+` 연산이 그대로 보일 수도 있습니다. http://www.benf.org/other/cfr/stringbuilder-vs-concatenation.html[cfr]이라는 디컴파일러가 그런 경우입니다. `javap -c` 명령으로 바이트코드를 확인하는 것이 정확합니다.
+====
+
+== 반복문 안 결합의 StringBuilder 반복 생성
+
+위의 역컴파일 결과에서 주목할 부분은 반복문입니다. 반복문 안의 더하기 연산도 `StringBuilder.append()` 호출로 바뀌기는 합니다. 하지만 반복 주기마다 새로운 `StringBuilder` 객체를 생성하고, `toString()` 메서드를 호출해서 다시 ``String``을 생성합니다. 필요 없는 임시 객체가 반복 횟수만큼 계속 만들어지는 것입니다.
+
+따라서 반복문 안에서 문자열을 결합할 때는 `+` 대신 ``StringBuilder``를 직접 써야 합니다. 반복 횟수가 커질수록 성능 차이가 크게 벌어집니다. footnote:[성능 테스트 사례는 http://www.pellegrino.link/2015/08/22/string-concatenation-with-java-8.html[String concatenation with Java 8]을 참고합니다.]
+
+[source,java]
+----
+StringBuilder sb = new StringBuilder(str2);
+for (int i = 0; i < 10; i++) {
+    sb.append("1111");
+}
+str2 = sb.toString();
+----
+
+== Java 9부터 적용된 invokedynamic 방식
+
+Java 9부터는 https://openjdk.org/jeps/280[JEP 280: Indify String Concatenation]으로 최적화 방식이 완전히 달라졌습니다. 컴파일러가 `StringBuilder` 호출 코드를 만들어 넣는 대신 `invokedynamic` 명령만 남기고, 실제 결합 코드는 실행 시점에 `StringConcatFactory.makeConcatWithConstants()` 메서드가 만들어 냅니다.
+
+JDK 25에서 아래의 소스를 컴파일해서 확인해 보았습니다.
+
+[source,java]
+.StringTest.java
+----
+String str0 = "It's a string....";
+String str1 = "It's" + " a string" + "....";
+String str2 = str0 + str1 + "1111";
+for (int i = 0; i < 10; i++) {
+    str2 = str2 + "1111";
+}
+----
+
+`javap -c StringTest` 명령으로 바이트코드를 보면 `StringBuilder` 호출 대신 `invokedynamic` 명령이 나옵니다.
+
+[source]
+.javap -c StringTest (JDK 25로 컴파일)
+----
+ 0: ldc           #7    // String It's a string....
+ 2: astore_1
+ 3: ldc           #7    // String It's a string....
+ 5: astore_2
+ 6: aload_1
+ 7: aload_2
+ 8: invokedynamic #9,  0  // InvokeDynamic #0:makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+13: astore_3
+14: iconst_0
+15: istore        4
+17: iload         4
+19: bipush        10
+21: if_icmpge     37
+24: aload_3
+25: invokedynamic #13,  0 // InvokeDynamic #1:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+30: astore_3
+31: iinc          4, 1
+34: goto          17
+----
+
+같은 소스를 `javac --release 8` 옵션으로 컴파일하면 앞 절에서 역컴파일로 보았던 것과 같은 `StringBuilder` 호출 코드가 나옵니다.
+
+이 방식의 장점은 결합 전략이 컴파일된 클래스 파일이 아니라 JDK 런타임에 있다는 점입니다. 한 번 컴파일한 클래스도 실행하는 JDK를 올리면 재컴파일 없이 새로운 최적화가 적용됩니다. 자세한 배경은 https://dzone.com/articles/jdk-9jep-280-string-concatenations-will-never-be-t[JDK 9/JEP 280: String Concatenations Will Never Be the Same]에 설명되어 있습니다.
+
+=== StringConcatFactory의 결합 전략과 JDK 15의 단일 구현
+
+JDK 9의 ``StringConcatFactory``에는 `BC_SB`, `BC_SB_SIZED`, `BC_SB_SIZED_EXACT`, `MH_SB_SIZED`, `MH_SB_SIZED_EXACT`, ``MH_INLINE_SIZED_EXACT``의 6가지 결합 전략이 있었고, `java.lang.invoke.stringConcat` 시스템 프로퍼티로 선택할 수 있었습니다. 기본 전략인 ``MH_INLINE_SIZED_EXACT``는 ``StringBuilder``를 거치지 않고 최종 길이의 `byte` 배열을 직접 만들어서 복사 없이 ``String``을 생성합니다. link:https://github.com/openjdk/jdk/blob/34c79640e76c001e9f316f9aaba49dbe227bbae7/src/java.base/share/classes/java/lang/invoke/StringConcatFactory.java#L448[StringConcatFactory.java]의 `generateMHInlineCopy()` 메서드가 그 구현입니다. 두 항목만 더하는 경우는 link:https://github.com/openjdk/jdk/blob/34c79640e76c001e9f316f9aaba49dbe227bbae7/src/java.base/share/classes/java/lang/StringConcatHelper.java#L406-L427[StringConcatHelper.java]의 `simpleConcat()` 메서드로 더 단순하게 처리합니다.
+
+기본 전략 외의 나머지 전략은 https://bugs.openjdk.org/browse/JDK-8245455[JDK-8245455]로 JDK 15에서 제거되었습니다. JDK 15부터는 `MH_INLINE_SIZED_EXACT` 방식의 단일 구현만 남아 있습니다.
+
+한편 위의 바이트코드에서 보듯이 반복문 안의 `invokedynamic` 명령도 반복 주기마다 실행되어 매번 새로운 ``String``을 생성합니다. 반복문 안에서는 ``StringBuilder``를 직접 써야 한다는 결론은 Java 9 이후에도 같습니다.
+
+== 정리
+
+[cols="1,3", options="header"]
+|===
+|JDK 버전 |`+` 결합 연산의 처리 방식
+
+|JDK 1.4까지
+|컴파일 시점에 ``StringBuffer``의 `append()`, `toString()` 호출로 변환
+
+|JDK 5 ~ 8
+|컴파일 시점에 동기화를 하지 않는 ``StringBuilder`` 호출로 변환
+
+|Java 9 ~ 14
+|``invokedynamic``으로 컴파일하고 실행 시점에 ``StringConcatFactory``가 결합 코드 생성. 6가지 전략 중 선택 가능
+
+|JDK 15부터
+|기본 전략이었던 `MH_INLINE_SIZED_EXACT` 방식의 단일 구현만 유지
+|===
+
+상수 문자열끼리의 결합이 컴파일 시점에 하나의 상수로 합쳐지는 동작은 모든 버전에서 같습니다. 반복문 밖에서 문자열 한두 개를 더하는 코드는 컴파일러와 JDK가 최적화해 주므로 가독성이 좋은 `+` 연산을 그대로 쓰면 됩니다. 반복문 안의 결합은 어느 버전에서도 최적화되지 않으므로 ``StringBuilder``를 직접 써야 합니다.
+
+== 참고 자료
+
+* https://openjdk.org/jeps/280[JEP 280: Indify String Concatenation]
+* https://dzone.com/articles/jdk-9jep-280-string-concatenations-will-never-be-t[JDK 9/JEP 280: String Concatenations Will Never Be the Same]
+* https://bugs.openjdk.org/browse/JDK-8245455[JDK-8245455: Remove alternative StringConcatFactory strategies]
+* http://www.pellegrino.link/2015/08/22/string-concatenation-with-java-8.html[String concatenation with Java 8]
+* http://www.benf.org/other/cfr/stringbuilder-vs-concatenation.html[CFR: StringBuilder vs concatenation]
+
+'''
+
+이 포스트는 Claude Code와 정상혁이 함께 작성했습니다.
