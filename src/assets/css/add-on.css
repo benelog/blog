@@ -24,3 +24,77 @@
 .quoteblock {
     margin-bottom: 32px;
 }
+
+/* AsciiDoc callout (conum): 코드 안의 번호와 아래 설명 목록의 번호를 같은 동그라미로 맞춘다 */
+pre b.conum,
+.colist > ol > li::before {
+    display: inline-block;
+    box-sizing: border-box;
+    min-width: 20px;
+    height: 20px;
+    line-height: 20px;
+    padding: 0;
+    border-radius: 999px;
+    background-color: var(--color-primary);
+    color: #fff;
+    font-family: 'Nanum Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    font-style: normal;
+    text-align: center;
+}
+
+pre b.conum {
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+/* highlight.js가 숫자를 주석 span으로 감싸면서 입히는 회색을 덮는다 */
+pre b.conum * {
+    color: #fff;
+}
+
+/* 콜아웃 설명 목록을 바로 위 코드 블록에 붙여서 한 덩어리로 보이게 한다 */
+.listingblock:has(+ .colist) {
+    margin-bottom: 0;
+}
+
+.listingblock:has(+ .colist) pre {
+    border-bottom: none;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.listingblock + .colist {
+    background-color: var(--color-primary-light);
+    border: 1px solid var(--border-color);
+    border-radius: 0 0 12px 12px;
+    padding: 12px 20px;
+    margin-bottom: 20px;
+}
+
+.colist > ol {
+    counter-reset: conum;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.colist > ol > li {
+    counter-increment: conum;
+    position: relative;
+    padding-left: 32px;
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+.colist > ol > li:last-child {
+    margin-bottom: 0;
+}
+
+.colist > ol > li::before {
+    content: counter(conum);
+    position: absolute;
+    left: 0;
+    top: 1px;
+}

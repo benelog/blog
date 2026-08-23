@@ -19,7 +19,13 @@
     <#if (config.site_google_trackingid?has_content)>
         <#include "commons/google-analytics.ftl" />
     </#if>
-    <script>hljs.initHighlightingOnLoad();</script>
+    <script>
+        // AsciiDoc 콜아웃 마커의 괄호를 없애서 동그라미 안에 숫자만 남긴다
+        document.querySelectorAll('b.conum').forEach(function (el) {
+            el.textContent = el.textContent.replace(/[()]/g, '');
+        });
+        hljs.initHighlightingOnLoad();
+    </script>
 
   </body>
 </html>

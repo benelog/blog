@@ -179,12 +179,12 @@ for (int i = 0; i < 10; i++) {
 
 JDK 9의 ``StringConcatFactory``에는 6가지 결합 전략이 있었고, `java.lang.invoke.stringConcat` 시스템 프로퍼티로 선택할 수 있었습니다. 전략 이름에서 ``BC``는 실행 시점의 바이트코드 생성을, ``MH``는 ``MethodHandle`` 조합을, ``SB``는 ``StringBuilder`` 사용을, ``SIZED``는 버퍼 초기 용량 추정을, ``SIZED_EXACT``는 정확한 용량 계산을 뜻합니다.
 
-`BC_SB`:: ``StringBuilder``를 호출하는 바이트코드를 가진 클래스를 실행 시점에 생성합니다. JDK 8까지의 ``javac``이 컴파일 시점에 만들던 코드와 같은 형태입니다.
+* `BC_SB` : ``StringBuilder``를 호출하는 바이트코드를 가진 클래스를 실행 시점에 생성합니다. JDK 8까지의 ``javac``이 컴파일 시점에 만들던 코드와 같은 형태입니다.
 `BC_SB_SIZED`:: ``BC_SB``와 같지만 ``StringBuilder``의 초기 용량을 추정값으로 지정해서 내부 버퍼의 확장을 줄입니다.
-`BC_SB_SIZED_EXACT`:: 인수들의 길이를 미리 계산해서 ``StringBuilder``의 초기 용량을 정확한 값으로 지정합니다.
-`MH_SB_SIZED`:: 바이트코드 생성 대신 ``MethodHandle`` 조합으로 ``StringBuilder`` 호출을 구성합니다. 초기 용량은 추정값입니다.
-`MH_SB_SIZED_EXACT`:: ``MH_SB_SIZED``와 같은 방식이지만 초기 용량을 정확하게 계산합니다.
-`MH_INLINE_SIZED_EXACT`:: 기본 전략입니다. ``StringBuilder``를 거치지 않고 최종 길이의 `byte` 배열을 직접 만들어 인수들을 그 배열에 바로 씁니다.
+* `BC_SB_SIZED_EXACT` : 인수들의 길이를 미리 계산해서 ``StringBuilder``의 초기 용량을 정확한 값으로 지정합니다.
+* `MH_SB_SIZED` : 바이트코드 생성 대신 ``MethodHandle`` 조합으로 ``StringBuilder`` 호출을 구성합니다. 초기 용량은 추정값입니다.
+* `MH_SB_SIZED_EXACT` : ``MH_SB_SIZED``와 같은 방식이지만 초기 용량을 정확하게 계산합니다.
+* `MH_INLINE_SIZED_EXACT` : 기본 전략입니다. ``StringBuilder``를 거치지 않고 최종 길이의 `byte` 배열을 직접 만들어 인수들을 그 배열에 바로 씁니다.
 
 기본 전략인 ``MH_INLINE_SIZED_EXACT``는 다 채운 `byte` 배열로 추가 복사 없이 ``String``을 생성하므로, 임시 객체와 복사가 가장 적습니다. link:https://github.com/openjdk/jdk/blob/34c79640e76c001e9f316f9aaba49dbe227bbae7/src/java.base/share/classes/java/lang/invoke/StringConcatFactory.java#L448[StringConcatFactory.java]의 `generateMHInlineCopy()` 메서드가 그 구현입니다. 두 참조 값을 더하는 단순한 형태에는 link:https://github.com/openjdk/jdk/blob/34c79640e76c001e9f316f9aaba49dbe227bbae7/src/java.base/share/classes/java/lang/StringConcatHelper.java#L406-L427[StringConcatHelper.java]의 `simpleConcat()` 같은 특수 경로도 사용됩니다.
 

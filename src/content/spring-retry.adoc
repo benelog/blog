@@ -7,16 +7,24 @@
 :description: Spring Retry의 RetryTemplate과 @Retryable, @Recover, @CircuitBreaker로 재시도, 리커버, 서킷 브레이커 정책을 적용하고 테스트 코드로 검증하는 방법을 정리합니다.
 :toc:
 :sectnums:
+:jbake-last_updated: 2026-08-23
 :idprefix:
 
 원격 호출처럼 일시적으로 실패할 수 있는 작업에는 재시도가 필요합니다.
 https://github.com/spring-projects/spring-retry[Spring Retry]는 재시도 정책과 실행 구조를 제공하는 모듈입니다.
-Spring Batch, Spring Integration 내부에서 재시도를 위해 쓰이던 모듈이었고, 독립적으로도 사용할 수 있습니다.
 이 글에서는 `RetryTemplate` 을 직접 호출하는 방법과 애너테이션 기반의 AOP를 이용하는 방법으로 재시도, 리커버, 서킷 브레이커 정책을 적용해보고, 그 동작을 테스트 코드로 확인합니다.
 
 [NOTE]
 ====
-Spring Framework 7.0부터는 재시도 기능이 Spring Core 모듈로 흡수되었습니다.
+이 글은 Spring Retry가 Spring Framework에 흡수되기 전, 독립된 모듈이던 시절의 사용법을 정리한 글입니다.
+
+Spring Batch에 내장되어 있던 재시도 기능은 Spring Batch 2.2.0부터 Spring Retry라는 독립된 모듈로 분리되었습니다.
+그 뒤로는 Spring Integration이나 Spring Cloud Netflix 같은 다른 프로젝트에서도 이 모듈을 의존했습니다.
+Spring Retry의 기능은 Spring Framework 7.0부터 프레임워크 안으로 흡수되었습니다.
+재시도의 핵심이 되는 클래스들은 'spring-core' 모듈에 들어갔습니다.
+`@Retryable` 애너테이션과 이를 처리하는 AOP 기능은 'spring-context' 모듈에 들어갔습니다.
+Spring Batch 6.0, Spring Boot 4.0 이상에서는 'spring-core' 모듈에 포함된 재시도 기능을 활용합니다.
+
 최신 버전에서의 유효한 사용법은 https://docs.spring.io/spring-framework/reference/core/resilience.html[Resilience Features] 문서를 참고할 수 있습니다.
 이 글에 소개된 ``@Recover``와 ``@CircuitBreaker``는 Spring Framework 7.0의 재시도 기능에서는 지원되지 않습니다.
 ====
