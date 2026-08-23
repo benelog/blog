@@ -14,7 +14,7 @@ Java 언어 명세는 문자열 결합의 결과와 평가 순서를 규정하�
 
 == 컴파일 타임 상수식의 결합
 
-문자열 타입의 컴파일 타임 상수식은 컴파일 시점에 평가되어 하나의 intern된 문자열이 됩니다. intern은 JVM이 같은 내용의 문자열을 문자열 풀(string pool)에 하나만 두고 공유하는 동작입니다. intern된 문자열은 내용이 같으면 동일한 인스턴스를 참조합니다. 문자열 리터럴뿐 아니라 primitive 리터럴과 상수 변수도 이런 상수식에 포함될 수 있습니다. footnote:[컴파일 타임 상수식의 정확한 범위는 https://docs.oracle.com/javase/specs/jls/se25/html/jls-15.html#jls-15.29[JLS 15.29]를 참고합니다.] 예를 들어 아래의 두 선언은 같은 코드로 컴파일됩니다.
+문자열 타입의 컴파일 타임 상수식은 컴파일 시점에 평가되어 하나의 intern된 문자열이 됩니다. ``String.intern()``은 같은 내용에 대한 문자열 풀(string pool)의 canonical reference(대표 참조)를 반환합니다. 내용이 같은 ``String`` 인스턴스가 힙에 여러 개 있어도 문자열 풀에는 내용별로 대표 인스턴스가 하나만 등록되는데, canonical reference는 그 대표 인스턴스를 가리키는 참조입니다. 그래서 내용이 같은 intern된 문자열은 동일한 인스턴스를 참조합니다. 이는 힙에 존재하는 내용이 같은 모든 ``String`` 객체가 자동으로 문자열 풀에 합쳐진다는 뜻은 아닙니다. 문자열 리터럴뿐 아니라 primitive 리터럴과 상수 변수도 이런 상수식에 포함될 수 있습니다. footnote:[컴파일 타임 상수식의 정확한 범위는 https://docs.oracle.com/javase/specs/jls/se25/html/jls-15.html#jls-15.29[JLS 15.29]를 참고합니다.] 예를 들어 아래의 두 선언은 같은 코드로 컴파일됩니다.
 
 [source,java]
 ----
@@ -22,11 +22,11 @@ String str1 = "It's" + " a string" + "....";
 String str2 = "It's a string....";
 ----
 
-이 규칙은 이 글에서 다루는 모든 JDK 버전에서 같습니다. 뒤에서 소개할 JDK 25의 바이트코드에서도 두 변수가 상수 풀의 같은 항목(`ldc #7`)을 읽는 것을 확인할 수 있습니다. 두 변수는 intern된 같은 인스턴스를 참조하므로 `equals()` 메서드뿐 아니라 `str1 == str2` 비교도 ``true``가 됩니다. 반면 실행 시점에 결합되어 만들어지는 문자열은 자동으로 intern되지 않으므로, 내용이 같아도 `==` 비교는 ``false``가 됩니다.
+이 규칙은 이 글에서 다루는 모든 JDK 버전에서 같습니다. 뒤에서 소개할 JDK 25의 바이트코드에서도 두 변수가 상수 풀의 같은 항목(`ldc #7`)을 읽는 것을 확인할 수 있습니다. 두 변수는 intern된 같은 인스턴스를 참조하므로 `equals()` 메서드뿐 아니라 `str1 == str2` 비교도 ``true``가 됩니다. 반면 비상수 결합식의 결과는 새 ``String``으로 만들어지고 자동으로 intern되지 않으므로, 내용이 같은 리터럴이나 별도로 만들어진 문자열과 ``==``로 비교하면 ``false``가 됩니다.
 
 == 변수가 섞인 결합의 StringBuffer·StringBuilder 치환
 
-상수와 String 변수를 섞어서 더하는 연산을 JDK 8까지의 ``javac``으로 컴파일하면 ``StringBuffer``나 ``StringBuilder``의 `append()`, `toString()` 메서드를 호출하는 코드로 변환됩니다. JDK 1.4 시절 ``StringBuffer``의 javadoc에는 이 동작이 아래와 같이 명시되어 있었습니다. 그 시절 JDK의 javadoc은 Oracle 사이트에서 내려갔지만, 같은 설명이 https://docs.oracle.com/javame/config/cldc/ref-impl/cldc1.1/jsr139/java/lang/StringBuffer.html[CLDC 1.1의 StringBuffer javadoc]에는 남아 있습니다.
+상수와 String 변수를 섞어서 더하는 연산을 JDK 8까지의 ``javac``으로 컴파일하면 ``StringBuffer``나 ``StringBuilder``의 `append()`, `toString()` 메서드를 호출하는 코드로 변환됩니다. JDK 1.4의 ``javac``도 ``StringBuffer``를 사용하는 방식이었습니다. 같은 시기의 Java ME 문서인 https://docs.oracle.com/javame/config/cldc/ref-impl/cldc1.1/jsr139/java/lang/StringBuffer.html[CLDC 1.1의 StringBuffer javadoc]에는 당시 컴파일러의 변환 방식이 아래와 같이 설명되어 있습니다.
 
 [quote]
 ____
@@ -116,7 +116,7 @@ str2 = sb.toString();
 |약 6,667배
 |===
 
-반복 횟수가 10배로 늘 때 `+` 결합의 시간은 약 100배로 늘어서, 누적 복사량이 제곱으로 증가한다는 앞의 설명과 일치합니다. 반복 횟수가 100회 정도라면 어느 방식이든 절대 시간은 무시할 만한 수준입니다.
+반복 횟수가 늘수록 `+` 결합 시간은 급격히 증가합니다. 측정값은 JIT와 GC의 영향을 받지만, 누적 복사량이 반복 횟수에 대해 제곱으로 증가한다는 앞의 설명과 일치하는 경향을 보입니다. 반복 횟수가 100회 정도라면 어느 방식이든 절대 시간은 무시할 만한 수준입니다.
 
 == JDK 9부터 적용된 invokedynamic 방식
 
@@ -126,7 +126,7 @@ JDK 9부터는 https://openjdk.org/jeps/280[JEP 280: Indify String Concatenation
 
 ``invokedynamic``은 호출할 메서드를 실행 시점에 결정하는 바이트코드 명령입니다. ``invokevirtual``이나 `invokestatic` 같은 다른 호출 명령은 호출 대상이 클래스 파일에 고정되어 있지만, ``invokedynamic``은 호출 지점(call site)을 어떤 메서드에 연결할지를 실행 시점의 Java 코드에 위임합니다. JVM에서 동적 언어를 지원하기 위해 https://jcp.org/en/jsr/detail?id=292[JSR 292]로 JDK 7에 추가되었고, JDK 8의 람다 표현식 구현에도 쓰입니다.
 
-이 연결을 담당하는 코드가 bootstrap 메서드입니다. 클래스 파일에는 `invokedynamic` 호출 지점마다 사용할 bootstrap 메서드가 기록됩니다. JVM은 호출 지점을 처음 실행할 때 bootstrap 메서드를 한 번만 호출하고, bootstrap 메서드는 실제 실행할 메서드를 가리키는 ``CallSite``를 만들어 반환합니다. 문자열 결합에서는 ``StringConcatFactory.makeConcatWithConstants()``가 bootstrap 메서드이고, 이 메서드가 결합 코드를 만들어 ``CallSite``에 담아 돌려줍니다.
+이 연결을 담당하는 코드가 bootstrap 메서드입니다. 클래스 파일에는 `invokedynamic` 호출 지점마다 사용할 bootstrap 메서드가 기록됩니다. JVM은 호출 지점을 처음 실행하기 전에 bootstrap 메서드를 호출해 링크하고, bootstrap 메서드는 실제 실행할 메서드를 가리키는 ``CallSite``를 만들어 반환합니다. 여러 스레드가 같은 호출 지점을 동시에 최초 실행하면 bootstrap 메서드가 병행 호출될 수 있지만, JVM은 그중 하나의 결과만 호출 지점에 설치합니다. 문자열 결합에서는 ``StringConcatFactory.makeConcatWithConstants()``가 bootstrap 메서드이고, 이 메서드가 결합 코드를 만들어 ``CallSite``에 담아 돌려줍니다.
 
 ``CallSite``는 `java.lang.invoke` 패키지의 객체로, 실행할 메서드를 가리키는 ``MethodHandle`` 하나를 target이라는 속성으로 참조합니다. `CallSite.getTarget()` 메서드가 현재 target인 ``MethodHandle``을 돌려줍니다. JVM은 bootstrap 메서드가 반환한 ``CallSite``를 호출 지점에 연결해 두는데, 이를 링크라고 합니다. 링크된 뒤의 `invokedynamic` 실행은 그 시점의 target ``MethodHandle``을 호출하는 것과 같습니다. ``MutableCallSite``처럼 실행 중에 target을 다른 ``MethodHandle``로 바꿀 수 있는 구현도 있지만, 문자열 결합에는 target이 바뀌지 않는 ``ConstantCallSite``가 쓰입니다. 그래서 한 번 링크된 뒤에는 일반 메서드 호출처럼 동작하고 JIT 컴파일러의 인라인 최적화 대상도 됩니다.
 
@@ -192,11 +192,11 @@ JDK 9의 ``StringConcatFactory``에는 6가지 결합 전략이 있었고, `java
 
 JDK 23에서는 https://bugs.openjdk.org/browse/JDK-8327247[JDK-8327247]로 인수 개수가 기본 임계값 20을 넘는 결합에 ``StringBuilder`` 호출 바이트코드를 생성하는 경로가 추가되었습니다. 큰 MethodHandle 표현식 트리가 JIT 컴파일 자원을 과도하게 쓰는 문제를 피하기 위한 변경입니다.
 
-JDK 24에서는 https://bugs.openjdk.org/browse/JDK-8336856[JDK-8336856]으로 일반 결합 경로가 per-shape hidden class를 생성하는 방식으로 다시 바뀌었습니다.
+JDK 24에서는 https://bugs.openjdk.org/browse/JDK-8336856[JDK-8336856]으로 주된 일반 결합 경로가 per-shape hidden class를 생성하는 방식으로 다시 바뀌었습니다.
 
-hidden class는 https://openjdk.org/jeps/371[JEP 371: Hidden Classes]로 JDK 15에 추가된 특수한 클래스입니다. `Lookup.defineHiddenClass()` 메서드로 정의하며, 클래스 이름으로 찾을 수 없고 참조가 사라지면 개별적으로 언로드될 수 있어서, 프레임워크나 JDK가 실행 시점에 만들어 내는 코드에 적합합니다. shape는 결합식의 형태, 즉 인수의 개수·타입과 상수의 배치를 말합니다. 예를 들어 앞의 바이트코드에서 `str0 + str1 + "1111"`의 호출 지점은 String 변수 2개를 받는 `(String, String) → String` 형태이고, 반복문 안 `str2 + "1111"`의 호출 지점은 String 변수 1개를 받는 `(String) → String` 형태이므로 서로 다른 shape입니다. 반면 상수의 내용만 다른 결합들은 같은 shape입니다. per-shape hidden class 방식은 결합 shape마다 결합 코드를 담은 hidden class를 하나씩 만들어 캐시에 두고, 같은 shape의 다른 호출 지점에서는 이미 만들어진 클래스를 재사용합니다. 깊게 중첩된 ``MethodHandle`` 트리 대신 JIT 컴파일러가 다루기 쉬운 평범한 바이트코드가 만들어지므로, 링크와 초기 구동(warmup) 비용이 줄어듭니다.
+hidden class는 https://openjdk.org/jeps/371[JEP 371: Hidden Classes]로 JDK 15에 추가된 특수한 클래스입니다. `Lookup.defineHiddenClass()` 메서드로 정의하며, 클래스 이름으로 찾을 수 없고 참조가 사라지면 개별적으로 언로드될 수 있어서, 프레임워크나 JDK가 실행 시점에 만들어 내는 코드에 적합합니다. JDK 25 구현에서 hidden class 캐시의 shape는 동적 인수의 개수와 정규화된 타입으로 이루어진 ``MethodType``입니다. 참조 타입은 ``Object``로, ``byte``와 ``short``는 ``int``로 정규화됩니다. 상수의 내용과 배치는 캐시 키에 포함되지 않고 호출 지점마다 별도의 ``String[]``에 저장됩니다. 따라서 앞의 바이트코드에서 ``str0 + str1 + "1111"``의 호출 지점은 `(String, String) → String` 시그니처를 가지지만 캐시에서는 `(Object, Object) → String` shape를 사용하고, 반복문 안 ``str2 + "1111"``의 호출 지점은 `(Object) → String` shape를 사용하므로 서로 다른 shape입니다. per-shape hidden class 방식은 생성한 결합 클래스를 캐시에 두고 같은 shape의 다른 호출 지점에서 재사용할 수 있습니다. 캐시는 soft reference를 사용하므로 캐시된 클래스가 회수되면 같은 shape의 클래스를 다시 만들 수도 있습니다. 깊게 중첩된 ``MethodHandle`` 트리 대신 JIT 컴파일러가 다루기 쉬운 평범한 바이트코드가 만들어지므로, 링크와 초기 구동(warmup) 비용이 줄어듭니다.
 
-JDK 25의 ``StringConcatFactory``는 먼저 단순 결합용 빠른 경로를 확인하고, 그 밖의 결합은 기본적으로 ``InlineHiddenClassStrategy``로 처리합니다. 생성된 코드는 최종 크기의 `byte` 배열을 채우고 그 배열로 ``String``을 만듭니다. link:https://github.com/openjdk/jdk/blob/jdk-25%2B36/src/java.base/share/classes/java/lang/invoke/StringConcatFactory.java[JDK 25의 StringConcatFactory.java]에서 이를 확인할 수 있습니다.
+JDK 25의 ``StringConcatFactory``는 먼저 단순 결합용 빠른 경로를 확인하고, 그 밖의 결합은 기본적으로 ``InlineHiddenClassStrategy``로 처리합니다. 이 전략은 동적 인수가 하나인 경우 미리 구현된 전용 핸들러를 사용하고, 그 밖의 일반적인 결합에는 per-shape hidden class를 사용합니다. 결합 코드는 최종 크기의 `byte` 배열을 채우고 그 배열로 ``String``을 만듭니다. link:https://github.com/openjdk/jdk/blob/jdk-25%2B36/src/java.base/share/classes/java/lang/invoke/StringConcatFactory.java[JDK 25의 StringConcatFactory.java]에서 이를 확인할 수 있습니다.
 
 한편 위의 바이트코드에서 보듯이 반복문 안의 `invokedynamic` 명령은 반복 주기마다 이미 링크된 결합 메서드를 호출하여 새로운 결과 ``String``을 만듭니다. ``StringConcatFactory``의 bootstrap 메서드가 매번 다시 실행되는 것은 아닙니다. 컴파일러나 런타임이 누적용 ``StringBuilder`` 하나를 반복문 밖에 만들어 주지는 않으므로, 많은 문자열을 누적하는 반복문에서 직접 ``StringBuilder``를 쓰라는 결론은 JDK 9 이후에도 같습니다.
 
@@ -222,7 +222,7 @@ JDK 25의 ``StringConcatFactory``는 먼저 단순 결합용 빠른 경로를 �
 |인수가 많은 결합에는 ``StringBuilder`` 호출 바이트코드를 생성하는 경로 사용
 
 |JDK 24 ~ 25
-|단순 결합용 빠른 경로와 per-shape hidden class 기반의 일반 결합 경로 사용
+|단순 결합용 빠른 경로, 단일 인수 전용 구현과 정규화된 인수 shape별 hidden class 기반의 일반 결합 경로 사용
 |===
 
 문자열 타입의 컴파일 타임 상수식이 하나의 상수로 합쳐지는 동작은 모든 버전에서 같습니다. 반복문 밖에서 문자열 한두 개를 더하는 코드는 ``javac``과 JDK 런타임이 최적화할 수 있으므로 가독성이 좋은 `+` 연산을 그대로 쓰면 됩니다. 반면 컴파일러나 런타임이 반복문을 누적용 ``StringBuilder`` 하나로 자동 변환하지는 않습니다. 성능이 중요한 반복문에서 많은 문자열을 누적한다면 ``StringBuilder``를 직접 쓰는 편이 좋습니다.
