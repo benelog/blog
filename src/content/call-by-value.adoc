@@ -203,7 +203,7 @@ ____
 
 === Call by sharing이라는 용어
 
-이처럼 호출자 변수 자체가 아니라 객체를 공유하는 인자 전달 동작을 **call by sharing**이라고 부르기도 합니다. Barbara Liskov를 비롯한 CLU 설계팀이 https://csg.csail.mit.edu/pubs/memos/Memo-112/memo112-1a.pdf[CLU 설계 문서]에서 쓴 용어입니다. Java, JavaScript, Python, Ruby의 객체 인자 동작을 이 개념으로 설명할 수 있습니다.
+이처럼 호출자 변수 자체가 아니라 객체를 공유하는 인자 전달 동작을 **call by sharing**이라고 부르기도 합니다. Barbara Liskov를 비롯한 설계팀이 1970년대 중반에 만든 언어인 CLU의 https://csg.csail.mit.edu/pubs/memos/Memo-112/memo112-1a.pdf[설계 문서]에서 쓴 용어입니다. Java, JavaScript, Python, Ruby의 객체 인자 동작을 이 개념으로 설명할 수 있습니다.
 
 Call by value라고 하면 '객체가 통째로 복사된다'는 오해를, call by reference라고 하면 '재할당도 호출한 쪽에 보인다'는 오해를 각각 부를 수 있습니다. 그래서 저는 JavaScript도 두 용어 중 하나를 고르기보다 call by sharing이라는 개념으로 설명하는 편이 더 명확하다고 생각합니다.
 
