@@ -228,7 +228,7 @@ swap(a, b); // a == 2, b == 1
 
 Java 이후에 등장한 Go와 Rust도 일반 함수 호출에서 호출자 변수 자체를 파라미터의 암묵적인 별칭으로 만들지 않습니다. https://go.dev/ref/spec#Calls[Go 사양]은 호출 전에 인자를 평가하고 새로 할당한 파라미터 저장 공간에 그 값을 대입한다고 설명합니다. https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#ownership-and-functions[Rust Book]은 함수 인자 전달이 대입과 마찬가지로 타입에 따라 값을 이동하거나 복사한다고 설명합니다.
 
-호출한 쪽의 값을 바꾸려면 `swap(&a, &b)`, `swap(&mut a, &mut b)`처럼 포인터나 참조를 호출 지점에 명시할 수 있습니다. Go에서는 포인터 값이 파라미터에 대입됩니다. Rust에서는 값이 타입과 문맥에 따라 이동하거나 복사되며, 특히 https://doc.rust-lang.org/reference/types/pointer.html#mutable-references-mut[`&mut T`는 `Copy`가 아닙니다]. 기존 가변 참조를 인자로 넘기는 문맥에서는 재대여(reborrow)가 일어날 수도 있습니다. 핵심은 어느 경우에도 파라미터 자체를 재할당해서 호출자의 변수 바인딩을 바꾸는 전통적인 call by reference가 아니라는 점입니다.
+호출한 쪽의 값을 바꾸려면 `swap(&a, &b)`, ``swap(&mut a, &mut b)``처럼 포인터나 참조를 호출 지점에 명시할 수 있습니다. Go에서는 포인터 값이 파라미터에 대입됩니다. Rust에서는 값이 타입과 문맥에 따라 이동하거나 복사되며, 특히 https://doc.rust-lang.org/reference/types/pointer.html#mutable-references-mut[`&mut T`는 `Copy`가 아닙니다]. 기존 가변 참조를 인자로 넘기는 문맥에서는 재대여(reborrow)가 일어날 수도 있습니다. 핵심은 어느 경우에도 파라미터 자체를 재할당해서 호출자의 변수 바인딩을 바꾸는 전통적인 call by reference가 아니라는 점입니다.
 
 == 정리
 
