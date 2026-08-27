@@ -1,0 +1,432 @@
+= GitHub Actions의 실행 구조와 워크플로 튜닝 기법
+정상혁
+2026-08-28
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: github-actions, ci, 개발환경
+:description: GitHub Actions에서 이벤트가 워크플로 실행이 되어 러너에 배정되기까지의 파이프라인 구조와 최근 장애 이력을 살펴보고, 그 구조에서 나오는 튜닝 기법을 측정, 트리거 조건, concurrency, 캐시, 잡 분리, 러너 선택 순서로 정리했습니다.
+:toc:
+:sectnums:
+:toclevels: 1
+:idprefix:
+
+GitHub Actions 워크플로가 느려지면 푸시한 뒤 결과를 확인하기까지 기다리는 시간이 길어지고, 리뷰와 배포도 함께 밀립니다.
+그런데 워크플로 파일만 보고 어느 설정을 고쳐야 할지 정하기는 어렵습니다.
+느린 원인이 빌드일 수도, 의존성 내려받기일 수도, 러너를 배정받기까지의 대기일 수도 있기 때문입니다.
+
+이 글에서는 먼저 워크플로가 실행되기까지 GitHub 내부에서 거치는 파이프라인 구조와 최근 장애 이력을 살펴봅니다.
+그 다음에 실행 시간을 줄이는 기법을 측정 → 실행 횟수 줄이기 → 캐시 → 병렬화 → 러너 선택 순서로 정리했습니다.
+각 기법에는 대가가 따르므로, 어떤 조건에서 손해인지도 함께 적었습니다.
+이 기법들을 제 저장소 다섯 곳에 적용하며 측정한 기록은 link:github-actions-tuning-cases.html[다음 글]에 따로 정리했습니다.
+
+GitHub의 사양·요금·한도는 2026년 8월 28일에 확인한 값입니다. 바뀔 수 있으므로 글 끝의 공식 문서를 함께 확인하시기를 권합니다.
+
+== 이벤트에서 러너까지의 실행 파이프라인
+
+구체적인 튜닝 기법을 보기 전에, 푸시 한 번이 러너 위에서 도는 잡이 되기까지 GitHub 내부에서 거치는 경로를 정리합니다.
+대기 시간이 어디에서 생기는지, 트리거 필터가 왜 가장 확실한 최적화인지가 이 구조에서 나옵니다.
+
+=== 워크플로를 트리거하는 이벤트의 종류
+
+워크플로는 ``on``에 선언한 이벤트가 발생할 때 실행됩니다.
+이벤트는 성격에 따라 네 갈래로 나뉩니다.
+
+[cols="2,3,4", options="header"]
+|===
+|분류 |이벤트 |특성
+
+|webhook 이벤트
+|`push`, `pull_request`, `issues` 등
+|저장소 활동이 만드는 이벤트입니다. ``issues``처럼 특정 브랜치에 묶이지 않는 이벤트는 기본 브랜치의 워크플로 파일만 트리거합니다.
+
+|스케줄
+|`schedule`
+|cron 문법으로 지정하고 기본 브랜치에서만 실행됩니다. 부하가 높은 시간대에는 실행이 지연될 수 있습니다.
+
+|수동·외부 트리거
+|`workflow_dispatch`, `repository_dispatch`
+|``workflow_dispatch``는 사용자가 UI·CLI·API로 직접 시작합니다. ``repository_dispatch``는 외부 시스템이 REST API를 호출해 트리거합니다.
+
+|워크플로 간 트리거
+|`workflow_run`, `workflow_call`
+|``workflow_run``은 다른 워크플로의 시작·완료에 반응해 별도 실행을 만듭니다. ``workflow_call``은 재사용 워크플로를 호출하는 메커니즘이라, 호출한 쪽 실행 안에서 돌고 별도 실행을 만들지 않습니다.
+|===
+
+성능 관점에서는 ``schedule``의 공식 문서 문구를 알아둘 만합니다.
+GitHub은 ``schedule`` 이벤트가 Actions 전체의 부하가 높은 시간대에 지연될 수 있고, 매시 정각이 바로 그런 시간대이며, 부하가 충분히 높으면 큐잉된 잡이 아예 드랍될 수도 있다고 안내합니다.
+cron의 분을 0이 아닌 값으로 두면 정각에 몰리는 혼잡을 피할 수 있습니다.
+
+이벤트 자체가 생성되지 않는 경우도 있습니다.
+한 번에 5,000개가 넘는 브랜치를 푸시하면 push 이벤트가 만들어지지 않고, 태그를 한 번에 3개 넘게 푸시하면 태그에 대한 이벤트가 만들어지지 않습니다.
+워크플로가 실행되지 않았는데 로그도 없다면, 워크플로 설정보다 앞 단계인 이벤트 생성이 생략되지 않았는지 의심해 볼 수 있습니다.
+
+=== 내부 큐 구조와 GraphQL 계층
+
+GitHub이 Actions 서버 쪽의 내부 구조를 공식 문서로 공개하지는 않았습니다.
+그래도 공식 문서와 장애 보고서(availability report)에 남은 조각을 이으면 큰 흐름을 재구성할 수 있습니다.
+
+. **이벤트 접수**: push 같은 저장소 활동은 webhook 이벤트가 되어 Kafka 기반의 백그라운드 잡 파이프라인으로 들어갑니다. 2023년 8월 장애 보고서는 이 파이프라인이 막히자 webhook 전달과 Actions 트리거가 함께 지연됐다고 기록합니다. 즉 Actions는 이벤트를 직접 받는 것이 아니라 GitHub의 공용 비동기 처리 계층을 거쳐 받습니다.
+. **실행 생성**: "이벤트를 처리하고 잡을 생성하는 내부 Actions 서비스"가 저장소의 워크플로 파일에서 트리거 조건을 평가해 워크플로 실행(run)과 잡을 만듭니다. 이 표현은 2026년 8월 6일 장애의 공식 원인 분석에 나옵니다. 이 경로는 커밋에 검사 상태를 기록하는 check suite 생성과 GraphQL 계층도 지납니다. 2021년 3월에는 check suite ID가 Int32 범위를 넘어서자 의존하던 GraphQL 라이브러리가 JSON을 읽지 못했고, 그 결과 잡이 큐에 들어가지 못하는 장애가 있었습니다.
+. **잡 큐잉과 배정**: 만들어진 잡은 큐에 들어가고, 잡 배정을 담당하는 서비스가 ``runs-on`` 레이블·그룹이 맞는 유휴 러너를 찾아 잡을 배정합니다. 잡 오케스트레이션은 Redis 클러스터에 의존합니다.
+. **러너 수령**: 러너는 GitHub으로 아웃바운드 HTTPS 연결만 열고, 50초 단위의 long poll로 잡을 기다립니다. 러너 애플리케이션은 Azure Pipelines Agent의 포크이고, 로그와 아티팩트는 Azure Blob Storage로 올라갑니다.
+
+핵심은 워크플로 실행이 단일 서비스가 아니라 여러 큐와 서비스를 지나는 비동기 파이프라인이라는 점입니다.
+webhook 처리 → 실행 생성 → 잡 큐 → 러너 배정 중 어느 구간이 막혀도 사용자에게는 똑같이 "워크플로가 시작되지 않는" 증상으로 보입니다.
+
+참고로 러너가 GraphQL API를 직접 호출하지는 않습니다.
+액션 내려받기와 API 호출은 `api.github.com` 등 REST 엔드포인트와 `*.actions.githubusercontent.com` 계열 도메인을 씁니다.
+워크플로 파일을 읽거나 액션을 resolve하는 단계에서 내부적으로 GraphQL을 쓰는지는 공개된 자료가 없습니다.
+
+=== 워크플로 파일 수와 조건문 위치의 영향
+
+이 구조에서 튜닝과 관련된 원리 두 가지를 끌어낼 수 있습니다.
+
+**첫째, 워크플로 파일 수가 성능 요인이라는 근거는 없습니다.**
+트리거 평가는 파일 단위로 일어나므로, 이벤트가 발생하면 실행 생성 서비스는 저장소의 각 워크플로 파일의 ``on`` 조건을 평가해 파일별로 실행 생성 여부를 정합니다.
+파일이 많으면 평가할 대상도 늘어나는 셈이지만, 파일 수가 실행 시작을 늦춘다는 공식 자료나 측정은 찾지 못했습니다.
+공식 한도도 파일 수가 아니라 파일 하나의 크기(500KB), 트리거 이벤트 빈도(저장소당 10초에 1,500개), 실행 생성 빈도(10초에 500개)에 걸려 있습니다.
+워크플로 파일을 합치는 정리는 관리 편의로는 의미가 있어도, 실행 시간을 줄이는 수단으로는 근거가 없습니다.
+
+**둘째, 조건은 파이프라인의 앞쪽에서 평가될수록 이득입니다.**
+같은 "건너뛰기"라도 평가 시점이 다릅니다.
+
+* ``on``의 ``paths``·``branches`` 필터는 실행 생성 전에 평가됩니다. 필터에 걸리면 실행 자체가 만들어지지 않아 파이프라인에 아무것도 들어가지 않습니다.
+* ``jobs.<job_id>.if``는 실행이 만들어진 뒤 잡 수준에서 평가됩니다. 조건이 거짓이면 잡은 skipped가 되어 러너를 쓰지 않지만, 실행은 생성되어 실행 목록에 남습니다.
+
+조건식의 개수 자체는 걱정할 요인이 아닙니다.
+표현식 평가는 서버 쪽에서 일어나고, 그 비용이 실행 시간에 잡힐 만큼 크다는 근거는 없습니다.
+튜닝의 대상은 조건식을 줄이는 일이 아니라, 실행과 잡을 만들지 않도록 조건을 가능한 한 앞 단(``on`` 필터)으로 옮기는 일입니다.
+
+두 평가 시점의 차이는 필수 상태 검사 문제와도 이어집니다.
+``on`` 필터로 워크플로를 건너뛰면 검사가 Pending으로 남아 병합이 막히지만, 잡 수준 ``if``로 건너뛴 잡은 상태가 Success로 보고되어 병합을 막지 않습니다.
+그래서 필수 검사로 지정한 워크플로에서는 경로 필터 대신 잡 수준에서 변경 파일을 판별해 건너뛰는 방식이 우회책이 됩니다.
+
+== 잦은 Actions 장애와 파이프라인 구조의 관계
+
+2025년 말부터 GitHub 장애가 잦아졌다는 체감은 데이터와 대체로 맞습니다.
+월별 availability report에 집계된 인시던트 수가 2025년 하반기에는 월 3~5건이었는데 2026년에는 월 6~10건으로 늘었습니다.
+이 글을 쓰는 2026년 8월에는 1일부터 27일까지 githubstatus.com에 올라온 인시던트 25건 중 7건이 Actions 관련이었습니다.
+증상도 "실행 시작 지연", "잡이 queued 상태로 고착"처럼 파이프라인 앞 단이 막히는 유형이 반복됩니다.
+
+원인을 나눠 보면, Actions 파이프라인 자체의 장애와 파이프라인이 의존하는 상류 서비스 장애가 섞여 있습니다.
+
+* **파이프라인 자체의 장애**: 2026년 8월 6일에는 이벤트를 처리해 잡을 생성하는 내부 서비스에 정기 배포가 나가면서 잠재해 있던 용량 문제가 드러났고, 피크에는 워크플로 실행의 71%가 실패했습니다. 잡 배정 서비스의 버그로 러너가 이미 무효가 된 잡을 배정받아 재시도를 반복했고, GitHub은 복구를 위해 webhook 유입을 평소의 15% 수준으로 줄였습니다. 그 밖에도 잡 오케스트레이션용 Redis 클러스터 문제로 실행의 95%가 5분 안에 시작하지 못한 장애(2026년 3월 5일), 러너 관련 서비스의 SSL 인증서 만료(2026년 7월과 8월), 데이터베이스 primary 포화(2026년 8월 26일)가 이어졌습니다. 2026년 5월 26일에는 자동 계정 심사 시스템이 Actions의 내부 서비스 계정을 오인해 정지시키는 바람에 새로 큐잉된 모든 실행이 실패하기도 했습니다.
+* **상류 장애의 전파**: Actions는 webhook, API, 데이터베이스·캐시 계층, Azure 인프라의 하류에 있습니다. 2025년 10월 29일 Azure Front Door 장애 때는 호스티드 러너 잡이 실패했고, 2026년 6월 8일에는 github.com의 릴리스 다운로드 엔드포인트가 504를 반환하자 그 엔드포인트에 의존하는 워크플로들이 실패했습니다. Actions 자체는 정상이어도 의존 대상이 무너지면 함께 무너지는 구조라서, github.com 전반에 걸친 장애에서는 거의 항상 Actions가 영향 목록에 들어갑니다.
+
+GitHub도 이 구조를 문제로 인정하고, 2026년 3월에 "Actions와 Git 같은 핵심 시스템이 공유 인프라 문제에 영향받지 않도록 의존성을 격리하겠다"고 밝혔습니다.
+커뮤니티에서는 진행 중인 데이터센터 이전 작업을 장애 증가와 연결하는 추측도 있지만, 공식 장애 보고서가 이전 작업을 원인으로 지목한 적은 없습니다.
+
+사용자 입장에서 중요한 함의는 하나입니다.
+장애나 혼잡으로 생기는 대기 시간은 워크플로 안쪽을 아무리 튜닝해도 줄지 않습니다.
+그래서 이 글의 첫 번째 기법은 측정, 그중에서도 실행 시간과 대기 시간의 구분입니다.
+
+== 단계별 소요 시간 측정
+
+워크플로를 고치기 전에 어느 단계가 시간을 쓰는지부터 확인해야 합니다.
+GitHub UI의 실행 결과 화면에서 각 단계를 펼치면 소요 시간이 나오지만, 여러 실행을 비교하려면 `gh` CLI로 뽑는 편이 빠릅니다.
+
+[source,bash]
+----
+gh run view -R <owner>/<repo> <run-id> --json jobs --jq '
+  .jobs[] | "JOB \(.name): \(((.completedAt|fromdateiso8601) - (.startedAt|fromdateiso8601)))s",
+  (.steps[] | "  \(.name): \(((.completedAt|fromdateiso8601) - (.startedAt|fromdateiso8601)))s")'
+----
+
+측정하지 않고 "빌드가 느리다"고 짐작해서 캐시 설정부터 손대면, 효과가 거의 없는 곳에 시간을 쓰게 됩니다.
+전체 시간의 대부분을 빌드가 아닌 단계(예: 아티팩트나 패키지 업로드)가 차지하는 워크플로도 흔합니다.
+
+=== 대기 시간 확인
+
+잡이 실제로 실행된 시간과 별개로, 러너를 배정받기까지 기다리는 시간이 따로 있습니다.
+워크플로 실행이 생성된 시각(`createdAt`)과 잡이 시작된 시각(`startedAt`)의 차이가 대기 시간입니다.
+앞에서 본 파이프라인으로 말하면 잡 큐잉부터 러너 배정까지의 구간입니다.
+
+[source,bash]
+----
+gh run view -R <owner>/<repo> <run-id> --json createdAt,jobs \
+  --jq '"created: \(.createdAt)", (.jobs[] | "started: \(.startedAt)")'
+----
+
+개인 저장소에서는 대기가 거의 없지만, 동시 실행 한도에 걸리는 조직 저장소에서는 대기가 실행 시간보다 길어지기도 합니다.
+그런 상황이면 워크플로 내부를 아무리 다듬어도 체감 시간이 줄지 않습니다.
+저장소나 조직의 Insights 탭에 있는 Actions Performance Metrics에서 잡별 평균 실행 시간과 평균 대기 시간을 최대 1년 치까지 볼 수 있으니, 여기서 대기가 문제인지 실행이 문제인지를 먼저 구분하는 편이 좋습니다.
+
+== 트리거 조건으로 불필요한 실행 제거
+
+가장 확실하게 시간을 줄이는 방법은 워크플로를 아예 실행하지 않는 것입니다.
+``on``에 ``paths``나 ``paths-ignore``를 걸면 바뀐 파일 경로에 따라 실행을 건너뜁니다.
+앞에서 본 대로 이 필터는 실행 생성 전에 평가되므로, 필터에 걸리면 파이프라인에 아무것도 들어가지 않습니다.
+
+[source,yaml]
+----
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'examples/**'
+      - '.github/workflows/test-examples.yml'
+----
+
+``paths``를 쓸 때는 워크플로 파일 자신을 목록에 넣어 두는 점이 중요합니다.
+이렇게 해야 워크플로를 고쳤을 때 그 변경이 검증됩니다.
+
+[CAUTION]
+====
+브랜치 보호 규칙에서 필수 상태 검사(required status check)로 지정한 워크플로에는 경로 필터를 쓰면 안 됩니다.
+필터 때문에 워크플로를 건너뛰면 검사 상태가 Pending으로 남고, 풀 리퀘스트는 "Waiting for status to be reported" 상태로 병합이 막힙니다.
+GitHub 문서는 필수 검사에 경로·브랜치 필터를 쓰지 말라고 안내하고, 굳이 써야 한다면 같은 이름으로 항상 성공하는 워크플로를 ``paths-ignore``와 함께 하나 더 두는 우회책을 제시합니다.
+====
+
+== concurrency로 중복 실행 취소
+
+같은 브랜치에 커밋을 연달아 밀어 넣으면 이전 커밋의 워크플로가 계속 돌고 있는데 새 실행이 또 시작됩니다.
+결과를 볼 필요가 없는 실행이 러너를 차지합니다.
+``concurrency``로 그룹을 묶고 ``cancel-in-progress``를 켜면 진행 중이던 실행이 취소됩니다.
+
+[source,yaml]
+----
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+----
+
+그런데 이 설정을 모든 워크플로에 넣으면 안 됩니다.
+배포 워크플로는 중간에 취소되면 어중간한 상태로 남을 수 있습니다.
+그런 워크플로는 그룹만 묶고 취소는 끕니다.
+
+[source,yaml]
+----
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+----
+
+``cancel-in-progress: false``로 두면 진행 중인 실행은 끝까지 돌고 새 실행은 대기합니다.
+다만 기본값으로는 한 그룹에서 대기할 수 있는 실행이 하나뿐이고, 뒤에 들어온 실행이 먼저 대기하던 실행을 취소합니다.
+커밋 세 개를 연달아 밀면 첫 번째는 배포되고 두 번째는 취소되며 세 번째만 배포됩니다.
+중간 실행까지 모두 돌려야 한다면 ``queue: max``를 지정해 최대 100개까지 줄을 세울 수 있습니다.
+``queue: max``와 ``cancel-in-progress: true``는 동작이 서로 어긋나므로 함께 쓸 수 없습니다.
+
+== 의존성 캐시와 그 비용
+
+의존성을 내려받는 시간은 대개 캐시로 줄입니다.
+``actions/cache``를 직접 쓰기 전에, 언어별 setup 액션에 내장된 캐시 옵션을 먼저 확인하는 편이 간단합니다.
+
+[cols="2,2,3", options="header"]
+|===
+|액션 |설정 |캐시 대상
+
+|`actions/setup-go`
+|`cache: true` (기본값)
+|모듈 캐시와 빌드 캐시
+
+|`actions/setup-node`
+|`cache: npm` 또는 `pnpm`, `yarn`
+|패키지 매니저의 전역 캐시 디렉터리
+
+|`actions/setup-python`
+|`cache: pip`
+|pip 캐시 디렉터리
+
+|`actions/setup-java`
+|`cache: gradle` 또는 `maven`
+|`~/.gradle`, `~/.m2/repository`
+
+|`gradle/actions/setup-gradle`
+|기본 동작
+|Gradle 사용자 홈과 설정 캐시
+|===
+
+=== 캐시의 손익 계산
+
+캐시는 복원과 저장에도 시간을 씁니다.
+복원은 setup 단계에서, 저장은 잡 마지막의 `Post` 단계에서 일어나므로, 실행 결과 화면에서 이 두 단계의 시간을 보면 캐시가 얼마를 쓰는지 알 수 있습니다.
+
+캐시가 이득인지는 "다시 내려받는 시간"과 "복원 + 저장 시간"의 차이로 정해집니다.
+의존성 다운로드에 시간을 많이 쓰는 프로젝트는 캐시로 줄어들 가능성이 높지만, 압축한 결과가 수백 MB인 캐시를 만들면 올리고 내리는 시간이 다시 받는 시간을 넘길 수 있습니다.
+어느 쪽인지는 캐시를 붙인 전후의 잡 전체 시간을 비교해야 알 수 있습니다.
+link:github-actions-tuning-cases.html[다음 글]에 캐시를 붙여도 잡 전체 시간이 줄지 않은 실제 측정 사례를 실었습니다.
+
+=== 캐시 한도와 스코프
+
+캐시를 설계할 때 알아야 할 GitHub의 제약이 세 가지 있습니다.
+
+* 저장소당 기본 한도는 10GB입니다. 한도를 넘으면 기존 캐시가 삭제됩니다.
+* 7일 넘게 접근되지 않은 캐시는 삭제됩니다. 한 달에 한 번 도는 워크플로는 매번 캐시가 없는 상태로 시작합니다.
+* 워크플로 실행은 현재 브랜치와 기본 브랜치의 캐시를 복원할 수 있습니다. 풀 리퀘스트에서 실행됐다면 base 브랜치의 캐시도 복원합니다. 자식 브랜치나 형제 브랜치의 캐시는 쓰지 못합니다.
+
+풀 리퀘스트에는 규칙이 하나 더 붙습니다.
+풀 리퀘스트에서 만든 캐시는 병합 참조(`refs/pull/.../merge`)에 묶이므로, 그 풀 리퀘스트를 다시 실행할 때만 복원됩니다.
+기본 브랜치나 다른 풀 리퀘스트는 그 캐시를 쓰지 못합니다.
+따라서 캐시를 처음 채우는 일은 기본 브랜치의 워크플로가 맡아야 하고, 풀 리퀘스트는 거기서 복원해 쓰는 구조가 됩니다.
+
+== 잡 분리와 매트릭스의 손익
+
+한 잡 안에서 순서대로 실행하던 작업을 여러 잡으로 나누면 병렬로 돌아갑니다.
+매트릭스를 쓰면 같은 작업을 여러 입력으로 반복하는 잡을 한 번에 선언할 수 있습니다.
+
+[source,yaml]
+----
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+----
+
+나눠진 잡들은 동시에 시작하므로, 러너 사용 시간의 합은 잡들의 합이지만 실제로 기다리는 시간은 가장 느린 잡의 시간으로 줄어듭니다.
+
+여기에 두 가지 대가가 따릅니다.
+
+첫째, 잡마다 러너 준비 비용을 다시 냅니다.
+`Set up job`, 체크아웃, setup 액션까지 실제 작업 전에 대개 10~30초를 씁니다.
+잡을 셋으로 나누면 이 비용을 세 번 냅니다.
+전체가 30초짜리인 워크플로를 나누면 오히려 느려집니다.
+
+둘째, 잡 사이에 데이터를 넘기려면 아티팩트 업로드와 다운로드가 필요합니다.
+한 잡 안에서는 파일 시스템에 그대로 두면 되던 빌드 결과물을, 잡을 나누면 올렸다가 다시 받아야 합니다.
+
+그래서 잡을 나눌 만한 경우는 다음과 같습니다.
+
+* 서로 결과를 주고받지 않는 작업이다. 예: 린트, 테스트, 문서 빌드
+* 각 작업이 러너 준비 비용(10~30초)보다 충분히 오래 걸린다
+* 매트릭스처럼 같은 작업을 다른 입력으로 반복한다
+
+``needs``로 잡 사이 의존을 걸면 병렬성이 사라지므로, 정말 앞 잡의 결과가 필요할 때만 씁니다.
+매트릭스에서는 ``fail-fast``가 기본값 ``true``라, 한 조합이 실패하면 나머지 조합이 취소됩니다.
+실패를 빨리 알고 러너 시간을 아끼려면 그대로 두고, 어느 버전에서 깨지는지 한 번에 다 보려면 ``false``로 바꿉니다.
+
+== 러너 사양과 종류 선택
+
+같은 워크플로도 저장소 공개 여부에 따라 다른 사양에서 돕니다.
+
+[cols="2,2,2", options="header"]
+|===
+|구분 |공개 저장소 |비공개 저장소
+
+|Linux 표준 러너
+|4 vCPU, 16GB RAM
+|2 vCPU, 8GB RAM
+
+|디스크
+|14GB SSD
+|14GB SSD
+|===
+
+비공개 저장소의 표준 러너는 2코어입니다.
+Gradle의 병렬 빌드나 ``go test -p``처럼 코어 수에 비례하는 작업은 여기서 기대만큼 빨라지지 않습니다.
+공개 저장소에서 측정한 시간을 비공개 저장소에 그대로 대입하면 안 되는 이유이기도 합니다.
+
+선택할 수 있는 러너는 세 가지입니다.
+
+* **arm64 표준 러너**: ``ubuntu-24.04-arm`` 같은 레이블로 씁니다. 2025년 8월에 공개 저장소에서 정식 출시됐고, 2026년 1월부터 비공개 저장소에서도 쓸 수 있습니다. x64 대비 분당 단가가 낮고, 워크로드에 따라 더 빠릅니다. 다만 네이티브 확장을 빌드하는 프로젝트는 arm64용 휠이나 바이너리가 있는지 확인해야 합니다.
+* **Larger runner**: 코어를 8개 이상으로 늘린 유료 러너입니다. 공개 저장소에서도 항상 과금되므로, 늘어난 코어를 실제로 쓰는 작업인지 먼저 확인해야 합니다.
+* **Self-hosted runner**: 캐시와 도구를 디스크에 남겨 둘 수 있어 준비 시간이 짧습니다. 대신 러너를 직접 관리해야 하고, 공개 저장소에서는 포크의 풀 리퀘스트가 임의의 코드를 실행할 수 있어 보안 위험이 큽니다.
+
+운영체제 선택도 시간과 비용에 영향을 줍니다.
+표준 러너의 분당 단가는 Linux 2코어가 $0.006, Windows 2코어가 $0.010, macOS 3~4코어가 $0.062입니다.
+공개 저장소에서는 표준 러너가 무료지만, 비공개 저장소에서 macOS 러너를 쓰면 같은 시간에 Linux의 10배가 넘게 청구됩니다.
+macOS 러너는 애플 플랫폼용 빌드에만 쓰고, 나머지는 Linux에 두는 편이 낫습니다.
+
+== 체크아웃과 아티팩트 다듬기
+
+남은 두 가지는 개별 효과가 크지는 않지만 설정이 간단합니다.
+
+``actions/checkout``의 ``fetch-depth`` 기본값은 ``1``이라 최신 커밋 하나만 받습니다.
+``0``으로 바꾸면 전체 이력을 받는데, 커밋이 수만 개인 저장소에서는 이 단계만 수십 초가 걸립니다.
+릴리스 노트 생성처럼 이력이 정말 필요한 잡에만 ``0``을 지정하고, 나머지는 기본값을 두면 됩니다.
+모노레포에서 일부 디렉터리만 필요하다면 ``sparse-checkout``으로 받는 범위를 줄일 수 있습니다.
+
+[source,yaml]
+----
+- uses: actions/checkout@v4
+  with:
+    sparse-checkout: |
+      services/api
+      libs/common
+----
+
+아티팩트는 필요할 때만 올립니다.
+예를 들어 테스트 리포트를 실패했을 때만 업로드하면, 성공한 실행에서는 이 단계가 0초로 끝납니다.
+
+[source,yaml]
+----
+- name: Upload test reports on failure
+  if: failure()
+  uses: actions/upload-artifact@v4
+  with:
+    name: test-reports
+    path: build/reports/tests/test
+----
+
+``actions/upload-artifact``는 v4에서 업로드·다운로드가 최대 10배 빨라졌으므로, v3 이하를 쓰고 있다면 올리는 편이 좋습니다.
+다만 v4부터 아티팩트가 워크플로가 아닌 잡 단위로 묶이므로, 매트릭스 잡에서 같은 이름으로 올리면 충돌합니다.
+이름에 매트릭스 값을 붙여 구분해야 합니다.
+
+== 정리
+
+지금까지 살펴본 기법을 적용 순서대로 정리하면 다음과 같습니다.
+
+[cols="1,3,3", options="header"]
+|===
+|순서 |확인할 것 |주의할 점
+
+|1
+|``gh run view``로 단계별 시간과 대기 시간 측정
+|대기가 길면 워크플로 내부 최적화는 효과가 없다
+
+|2
+|``paths``·``paths-ignore``로 실행 자체를 제거
+|필수 상태 검사에는 쓰지 않는다
+
+|3
+|``concurrency``로 중복 실행 취소
+|배포 워크플로에는 ``cancel-in-progress``를 켜지 않는다
+
+|4
+|setup 액션의 내장 캐시 적용
+|복원 + 저장 시간이 다시 받는 시간보다 클 수 있다
+
+|5
+|잡 분리와 매트릭스로 병렬화
+|잡마다 준비 비용 10~30초를 다시 낸다
+
+|6
+|러너 사양과 운영체제 선택
+|비공개 저장소는 2코어, macOS는 Linux의 10배 단가
+|===
+
+1번을 건너뛰고 2번부터 시작하면, 병목이 다른 곳에 있는 워크플로에서 헛수고를 하게 됩니다.
+이 순서대로 제 저장소 다섯 곳에 적용하며 측정한 기록을 다음 글에 정리했습니다.
+
+link:github-actions-tuning-cases.html[GitHub Actions 워크플로 튜닝: 저장소 다섯 곳의 적용 사례 →]
+
+== 참고 자료
+
+* https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows[Events that trigger workflows - GitHub Docs]
+* https://docs.github.com/en/actions/reference/limits[GitHub Actions limits - GitHub Docs]
+* https://docs.github.com/en/actions/using-jobs/using-conditions-to-control-job-execution[Using conditions to control job execution - GitHub Docs]
+* https://docs.github.com/en/enterprise-cloud@latest/actions/concepts/runners/communicating-with-self-hosted-runners[Communicating with self-hosted runners - GitHub Docs]
+* https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching[Dependency caching - GitHub Docs]
+* https://docs.github.com/en/actions/concepts/workflows-and-actions/concurrency[Concurrency - GitHub Docs]
+* https://docs.github.com/en/actions/reference/runners/github-hosted-runners[GitHub-hosted runners reference - GitHub Docs]
+* https://docs.github.com/en/billing/concepts/product-billing/github-actions[About billing for GitHub Actions - GitHub Docs]
+* https://docs.github.com/en/actions/concepts/metrics[About GitHub Actions metrics - GitHub Docs]
+* https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/troubleshooting-required-status-checks[Troubleshooting required status checks - GitHub Docs]
+* https://github.blog/changelog/2025-08-07-arm64-hosted-runners-for-public-repositories-are-now-generally-available/[arm64 hosted runners for public repositories are now generally available - GitHub Changelog]
+* https://github.blog/changelog/2026-01-29-arm64-standard-runners-are-now-available-in-private-repositories/[arm64 standard runners are now available in private repositories - GitHub Changelog]
+* https://github.blog/changelog/2024-02-12-github-actions-artifacts-v4-is-now-generally-available/[GitHub Actions Artifacts v4 is now Generally Available - GitHub Changelog]
+* https://www.githubstatus.com/incidents/qcvjkzcs7j74[2026년 8월 6일 Actions 장애 원인 분석 - GitHub Status]
+* https://github.blog/news-insights/company-news/github-availability-report-march-2021/[GitHub Availability Report: March 2021 - GitHub Blog]
+* https://github.blog/news-insights/company-news/github-availability-report-august-2023/[GitHub Availability Report: August 2023 - GitHub Blog]
+* https://github.blog/news-insights/company-news/github-availability-report-october-2025/[GitHub Availability Report: October 2025 - GitHub Blog]
+* https://github.blog/news-insights/company-news/github-availability-report-march-2026/[GitHub Availability Report: March 2026 - GitHub Blog]
+* https://github.blog/news-insights/company-news/github-availability-report-may-2026/[GitHub Availability Report: May 2026 - GitHub Blog]
+* https://github.blog/news-insights/company-news/github-availability-report-june-2026/[GitHub Availability Report: June 2026 - GitHub Blog]
+* https://github.blog/news-insights/company-news/addressing-githubs-recent-availability-issues-2/[Addressing GitHub's recent availability issues - GitHub Blog]
+* https://depot.dev/blog/github-actions-runner-architecture-part-1-the-listener[GitHub Actions Runner Architecture Part 1: The Listener - Depot]
+
+'''
+
+이 포스트는 Claude Code와 정상혁이 함께 작성했습니다.
