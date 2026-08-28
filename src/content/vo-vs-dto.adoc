@@ -1,4 +1,4 @@
-= VO vs DTO
+= VO vs DTO: 정의와 용어 혼용의 역사
 정상혁
 2026-08-29
 :jbake-type: post
