@@ -1,0 +1,116 @@
+= VO vs DTO
+정상혁
+2026-08-29
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: java, ddd, convention
+:description: getter/setter만 있는 데이터 운반용 객체를 VO(Value Object)라고 부르는 관행은 혼란을 부릅니다. VO는 값으로 동등성을 판단하는 객체이고, 계층 사이에서 데이터를 나르는 객체는 DTO입니다. Core J2EE Patterns 초판에서 시작된 용어 혼용의 역사와 두 패턴의 정의를 정리합니다.
+:toc:
+:idprefix:
+
+getter/setter만 있는, 값을 실어나르는 객체를 VO(Value Object)라고 부르는 사례를 실무에서 자주 접합니다. 계층 사이에서 데이터를 운반하는 역할이라면 그 객체는 DTO(Data Transfer Object)로 칭하는 편이 혼란의 여지가 적습니다. 원래 정의를 따르면 Value Object는 값에 의해 동등성이 판단되는 객체이기 때문입니다. 이 혼용에는 역사적인 배경이 있습니다. 'Core J2EE Patterns'라는 책의 초판에서 데이터 운반 객체를 VO라고 정의했었는데, 혼동의 여지가 있어서 2판부터는 TO(Transfer Object)로 이름이 바뀌었습니다. 이 글에서는 두 패턴의 정의와 용어가 뒤섞인 역사를 정리합니다.
+
+== Value Object의 정의
+
+Value Object는 식별성 없이 값이 같으면 같다고 간주되는 객체입니다. 돈, 색상, 날짜 같은 개념이 대표적인 예입니다. 10,000원짜리 지폐 두 장은 일련번호가 다르더라도 같은 돈으로 취급하는 것과 같은 원리입니다. link:https://martinfowler.com/bliki/ValueObject.html[Martin Fowler의 글], link:https://en.wikipedia.org/wiki/Value_object[Wikipedia], link:https://learn.microsoft.com/ko-kr/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/implement-value-objects[Microsoft의 .NET 아키텍처 문서]에서 모두 이 정의를 확인할 수 있습니다. Eric Evans의 'Domain-Driven Design'에서도 VALUE OBJECT를 식별성 없이 속성만으로 동일성을 판단하는 객체로 정의합니다.
+
+Java 코드로는 ``equals()``와 ``hashCode()``를 모든 속성 값 기반으로 구현한 객체입니다. Java 14 이후로는 record로 간결하게 정의할 수 있습니다.
+
+[source,java]
+----
+public record Money(BigDecimal amount, Currency currency) {
+}
+----
+
+이 클래스의 두 인스턴스는 담고 있는 값이 같으면 동등합니다.
+
+[source,java]
+----
+Currency krw = Currency.getInstance("KRW");
+Money price1 = new Money(BigDecimal.valueOf(10000), krw);
+Money price2 = new Money(BigDecimal.valueOf(10000), krw);
+
+assertThat(price1).isEqualTo(price2); // 참조가 달라도 값이 같으면 동등
+----
+
+Value Object는 완전한 불변 객체로 만드는 것이 권장됩니다. 불변이면 여러 객체가 같은 인스턴스를 공유해도 별칭 문제(aliasing bug) 같은 부작용에서 자유롭기 때문입니다. Java의 ``java.util.Date``와 ``Calendar``는 값의 성격을 가진 객체인데도 가변으로 설계되어서 공유된 인스턴스가 한쪽에서 수정되는 버그의 원인이 되었습니다. Java 8의 ``java.time`` 패키지가 모든 날짜 클래스를 불변으로 만든 것도 이 교훈의 반영입니다.
+
+Value Object는 Java 언어 스펙 차원에서도 논의되어 온 개념입니다. link:https://openjdk.org/jeps/169[JEP 169: Value Objects]에서 시작된 논의는 Project Valhalla의 link:https://openjdk.org/jeps/401[JEP 401: Value Classes and Objects]로 이어졌습니다. 여기에서도 value object는 식별성 없이 값으로만 구분되는 객체를 의미하며, getter/setter만 가진 객체라는 의미는 어디에도 없습니다.
+
+== DTO(Data Transfer Object)의 정의
+
+DTO는 프로세스나 계층의 경계를 넘어서 데이터를 전달하기 위한 객체입니다. link:https://martinfowler.com/eaaCatalog/dataTransferObject.html[Martin Fowler의 'Patterns of Enterprise Application Architecture' 카탈로그]에서는 원격 호출의 횟수를 줄이기 위해 여러 데이터를 한 번에 담아서 나르는 객체로 정의합니다. 원격 호출은 비용이 크므로 한 번의 호출로 필요한 데이터를 모두 전달하려는 의도에서 나온 패턴입니다.
+
+요즘은 원격 호출에 국한하지 않고 계층 사이의 데이터 운반 객체를 폭넓게 DTO라고 부릅니다. 웹 애플리케이션에서 엔티티를 API 응답에 직접 노출하지 않고 응답 전용 객체로 변환할 때, 그 객체를 DTO라고 부르는 경우가 대표적입니다. DTO는 비즈니스 로직 없이 데이터만 담는 객체이므로 흔히 getter/setter만 가진 형태로 작성됩니다. "getter/setter만 있는 값 운반 객체"라는 통념에 들어맞는 패턴 이름은 VO가 아니라 DTO인 셈입니다.
+
+DTO라고 해서 getter/setter가 필수인 것도 아닙니다. 여러 계층을 오가는 DTO는 오히려 불변으로 만드는 편이 안전하므로, 최근의 Java 코드에서는 DTO도 record로 정의하는 경우가 많습니다. 결국 VO와 DTO를 가르는 기준은 getter/setter 같은 형태가 아니라 객체의 역할입니다. 값 개념을 표현하며 동등성을 값으로 판단하면 VO이고, 경계를 넘어 데이터를 운반하는 역할이면 DTO입니다.
+
+== Core J2EE Patterns 초판의 VO와 개정판의 TO
+
+두 용어가 뒤섞인 출발점은 Deepak Alur 등이 쓴 'Core J2EE Patterns: Best Practices and Design Strategies'입니다. 2001년에 나온 초판에서는 티어(tier) 사이의 데이터 전송 객체를 Value Object라는 이름의 패턴으로 정의했습니다. 이 이름이 값 동등성 객체로서의 Value Object와 혼동을 유발했기 때문에, 2003년의 2판에서는 같은 패턴을 TO(Transfer Object)로 개칭했습니다. Martin Fowler는 같은 역할의 패턴을 DTO라고 부릅니다. 정리하면 다음 세 가지는 같은 패턴을 가리킵니다.
+
+____
+Core J2EE Patterns 초판의 VO = 2판의 TO = Martin Fowler의 DTO
+____
+
+link:https://www.oracle.com/java/technologies/transfer-object.html[Oracle의 Transfer Object 문서]에서 개칭된 이름으로 정리된 패턴 설명을 볼 수 있습니다.
+
+초판의 영향은 다른 책에도 남았습니다. 여러 서적이 VO와 DTO를 같은 의미로 쓴다고 명시했습니다.
+
+* Rod Johnson의 'Expert One-on-One J2EE Development without EJB'(2004): "Value objects are sometimes referred to as Data Transfer Objects (DTOs)"
+* 'Professional Java EE Design Patterns'(2014): "The DTO is also referred to as the Value Object"
+* 'The Java EE Architect's Handbook, Second Edition'(2014): "My definition of "value object" is very close to a Data Transfer Object (DTO)"
+
+J2EE 시대에 이 책들로 학습한 개발자들을 통해 "VO = 데이터 운반 객체"라는 용법이 실무에 퍼졌고, 원저자가 이름을 정정한 지 20년이 넘은 지금까지도 그 관행이 이어지고 있습니다.
+
+== 데이터 운반 객체를 VO라고 부를 때의 비용
+
+이미 팀 안에서 통용되는 이름을 굳이 바꿔야 하는지 의문이 들 수도 있습니다. 저는 데이터 운반 객체를 VO라고 부르는 관행에는 실질적인 비용이 있다고 생각합니다. 값 동등성 객체로서의 Value Object가 여러 중요한 맥락에서 계속 등장하기 때문입니다.
+
+* DDD(Domain-Driven Design): VALUE OBJECT는 ENTITY와 함께 도메인 모델을 구성하는 핵심 요소입니다. AGGREGATE도 ENTITY와 VALUE OBJECT의 묶음으로 정의됩니다.
+* ORM: Hibernate와 JPA에서 ``@Embeddable``로 매핑되는 value type은 식별자 없이 소유한 엔티티에 종속되는 객체로, DDD의 VALUE OBJECT와 통하는 개념입니다.
+* Java 언어 스펙: 앞에서 언급한 JEP 401을 비롯한 Project Valhalla의 문서들이 value object라는 용어를 값 동등성의 의미로 씁니다.
+
+getter/setter만 가진 데이터 홀더를 VO라고 이해하고 있다면 이런 자료를 읽을 때 용어가 어긋나서 혼란이 생깁니다. 반대로 데이터 운반 객체를 DTO라고 부르면 Fowler의 정의와도, Core J2EE Patterns 2판 이후의 정정된 이름과도 자연스럽게 연결됩니다.
+
+한편 DTO가 만능 이름도 아닙니다. HTTP 요청 파라미터를 담는 객체, 통계 쿼리의 결과를 담는 객체까지 모두 DTO라고 부르면 이름만으로는 역할이 드러나지 않습니다. 계층 경계를 넘는 데이터 홀더라는 넓은 의미에서는 다 DTO로 이해할 만하지만, 실제 코드에서는 역할이 드러나는 이름을 붙이는 편이 좋다고 생각합니다. 예를 들면 다음과 같은 이름입니다.
+
+[cols="2,2", options="header"]
+|===
+|역할 |이름 예
+
+|이슈 조회 JSON 응답
+|``IssueResponse``, ``IssueDetailDto``
+
+|이슈 생성 JSON 요청
+|``IssueCreationRequest``, ``IssueCreationCommand``
+
+|이슈 조회 조건
+|``IssueQuery``, ``IssueCriteria``
+
+|이슈 DB 통계 조회 결과
+|``IssueStatsRow``
+|===
+
+== 참고 자료
+
+Value Object
+
+* https://martinfowler.com/bliki/ValueObject.html[Martin Fowler: Value Object]
+* https://en.wikipedia.org/wiki/Value_object[Wikipedia: Value object]
+* https://learn.microsoft.com/ko-kr/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/implement-value-objects[Microsoft: 값 개체 구현]
+* https://openjdk.org/jeps/401[JEP 401: Value Classes and Objects]
+
+Transfer Object / DTO
+
+* https://martinfowler.com/eaaCatalog/dataTransferObject.html[Martin Fowler: Data Transfer Object]
+* https://www.oracle.com/java/technologies/transfer-object.html[Oracle: Core J2EE Patterns - Transfer Object]
+* http://www.adam-bien.com/roller/abien/entry/value_object_vs_data_transfer[Adam Bien: Value Object vs. Data Transfer Object (VO vs. DTO)]
+
+발표 자료
+
+* https://github.com/benelog/presentations/blob/main/20200507-entity-design/slides.md[엔티티 클래스 설계와 퍼시스턴스 프레임워크 (2020년 발표)]
+
+'''
+
+이 포스트는 Claude Code와 정상혁이 함께 작성했습니다.
