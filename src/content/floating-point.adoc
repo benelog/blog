@@ -96,9 +96,9 @@ image::img/floating-point/ieee754-double.png[IEEE 754 double의 비트 구조와
 위 예제처럼 1.03달러에서 0.42달러를 빼는 단순한 계산도 0.6100000000000001달러가 되어, 반올림 처리 없이는 화면에 그대로 노출되거나 비교 연산이 어긋납니다.
 https://dzone.com/articles/never-use-float-and-double-for-monetary-calculatio[Never Use Float and Double for Monetary Calculations]를 비롯해 많은 글이 같은 이유로 금액 계산에 부동소수점 자료형을 쓰지 말라고 권고합니다.
 돈이 아니어도 마지막 자리까지 정확해야 하는 값이라면 같은 원칙이 적용됩니다.
-이어지는 NEIS 사례의 성적 처리가 그런 예입니다.
+이런 오차가 실제 장애로 이어진 국내와 해외 사례를 하나씩 살펴보겠습니다.
 
-=== 실제 장애 사례: 2011년 NEIS 성적 처리 오류
+=== 2011년 NEIS 성적 처리 오류
 
 부동소수점 계산 오차는 실제로 큰 장애로 이어진 적이 있습니다.
 2011년 7월 차세대 교육행정정보시스템(NEIS·나이스)에서 성적 처리 오류가 발생해, 전국 2,300여개 고교에서 1만 7천여명의 학기말 성적이 바뀌었습니다.
@@ -107,10 +107,25 @@ https://dzone.com/articles/never-use-float-and-double-for-monetary-calculatio[Ne
 https://www.khan.co.kr/article/201107222144165[경향신문 기사]에 따르면 고교생 성적 오류는 동점자를 판별하고 석차를 매기는 과정에서 컴퓨터의 계산 오차를 보정하지 않아 발생했습니다.
 https://www.yna.co.kr/view/AKR20110902079600004[연합뉴스 기사]에 실린 교육과학기술부의 점검 결과를 보면, 동점자 처리의 '오류 보정 코드'를 일부 프로그램에 적용하지 않았고, 새로 도입한 DB의 특성상 나타나는 연산 오류를 예측하지 못한 것이 원인으로 지목됐습니다.
 성적처럼 소수점 계산이 들어가는 값을 다룰 때 부동소수점 오차를 고려하지 않으면, 동점 여부 판정 같은 비교 연산이 어긋날 수 있음을 보여주는 사례입니다.
-
 이 사례에서 오류는 자바 코드가 아니라 새로 도입한 DB의 연산에서 발생했습니다.
 그러나 IEEE 754는 대부분의 프로그래밍 언어와 DB가 함께 쓰는 표준이므로, 같은 오차는 어떤 환경에서든 나타날 수 있습니다.
-다음 절에서는 자바에서 이 오차를 피하는 대안을 살펴봅니다.
+
+=== 1991년 걸프전 패트리어트 미사일 요격 실패
+
+0.1을 유한한 2진수로 표현할 수 없다는 사실은 인명 피해로 이어진 적도 있습니다.
+걸프전 중이던 1991년 2월 25일, 사우디아라비아 다란(Dhahran)의 미군 기지에 이라크의 스커드 미사일이 떨어져 미군 28명이 사망하고 97명이 다쳤습니다.
+기지에는 요격용 패트리어트 미사일이 배치되어 있었지만 격추 시도조차 하지 못했습니다.
+
+김종하의 '역사 속의 소프트웨어 오류'(에이콘출판, 2014)는 1장 "0.000000095의 오차가 앗아간 28명의 생명"에서 미국 GAO의 https://www.gao.gov/products/imtec-92-26[조사 보고서]를 바탕으로 이 사건의 원인을 설명합니다.
+패트리어트 시스템은 0.1초 단위로 시간을 세어 목표물이 나타날 구간을 예측하는데, 이 계산에 24비트 고정소수점 레지스터를 사용했습니다.
+0.1은 2진수로는 무한히 반복되는 소수이므로 24비트 이후는 잘려 나갔고, 계산할 때마다 약 0.000000095의 오차가 쌓였습니다.
+연속 가동 20시간이면 시계가 0.0687초, 사건 당시 포대처럼 100시간이면 0.3433초 어긋납니다.
+초속 2km로 날아오는 스커드 미사일에게 0.3433초는 687m에 해당합니다.
+추적 레이더는 실제 미사일 위치에서 687m 벗어난 구간을 탐색했고, 미사일은 아무 방해 없이 병영에 떨어졌습니다.
+이 오차를 수정한 소프트웨어는 사건 다음 날에야 다란에 도착했습니다.
+
+이 시스템의 계산은 `double` 같은 부동소수점이 아니라 고정소수점 방식이었지만, 0.1을 유한한 비트의 2진수에 담지 못해 오차가 생긴다는 원인은 이 글에서 다룬 것과 같습니다.
+다음 절에서는 자바에서 이런 오차를 피하는 대안을 살펴봅니다.
 
 == 자바에서의 대안
 
@@ -176,10 +191,13 @@ Lawrey의 결론은 "`double` 의 반올림을 다루는 법을 모르거나 프
 
 * https://ko.wikipedia.org/wiki/IEEE_754[IEEE 754 - 위키백과]
 * https://dzone.com/articles/never-use-float-and-double-for-monetary-calculatio[Never Use Float and Double for Monetary Calculations]
-* https://www.khan.co.kr/article/201107222144165[“NEIS 성적 오류 어쩌다 발생했나” - 경향신문 (2011.07.22)]
-* https://www.yna.co.kr/view/AKR20110902079600004[`나이스오류' 예견된 사고…설계서ㆍ테스트 없었다 - 연합뉴스 (2011.09.02)]
-* https://woowabros.github.io/study/2018/03/01/spock-test.html[Spock으로 테스트코드를 짜보자 - 우아한형제들 기술 블로그]
-* https://javamoney.github.io/[Java Money]
-* https://blog.vanillajava.blog/2014/07/if-bigdecimal-is-answer-it-must-have.html[If BigDecimal is the answer, it must have been a strange question - Peter Lawrey]
 * https://www.geeksforgeeks.org/bigdecimal-class-java/[BigDecimal Class in Java - GeeksforGeeks]
-* link:1483100.html[JavaScript, JSUnit으로 풀어본 뉴질랜드 화폐 문제] — 이 블로그의 화폐 계산 관련 글
+* https://blog.vanillajava.blog/2014/07/if-bigdecimal-is-answer-it-must-have.html[If BigDecimal is the answer, it must have been a strange question - Peter Lawrey]
+* https://javamoney.github.io/[Java Money]
+* https://woowabros.github.io/study/2018/03/01/spock-test.html[Spock으로 테스트코드를 짜보자 - 우아한형제들 기술 블로그]
+* NEIS 성적 오류
+** https://www.khan.co.kr/article/201107222144165[“NEIS 성적 오류 어쩌다 발생했나” - 경향신문 (2011.07.22)]
+** https://www.yna.co.kr/view/AKR20110902079600004[`나이스오류' 예견된 사고…설계서ㆍ테스트 없었다 - 연합뉴스 (2011.09.02)]
+* 패트리어트 미사일 요격 실패
+** 김종하, '역사 속의 소프트웨어 오류', 에이콘출판(2014), 25~35쪽
+** https://www.gao.gov/products/imtec-92-26[Patriot Missile Defense: Software Problem Led to System Failure at Dhahran, Saudi Arabia - GAO (1992.02)]
