@@ -33,7 +33,7 @@ Money price2 = new Money(BigDecimal.valueOf(10000), krw);
 assertThat(price1).isEqualTo(price2); // 참조가 달라도 값이 같으면 동등
 ----
 
-Value Object는 완전한 불변 객체로 만드는 것이 권장됩니다. Fowler도 'Patterns of Enterprise Application Architecture' 486쪽에서 Value Object를 불변으로 만드는 것이 매우 좋은 방법이라고("it's a very good idea to make them immutable") 권고합니다. 불변이면 여러 객체가 같은 인스턴스를 공유해도 별칭 문제(aliasing bug) 같은 부작용에서 자유롭기 때문입니다. Eric Evans도 'Domain-Driven Design' 99~103쪽에서 불변 Value Object를 자유롭게 공유할 수 있다는 점을 설명합니다. Java의 ``java.util.Date``와 ``Calendar``는 값의 성격을 가진 객체인데도 가변으로 설계되어서 공유된 인스턴스가 한쪽에서 수정되는 버그의 원인이 되었습니다. Java 8의 ``java.time`` 패키지가 모든 날짜 클래스를 불변으로 만든 것도 이 교훈의 반영입니다.
+Value Object는 완전한 불변 객체로 만드는 것이 권장됩니다. Fowler도 'Patterns of Enterprise Application Architecture' 486쪽에서 Value Object를 불변으로 만드는 것이 매우 좋은 방법이라고("it's a very good idea to make them immutable") 권고합니다. 그의 Value Object 글도 마찬가지입니다. link:https://web.archive.org/web/20110104080034/http://martinfowler.com/bliki/ValueObject.html[2016년 개정 전 버전]에서는 "A general heuristic is that value objects should be entirely immutable."라고 썼고, 개정된 현재 버전에서도 "value objects should be immutable"를 중요한 규칙으로 제시합니다. 불변이면 여러 객체가 같은 인스턴스를 공유해도 별칭 문제(aliasing bug) 같은 부작용에서 자유롭기 때문입니다. Eric Evans도 'Domain-Driven Design' 99~103쪽에서 불변 Value Object를 자유롭게 공유할 수 있다는 점을 설명합니다. Java의 ``java.util.Date``와 ``Calendar``는 값의 성격을 가진 객체인데도 가변으로 설계되어서 공유된 인스턴스가 한쪽에서 수정되는 버그의 원인이 되었습니다. Java 8의 ``java.time`` 패키지가 모든 날짜 클래스를 불변으로 만든 것도 이 교훈의 반영입니다.
 
 Value Object는 Java 언어와 JVM의 기능으로도 도입되고 있습니다. Project Valhalla의 link:https://openjdk.org/jeps/401[JEP 401: Value Objects (Preview)]는 불변이고 객체 식별성이 없으며 필드 값으로만 구분되는 value object를 제안합니다. 2026년 8월 현재 이 JEP는 JDK 28에 미리보기 기능으로 통합되어 있습니다. link:https://openjdk.org/jeps/169[JEP 169: Larval State for Value Objects]는 이러한 불변 value object의 임시 가변 상태를 다루는 별도의 Draft 제안입니다. 어느 쪽에서도 value object를 getter/setter만 가진 객체라는 의미로 사용하지 않습니다.
 
@@ -106,6 +106,7 @@ getter/setter만 가진 데이터 홀더를 VO라고 이해하고 있다면 이�
 Value Object
 
 * https://martinfowler.com/bliki/ValueObject.html[Martin Fowler: Value Object]
+* https://web.archive.org/web/20110104080034/http://martinfowler.com/bliki/ValueObject.html[Martin Fowler: Value Object (2016년 개정 전 버전, Wayback Machine)]
 * https://en.wikipedia.org/wiki/Value_object[Wikipedia: Value object]
 * https://learn.microsoft.com/ko-kr/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/implement-value-objects[Microsoft: 값 개체 구현]
 * Martin Fowler, 'Patterns of Enterprise Application Architecture', 486쪽
