@@ -74,7 +74,7 @@ Core J2EE Patterns를 비롯한 당시의 Java/J2EE 문헌은 "VO = 데이터 �
 
 이미 팀 안에서 통용되는 이름을 굳이 바꿔야 하는지 의문이 들 수도 있습니다. 저는 데이터 운반 객체를 VO라고 부르는 관행에는 실질적인 비용이 있다고 생각합니다. 값 동등성 객체로서의 Value Object가 여러 중요한 맥락에서 계속 등장하기 때문입니다.
 
-같은 이름을 서로 다른 개념에 재사용하는 비용은 Java API에도 남아 있습니다. ``java.sql.Date``는 ``java.util.Date``의 이름을 재사용해서 두 클래스를 함께 쓸 때마다 혼란을 일으키는 대표적인 사례입니다. Joshua Bloch와 Neal Gafter도 'Java Puzzlers'의 Puzzle 67에서 플랫폼 클래스의 이름을 재사용하지 말라고 권고합니다.
+같은 이름을 서로 다른 개념에 재사용하는 비용은 Java API에도 남아 있습니다. Joshua Bloch와 Neal Gafter는 'Java Puzzlers'의 Puzzle 67(한국어 번역판 171쪽)에서 ``java.sql.Date``가 ``java.util.Date``의 이름과 겹치는 것을 플랫폼 설계자의 실수 사례로 들며, 플랫폼 클래스의 이름 재사용을 피하라고 권고합니다.
 
 * DDD(Domain-Driven Design): VALUE OBJECT는 ENTITY와 함께 도메인 모델을 구성하는 핵심 요소입니다. AGGREGATE도 ENTITY와 VALUE OBJECT의 묶음으로 정의됩니다.
 * ORM: Hibernate와 JPA의 ``@Embeddable``은 자체 영속 식별성 없이 소유한 엔티티에 종속되는 객체를 매핑합니다. DDD의 VALUE OBJECT를 매핑할 때 흔히 사용하는 구조이지만, JPA가 값 동등성이나 불변성을 강제하지는 않으므로 모든 ``@Embeddable``이 곧 DDD VALUE OBJECT인 것은 아닙니다.
@@ -126,7 +126,7 @@ Transfer Object / DTO
 
 이름 충돌
 
-* Joshua Bloch·Neal Gafter, 'Java Puzzlers', Puzzle 67: All Strung Out
+* Joshua Bloch·Neal Gafter, 'Java Puzzlers', Puzzle 67: All Strung Out(한국어 번역판 169~171쪽)
 
 발표 자료
 
