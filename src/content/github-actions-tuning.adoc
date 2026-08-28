@@ -5,6 +5,7 @@
 :jbake-status: published
 :jbake-tags: github-actions, ci, 개발환경
 :description: GitHub Actions에서 이벤트가 워크플로 실행이 되어 러너에 배정되기까지의 파이프라인 구조와 최근 장애 이력을 살펴보고, 그 구조에서 나오는 튜닝 기법을 측정, 트리거 조건, concurrency, 캐시, 잡 분리, 러너 선택 순서로 정리했습니다.
+:jbake-og: {"image": "img/github-actions-tuning/actions-pipeline.png"}
 :toc:
 :sectnums:
 :toclevels: 1
@@ -16,8 +17,6 @@ GitHub Actions 워크플로가 느려지면 푸시한 뒤 결과를 확인하기
 
 이 글에서는 먼저 워크플로가 실행되기까지 GitHub 내부에서 거치는 파이프라인 구조와 최근 장애 이력을 살펴봅니다.
 그 다음에 실행 시간을 줄이는 기법을 측정 → 실행 횟수 줄이기 → 캐시 → 병렬화 → 러너 선택 순서로 정리했습니다.
-각 기법에는 대가가 따르므로, 어떤 조건에서 손해인지도 함께 적었습니다.
-이 기법들을 제 저장소 다섯 곳에 적용하며 측정한 기록은 link:github-actions-tuning-cases.html[다음 글]에 따로 정리했습니다.
 
 GitHub의 사양·요금·한도는 2026년 8월 28일에 확인한 값입니다. 바뀔 수 있으므로 글 끝의 공식 문서를 함께 확인하시기를 권합니다.
 
@@ -26,7 +25,6 @@ GitHub의 사양·요금·한도는 2026년 8월 28일에 확인한 값입니다
 구체적인 튜닝 기법을 보기 전에, 푸시 한 번이 러너 위에서 도는 잡이 되기까지 GitHub 내부에서 거치는 경로를 정리합니다.
 튜닝하려면 시간이 어디에서 소모되는지 알아야 하는데, GitHub이 Actions의 내부 구조를 직접 공개하지는 않습니다.
 대신 공식 문서와 장애 보고서(availability report)에 흩어져 있는 내부 서비스에 대한 언급으로 구조를 재구성할 수 있고, 장애 사례는 그 구조의 어느 단계가 실제로 막히는지도 보여줍니다.
-대기 시간이 어디에서 생기는지, 트리거 필터가 왜 가장 확실한 최적화인지가 이 구조에서 나옵니다.
 
 === 워크플로를 트리거하는 이벤트의 종류
 
@@ -71,7 +69,9 @@ cron의 분을 0이 아닌 값으로 두면 정각에 몰리는 혼잡을 피할
 . **잡 큐잉과 배정**: 만들어진 잡은 큐에 들어가고, 잡 배정을 담당하는 서비스가 ``runs-on`` 레이블·그룹이 맞는 유휴 러너를 찾아 잡을 배정합니다. 잡 오케스트레이션은 Redis 클러스터에 의존합니다.
 . **러너 수령**: 러너는 GitHub으로 아웃바운드 HTTPS 연결만 열고, 50초 단위의 long poll로 잡을 기다립니다. 러너 애플리케이션은 Azure Pipelines Agent의 포크이고, 로그와 아티팩트는 Azure Blob Storage로 올라갑니다.
 
-핵심은 워크플로 실행이 단일 서비스가 아니라 여러 큐와 서비스를 지나는 비동기 파이프라인이라는 점입니다.
+image::img/github-actions-tuning/actions-pipeline.png[이벤트 접수부터 러너 수령까지 GitHub Actions 실행 파이프라인 다이어그램,width=800]
+
+이와 같이 워크플로 실행은 여러 큐와 서비스를 지나는 비동기 파이프라인입니다.
 webhook 처리 → 실행 생성 → 잡 큐 → 러너 배정 중 어느 구간이 막혀도 사용자에게는 똑같이 "워크플로가 시작되지 않는" 증상으로 보입니다.
 
 참고로 러너가 GraphQL API를 직접 호출하지는 않습니다.
@@ -105,22 +105,21 @@ webhook 처리 → 실행 생성 → 잡 큐 → 러너 배정 중 어느 구간
 앞 절에서 장애 보고서는 구조를 재구성하는 근거였는데, 이 절에서는 장애 사례 자체를 봅니다.
 장애가 파이프라인의 어느 단계를 막는지, 그리고 그때 생기는 지연이 왜 워크플로 튜닝의 범위 밖인지가 여기서 드러납니다.
 
-2025년 말부터 GitHub 장애가 잦아졌다는 체감은 데이터와 대체로 맞습니다.
+2025년 말부터 GitHub의 장애는 잦아지고 있습니다.
 월별 availability report에 집계된 인시던트 수가 2025년 하반기에는 월 3~5건이었는데 2026년에는 월 6~10건으로 늘었습니다.
 이 글을 쓰는 2026년 8월에는 1일부터 27일까지 githubstatus.com에 올라온 인시던트 25건 중 7건이 Actions 관련이었습니다.
 증상도 "실행 시작 지연", "잡이 queued 상태로 고착"처럼 파이프라인 앞 단이 막히는 유형이 반복됩니다.
 
-원인을 나눠 보면, Actions 파이프라인 자체의 장애와 파이프라인이 의존하는 상류 서비스 장애가 섞여 있습니다.
+원인을 나눠 보면, Actions 파이프라인 자체의 장애와 파이프라인이 의존하는 공용 서비스·인프라의 장애가 섞여 있습니다.
 
 * **파이프라인 자체의 장애**: 2026년 8월 6일에는 이벤트를 처리해 잡을 생성하는 내부 서비스에 정기 배포가 나가면서 잠재해 있던 용량 문제가 드러났고, 피크에는 워크플로 실행의 71%가 실패했습니다. 잡 배정 서비스의 버그로 러너가 이미 무효가 된 잡을 배정받아 재시도를 반복했고, GitHub은 복구를 위해 webhook 유입을 평소의 15% 수준으로 줄였습니다. 그 밖에도 잡 오케스트레이션용 Redis 클러스터 문제로 실행의 95%가 5분 안에 시작하지 못한 장애(2026년 3월 5일), 러너 관련 서비스의 SSL 인증서 만료(2026년 7월과 8월), 데이터베이스 primary 포화(2026년 8월 26일)가 이어졌습니다. 2026년 5월 26일에는 자동 계정 심사 시스템이 Actions의 내부 서비스 계정을 오인해 정지시키는 바람에 새로 큐잉된 모든 실행이 실패하기도 했습니다.
-* **상류 장애의 전파**: Actions는 webhook, API, 데이터베이스·캐시 계층, Azure 인프라의 하류에 있습니다. 2025년 10월 29일 Azure Front Door 장애 때는 호스티드 러너 잡이 실패했고, 2026년 6월 8일에는 github.com의 릴리스 다운로드 엔드포인트가 504를 반환하자 그 엔드포인트에 의존하는 워크플로들이 실패했습니다. Actions 자체는 정상이어도 의존 대상이 무너지면 함께 무너지는 구조라서, github.com 전반에 걸친 장애에서는 거의 항상 Actions가 영향 목록에 들어갑니다.
+* **공용 서비스·인프라 장애의 전파**: Actions는 webhook, API, 데이터베이스·캐시 계층, Azure 인프라에 바탕을 두고 있습니다. 2025년 10월 29일 Azure Front Door 장애 때는 호스티드 러너 잡이 실패했고, 2026년 6월 8일에는 github.com의 릴리스 다운로드 엔드포인트가 504를 반환하자 그 엔드포인트에 의존하는 워크플로들이 실패했습니다. Actions 자체는 정상이어도 의존 대상이 무너지면 함께 무너지는 구조라서, github.com 전반에 걸친 장애에서는 거의 항상 Actions가 영향 목록에 들어갑니다.
 
 GitHub도 이 구조를 문제로 인정하고, 2026년 3월에 "Actions와 Git 같은 핵심 시스템이 공유 인프라 문제에 영향받지 않도록 의존성을 격리하겠다"고 밝혔습니다.
 커뮤니티에서는 진행 중인 데이터센터 이전 작업을 장애 증가와 연결하는 추측도 있지만, 공식 장애 보고서가 이전 작업을 원인으로 지목한 적은 없습니다.
 
-사용자 입장에서 중요한 함의는 하나입니다.
 장애나 혼잡으로 생기는 대기 시간은 워크플로 안쪽을 아무리 튜닝해도 줄지 않습니다.
-그래서 이 글의 첫 번째 기법은 측정, 그중에서도 실행 시간과 대기 시간의 구분입니다.
+그래서 이 글에서는 먼저 튜닝할 대상을 측정할 수 있는 기법을 설명합니다.
 
 == 단계별 소요 시간 측정
 
@@ -370,6 +369,29 @@ macOS 러너는 애플 플랫폼용 빌드에만 쓰고, 나머지는 Linux에 �
 다만 v4부터 아티팩트가 워크플로가 아닌 잡 단위로 묶이므로, 매트릭스 잡에서 같은 이름으로 올리면 충돌합니다.
 이름에 매트릭스 값을 붙여 구분해야 합니다.
 
+== GitHub Enterprise Server에서 달라지는 손익 계산
+
+지금까지의 계산은 github.com을 전제로 했습니다.
+앞의 조건 평가 시점 절에서 파일 수와 조건식의 개수는 걱정할 요인이 아니라고 했는데, 그 전제는 트리거 평가와 실행 생성이 GitHub의 공용 인프라에서 일어난다는 것이었습니다.
+설치형인 GitHub Enterprise Server(GHES)에서는 이 전제가 달라집니다.
+webhook 접수부터 트리거 평가, 실행 생성, 잡 큐잉까지 파이프라인 전체가 사내 인스턴스의 자원으로 돌아가기 때문입니다.
+GitHub은 GHES에서 Actions를 켜는 데에 최소 8 vCPU와 64GB 메모리를 요구하고, 연결하는 러너 수에 따라 권장 사양을 올려 잡습니다(예: 32 vCPU·160GB 메모리의 최대 연결 러너 수는 2,700대).
+
+그래서 github.com에서는 유지보수성 관점에서 추천했던 파일 정리가 GHES에서는 자기 인스턴스의 용량 절감이 됩니다.
+안 쓰는 워크플로를 삭제·비활성화하고, 미러링이나 봇의 대량 푸시처럼 워크플로가 필요 없는 이벤트를 줄이면, 그만큼 인스턴스가 처리할 평가와 실행 생성이 줄어듭니다.
+``schedule``의 정각 분산도 의미가 달라집니다.
+github.com에서는 GitHub의 혼잡을 피하는 요령이었지만, GHES에서는 조직 전체의 cron이 정각에 몰리면 내 인스턴스에 부하 스파이크가 생깁니다.
+다만 GHES에서도 트리거 평가 자체가 병목이라는 근거가 따로 있지는 않으므로, 이런 정리는 지연을 고치는 처방이라기보다 인스턴스 용량을 아끼는 예방에 가깝습니다.
+
+러너와 스토리지의 전제도 다릅니다.
+GHES에는 GitHub 호스티드 러너가 없어 셀프 호스티드 러너만 쓸 수 있습니다.
+잡이 큐에서 기다리는 시간이 전적으로 사내 러너 풀의 용량에 달려 있으므로, 러너 사양 절에서 본 표준 러너의 사양·단가 비교는 GHES에 적용되지 않습니다.
+로그·아티팩트·캐시는 별도로 준비한 외부 blob storage(S3, Azure Blob 등)에 저장되므로, 캐시의 손익도 그 스토리지의 성능에 따라 달라집니다.
+
+측정 수단은 오히려 늘어납니다.
+github.com에서는 실행 생성 앞 구간이 블랙박스지만, GHES 관리자는 관리 콘솔의 모니터 대시보드에서 CPU·메모리 포화, 백그라운드 잡 큐 적체, Actions 관련 지표를 직접 볼 수 있습니다.
+실행 시작이 느릴 때 워크플로를 고치기 전에 인스턴스 쪽 병목부터 확인할 수 있으므로, 측정을 먼저 하라는 이 글의 순서는 GHES에서도 그대로 적용됩니다.
+
 == 정리
 
 지금까지 살펴본 기법을 적용 순서대로 정리하면 다음과 같습니다.
@@ -421,6 +443,8 @@ link:github-actions-tuning-cases.html[GitHub Actions 워크플로 튜닝: 저장
 * https://docs.github.com/en/billing/concepts/product-billing/github-actions[About billing for GitHub Actions]
 * https://docs.github.com/en/actions/concepts/metrics[About GitHub Actions metrics]
 * https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/troubleshooting-required-status-checks[Troubleshooting required status checks]
+* https://docs.github.com/en/enterprise-server@latest/admin/github-actions/getting-started-with-github-actions-for-your-enterprise/getting-started-with-github-actions-for-github-enterprise-server[Getting started with GitHub Actions for GitHub Enterprise Server]
+* https://docs.github.com/en/enterprise-server@latest/admin/monitoring-and-managing-your-instance/monitoring-your-instance/accessing-the-monitor-dashboard[Accessing the monitor dashboard (GHES)]
 
 .GitHub Changelog
 * https://github.blog/changelog/2025-08-07-arm64-hosted-runners-for-public-repositories-are-now-generally-available/[arm64 hosted runners for public repositories are now generally available]

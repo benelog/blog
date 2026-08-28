@@ -1,0 +1,104 @@
+<mxfile host="app.diagrams.net" agent="claude-code">
+  <diagram id="gha-pipeline" name="GitHub Actions 실행 파이프라인">
+    <mxGraphModel dx="1200" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1480" pageHeight="560" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="t_title" value="GitHub Actions: 이벤트에서 러너까지의 실행 파이프라인" style="text;html=1;fontSize=16;fontStyle=1;align=left;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="520" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="zone1" value="① 이벤트 접수" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#b3b3b3;dashed=1;verticalAlign=top;align=left;fontSize=13;fontStyle=1;spacingLeft=10;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="40" y="100" width="380" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="zone2" value="② 실행 생성" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#b3b3b3;dashed=1;verticalAlign=top;align=left;fontSize=13;fontStyle=1;spacingLeft=10;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="450" y="100" width="330" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="zone3" value="③ 잡 큐잉과 배정" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#b3b3b3;dashed=1;verticalAlign=top;align=left;fontSize=13;fontStyle=1;spacingLeft=10;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="810" y="100" width="310" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="zone4" value="④ 러너 수령" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#b3b3b3;dashed=1;verticalAlign=top;align=left;fontSize=13;fontStyle=1;spacingLeft=10;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="1150" y="100" width="290" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="n_repo" value="저장소 활동&lt;br&gt;(push, PR 등)" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="60" y="170" width="120" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="n_kafka" value="Kafka 기반&lt;br&gt;백그라운드 잡 파이프라인" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="240" y="165" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="note_evt" value="브랜치 5,000개 초과 푸시, 태그 3개 초과 푸시 등은&lt;br&gt;이벤트 자체가 생성되지 않음" style="text;html=1;fontSize=11;fontColor=#666666;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="60" y="380" width="340" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="n_svc" value="내부 Actions 서비스&lt;br&gt;트리거 조건 평가,&lt;br&gt;실행(run)·잡 생성" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="480" y="160" width="180" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="n_check" value="check suite 생성" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#ffffff;strokeColor=#999999;" vertex="1" parent="1">
+          <mxGeometry x="480" y="300" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="n_gql" value="GraphQL 계층" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#ffffff;strokeColor=#999999;" vertex="1" parent="1">
+          <mxGeometry x="640" y="300" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="note_on" value="on의 paths·branches 필터는 이 단계에서 평가.&lt;br&gt;필터에 걸리면 실행이 만들어지지 않음" style="text;html=1;fontSize=11;fontColor=#666666;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="470" y="380" width="300" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="n_queue" value="잡 큐" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="840" y="170" width="90" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="n_assign" value="잡 배정 서비스" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="970" y="170" width="120" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="n_redis" value="Redis 클러스터" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="930" y="300" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="n_runner" value="러너&lt;br&gt;(Azure Pipelines&lt;br&gt;Agent 포크)" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="1180" y="160" width="160" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="n_blob" value="Azure Blob Storage&lt;br&gt;(로그·아티팩트)" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#f5f5f5;strokeColor=#999999;" vertex="1" parent="1">
+          <mxGeometry x="1180" y="310" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" value="webhook 이벤트" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="n_repo" target="n_kafka">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" x="0" y="-24" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2" value="이벤트 전달" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="n_kafka" target="n_svc">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" x="0" y="-20" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e3" value="잡 큐잉" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="n_svc" target="n_queue">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" x="0" y="-20" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e4" value="생성 경로가 경유" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;dashed=1;labelBackgroundColor=#ffffff;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="n_svc" target="n_check">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;dashed=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="n_svc" target="n_gql">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;" edge="1" parent="1" source="n_queue" target="n_assign">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" value="runs-on이 맞는&lt;br&gt;유휴 러너에 배정" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="n_assign" target="n_runner">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" x="0" y="-32" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e8" value="50초 long poll&lt;br&gt;(아웃바운드 HTTPS만)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;dashed=1;labelBackgroundColor=#ffffff;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=0.7;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="n_runner" target="n_assign">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1120" y="272" />
+              <mxPoint x="1054" y="272" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e9" value="잡 오케스트레이션 의존" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;dashed=1;labelBackgroundColor=#ffffff;exitX=0.2;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="n_assign" target="n_redis">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" value="로그·아티팩트 업로드" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="n_runner" target="n_blob">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
