@@ -39,9 +39,9 @@ Value Object는 Java 언어 스펙 차원에서도 논의되어 온 개념입니
 
 == DTO(Data Transfer Object)의 정의
 
-DTO는 프로세스나 계층의 경계를 넘어서 데이터를 전달하기 위한 객체입니다. link:https://martinfowler.com/eaaCatalog/dataTransferObject.html[Martin Fowler의 'Patterns of Enterprise Application Architecture' 카탈로그]에서는 원격 호출의 횟수를 줄이기 위해 여러 데이터를 한 번에 담아서 나르는 객체로 정의합니다. 원격 호출은 비용이 크므로 한 번의 호출로 필요한 데이터를 모두 전달하려는 의도에서 나온 패턴입니다.
+DTO의 원래 정의는 원격 호출을 효율화하기 위한 객체입니다. link:https://martinfowler.com/eaaCatalog/dataTransferObject.html[Martin Fowler의 'Patterns of Enterprise Application Architecture' 카탈로그]에서는 원격 호출의 횟수를 줄이기 위해 여러 데이터를 한 번에 담아서 나르는 객체로 정의합니다. 원격 호출은 비용이 크므로 한 번의 호출로 필요한 데이터를 모두 전달하려는 의도에서 나온 패턴입니다.
 
-요즘은 원격 호출에 국한하지 않고 계층 사이의 데이터 운반 객체를 폭넓게 DTO라고 부릅니다. 웹 애플리케이션에서 엔티티를 API 응답에 직접 노출하지 않고 응답 전용 객체로 변환할 때, 그 객체를 DTO라고 부르는 경우가 대표적입니다. DTO는 비즈니스 로직 없이 데이터만 담는 객체이므로 흔히 getter/setter만 가진 형태로 작성됩니다. "getter/setter만 있는 값 운반 객체"라는 통념에 들어맞는 패턴 이름은 VO가 아니라 DTO인 셈입니다.
+실무에서는 이 정의를 폭넓게 해석해서, 원격 호출이 아니더라도 계층의 경계를 넘어 데이터를 운반하는 객체를 DTO라고 부르는 관례가 생겼습니다. 웹 애플리케이션에서 엔티티를 API 응답에 직접 노출하지 않고 응답 전용 객체로 변환할 때, 그 객체를 DTO라고 부르는 경우가 대표적입니다. DTO는 비즈니스 로직 없이 데이터만 담는 객체이므로 흔히 getter/setter만 가진 형태로 작성됩니다. "getter/setter만 있는 값 운반 객체"라는 통념에 들어맞는 패턴 이름은 VO가 아니라 DTO인 셈입니다.
 
 DTO라고 해서 getter/setter가 필수인 것도 아닙니다. 여러 계층을 오가는 DTO는 오히려 불변으로 만드는 편이 안전하므로, 최근의 Java 코드에서는 DTO도 record로 정의하는 경우가 많습니다. 결국 VO와 DTO를 가르는 기준은 getter/setter 같은 형태가 아니라 객체의 역할입니다. 값 개념을 표현하며 동등성을 값으로 판단하면 VO이고, 경계를 넘어 데이터를 운반하는 역할이면 DTO입니다.
 
