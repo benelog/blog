@@ -4,17 +4,17 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: java, ddd, convention
-:description: getter/setter만 있는 데이터 운반용 객체를 VO(Value Object)라고 부르는 관행은 혼란을 부릅니다. VO는 값으로 동등성을 판단하는 객체이고, 계층 사이에서 데이터를 나르는 객체는 DTO입니다. Core J2EE Patterns 초판에서 시작된 용어 혼용의 역사와 두 패턴의 정의를 정리합니다.
+:description: getter/setter만 있는 데이터 운반용 객체를 VO(Value Object)라고 부르는 관행은 혼란을 부릅니다. VO는 값의 의미와 동등성에 관한 분류이고, DTO는 데이터를 전송하는 역할에 관한 분류입니다. Java/J2EE 진영에서 용어 혼용을 확산시킨 Core J2EE Patterns의 사례와 두 패턴의 정의를 정리합니다.
 :toc:
 :idprefix:
 
-getter/setter만 있는, 값을 실어나르는 객체를 VO(Value Object)라고 부르는 사례를 실무에서 종종 접합니다. 원격 호출 프로세스 사이에서 데이터를 운반하는 역할이라면 그 객체는 DTO(Data Transfer Object)로 칭하는 편이 혼란의 여지가 적습니다. 원래 정의를 따르면 Value Object는 값에 의해 동등성이 판단되는 객체이기 때문입니다. 이 혼용에는 역사적인 배경이 있습니다. 'Core J2EE Patterns'라는 책의 초판에서 데이터 운반 객체를 VO라고 정의했었는데, 혼동의 여지가 있어서 2판부터는 TO(Transfer Object)로 이름이 바뀌었습니다. 이 글에서는 두 패턴의 정의와 용어가 뒤섞인 역사를 정리합니다.
+getter/setter만 있는, 값을 실어나르는 객체를 VO(Value Object)라고 부르는 사례를 실무에서 종종 접합니다. 원격 호출 프로세스 사이에서 데이터를 운반하는 역할이라면 그 객체는 DTO(Data Transfer Object)로 칭하는 편이 혼란의 여지가 적습니다. Fowler와 DDD에서 널리 쓰이는 정의에 따르면 Value Object는 값에 의해 동등성이 판단되는 객체이기 때문입니다. 이 혼용에는 역사적인 배경이 있습니다. Java/J2EE 진영에서 혼용을 확산시킨 대표적인 초기 출처인 'Core J2EE Patterns' 초판에서는 데이터 운반 객체를 VO라고 불렀고, 2판부터는 TO(Transfer Object)로 이름을 바꿨습니다. 이 글에서는 두 패턴의 정의와 용어가 뒤섞인 역사를 정리합니다.
 
 == Value Object의 정의
 
-Value Object는 식별성 없이 값이 같으면 같다고 간주되는 객체입니다. 돈, 색상, 날짜 같은 개념이 대표적인 예입니다. 10,000원짜리 지폐 두 장은 일련번호가 다르더라도 같은 돈으로 취급하는 것과 같은 원리입니다. link:https://martinfowler.com/bliki/ValueObject.html[Martin Fowler의 글], link:https://en.wikipedia.org/wiki/Value_object[Wikipedia], link:https://learn.microsoft.com/ko-kr/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/implement-value-objects[Microsoft의 .NET 아키텍처 문서]에서 모두 이 정의를 확인할 수 있습니다. Eric Evans의 'Domain-Driven Design'에서도 VALUE OBJECT를 식별성 없이 속성만으로 동일성을 판단하는 객체로 정의합니다.
+Value Object는 식별성 없이 값이 같으면 같다고 간주되는 객체입니다. 돈, 색상, 날짜 같은 개념이 대표적인 예입니다. 10,000원이라는 금액은 어떤 지폐나 계좌 잔액으로 표현되더라도 같은 금액으로 취급할 수 있습니다. 다만 실제 지폐 자체를 추적하는 맥락에서는 일련번호를 식별자로 가진 Entity로 모델링할 수도 있습니다. link:https://martinfowler.com/bliki/ValueObject.html[Martin Fowler의 글], link:https://en.wikipedia.org/wiki/Value_object[Wikipedia], link:https://learn.microsoft.com/ko-kr/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/implement-value-objects[Microsoft의 .NET 아키텍처 문서]에서 모두 이 정의를 확인할 수 있습니다. Eric Evans의 'Domain-Driven Design'에서도 VALUE OBJECT를 식별성 없이 속성만으로 동일성을 판단하는 객체로 정의합니다.
 
-Java 코드로는 ``equals()``와 ``hashCode()``를 모든 속성 값 기반으로 구현한 객체입니다. Java 14 이후로는 record로 간결하게 정의할 수 있습니다.
+Java 코드로는 ``equals()``와 ``hashCode()``를 동등성을 구성하는 속성 값 기반으로 구현한 객체입니다. Java 14와 15에서는 미리보기 기능이었고 Java 16부터 정식 기능이 된 record로 간결하게 정의할 수 있습니다.
 
 [source,java]
 ----
@@ -33,25 +33,27 @@ Money price2 = new Money(BigDecimal.valueOf(10000), krw);
 assertThat(price1).isEqualTo(price2); // 참조가 달라도 값이 같으면 동등
 ----
 
-Value Object는 완전한 불변 객체로 만드는 것이 권장됩니다. 불변이면 여러 객체가 같은 인스턴스를 공유해도 별칭 문제(aliasing bug) 같은 부작용에서 자유롭기 때문입니다. Java의 ``java.util.Date``와 ``Calendar``는 값의 성격을 가진 객체인데도 가변으로 설계되어서 공유된 인스턴스가 한쪽에서 수정되는 버그의 원인이 되었습니다. Java 8의 ``java.time`` 패키지가 모든 날짜 클래스를 불변으로 만든 것도 이 교훈의 반영입니다.
+Value Object는 완전한 불변 객체로 만드는 것이 권장됩니다. Fowler도 'Patterns of Enterprise Application Architecture' 486쪽에서 Value Object를 불변으로 만드는 것이 매우 좋은 방법이라고("it's a very good idea to make them immutable") 권고합니다. 불변이면 여러 객체가 같은 인스턴스를 공유해도 별칭 문제(aliasing bug) 같은 부작용에서 자유롭기 때문입니다. Eric Evans도 'Domain-Driven Design' 99~103쪽에서 불변 Value Object를 자유롭게 공유할 수 있다는 점을 설명합니다. Java의 ``java.util.Date``와 ``Calendar``는 값의 성격을 가진 객체인데도 가변으로 설계되어서 공유된 인스턴스가 한쪽에서 수정되는 버그의 원인이 되었습니다. Java 8의 ``java.time`` 패키지가 모든 날짜 클래스를 불변으로 만든 것도 이 교훈의 반영입니다.
 
-Value Object는 Java 언어 스펙 차원에서도 논의되어 온 개념입니다. link:https://openjdk.org/jeps/169[JEP 169: Value Objects]에서 시작된 논의는 Project Valhalla의 link:https://openjdk.org/jeps/401[JEP 401: Value Classes and Objects]로 이어졌습니다. 여기에서도 value object는 식별성 없이 값으로만 구분되는 객체를 의미하며, getter/setter만 가진 객체라는 의미는 어디에도 없습니다.
+Value Object는 Java 언어와 JVM의 기능으로도 도입되고 있습니다. Project Valhalla의 link:https://openjdk.org/jeps/401[JEP 401: Value Objects (Preview)]는 불변이고 객체 식별성이 없으며 필드 값으로만 구분되는 value object를 제안합니다. 2026년 8월 현재 이 JEP는 JDK 28에 미리보기 기능으로 통합되어 있습니다. link:https://openjdk.org/jeps/169[JEP 169: Larval State for Value Objects]는 이러한 불변 value object의 임시 가변 상태를 다루는 별도의 Draft 제안입니다. 어느 쪽에서도 value object를 getter/setter만 가진 객체라는 의미로 사용하지 않습니다.
 
-한편 실무에서는 원래 정의와 무관하게, 값 동등성과 상관없이 데이터를 담는 객체(data holder)라는 의미로 폭넓게 해석해서 getter/setter만 가진 운반용 객체를 VO라고 부르는 관례도 퍼져 있습니다. 이 관례가 어디에서 비롯되었는지는 뒤의 Core J2EE Patterns 절에서 살펴봅니다.
+한편 실무에서는 앞의 정의와 무관하게, 값 동등성과 상관없이 데이터를 담는 객체(data holder)라는 의미로 폭넓게 해석해서 getter/setter만 가진 운반용 객체를 VO라고 부르는 관례도 퍼져 있습니다. 이 관례를 확산시킨 대표적인 출처는 뒤의 Core J2EE Patterns 절에서 살펴봅니다.
 
 == DTO(Data Transfer Object)의 정의
 
-DTO의 원래 정의는 원격 호출을 효율화하기 위한 객체입니다. link:https://martinfowler.com/eaaCatalog/dataTransferObject.html[Martin Fowler의 'Patterns of Enterprise Application Architecture' 카탈로그]에서는 원격 호출의 횟수를 줄이기 위해 여러 데이터를 한 번에 담아서 나르는 객체로 정의합니다. 원격 호출은 비용이 크므로 한 번의 호출로 필요한 데이터를 모두 전달하려는 의도에서 나온 패턴입니다.
+DTO의 원래 정의는 원격 호출을 효율화하기 위한 객체입니다. link:https://martinfowler.com/eaaCatalog/dataTransferObject.html[Martin Fowler의 'Patterns of Enterprise Application Architecture' 카탈로그]와 책의 401쪽에서는 원격 호출의 횟수를 줄이기 위해 여러 데이터를 한 번에 담아서 나르는 객체로 정의합니다. 원격 호출은 비용이 크므로 한 번의 호출로 필요한 데이터를 모두 전달하려는 의도에서 나온 패턴입니다.
 
-HTTP API의 요청과 응답처럼 네트워크를 건너는 데이터를 담는 객체는 이 정의에 그대로 부합합니다. 웹 애플리케이션에서 엔티티를 API 응답에 직접 노출하지 않고 응답 전용 객체로 변환할 때 그 객체를 DTO라고 부르는 용법은 원래 정의의 연장선에 있습니다.
+HTTP API의 요청과 응답처럼 네트워크를 건너는 데이터를 담는 객체는 프로세스 경계를 넘고 직렬화된다는 점에서 이 정의와 통합니다. 다만 모든 HTTP 메시지가 원격 호출 횟수를 줄이기 위해 도입되는 것은 아니므로, 이를 DTO라고 부르는 용법은 원래 정의를 현대적인 API 경계에 확장한 것으로 보는 편이 정확합니다. 웹 애플리케이션에서 엔티티를 API 응답에 직접 노출하지 않고 응답 전용 객체로 변환할 때 그 객체를 DTO라고 부르는 용법도 이런 연장선에 있습니다.
 
-실무에서는 여기에서 더 나아가 이 정의를 폭넓게 해석해서, 원격 호출과 무관하게 같은 프로세스 안에서 계층의 경계를 넘어 데이터를 운반하는 객체까지 DTO라고 부르는 관례가 생겼습니다. DB 조회 결과를 담는 객체나 서비스 계층에서 뷰 렌더링 계층으로 전달하는 객체가 그런 예입니다. DTO는 비즈니스 로직 없이 데이터만 담는 객체이므로 흔히 getter/setter만 가진 형태로 작성됩니다. "getter/setter만 있는 값 운반 객체"라는 통념에 들어맞는 패턴 이름은 VO가 아니라 DTO인 셈입니다.
+실무에서는 여기에서 더 나아가 이 정의를 폭넓게 해석해서, 원격 호출과 무관하게 같은 프로세스 안에서 계층의 경계를 넘어 데이터를 운반하는 객체까지 DTO라고 부르는 관례가 생겼습니다. DB 조회 결과를 담는 객체나 서비스 계층에서 뷰 렌더링 계층으로 전달하는 객체가 그런 예입니다. DTO에는 통상 도메인 비즈니스 로직을 두지 않지만, 전송 형식 변환이나 입력 검증처럼 경계에 관한 동작은 포함할 수 있습니다. DTO는 흔히 getter/setter만 가진 형태로 작성되므로 "getter/setter만 있는 값 운반 객체"라는 통념에는 VO보다 DTO가 더 잘 들어맞습니다.
 
-DTO라고 해서 getter/setter가 필수인 것도 아닙니다. 여러 계층을 오가는 DTO는 오히려 불변으로 만드는 편이 안전하므로, 최근의 Java 코드에서는 DTO도 record로 정의하는 경우가 많습니다. 결국 VO와 DTO를 가르는 기준은 getter/setter 같은 형태가 아니라 객체의 역할입니다. 값 개념을 표현하며 동등성을 값으로 판단하면 VO이고, 경계를 넘어 데이터를 운반하는 역할이면 DTO입니다.
+DTO라고 해서 getter/setter가 필수인 것도 아닙니다. 여러 계층을 오가는 DTO는 오히려 불변으로 만드는 편이 안전하므로, 최근의 Java 코드에서는 DTO도 record로 정의하는 경우가 많습니다. 다만 record가 보장하는 것은 얕은 불변성이므로, 완전한 불변 객체로 만들려면 record component도 불변이거나 방어적으로 복사되어야 합니다.
+
+결국 VO와 DTO를 구분하는 기준은 getter/setter 같은 형태가 아니라 객체의 의미와 역할입니다. 값 개념을 표현하며 동등성을 값으로 판단하는 것은 VO의 성질이고, 경계를 넘어 데이터를 운반하는 것은 DTO의 역할입니다. 이 둘은 서로 배타적인 분류가 아니므로, 값 동등성을 가진 불변 DTO는 동시에 VO의 성질을 가질 수도 있습니다. 반대로 DTO가 반드시 값 동등성을 가져야 하는 것은 아닙니다.
 
 == Core J2EE Patterns 초판의 VO와 개정판의 TO
 
-두 용어가 뒤섞인 출발점은 Deepak Alur 등이 쓴 'Core J2EE Patterns: Best Practices and Design Strategies'입니다. 2001년에 나온 초판에서는 티어(tier) 사이의 데이터 전송 객체를 Value Object라는 이름의 패턴으로 정의했습니다. 이 이름이 값 동등성 객체로서의 Value Object와 혼동을 유발했기 때문에, 2003년의 2판에서는 같은 패턴을 TO(Transfer Object)로 개칭했습니다. Martin Fowler는 같은 역할의 패턴을 DTO라고 부릅니다. 정리하면 다음 세 가지는 같은 패턴을 가리킵니다.
+Java/J2EE 진영에서 두 용어의 혼용을 확산시킨 대표적인 초기 출처는 Deepak Alur 등이 쓴 'Core J2EE Patterns: Best Practices and Design Strategies'입니다. 2001년에 나온 초판에서는 티어(tier) 사이의 데이터 전송 객체를 Value Object라는 이름의 패턴으로 정의했습니다. 이 이름이 값 동등성 객체로서의 Value Object와 혼동을 유발했기 때문에, 2003년의 2판에서는 같은 패턴을 TO(Transfer Object)로 개칭했습니다. Martin Fowler는 같은 역할의 패턴을 DTO라고 부릅니다('Patterns of Enterprise Application Architecture' 401쪽). 정리하면 다음 세 가지는 같은 전송 패턴을 가리킵니다.
 
 ____
 Core J2EE Patterns 초판의 VO = 2판의 TO = Martin Fowler의 DTO
@@ -61,21 +63,24 @@ link:https://www.oracle.com/java/technologies/transfer-object.html[Oracle의 Tra
 
 초판의 영향은 다른 책에도 남았습니다. 여러 서적이 VO와 DTO를 같은 의미로 쓴다고 명시했습니다.
 
-* Rod Johnson의 'Expert One-on-One J2EE Development without EJB'(2004): "Value objects are sometimes referred to as Data Transfer Objects (DTOs)"
-* 'Professional Java EE Design Patterns'(2014): "The DTO is also referred to as the Value Object"
-* 'The Java EE Architect's Handbook, Second Edition'(2014): "My definition of "value object" is very close to a Data Transfer Object (DTO)"
+* Rod Johnson의 'Expert One-on-One J2EE Design and Development'(2002, 265쪽): "Value objects are sometimes referred to as Data Transfer Objects (DTOs)."
+* Rod Johnson과 Juergen Hoeller의 'Expert One-on-One J2EE Development without EJB'(2004, 27쪽): "Transfer objects, often referred to as Data Transfer Objects (DTOs) or Value Objects."
+* 'Professional Java EE Design Patterns'(2014, 12장): "The DTO is also referred to as the Value Object"
+* 'The Java EE Architect's Handbook, Second Edition'(2014, 5장): "My definition of "value object" is very close to a Data Transfer Object (DTO)"
 
-J2EE 시대에 이 책들로 학습한 개발자들을 통해 "VO = 데이터 운반 객체"라는 용법이 실무에 퍼졌고, 원저자가 이름을 정정한 지 20년이 넘은 지금까지도 그 관행이 이어지고 있습니다.
+Core J2EE Patterns를 비롯한 당시의 Java/J2EE 문헌은 "VO = 데이터 운반 객체"라는 용법이 실무에 퍼지는 데 영향을 주었고, 2판에서 이름을 개칭한 지 20년이 넘은 지금까지도 그 관행이 남아 있습니다.
 
 == 데이터 운반 객체를 VO라고 부를 때의 비용
 
 이미 팀 안에서 통용되는 이름을 굳이 바꿔야 하는지 의문이 들 수도 있습니다. 저는 데이터 운반 객체를 VO라고 부르는 관행에는 실질적인 비용이 있다고 생각합니다. 값 동등성 객체로서의 Value Object가 여러 중요한 맥락에서 계속 등장하기 때문입니다.
 
-* DDD(Domain-Driven Design): VALUE OBJECT는 ENTITY와 함께 도메인 모델을 구성하는 핵심 요소입니다. AGGREGATE도 ENTITY와 VALUE OBJECT의 묶음으로 정의됩니다.
-* ORM: Hibernate와 JPA에서 ``@Embeddable``로 매핑되는 value type은 식별자 없이 소유한 엔티티에 종속되는 객체로, DDD의 VALUE OBJECT와 통하는 개념입니다.
-* Java 언어 스펙: 앞에서 언급한 JEP 401을 비롯한 Project Valhalla의 문서들이 value object라는 용어를 값 동등성의 의미로 씁니다.
+같은 이름을 서로 다른 개념에 재사용하는 비용은 Java API에도 남아 있습니다. ``java.sql.Date``는 ``java.util.Date``의 이름을 재사용해서 두 클래스를 함께 쓸 때마다 혼란을 일으키는 대표적인 사례입니다. Joshua Bloch와 Neal Gafter도 'Java Puzzlers'의 Puzzle 67에서 플랫폼 클래스의 이름을 재사용하지 말라고 권고합니다.
 
-getter/setter만 가진 데이터 홀더를 VO라고 이해하고 있다면 이런 자료를 읽을 때 용어가 어긋나서 혼란이 생깁니다. 반대로 데이터 운반 객체를 DTO라고 부르면 Fowler의 정의와도, Core J2EE Patterns 2판 이후의 정정된 이름과도 자연스럽게 연결됩니다.
+* DDD(Domain-Driven Design): VALUE OBJECT는 ENTITY와 함께 도메인 모델을 구성하는 핵심 요소입니다. AGGREGATE도 ENTITY와 VALUE OBJECT의 묶음으로 정의됩니다.
+* ORM: Hibernate와 JPA의 ``@Embeddable``은 자체 영속 식별성 없이 소유한 엔티티에 종속되는 객체를 매핑합니다. DDD의 VALUE OBJECT를 매핑할 때 흔히 사용하는 구조이지만, JPA가 값 동등성이나 불변성을 강제하지는 않으므로 모든 ``@Embeddable``이 곧 DDD VALUE OBJECT인 것은 아닙니다.
+* Java 언어·JVM 기능: JEP 401을 비롯한 Project Valhalla의 문서들은 value object라는 용어를 불변이고 객체 식별성이 없으며 필드 값으로 구분되는 객체라는 의미로 씁니다.
+
+getter/setter만 가진 데이터 홀더를 VO라고 이해하고 있다면 이런 자료를 읽을 때 용어가 어긋나서 혼란이 생깁니다. 반대로 데이터 운반 객체를 DTO라고 부르면 Fowler의 정의와도, Core J2EE Patterns 2판 이후의 개칭된 이름과도 자연스럽게 연결됩니다.
 
 한편 DTO가 만능 이름도 아닙니다. HTTP 요청 파라미터를 담는 객체, 통계 쿼리의 결과를 담는 객체까지 모두 DTO라고 부르면 이름만으로는 역할이 드러나지 않습니다. 계층 경계를 넘는 데이터 홀더라는 넓은 의미에서는 다 DTO로 이해할 만하지만, 실제 코드에서는 역할이 드러나는 이름을 붙이는 편이 좋다고 생각합니다. 예를 들면 다음과 같은 이름입니다.
 
@@ -103,13 +108,24 @@ Value Object
 * https://martinfowler.com/bliki/ValueObject.html[Martin Fowler: Value Object]
 * https://en.wikipedia.org/wiki/Value_object[Wikipedia: Value object]
 * https://learn.microsoft.com/ko-kr/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/implement-value-objects[Microsoft: 값 개체 구현]
-* https://openjdk.org/jeps/401[JEP 401: Value Classes and Objects]
+* Martin Fowler, 'Patterns of Enterprise Application Architecture', 486쪽
+* Eric Evans, 'Domain-Driven Design', 99~103쪽
+* https://openjdk.org/jeps/401[JEP 401: Value Objects (Preview)]
+* https://openjdk.org/jeps/169[JEP 169: Larval State for Value Objects]
 
 Transfer Object / DTO
 
 * https://martinfowler.com/eaaCatalog/dataTransferObject.html[Martin Fowler: Data Transfer Object]
+* Martin Fowler, 'Patterns of Enterprise Application Architecture', 401쪽
+* Deepak Alur 외, 'Core J2EE Patterns' 초판(2001)
+* Rod Johnson, 'Expert One-on-One J2EE Design and Development', 265쪽
+* Rod Johnson·Juergen Hoeller, 'Expert One-on-One J2EE Development without EJB', 27쪽
 * https://www.oracle.com/java/technologies/transfer-object.html[Oracle: Core J2EE Patterns - Transfer Object]
 * http://www.adam-bien.com/roller/abien/entry/value_object_vs_data_transfer[Adam Bien: Value Object vs. Data Transfer Object (VO vs. DTO)]
+
+이름 충돌
+
+* Joshua Bloch·Neal Gafter, 'Java Puzzlers', Puzzle 67: All Strung Out
 
 발표 자료
 
