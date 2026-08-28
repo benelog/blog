@@ -1,0 +1,74 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="ieee754-double" name="ieee754-double">
+    <mxGraphModel dx="1200" dy="700" grid="1" gridSize="10" page="1" pageWidth="960" pageHeight="460">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="bg1" value="double (binary64)의 비트 구조" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#b3b3b3;dashed=1;verticalAlign=top;align=left;fontStyle=1;spacingLeft=10;spacingTop=6;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="20" y="10" width="920" height="150" as="geometry" />
+        </mxCell>
+
+        <mxCell id="idx-sign" value="63" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="40" y="38" width="80" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="idx-exp" value="62 ··· 52" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="124" y="38" width="240" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="idx-frac" value="51 ······························ 0" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="368" y="38" width="552" height="18" as="geometry" />
+        </mxCell>
+
+        <mxCell id="box-sign" value="부호 s&lt;br&gt;(1비트)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=12;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="40" y="58" width="80" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="box-exp" value="지수 e&lt;br&gt;(11비트)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="124" y="58" width="240" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="box-frac" value="가수 f&lt;br&gt;(52비트)" style="rounded=0;whiteSpace=wrap;html=1;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="368" y="58" width="552" height="44" as="geometry" />
+        </mxCell>
+
+        <mxCell id="formula" value="값 = (-1)&lt;sup&gt;s&lt;/sup&gt; × 1.f × 2&lt;sup&gt;e - 1023&lt;/sup&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="40" y="112" width="880" height="34" as="geometry" />
+        </mxCell>
+
+        <mxCell id="bg2" value="0.1을 저장하는 예: 0.1 = 1.6 × 2&lt;sup&gt;-4&lt;/sup&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#b3b3b3;dashed=1;verticalAlign=top;align=left;fontStyle=1;spacingLeft=10;spacingTop=6;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="20" y="180" width="920" height="250" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ex-sign" value="0" style="rounded=0;whiteSpace=wrap;html=1;fontSize=12;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="40" y="225" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ex-exp" value="011 1111 1011" style="rounded=0;whiteSpace=wrap;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="124" y="225" width="240" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ex-frac" value="1001 1001 1001 ··· 1001 1010" style="rounded=0;whiteSpace=wrap;html=1;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="368" y="225" width="552" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="note-sign" value="양수" style="text;html=1;align=center;verticalAlign=top;fontSize=11;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="30" y="272" width="100" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="note-exp" value="1019 - 1023 = -4&lt;br&gt;→ × 2&lt;sup&gt;-4&lt;/sup&gt;" style="text;html=1;align=center;verticalAlign=top;fontSize=11;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="124" y="272" width="240" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="note-frac" value="0.6의 2진 표현은 1001이 무한 반복&lt;br&gt;→ 52비트에서 반올림 (마지막이 1010)" style="text;html=1;align=center;verticalAlign=top;fontSize=11;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="368" y="272" width="552" height="34" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arrow1" style="endArrow=classic;html=1;strokeColor=#666666;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="480" y="314" as="sourcePoint" />
+            <mxPoint x="480" y="338" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="result" value="실제 저장 값&lt;br&gt;0.1000000000000000055511151231257827021181583404541015625&lt;br&gt;(0.1보다 아주 조금 큰 수)" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="140" y="340" width="680" height="72" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
