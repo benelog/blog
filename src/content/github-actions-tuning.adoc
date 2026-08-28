@@ -410,27 +410,34 @@ link:github-actions-tuning-cases.html[GitHub Actions 워크플로 튜닝: 저장
 
 == 참고 자료
 
-* https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows[Events that trigger workflows - GitHub Docs]
-* https://docs.github.com/en/actions/reference/limits[GitHub Actions limits - GitHub Docs]
-* https://docs.github.com/en/actions/using-jobs/using-conditions-to-control-job-execution[Using conditions to control job execution - GitHub Docs]
-* https://docs.github.com/en/enterprise-cloud@latest/actions/concepts/runners/communicating-with-self-hosted-runners[Communicating with self-hosted runners - GitHub Docs]
-* https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching[Dependency caching - GitHub Docs]
-* https://docs.github.com/en/actions/concepts/workflows-and-actions/concurrency[Concurrency - GitHub Docs]
-* https://docs.github.com/en/actions/reference/runners/github-hosted-runners[GitHub-hosted runners reference - GitHub Docs]
-* https://docs.github.com/en/billing/concepts/product-billing/github-actions[About billing for GitHub Actions - GitHub Docs]
-* https://docs.github.com/en/actions/concepts/metrics[About GitHub Actions metrics - GitHub Docs]
-* https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/troubleshooting-required-status-checks[Troubleshooting required status checks - GitHub Docs]
-* https://github.blog/changelog/2025-08-07-arm64-hosted-runners-for-public-repositories-are-now-generally-available/[arm64 hosted runners for public repositories are now generally available - GitHub Changelog]
-* https://github.blog/changelog/2026-01-29-arm64-standard-runners-are-now-available-in-private-repositories/[arm64 standard runners are now available in private repositories - GitHub Changelog]
-* https://github.blog/changelog/2024-02-12-github-actions-artifacts-v4-is-now-generally-available/[GitHub Actions Artifacts v4 is now Generally Available - GitHub Changelog]
+.GitHub 공식 문서
+* https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows[Events that trigger workflows]
+* https://docs.github.com/en/actions/reference/limits[GitHub Actions limits]
+* https://docs.github.com/en/actions/using-jobs/using-conditions-to-control-job-execution[Using conditions to control job execution]
+* https://docs.github.com/en/enterprise-cloud@latest/actions/concepts/runners/communicating-with-self-hosted-runners[Communicating with self-hosted runners]
+* https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching[Dependency caching]
+* https://docs.github.com/en/actions/concepts/workflows-and-actions/concurrency[Concurrency]
+* https://docs.github.com/en/actions/reference/runners/github-hosted-runners[GitHub-hosted runners reference]
+* https://docs.github.com/en/billing/concepts/product-billing/github-actions[About billing for GitHub Actions]
+* https://docs.github.com/en/actions/concepts/metrics[About GitHub Actions metrics]
+* https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/troubleshooting-required-status-checks[Troubleshooting required status checks]
+
+.GitHub Changelog
+* https://github.blog/changelog/2025-08-07-arm64-hosted-runners-for-public-repositories-are-now-generally-available/[arm64 hosted runners for public repositories are now generally available]
+* https://github.blog/changelog/2026-01-29-arm64-standard-runners-are-now-available-in-private-repositories/[arm64 standard runners are now available in private repositories]
+* https://github.blog/changelog/2024-02-12-github-actions-artifacts-v4-is-now-generally-available/[GitHub Actions Artifacts v4 is now Generally Available]
+
+.장애 보고서 (GitHub Status·GitHub Blog)
 * https://www.githubstatus.com/incidents/qcvjkzcs7j74[2026년 8월 6일 Actions 장애 원인 분석 - GitHub Status]
-* https://github.blog/news-insights/company-news/github-availability-report-march-2021/[GitHub Availability Report: March 2021 - GitHub Blog]
-* https://github.blog/news-insights/company-news/github-availability-report-august-2023/[GitHub Availability Report: August 2023 - GitHub Blog]
-* https://github.blog/news-insights/company-news/github-availability-report-october-2025/[GitHub Availability Report: October 2025 - GitHub Blog]
-* https://github.blog/news-insights/company-news/github-availability-report-march-2026/[GitHub Availability Report: March 2026 - GitHub Blog]
-* https://github.blog/news-insights/company-news/github-availability-report-may-2026/[GitHub Availability Report: May 2026 - GitHub Blog]
-* https://github.blog/news-insights/company-news/github-availability-report-june-2026/[GitHub Availability Report: June 2026 - GitHub Blog]
-* https://github.blog/news-insights/company-news/addressing-githubs-recent-availability-issues-2/[Addressing GitHub's recent availability issues - GitHub Blog]
+* https://github.blog/news-insights/company-news/github-availability-report-march-2021/[GitHub Availability Report: March 2021]
+* https://github.blog/news-insights/company-news/github-availability-report-august-2023/[GitHub Availability Report: August 2023]
+* https://github.blog/news-insights/company-news/github-availability-report-october-2025/[GitHub Availability Report: October 2025]
+* https://github.blog/news-insights/company-news/github-availability-report-march-2026/[GitHub Availability Report: March 2026]
+* https://github.blog/news-insights/company-news/github-availability-report-may-2026/[GitHub Availability Report: May 2026]
+* https://github.blog/news-insights/company-news/github-availability-report-june-2026/[GitHub Availability Report: June 2026]
+* https://github.blog/news-insights/company-news/addressing-githubs-recent-availability-issues-2/[Addressing GitHub's recent availability issues]
+
+.외부 블로그
 * https://depot.dev/blog/github-actions-runner-architecture-part-1-the-listener[GitHub Actions Runner Architecture Part 1: The Listener - Depot]
 
 '''
