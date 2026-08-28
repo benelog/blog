@@ -72,7 +72,7 @@ IEEE 754는 실수를 2진수 과학적 표기법으로 바꾼 다음 비트로 
 이 규칙대로 0.1을 저장한 결과가 아래 그림입니다.
 64비트가 부호 1비트, 지수 11비트, 가수 52비트로 나뉘어 있습니다.
 
-image::img/floating-point/ieee754-double.png[IEEE 754 double의 비트 구조와 0.1 저장 예,width=800]
+image::img/floating-point-big-decimal/ieee754-double.png[IEEE 754 double의 비트 구조와 0.1 저장 예,width=800]
 
 그림 아래쪽의 변환 과정을 따라가 보겠습니다.
 0.1에 2를 거듭 곱해 보면 0.2, 0.4, 0.8을 거쳐 네 번째에 1.6이 되어 처음으로 1 이상 2 미만 구간에 들어옵니다.
