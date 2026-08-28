@@ -217,10 +217,13 @@ spider-silk처럼 병목이 짐작과 다른 곳에 있기도 하고, spring-jdb
 
 == 참고 자료
 
+.이 블로그
 * link:github-actions-tuning.html[GitHub Actions의 실행 구조와 워크플로 튜닝 기법] — 이 글에서 적용한 기법들의 원리와 주의점
+
+.GitHub 공식 문서
 * https://cli.github.com/manual/gh_run_view[gh run view - GitHub CLI manual]
-* https://docs.github.com/en/actions/concepts/metrics[About GitHub Actions metrics - GitHub Docs]
-* https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching[Dependency caching - GitHub Docs]
+* https://docs.github.com/en/actions/concepts/metrics[About GitHub Actions metrics]
+* https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching[Dependency caching]
 
 '''
 
