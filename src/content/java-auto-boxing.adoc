@@ -1,98 +1,413 @@
-= Java의 auto boxing과 unbox은 어떻게 컴파일될까?
+= Java의 auto boxing과 unboxing은 어떻게 컴파일될까?
 정상혁
 2009-02-10
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: java,autoboxing
+:jbake-tags: java, code-review, performance
+:description: int와 Integer를 섞어 쓸 때 생기는 auto boxing·unboxing이 Integer.valueOf()와 intValue() 호출로 컴파일되는 과정을 JDK 25의 바이트코드로 확인합니다. IntegerCache의 -128~127 범위와 JLS 5.1.7의 요구사항, -XX:AutoBoxCacheMax 옵션, 박싱된 타입을 반복문에 쓸 때의 비용, 그리고 캐시 구현과 wrapper 생성자 deprecation이 JDK 5부터 25까지 어떻게 바뀌었는지 정리합니다.
+:jbake-last_updated: 2026-08-29
 :idprefix:
+:toc:
 
-아래 코드는 [프리미티브 타입과 Wrapper 클래스, 자동 Boxing, 자동 UnBoxing]이라는 글에 나오는 것을 입력해 본 것입니다. int와 java.lang.Integer객체를 "=="와 "equals()"메서드로 비교하고 있습니다.
+`int` 와 ``java.lang.Integer``를 섞어 쓰면 컴파일러가 auto boxing과 unboxing 코드를 대신 넣어 줍니다. 그 변환이 어떤 메서드 호출로 바뀌는지 알아 두면 `==` 비교의 결과나 반복문에서 생기는 객체 생성 비용을 예측할 수 있습니다.
 
-image:img/java/auto-boxing-test.jpg[title="auto-boxing-test.jpg"]
+변환 방식 자체는 JDK 5에서 auto boxing이 도입된 뒤로 바뀌지 않았지만, 캐시의 구현과 wrapper 생성자의 deprecation 상태는 버전마다 달라졌습니다. 이 글의 바이트코드와 실행 결과는 JDK 25(Temurin 25+36)에서 확인했습니다.
 
-위의 코드에서 생성한 .class파일을 역컴파일해보면 아래와 같은 코드가 나옵니다. autoboxing과 unboxing이 어떤 방식으로 이루어 지는지 잘 확인할 수 있습니다. java.lang.Integer가 int로 바뀔 때는 intValue() 메서드, int가 java.lang.Integer로 바뀔 때는 Integer.valueOf()메서드를 사용하고 있습니다. JDK 1.4이하 버전과의 하위호환성을 위해서 이런 방식을 쓰는 것이겠죠.
+== 박싱과 언박싱으로 컴파일되는 바이트코드
 
-[source,java]
-----
-int a = 1;
-int b = 1;
-Integer c = new Integer(1);
-Integer d = new Integer(1);
-System.out.println((new StringBuilder("1:")).append(System.identityHashCode(Integer.valueOf(a))).toString());
-System.out.println((new StringBuilder("2:")).append(System.identityHashCode(Integer.valueOf(b))).toString());
-System.out.println((new StringBuilder("3:")).append(System.identityHashCode(c)).toString());
-System.out.println((new StringBuilder("4:")).append(System.identityHashCode(d)).toString());
-System.out.println((new StringBuilder("5:")).append(a == b).toString());
-System.out.println((new StringBuilder("7:")).append(c == d).toString());
-System.out.println((new StringBuilder("8:")).append(c.equals(d)).toString());
-System.out.println((new StringBuilder("9:")).append(a == c.intValue()).toString());
-----
-
-
-
-`new Integer()` 로 생성자를 호출하면 매로 새로 객체를 생성하는데, Integer.valueOf()메서드를 사용하면 캐시된 값을 사용할 수 있습니다. 이 메서드의 소스를 보면 -128부터 127까지의 static영역에 캐시로 쌓아두고 있습니다.
+아래 코드는 `int` 와 ``Integer``를 서로 대입하고 `==` 로 비교합니다.
 
 [source,java]
+.Boxing.java
 ----
- static {
-  cache = new Integer[256];
-  for (int i = 0; i < cache.length; i++)
-  cache[i] = new Integer(i - 128);
-}
-
-public static Integer valueOf(int i) {
-  if (i >= -128 && i <= 127)
-  return IntegerCache.cache[i + 128];
-  else
-  return new Integer(i);
+public class Boxing {
+    public static void main(String[] args) {
+        int a = 1;
+        Integer b = 1;
+        int c = b;
+        System.out.println(a == b);
+        System.out.println(a == c);
+    }
 }
 ----
 
-처음에 나왔던 저의 Eclipse 캡쳐화면을 보면 findbugs 플러그인에서 new Integer()사용 코드에 대한 경고를 보여주고 있습니다. 자세한 설명을 보니, `Integer.valueOf()` 를 사용할 경우 약 3.5배 정도 실행속도가 빠르다고 하네요.
+JDK에 포함된 ``javap``으로 `javap -c Boxing.class` 를 실행하면 다음 바이트코드가 나옵니다.
 
-[quote, Findbugs의 경고메시지]
+[source]
 ----
-M P Bx] Method invokes inefficient Number constructor; use static valueOf instead [DM_NUMBER_CTOR]
-
-Using new Integer(int) is guaranteed to always result in a new object whereas Integer.valueOf(int) allows caching of values to be done by the compiler, class library, or JVM. Using of cached values avoids object allocation and the code will be faster.
-
-Values between -128 and 127 are guaranteed to have corresponding cached instances and using valueOf is approximately 3.5 times faster than using constructor. For values outside the constant range the performance of both styles is the same.
-
-Unless the class must be compatible with JVMs predating Java 1.5, use either autoboxing or the valueOf() method when creating instances of Long, Integer, Short, Character, and Byte.
+  public static void main(java.lang.String[]);
+    Code:
+         0: iconst_1
+         1: istore_1
+         2: iconst_1
+         3: invokestatic  #7    // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+         6: astore_2
+         7: aload_2
+         8: invokevirtual #13   // Method java/lang/Integer.intValue:()I
+        11: istore_3
+        12: getstatic     #17   // Field java/lang/System.out:Ljava/io/PrintStream;
+        15: iload_1
+        16: aload_2
+        17: invokevirtual #13   // Method java/lang/Integer.intValue:()I
+        20: if_icmpne     27
+        ...
 ----
 
-이런 원리들을 잘 염두해 둬서, auto boxing과 unboxing이 사용될 때 필요없는 객체가 생성되지 않는지 유의해야 합니다.
+박싱과 언박싱만을 위한 바이트코드 명령은 따로 없습니다. `int` 가 ``Integer``로 바뀔 때는 ``Integer.valueOf()``를, ``Integer``가 `int` 로 바뀔 때는 ``intValue()``를 호출하는 평범한 메서드 호출로 컴파일됩니다. 이 방식은 JDK 5에서 auto boxing이 도입된 이후 JDK 25까지 같습니다.
 
-다음 코드는 Effective Java 2nd Edition의 Item 5 - '불필요한 객체를 생성하지 마라'에 나오는 예제입니다.
+`a == b` 처럼 한쪽이 `int` 이고 다른 쪽이 ``Integer``이면 ``Integer``쪽이 언박싱되어 값 비교(`if_icmpne`)가 됩니다. 반면 양쪽이 모두 ``Integer``이면 언박싱 없이 참조 비교(`if_acmpne`)가 되므로, 다음 절에서 다루는 캐시 범위에 따라 결과가 달라집니다.
+
+바이트코드를 다시 Java 코드로 되돌려 보면 변환 결과가 더 뚜렷하게 보입니다. 다만 요즘 역컴파일러는 ``valueOf()``와 ``intValue()`` 호출을 auto boxing 문법으로 도로 접어서 원본과 거의 같은 코드를 보여 줍니다. https://www.benf.org/other/cfr/[CFR]에서는 `--sugarboxing false` 옵션으로 이 접기를 끌 수 있습니다.
 
 [source,java]
+.java -jar cfr-0.152.jar --sugarboxing false Boxing.class
 ----
-Long sum = 0L;
-for(long i=0;i< Integer.MAX_VALUE;i++){
-   sum += i;
-}
-System.out.println(sum);
-----
-
-  이 코드를 컴파일한 후 다시 역컴파일 해보면 다음과 같이 나옵니다.
-
-[source,java]
-----
-Long sum = Long.valueOf(0L);
-for(long i = 0L; i < 0x7fffffffL; i++)  sum = Long.valueOf(sum.longValue() + i);
-
-System.out.println(sum);
-----
-
-java.lang.Double.valueOf(double) 메서드는 매번 새로운 객체를 생성하게 되어 있습니다.
-
-[source,java]
-----
-public static Double valueOf(double d) {
-  return new Double(d);
+public class Boxing {
+    public static void main(String[] stringArray) {
+        int n = 1;
+        Integer n2 = Integer.valueOf((int)1);
+        int n3 = n2.intValue();
+        System.out.println((n == n2.intValue() ? 1 : 0) != 0);
+        System.out.println((n == n3 ? 1 : 0) != 0);
+    }
 }
 ----
 
+`Integer.valueOf((int)1)` 의 `(int)` 처럼 원본에 없던 캐스팅과 `(... ? 1 : 0) != 0` 같은 표현은 역컴파일러가 붙인 것입니다. 바이트코드에는 boolean 연산이 따로 없고 분기 명령만 있어서 이런 모양이 됩니다. 눈여겨볼 곳은 대입문 두 줄입니다. `Integer n2` 에는 ``Integer.valueOf()``의 반환값이, `int n3` 에는 ``intValue()``의 반환값이 들어갑니다.
 
-이렇듯 불필요한 객체생성을 막기 위해 되도록 primitive type을 선호해야 합니다. auto boxing은 Collection이나 Map에 들어가는 요소로 변수가 쓰일 때, generics가 적용한 코드를 작성할 때 등이 적절한 사용의 예입니다. (Effective Java 2nd Edition, Item 49 참조)
+`--sugarboxing` 옵션을 그대로 두면 아래처럼 원본 소스와 같은 코드가 나옵니다. 역컴파일 결과만 보고 박싱 비용을 판단할 수 없다는 뜻이기도 합니다.
 
+[source,java]
+.java -jar cfr-0.152.jar Boxing.class
+----
+public class Boxing {
+    public static void main(String[] stringArray) {
+        int n = 1;
+        Integer n2 = 1;
+        int n3 = n2;
+        System.out.println(n == n2);
+        System.out.println(n == n3);
+    }
+}
+----
+
+== Integer.valueOf()의 캐시와 참조 비교
+
+``new Integer()``로 생성자를 호출하면 매번 새 객체를 만들지만, ``Integer.valueOf()``는 캐시된 인스턴스를 재사용할 수 있습니다. JDK 25의 `java.lang.Integer` 소스를 보면 -128부터 127까지를 `IntegerCache` 에 담아 둡니다.
+
+[source,java]
+.java/lang/Integer.java (JDK 25)
+----
+    private static final class IntegerCache {
+        static final int low = -128;
+        static final int high;
+
+        @Stable
+        static final Integer[] cache;
+        static Integer[] archivedCache;
+
+        static {
+            // high value may be configured by property
+            int h = 127;
+            String integerCacheHighPropValue =
+                VM.getSavedProperty("java.lang.Integer.IntegerCache.high");
+            ...
+        }
+    }
+
+    public static Integer valueOf(int i) {
+        if (i >= IntegerCache.low && i <= IntegerCache.high)
+            return IntegerCache.cache[i + (-IntegerCache.low)];
+        return new Integer(i);
+    }
+----
+
+캐시의 상한은 상수가 아니라 시스템 프로퍼티로 결정되고, 배열 자체는 CDS(Class Data Sharing) 아카이브에 저장된 것을 읽어 옵니다.
+
+이 캐시 범위는 구현체의 재량이 아니라 언어 명세가 요구하는 최소 범위입니다. https://docs.oracle.com/javase/specs/jls/se25/html/jls-5.html#jls-5.1.7[JLS 5.1.7]은 박싱 대상이 상수식일 때 아래 조건에서 두 박싱 결과가 반드시 같은 참조여야 한다고 규정합니다.
+
+[quote, 'JLS 5.1.7. Boxing Conversion']
+____
+If the value `p` being boxed is the result of evaluating a constant expression of type `boolean`, `byte`, `char`, `short`, `int`, or `long`, and the result is `true`, `false`, a character in the range `'\u0000'` to `'\u007f'` inclusive, or an integer in the range `-128` to `127` inclusive, then let `a` and `b` be the results of any two boxing conversions of `p`. It is always the case that `a == b`.
+____
+
+그래서 아래 코드의 결과는 값의 크기에 따라 달라집니다.
+
+[source,java]
+.Identity.java
+----
+public class Identity {
+    public static void main(String[] args) {
+        Integer a = 127;
+        Integer b = 127;
+        Integer c = 128;
+        Integer d = 128;
+        System.out.println("a == b : " + (a == b));
+        System.out.println("c == d : " + (c == d));
+        System.out.println("c.equals(d) : " + c.equals(d));
+    }
+}
+----
+
+[source]
+----
+a == b : true
+c == d : false
+c.equals(d) : true
+----
+
+128은 캐시 범위 밖이라 매번 새 ``Integer``가 만들어지므로 `c == d` 가 `false` 가 됩니다. 박싱된 타입끼리는 `==` 대신 ``equals()``로 비교해야 하는 이유입니다.
+
+캐시 범위는 타입마다 다릅니다. JDK 25 기준으로 ``Long``, ``Short``, ``Byte``는 -128~127을, ``Character``는 `'\u0000'` 부터 `'\u007f'` 까지를 캐시합니다. ``Boolean``은 ``Boolean.TRUE``와 ``Boolean.FALSE``를 재사용합니다.
+
+=== -XX:AutoBoxCacheMax로 캐시 범위 조정
+
+``Integer``만은 캐시의 상한을 늘릴 수 있습니다. `-XX:AutoBoxCacheMax=<size>` 옵션이나 `java.lang.Integer.IntegerCache.high` 시스템 프로퍼티로 지정하면 됩니다. 앞의 예제를 같은 클래스 파일로 다시 실행하면 결과가 바뀝니다.
+
+[source,shell]
+----
+$ java Identity
+a == b : true
+c == d : false
+c.equals(d) : true
+
+$ java -XX:AutoBoxCacheMax=1000 Identity
+a == b : true
+c == d : true
+c.equals(d) : true
+----
+
+같은 코드의 `==` 비교 결과가 실행 옵션에 따라 달라진다는 점은, 박싱된 타입을 `==` 로 비교하면 안 되는 이유를 한 번 더 보여 줍니다. 이 옵션은 ``Integer``에만 적용되고 ``Long``이나 ``Short``에는 영향을 주지 않습니다.
+
+== JDK 9부터 deprecated된 wrapper 생성자
+
+``new Integer(int)``에 `@Deprecated` 가 붙은 것은 JDK 9부터입니다. 그전까지는 컴파일러가 이 코드에 아무 경고도 하지 않아서, https://findbugs.sourceforge.net/[FindBugs] 같은 정적 분석기를 따로 붙여야 알 수 있는 문제였습니다. Eclipse에 FindBugs 플러그인을 설치하면 Problems 뷰에 아래와 같은 경고가 떴습니다.
+
+[source]
+----
+M P Bx: Method study.Test.testInteger() invokes inefficient new Integer(int) constructor;
+        use Integer.valueOf(int) instead
+----
+
+지금은 ``javac``이 직접 경고합니다.
+
+[source,shell]
+----
+$ javac -Xlint:deprecation OldStyle.java
+OldStyle.java:3: warning: [deprecation] Integer(int) in Integer has been deprecated
+        Integer c = new Integer(1);
+                    ^
+OldStyle.java:4: warning: [deprecation] Double(double) in Double has been deprecated
+        Double d = new Double(1.0);
+                   ^
+2 warnings
+----
+
+JDK 25의 소스에는 `@Deprecated(since="9")` 가 붙어 있습니다. `forRemoval` 은 지정되어 있지 않아서 아직 제거 예정으로 표시된 상태는 아니지만, 새 코드에서 쓸 이유는 없습니다.
+
+[source,java]
+.java/lang/Integer.java (JDK 25)
+----
+    /**
+     * @deprecated
+     * It is rarely appropriate to use this constructor. The static factory
+     * {@link #valueOf(int)} is generally a better choice, as it is
+     * likely to yield significantly better space and time performance.
+     */
+    @Deprecated(since="9")
+    public Integer(int value) {
+----
+
+FindBugs의 후속 프로젝트인 https://spotbugs.github.io/[SpotBugs]에도 같은 규칙이 `DM_NUMBER_CTOR` 로 남아 있습니다. 설명 문구는 FindBugs 시절과 거의 같습니다.
+
+[quote, 'SpotBugs DM_NUMBER_CTOR: Method invokes inefficient Number constructor; use static valueOf instead']
+____
+Using `new Integer(int)` is guaranteed to always result in a new object whereas `Integer.valueOf(int)` allows caching of values to be done by the compiler, class library, or JVM. Using of cached values avoids object allocation and the code will be faster.
+
+Values between -128 and 127 are guaranteed to have corresponding cached instances and using `valueOf` is approximately 3.5 times faster than using constructor. For values outside the constant range the performance of both styles is the same.
+
+Unless the class must be compatible with JVMs predating Java 5, use either autoboxing or the `valueOf()` method when creating instances of `Long`, `Integer`, `Short`, `Character`, and `Byte`.
+____
+
+IDE에 내장된 검사로도 잡힙니다. Eclipse는 Java > Compiler > Errors/Warnings의 'Deprecated and restricted API' 아래 'Deprecated API' 항목이 기본값 Warning이라 별도 플러그인 없이 deprecation 경고를 표시합니다. IntelliJ IDEA에는 deprecation 경고와 별개로 'Number constructor call with primitive argument'(`CachedNumberConstructorCall`) 인스펙션이 Java > Numeric issues 그룹에 있습니다. `Long`, `Integer`, `Short`, `Byte` 생성자에 primitive 값을 넘기는 코드를 찾아 ``valueOf()``로 바꾸도록 안내합니다.
+
+== 박싱된 타입을 반복문에 쓸 때의 비용
+
+박싱과 언박싱이 메서드 호출로 컴파일된다는 것을 알면, 반복문에서 박싱된 타입을 누적 변수로 쓸 때 어떤 일이 생기는지도 예측할 수 있습니다. 다음은 Effective Java 3판의 'Item 6: 불필요한 객체 생성을 피하라'에 나오는 예제입니다.
+
+[source,java]
+----
+static long boxed() {
+    Long sum = 0L;
+    for (long i = 0; i < Integer.MAX_VALUE; i++) {
+        sum += i;
+    }
+    return sum;
+}
+----
+
+`sum += i` 한 줄이 언박싱과 박싱을 모두 거치는 코드로 컴파일됩니다. 역컴파일하면 그 한 줄이 어떻게 부풀어 오르는지 드러납니다.
+
+[source,java]
+.java -jar cfr-0.152.jar --sugarboxing false SumTest.class
+----
+    static long boxed() {
+        Long l = Long.valueOf((long)0L);
+        for (long i = 0L; i < Integer.MAX_VALUE; ++i) {
+            l = Long.valueOf((long)(l.longValue() + i));
+        }
+        return l.longValue();
+    }
+----
+
+바이트코드로도 같은 흐름을 확인할 수 있습니다.
+
+[source]
+----
+  static long boxed();
+    Code:
+         0: lconst_0
+         1: invokestatic  #7    // Method java/lang/Long.valueOf:(J)Ljava/lang/Long;
+         4: astore_0
+         5: lconst_0
+         6: lstore_1
+         7: lload_1
+         8: ldc2_w        #15   // long 2147483647l
+        11: lcmp
+        12: ifge          32
+        15: aload_0
+        16: invokevirtual #17   // Method java/lang/Long.longValue:()J
+        19: lload_1
+        20: ladd
+        21: invokestatic  #7    // Method java/lang/Long.valueOf:(J)Ljava/lang/Long;
+        24: astore_0
+        25: lload_1
+        26: lconst_1
+        27: ladd
+        28: lstore_1
+        29: goto          7
+----
+
+반복할 때마다 ``longValue()``로 값을 꺼내 더한 뒤 ``Long.valueOf()``로 다시 박싱합니다. 누적값은 대부분 캐시 범위 밖이므로 매번 새 ``Long``이 생성됩니다. 누적 변수의 타입만 `long` 으로 바꾸면 박싱이 사라집니다. 두 방식을 JDK 25에서 한 번씩 실행해 걸린 시간을 재 보면 차이가 큽니다.
+
+[source]
+----
+Long: 5122 ms, long: 507 ms
+Long: 4987 ms, long: 516 ms
+Long: 4919 ms, long: 513 ms
+----
+
+JMH 같은 벤치마크 도구를 쓰지 않고 `System.nanoTime()` 으로 한 번씩 잰 값이라 절대 수치를 그대로 믿을 수는 없습니다. 그래도 자릿수가 달라질 만큼 벌어진다는 점은 확인할 수 있습니다.
+
+== 캐시가 없는 Double과 Float
+
+정수 계열과 달리 ``Double``과 ``Float``에는 캐시가 없습니다. JLS 5.1.7이 `float` 과 `double` 에 대해서는 참조 동일성을 요구하지 않기 때문입니다. JDK 25의 ``Double.valueOf()``는 아직도 생성자를 그대로 호출합니다.
+
+[source,java]
+.java/lang/Double.java (JDK 25)
+----
+    public static Double valueOf(double d) {
+        return new Double(d);
+    }
+----
+
+그래서 ``Double``은 값이 작아도 박싱할 때마다 새 객체가 만들어집니다. 실수 계열을 다루는 반복문에서는 박싱된 타입을 누적 변수로 쓰지 않도록 더 주의해야 합니다.
+
+== JDK 버전별 변경 이력
+
+박싱과 언박싱이 ``valueOf()``와 ``intValue()`` 호출로 컴파일되는 방식은 JDK 5 이후로 바뀌지 않았습니다. 대신 캐시의 구현과 생성자의 deprecation 상태, 그리고 언어 명세가 보장하는 범위가 아래와 같이 달라졌습니다.
+
+[cols="1,4", options="header"]
+|===
+|JDK 버전 |변경 내용
+
+|JDK 5
+|auto boxing과 unboxing 도입. `valueOf(int)` 등의 팩터리 메서드가 추가되고 -128~127을 캐시하기 시작
+
+|JDK 7
+|`IntegerCache` 의 상한이 설정 가능해짐. `-XX:AutoBoxCacheMax` 옵션과 `java.lang.Integer.IntegerCache.high` 프로퍼티 도입 (JDK-6807702)
+
+|JDK 9
+|wrapper 클래스의 생성자에 `@Deprecated(since="9")` 부여. JLS 5.1.7의 참조 동일성 보장 대상이 '리터럴'에서 '상수식의 평가 결과'로 확대
+
+|JDK 12
+|`IntegerCache` 를 비롯한 박스 캐시를 CDS 아카이브에 저장하고 실행 시점에 그대로 읽어 오도록 변경 (JDK-8209120, JDK-8213033)
+
+|JDK 14
+|JLS 5.1.7의 참조 동일성 보장 대상 타입 목록에 `byte` 추가
+
+|JDK 16
+|JEP 390으로 wrapper 클래스를 value-based class로 지정하고, 생성자를 `forRemoval = true` 로 표시
+
+|JDK 22
+|박스 캐시 배열에 `@Stable` 을 붙여 JIT이 상수로 접을 수 있게 함 (JDK-8295555)
+
+|JDK 25
+|생성자의 `forRemoval` 표시를 해제. 제거 예정이 아닌 일반 deprecated 상태로 되돌림 (JDK-8354335)
+|===
+
+`forRemoval` 이 붙어 있던 JDK 16부터 JDK 24까지는 아무 옵션 없이 컴파일해도 removal 경고가 났습니다. JDK 21과 JDK 25에서 같은 코드를 컴파일해 보면 차이가 드러납니다.
+
+[source,shell]
+----
+$ ~/.sdkman/candidates/java/21.0.8-tem/bin/javac OldStyle.java
+OldStyle.java:3: warning: [removal] Integer(int) in Integer has been deprecated and marked for removal
+        Integer c = new Integer(1);
+                    ^
+OldStyle.java:4: warning: [removal] Double(double) in Double has been deprecated and marked for removal
+        Double d = new Double(1.0);
+                   ^
+2 warnings
+
+$ ~/.sdkman/candidates/java/25-tem/bin/javac OldStyle.java
+Note: OldStyle.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+----
+
+JLS 5.1.7의 변화도 짚어 둘 만합니다. Java SE 8까지는 참조 동일성을 '리터럴'에 대해서만 보장했습니다.
+
+[quote, 'JLS SE8 5.1.7']
+____
+If the value `p` being boxed is an integer literal of type `int` between `-128` and `127` inclusive, or the boolean literal `true` or `false`, or a character literal between `'\u0000'` and `'\u007f'` inclusive, then let `a` and `b` be the results of any two boxing conversions of `p`. It is always the case that `a == b`.
+____
+
+Java SE 9부터 이 조건이 상수식의 평가 결과로 넓어졌습니다. `Integer x = 100 + 27;` 처럼 리터럴이 아닌 상수식도 보장 대상이 된 것입니다. 실제 JDK 구현은 그 전에도 ``valueOf()``를 거쳐 같은 인스턴스를 돌려주고 있었으니, 명세가 구현을 따라간 셈입니다.
+
+== 정리
+
+* auto boxing은 ``valueOf()``, unboxing은 ``intValue()`` 계열의 메서드 호출로 컴파일됩니다. 전용 바이트코드 명령은 없습니다.
+* ``Integer.valueOf()``는 -128~127을 캐시합니다. 이 범위는 JLS 5.1.7이 요구하는 최소 범위이고, ``Integer``에 한해 `-XX:AutoBoxCacheMax` 로 넓힐 수 있습니다.
+* 박싱된 타입끼리는 `==` 가 아니라 ``equals()``로 비교해야 합니다. `==` 의 결과가 값의 크기와 실행 옵션에 따라 달라집니다.
+* wrapper 클래스의 생성자는 JDK 9부터 deprecated 상태입니다. 예전에는 FindBugs 같은 정적 분석기를 따로 붙여야 알 수 있었지만, 지금은 ``javac``과 Eclipse, IntelliJ IDEA가 모두 경고합니다.
+* 되도록 primitive 타입을 쓰고, ``Collection``의 요소나 generics의 타입 인자처럼 객체가 필요한 자리에만 박싱된 타입을 씁니다. (Effective Java 3판, 'Item 61: 박싱된 기본 타입보다는 기본 타입을 사용하라')
+
+.주요 변경이력
+* 2026.08.29
+** JDK 25 기준으로 바이트코드, `IntegerCache` 소스, 경고 메시지를 다시 확인해 갱신
+** Eclipse 캡처 화면을 예제 소스와 ``javap`` 출력으로 교체하고, 화면에 있던 FindBugs 경고 메시지는 본문에 인용
+** `-XX:AutoBoxCacheMax` 옵션, JLS 5.1.7 인용, 실행 시간 측정 결과 추가
+** FindBugs 항목을 SpotBugs 기준으로 갱신하고, Eclipse·IntelliJ IDEA의 현재 경고 방식 추가
+** Effective Java 인용을 2판(Item 5, 49)에서 3판(Item 6, 61) 기준으로 수정
+** 'JDK 버전별 변경 이력' 절을 추가하고, 2009년 원문을 언급하던 서술을 버전 기준 서술로 정리
+** 원문에 있던 역컴파일 결과를 CFR 0.152로 다시 뽑아 수록. 역컴파일러가 박싱을 도로 접는다는 점과 `--sugarboxing` 옵션 설명 추가
+* 2009.02.10
+** 최초 작성
+
+== 참고 자료
+
+* https://docs.oracle.com/javase/specs/jls/se25/html/jls-5.html#jls-5.1.7[JLS 5.1.7: Boxing Conversion]
+* https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Integer.html[Integer javadoc]
+* https://github.com/openjdk/jdk/blob/jdk-25%2B36/src/java.base/share/classes/java/lang/Integer.java[JDK 25 Integer.java]
+* https://github.com/openjdk/jdk/blob/jdk-25%2B36/src/java.base/share/classes/java/lang/Double.java[JDK 25 Double.java]
+* https://www.benf.org/other/cfr/[CFR: another Java decompiler]
+* https://spotbugs.readthedocs.io/en/stable/bugDescriptions.html[SpotBugs Bug descriptions]
+* https://www.jetbrains.com/help/inspectopedia/CachedNumberConstructorCall.html[IntelliJ IDEA Inspectopedia: Number constructor call with primitive argument]
+* https://help.eclipse.org/latest/topic/org.eclipse.jdt.doc.user/reference/preferences/java/compiler/ref-preferences-errors-warnings.htm[Eclipse JDT: Java Compiler Errors/Warnings Preferences]
+* https://docs.oracle.com/javase/specs/jls/se8/html/jls-5.html#jls-5.1.7[JLS SE8 5.1.7: Boxing Conversion]
+* https://openjdk.org/jeps/390[JEP 390: Warnings for Value-Based Classes]
+* https://bugs.openjdk.org/browse/JDK-6807702[JDK-6807702: Integer.valueOf cache should be configurable]
+* https://bugs.openjdk.org/browse/JDK-8209120[JDK-8209120: Archive the Integer.IntegerCache]
+* https://bugs.openjdk.org/browse/JDK-8213033[JDK-8213033: Archive remaining primitive box caches]
+* https://bugs.openjdk.org/browse/JDK-8295555[JDK-8295555: Primitive wrapper caches could be @Stable]
+* https://bugs.openjdk.org/browse/JDK-8354335[JDK-8354335: No longer deprecate wrapper class constructors for removal]
+* https://www.oreilly.com/library/view/effective-java/9780134686097/[Effective Java, Third Edition]
