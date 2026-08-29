@@ -36,7 +36,7 @@ ____
 
 저는 이 단어를 SpringSource의 Gunnar Hillert와 Roy Clarkson이 2013년에 발표한 link:https://www.slideshare.net/royclarkson/spring-project-infrastructure[Spring Project Infrastructure]라는 슬라이드에서 처음 봤습니다. Spring 프로젝트들이 GitHub로 이전하고 PR로 기여를 받는 과정을 소개하는 발표인데, 후반부에 'Jürgenization'이라는 슬라이드가 등장합니다. 같은 제목의 link:https://www.youtube.com/watch?v=m74QsK5XCeQ[발표 영상]에서는 이를 Juergen Hoeller의 코딩 스타일과 기준에 맞는 코드 품질과 엄격함이라고 설명합니다.
 
-이 용어를 리팩터링의 한 유형으로 분류한 문서도 있습니다. link:http://notes.experimental-software.com/SoftwareEngineering/Programming/Refactoring.html[Refactoring 정리 노트]는 Refactor Type을 TDD, Boy Scout Rule, Comprehension, Preparatory, Planned, Long term으로 나열하는데, 그 목록의 마지막 항목이 Jürgenizing입니다. 출처로는 앞서 소개한 Oliver Drotbohm의 글을 링크하고 있습니다.
+이 용어를 리팩터링의 한 유형으로 분류한 문서도 있습니다. link:https://web.archive.org/web/20210516210106/http://notes.experimental-software.com/SoftwareEngineering/Programming/Refactoring.html[Refactoring 정리 노트]는 Refactor Type을 TDD, Boy Scout Rule, Comprehension, Preparatory, Planned, Long term으로 나열하는데, 그 목록의 마지막 항목이 Jürgenizing입니다. 출처로는 앞서 소개한 Oliver Drotbohm의 글을 링크하고 있습니다.
 
 == 머지 대신 직접 커밋: PR #23200의 처리 과정
 
@@ -62,7 +62,7 @@ Juergen Hoeller의 이런 위상을 보여주는 인터뷰가 있습니다. Ed B
 * https://odrotbohm.de/2013/03/juergenized/[Oliver Drotbohm - Jürgenized]
 * https://www.slideshare.net/royclarkson/spring-project-infrastructure[Spring Project Infrastructure 슬라이드]
 * https://www.youtube.com/watch?v=m74QsK5XCeQ[Spring Project Infrastructure 발표 영상]
-* http://notes.experimental-software.com/SoftwareEngineering/Programming/Refactoring.html[Refactoring - notes.experimental-software.com]
+* https://web.archive.org/web/20210516210106/http://notes.experimental-software.com/SoftwareEngineering/Programming/Refactoring.html[Refactoring - notes.experimental-software.com (Wayback Machine)]
 * https://github.com/spring-projects/spring-framework/issues/23199[spring-framework issue #23199]
 * https://github.com/spring-projects/spring-framework/pull/23200[spring-framework PR #23200]
 * https://github.com/spring-projects/spring-framework/commit/56cc0d02e9[Juergen Hoeller의 반영 커밋]
