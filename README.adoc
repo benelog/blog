@@ -43,7 +43,7 @@ output/            # 빌드 결과물 (gitignore)
 
 == 예제 코드와 글의 연결 관계
 
-글에서 인용하는 예제 코드 중 순수 예제 성격의 저장소는 이 저장소의 `examples/` 하위 폴더로 병합했고(커밋 이력 보존), 독자적인 정체성이 있는 프로젝트는 별도 저장소로 유지합니다.
+글에서 인용하는 예제 코드 중 순수 예제 성격의 것은 이 저장소의 `examples/` 하위 폴더에 모았고(별도 저장소에서 옮겨 온 경우 커밋 이력 보존), 독자적인 정체성이 있는 프로젝트는 별도 저장소로 유지합니다.
 
 === 이 저장소의 `examples/` 폴더
 
@@ -69,6 +69,12 @@ a|
 
 |link:examples/tomcat-bed/[tomcat-bed]
 |https://blog.benelog.net/tomcat-bed.html[통합 테스트를 위한 내장 Tomcat, tomcat-bed]
+
+|link:examples/string-concat/[string-concat]
+|https://blog.benelog.net/java-string-concat.html[Java 문자열 더하기 연산의 최적화]
+
+|link:examples/benchmark-test/[benchmark-test]
+|https://blog.benelog.net/junit-benchmarks.html[junit-benchmarks로 HTTP API의 응답 시간 측정하기]
 |===
 
 === 별도 저장소로 유지하는 예제
@@ -104,9 +110,6 @@ a|https://github.com/benelog/dumper[dumper]
 a|
 * https://blog.benelog.net/2874354.html[Java Stack dump 다운로드를 편하게]
 * https://blog.benelog.net/2875999.html[Winstone, 경량 Servlet container]
-
-|https://gist.github.com/benelog/a9db4ac3018d6222baea32d5c2f783b5[benchmark-test (gist)]
-|https://blog.benelog.net/junit-benchmarks.html[junit-benchmarks로 HTTP API의 응답 시간 측정하기]
 |===
 
 == 포스트 작성
