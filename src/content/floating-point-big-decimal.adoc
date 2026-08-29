@@ -170,6 +170,22 @@ $2 ==> 0.61
 앞에서 봤듯이 `new BigDecimal(0.1)` 은 0.1이 아니라 `double` 에 저장된 근사값을 그대로 옮겨 담습니다.
 문자열을 받는 생성자나 `BigDecimal.valueOf()` 를 사용해야 합니다.
 
+`BigDecimal` 을 쓴다고 반올림 정책까지 저절로 정해지지는 않습니다.
+1을 3으로 나누는 것처럼 십진수로 끝나지 않는 나눗셈은 자릿수와 반올림 방식을 지정하지 않으면 예외가 납니다.
+
+[source,java]
+----
+jshell> new BigDecimal("1").divide(new BigDecimal("3"))
+|  Exception java.lang.ArithmeticException: Non-terminating decimal expansion; no exact representable decimal result.
+
+jshell> new BigDecimal("1").divide(new BigDecimal("3"), 10, RoundingMode.HALF_UP)
+$1 ==> 0.3333333333
+----
+
+여기서 쓴 `java.math.RoundingMode` 는 0.5를 올릴지(`HALF_UP`), 짝수 쪽으로 붙일지(`HALF_EVEN`), 무조건 버릴지(`DOWN`) 같은 반올림 방식을 고르는 열거형입니다.
+`BigDecimal` 이 없애 주는 것은 2진수 표현에서 생기는 오차입니다.
+소수점 이하 몇 자리까지 어떤 방식으로 반올림할지는 여전히 팀이 정해서 지켜야 하는 규칙으로 남습니다.
+
 === 정수형 최소 단위 계산
 
 금액을 원(₩)이나 센트 같은 최소 단위의 정수로 다루는 방법도 널리 쓰입니다.
@@ -185,8 +201,35 @@ public static long calculate(long amount, float rate, RoundingMode roundingMode)
 ----
 
 금액 자체는 정수로 유지하고, 소수점이 생기는 비율 계산 직후에 반올림 모드를 명시한 `BigDecimal` 로 다시 정수로 돌아오는 구조입니다.
-여기서 반올림 모드는 `java.math.RoundingMode` 로, 0.5를 올릴지(`HALF_UP`) 짝수 쪽으로 붙일지(`HALF_EVEN`) 무조건 버릴지(`DOWN`) 같은 반올림 방식을 고르는 열거형입니다.
-다만 `amount * rate * 0.01` 곱셈 자체는 부동소수점 연산으로 수행되므로, 이 오차가 반올림 경계에 걸릴 수 있는 정밀도라면 곱셈까지 `BigDecimal` 로 옮기는 편이 안전합니다.
+다만 `amount * rate * 0.01` 곱셈은 부동소수점 연산으로 수행됩니다.
+`long` 값이 `float` 로 변환되면서 정밀도를 잃기 때문에, 입력과 리턴 타입이 정수여도 금액이 커지면 결과가 어긋납니다.
+
+[source,java]
+----
+jshell> calculate(16_777_217L, 100f, RoundingMode.HALF_UP)
+$1 ==> 16777216
+----
+
+100%를 곱했으니 16,777,217이 그대로 나와야 하는데 1원이 사라졌습니다.
+`float` 의 가수는 23비트여서 2^24^(16,777,216)을 넘는 정수를 빠짐없이 표현하지는 못하고, `16_777_217L` 은 `float` 로 변환되는 순간 16,777,216이 됩니다.
+입력을 정수로 유지해도 중간 계산 한 곳이 부동소수점이면 오차는 그대로 들어옵니다.
+
+인용한 예제를 고쳐서 비율까지 `BigDecimal` 로 옮기면 이 문제가 사라집니다.
+
+[source,java]
+.곱셈까지 BigDecimal로 옮긴 버전
+----
+public static long calculate(long amount, BigDecimal percent, RoundingMode roundingMode) {
+    return BigDecimal.valueOf(amount)
+            .multiply(percent)
+            .movePointLeft(2)
+            .setScale(0, roundingMode)
+            .longValue();
+}
+----
+
+이 버전에서 `calculate(16_777_217L, new BigDecimal("100"), RoundingMode.HALF_UP)` 은 16,777,217을 그대로 돌려줍니다.
+정수형 최소 단위 방식이 오차를 없애는 것은 이렇게 모든 중간값을 정수나 `BigDecimal` 로 유지할 때뿐입니다.
 금액이 대표적인 사례일 뿐, 소수점 이하 자릿수가 정해진 값이라면 무엇이든 같은 방식으로 정수로 환산해 다룰 수 있습니다.
 
 === Java Money (JSR 354)
@@ -231,9 +274,13 @@ price.add(Money.of(100, "KRW"));
 
 더 많은 사용 예제는 https://www.baeldung.com/java-money-and-currency[Baeldung의 Java Money and the Currency API]를 참고할 수 있습니다.
 
-== 세 대안의 비용과 선택 기준
+== 수치 표현과 도메인 모델, 두 축의 선택 기준
 
-세 방법 모두 부동소수점 오차를 피할 수 있지만, 각각의 추가 비용이 있습니다.
+세 방법 모두 중간 계산까지 부동소수점을 쓰지 않는다면 오차를 피할 수 있지만, 각각의 추가 비용이 있습니다.
+그리고 세 방법이 같은 층위에 있는 것도 아닙니다.
+`BigDecimal` 과 정수형 최소 단위는 수를 어떤 형태로 담을지에 대한 선택이고, Java Money는 그 위에서 금액과 통화를 어떤 타입으로 표현할지에 대한 선택입니다.
+`Money` 가 내부적으로 ``BigDecimal``을, `FastMoney` 가 `long` 을 쓰는 것이 그 관계를 보여줍니다.
+그래서 선택도 수치 표현과 도메인 모델의 두 단계로 나누어 하게 됩니다.
 
 ``BigDecimal``는 표현력과 시스템 자원 사용량에서 단점이 생깁니다.
 Chronicle Software의 Peter Lawrey는 https://blog.vanillajava.blog/2014/07/if-bigdecimal-is-answer-it-must-have.html[If BigDecimal is the answer, it must have been a strange question]에서 `BigDecimal` 의 단점을 이렇게 꼽습니다.
@@ -259,11 +306,16 @@ Java Money는 정확성보다는 돈을 다룰 때 편의성과 표현력을 얻
 속도가 문제가 되면 같은 `MonetaryAmount` 인터페이스를 구현한 https://github.com/JavaMoney/jsr354-ri/blob/master/moneta-core/src/main/java/org/javamoney/moneta/FastMoney.java[FastMoney]로 바꿔 끼울 수 있습니다.
 `FastMoney` 는 금액을 `long` 하나에 최소 단위로 저장하는 구현으로, 소수점 아래 5자리로 스케일이 고정된다는 제약을 받는 대신 자바독에서는 ``Money``보다 10~15배 빠른 것으로 소개합니다.
 앞의 두 방식을 같은 API 아래에서 바꿔 쓸 수 있는 셈입니다.
-다만 JDK에 포함되지 않은 별도 의존성이라는 점은 그대로 남습니다.
+다만 구현을 바꾸면 수치 표현도 함께 바뀝니다.
+`FastMoney` 는 스케일이 5자리로 고정되고 값의 범위도 `long` 에 갇히므로, 기존 계산의 정밀도와 반올림 결과가 달라지지 않는지 확인해야 합니다.
+JDK에 포함되지 않은 별도 의존성이라는 점도 그대로 남습니다.
+
+먼저 수를 어떤 형태로 담을지 고릅니다.
 
 [cols="1,1,2,2", options="header"]
+.수치 표현 선택
 |===
-|대안 |내부 표현 |강점 |감수할 점
+|선택지 |내부 표현 |강점 |감수할 점
 
 |`BigDecimal`
 |임의 정밀도 정수 + 스케일
@@ -274,11 +326,22 @@ Java Money는 정확성보다는 돈을 다룰 때 편의성과 표현력을 얻
 |`long`
 |객체 생성 없이 가장 빠름
 |최소 단위 규칙과 반올림 통제를 개발자가 부담
+|===
 
-|Java Money
-|`Money` 는 `BigDecimal`, `FastMoney` 는 `long`
+그다음 그 값을 도메인 타입으로 감쌀지 정합니다.
+
+[cols="1,2,2", options="header"]
+.도메인 모델 선택
+|===
+|선택지 |강점 |감수할 점
+
+|원시 값 그대로 (`long`, `BigDecimal`)
+|추가 의존성이 없고 구조가 단순함
+|금액과 통화가 분리되어, 값만 보고는 단위를 알 수 없음
+
+|Java Money (`MonetaryAmount`)
 |금액과 통화를 한 값으로 묶어 통화 불일치를 걸러냄
-|택한 구현의 비용에 래핑 비용이 더해지고, 별도 의존성이 필요
+|래핑 비용과 별도 의존성, 구현 선택이 곧 수치 표현 선택
 |===
 
 저는 돈과 같이 정밀한 계산이 필요한 영역에서는 최소한 ``double``보다는 ``BigDecimal``을 권장해야 한다고 생각합니다.
@@ -288,6 +351,12 @@ Java Money는 정확성보다는 돈을 다룰 때 편의성과 표현력을 얻
 다만 이 방식도 최소 단위를 무엇으로 할지와 반올림 규칙을 팀의 약속으로 유지해야 합니다.
 조직에는 늘 새로운 사람이 들어오기 때문에, 모든 사람이 그 약속과 이 글에서 다룬 오차의 특성을 이해하고 있다고 전제하기는 어렵습니다.
 따라서 정밀한 연산이 필요한 소수 처리를 하는 코드에서는 팀과 프로젝트의 표준으로 `BigDecimal` 사용을 전수하는 편이 더 안전합니다.
+물론 `BigDecimal` 을 쓴다고 반올림 규칙까지 없어지지는 않습니다.
+앞에서 봤듯이 나눗셈의 자릿수와 반올림 방식은 여전히 합의해야 합니다.
+`BigDecimal` 이 확실히 없애 주는 것은 2진수 표현에서 오는 오차이고, 그만큼 팀이 신경 쓸 규칙이 줄어듭니다.
+
+도메인 모델 축은 통화를 여러 개 다루는지에 따라 갈린다고 봅니다.
+통화가 하나뿐이라면 원시 값에 `BigDecimal` 로도 충분하고, 여러 통화가 섞이는 시스템이라면 통화 불일치를 API가 걸러 준다는 이점이 별도 의존성을 감수할 만합니다.
 
 == 참고 자료
 
