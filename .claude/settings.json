@@ -1,13 +1,20 @@
 {
+  "enabledPlugins": {
+    "korean-tech-writing@korean-tech-writing": true,
+    "codex@openai-codex": true
+  },
   "extraKnownMarketplaces": {
     "korean-tech-writing": {
       "source": {
         "source": "github",
         "repo": "benelog/korean-tech-writing"
       }
+    },
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
+      }
     }
-  },
-  "enabledPlugins": {
-    "korean-tech-writing@korean-tech-writing": true
   }
 }

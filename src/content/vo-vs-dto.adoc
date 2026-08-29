@@ -18,9 +18,9 @@ Value Object는 식별성 없이 값이 같으면 같다고 간주되는 객체�
 * link:https://en.wikipedia.org/wiki/Value_object[Wikipedia]
 * link:https://learn.microsoft.com/ko-kr/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/implement-value-objects[Microsoft의 .NET 아키텍처 문서]
 
-Eric Evans의 'Domain-Driven Design'에서도 'VALUE OBJECT'를 식별성 없이 속성만으로 동일성을 판단하는 객체로 정의합니다.
+Eric Evans의 **Domain-Driven Design**에서도 'VALUE OBJECT'를 식별성 없이 속성만으로 동일성을 판단하는 객체로 정의합니다.
 
-Java 코드에서는 동등성을 판단할 속성 값을 기준으로 ``equals()``와 ``hashCode()``를 구현하면 Value Object가 됩니다. 이때 지켜야 할 두 메서드의 규약은 Joshua Bloch의 'Effective Java' 3판 Item 10과 Item 11에 정리되어 있습니다. Java 16부터 정식 기능이 된 record를 사용하면 간결하게 정의할 수 있습니다. record를 도입한 link:https://openjdk.org/jeps/395[JEP 395]도 record를 불변 데이터의 투명한 운반자 역할을 하는 클래스("classes that act as transparent carriers for immutable data")로 소개합니다.
+Java 코드에서는 동등성을 판단할 속성 값을 기준으로 ``equals()``와 ``hashCode()``를 구현하면 Value Object가 됩니다. 이때 지켜야 할 두 메서드의 규약은 Joshua Bloch의 **Effective Java** 3판 Item 10과 Item 11에 정리되어 있습니다. Java 16부터 정식 기능이 된 record를 사용하면 간결하게 정의할 수 있습니다. record를 도입한 link:https://openjdk.org/jeps/395[JEP 395]도 record를 불변 데이터의 투명한 운반자 역할을 하는 클래스("classes that act as transparent carriers for immutable data")로 소개합니다.
 
 [source,java]
 ----
@@ -47,14 +47,14 @@ Java 언어와 JVM에도 DDD 및 Fowler의 Value Object와 핵심 성질을 공�
 
 Value Object는 완전한 불변 객체로 만드는 것이 권장됩니다. 여러 책과 글에서 이를 권고합니다.
 
-* Fowler는 'Patterns of Enterprise Application Architecture' 486쪽에서 Value Object를 불변으로 만드는 것이 매우 좋은 방법이라고("it's a very good idea to make them immutable") 권고합니다.
+* Fowler는 **Patterns of Enterprise Application Architecture** 486쪽에서 Value Object를 불변으로 만드는 것이 매우 좋은 방법이라고("it's a very good idea to make them immutable") 권고합니다.
 * Fowler의 Value Object 글도 마찬가지입니다. link:https://web.archive.org/web/20110104080034/http://martinfowler.com/bliki/ValueObject.html[2016년 개정 전 버전]에서는 "A general heuristic is that value objects should be entirely immutable."라고 썼고, 개정된 현재 버전에서도 "value objects should be immutable"를 중요한 규칙으로 제시합니다.
-* Joshua Bloch는 'Effective Java' 3판의 Item 17 "Minimize mutability"에서 클래스의 가변성을 최소화하고 가능하면 불변으로 만들라고 권고합니다.
-* Eric Evans는 'Domain-Driven Design' 99~103쪽에서 불변 Value Object를 자유롭게 공유할 수 있다는 점을 설명합니다.
+* Joshua Bloch는 **Effective Java** 3판의 Item 17 "Minimize mutability"에서 클래스의 가변성을 최소화하고 가능하면 불변으로 만들라고 권고합니다.
+* Eric Evans는 **Domain-Driven Design** 99~103쪽에서 불변 Value Object를 자유롭게 공유할 수 있다는 점을 설명합니다.
 
 VO가 불변이면 여러 객체가 같은 인스턴스를 공유해도 별칭 문제(aliasing bug) 같은 부작용에서 자유롭습니다. Java의 ``java.util.Date``와 ``Calendar``는 값의 성격을 가진 객체인데도 가변으로 설계되어서 공유된 인스턴스가 한쪽에서 수정되는 버그의 원인이 되었습니다. Java 8의 ``java.time`` 패키지가 모든 날짜 클래스를 불변으로 만든 것도 이 교훈의 반영입니다.
 
-그런데 Fowler와 Evans의 문장을 자세히 보면 불변성을 VO의 정의에 포함하지는 않았습니다. Fowler가 Value Object의 정의로 제시하는 성질은 값에 의한 동등성이고, 앞에서 인용한 "value objects should be immutable"도 전체 문장을 보면 별칭 문제를 피하기 위해 따르는 규칙("To avoid aliasing bugs I follow a simple but important rule: value objects should be immutable.")으로 등장합니다. 같은 글에서 불변으로 만드는 대신 대입할 때마다 복사해서 별칭 문제를 피할 수도 있다고("it's also possible to avoid them by ensuring assignments always make a copy") 대안까지 언급합니다. Evans의 문장도 명령형의 지침입니다. 'Domain-Driven Design' 99쪽의 "Treat the VALUE OBJECT as immutable."는 VALUE OBJECT가 무엇인지에 대한 정의가 아니라 그것을 다루는 방법에 대한 권고이고, 이어지는 내용은 그렇게 했을 때 얻는 공유와 참조 전달의 안전성입니다.
+그런데 Fowler와 Evans의 문장을 자세히 보면 불변성을 VO의 정의에 포함하지는 않았습니다. Fowler가 Value Object의 정의로 제시하는 성질은 값에 의한 동등성이고, 앞에서 인용한 "value objects should be immutable"도 전체 문장을 보면 별칭 문제를 피하기 위해 따르는 규칙("To avoid aliasing bugs I follow a simple but important rule: value objects should be immutable.")으로 등장합니다. 같은 글에서 불변으로 만드는 대신 대입할 때마다 복사해서 별칭 문제를 피할 수도 있다고("it's also possible to avoid them by ensuring assignments always make a copy") 대안까지 언급합니다. Evans의 문장도 명령형의 지침입니다. **Domain-Driven Design** 99쪽의 "Treat the VALUE OBJECT as immutable."는 VALUE OBJECT가 무엇인지에 대한 정의가 아니라 그것을 다루는 방법에 대한 권고이고, 이어지는 내용은 그렇게 했을 때 얻는 공유와 참조 전달의 안전성입니다.
 
 Ward Cunningham의 wiki에 있는 link:https://wiki.c2.com/?ValueObjectsShouldBeImmutable[ValueObjectsShouldBeImmutable] 페이지에 Fowler가 남긴 문장은 이 뉘앙스를 더 분명하게 보여줍니다.
 
@@ -68,8 +68,8 @@ ____
 
 * 앞에서 인용한 Microsoft의 .NET 아키텍처 문서는 value object의 두 가지 주요 특성으로 식별성 없음과 불변성을 나란히 들고("There are two main characteristics for value objects: They have no identity. They are immutable."), 불변성을 중요한 요건("Immutability is an important requirement.")이라고 씁니다.
 * Wikipedia도 같게 생성된 두 value object가 계속 같아야 한다는 암묵적 계약을 위해 불변성이 요구된다고 서술합니다.
-* Vaughn Vernon의 'Implementing Domain-Driven Design'(2013) 6장도 Value Object의 특성을 열거하면서 불변성을 그중 하나로 포함합니다.
-* 김우근의 '자바/스프링 개발자를 위한 실용주의 프로그래밍'(2024)도 "VO는 이러한 불변성이라는 특징을 갖고 있는 객체를 말합니다"(43쪽)라고 설명하고, 불변성·동등성·자가 검증이라는 세 특성을 만족하는 객체를 VO로 정의합니다.
+* Vaughn Vernon의 **Implementing Domain-Driven Design**(2013) 6장도 Value Object의 특성을 열거하면서 불변성을 그중 하나로 포함합니다.
+* 김우근 님의 **자바/스프링 개발자를 위한 실용주의 프로그래밍**(2024)도 "VO는 이러한 불변성이라는 특징을 갖고 있는 객체를 말합니다"(43쪽)라고 설명하고, 불변성·동등성·자가 검증이라는 세 특성을 만족하는 객체를 VO로 정의합니다.
 * JEP 401의 value object처럼 언어 차원에서 불변성이 강제되는 개념도 있습니다.
 
 저는 불변성을 VO의 정의 요건이라기보다는 바람직한 설계 규범으로 인식합니다. 어차피 새로 만드는 Value Object는 불변으로 설계할 것이므로, 실무에서 should와 must의 구분이 드러나는 경우는 많지 않습니다. 그래도 이 구분이 무의미하지는 않습니다. ``java.util.Date``처럼 가변으로 만들어진 값 성격의 객체를 만났을 때, 불변성을 정의에 포함하면 그 객체는 VO가 아닌 무언가가 되고, 권고로 보면 불변 권고를 지키지 못한 VO가 됩니다. c2 wiki의 Fowler 문장은 후자의 관점에서 나온 실용적인 조언입니다. 불변 권고를 지키지 못한 VO를 이미 마주쳤을 때, 그것을 VO가 아니라고 배제하는 대신 최소한 불변인 것처럼 다루라는 지침입니다.
@@ -78,7 +78,7 @@ ____
 
 == DTO(Data Transfer Object)의 정의
 
-DTO의 원래 정의는 원격 호출을 효율화하기 위한 객체입니다. link:https://martinfowler.com/eaaCatalog/dataTransferObject.html[Martin Fowler의 'Patterns of Enterprise Application Architecture' 카탈로그]와 책의 401쪽에서는 원격 호출의 횟수를 줄이기 위해 여러 데이터를 한 번에 담아서 나르는 객체로 정의합니다. 원격 호출은 비용이 크므로 한 번의 호출로 필요한 데이터를 모두 전달하려는 의도에서 나온 패턴입니다.
+DTO의 원래 정의는 원격 호출을 효율화하기 위한 객체입니다. link:https://martinfowler.com/eaaCatalog/dataTransferObject.html[Martin Fowler의 **Patterns of Enterprise Application Architecture** 카탈로그]와 책의 401쪽에서는 원격 호출의 횟수를 줄이기 위해 여러 데이터를 한 번에 담아서 나르는 객체로 정의합니다. 원격 호출은 비용이 크므로 한 번의 호출로 필요한 데이터를 모두 전달하려는 의도에서 나온 패턴입니다.
 
 HTTP API의 요청과 응답처럼 네트워크를 건너는 데이터를 담는 객체는 프로세스 경계를 넘고 직렬화된다는 점에서 이 정의와 통합니다. 다만 모든 HTTP 메시지가 원격 호출 횟수를 줄이기 위해 도입되는 것은 아니므로, 이를 DTO라고 부르는 용법은 원래 정의를 현대적인 API 경계에 확장한 것입니다.
 
@@ -88,7 +88,7 @@ HTTP API의 요청과 응답처럼 네트워크를 건너는 데이터를 담는
 
 == Core J2EE Patterns 초판의 VO와 개정판의 TO
 
-Java/J2EE(현 Jakarta EE) 진영에서 두 용어의 혼용을 확산시킨 대표적인 초기 출처는 Deepak Alur 등이 쓴 'Core J2EE Patterns: Best Practices and Design Strategies'입니다. 2001년에 나온 초판에서는 티어(tier) 사이의 데이터 전송 객체를 Value Object라는 이름의 패턴으로 정의했습니다. 이 이름이 값 동등성 객체로서의 Value Object와 혼동을 유발했기 때문에, 2003년의 2판에서는 같은 패턴을 TO(Transfer Object)로 개칭했습니다. Martin Fowler는 같은 역할의 패턴을 DTO라고 부릅니다('Patterns of Enterprise Application Architecture' 401쪽). 정리하면 다음 세 가지는 같은 전송 패턴을 가리킵니다.
+Java/J2EE(현 Jakarta EE) 진영에서 두 용어의 혼용을 확산시킨 대표적인 초기 출처는 Deepak Alur 등이 쓴 **Core J2EE Patterns: Best Practices and Design Strategies**입니다. 2001년에 나온 초판에서는 티어(tier) 사이의 데이터 전송 객체를 Value Object라는 이름의 패턴으로 정의했습니다. 이 이름이 값 동등성 객체로서의 Value Object와 혼동을 유발했기 때문에, 2003년의 2판에서는 같은 패턴을 TO(Transfer Object)로 개칭했습니다. Martin Fowler는 같은 역할의 패턴을 DTO라고 부릅니다(**Patterns of Enterprise Application Architecture** 401쪽). 정리하면 다음 세 가지는 같은 전송 패턴을 가리킵니다.
 
 ____
 Core J2EE Patterns 초판의 VO = 2판의 TO = Martin Fowler의 DTO
@@ -98,10 +98,10 @@ link:https://www.oracle.com/java/technologies/transfer-object.html[Oracle의 Tra
 
 같은 용법은 다른 책에서도 확인됩니다. 여러 서적이 VO와 DTO를 같은 의미로 쓴다고 명시했습니다.
 
-* Rod Johnson의 'Expert One-on-One J2EE Design and Development'(2002, 265쪽): "Value objects are sometimes referred to as Data Transfer Objects (DTOs)."
-* Rod Johnson과 Juergen Hoeller의 'Expert One-on-One J2EE Development without EJB'(2004, 27쪽): "Transfer objects, often referred to as Data Transfer Objects (DTOs) or Value Objects."
-* 'Professional Java EE Design Patterns'(2014, 12장): "The DTO is also referred to as the Value Object"
-* 'The Java EE Architect's Handbook, Second Edition'(2014, 5장): "My definition of "value object" is very close to a Data Transfer Object (DTO)"
+* Rod Johnson, **Expert One-on-One J2EE Design and Development**, Wrox, 2002, 265쪽: "Value objects are sometimes referred to as Data Transfer Objects (DTOs)."
+* Rod Johnson·Juergen Hoeller, **Expert One-on-One J2EE Development without EJB**, Wrox, 2004, 27쪽: "Transfer objects, often referred to as Data Transfer Objects (DTOs) or Value Objects."
+* Murat Yener·Alex Theedom, **Professional Java EE Design Patterns**, Wrox, 2014, 12장: "The DTO is also referred to as the Value Object"
+* Derek C. Ashmore, **The Java EE Architect's Handbook, Second Edition**, DVT Press, 2014, 5장: "My definition of 'value object' is very close to a Data Transfer Object (DTO)"
 
 이 책들이 모두 Core J2EE Patterns 초판의 직접적인 영향을 받았다고 단정할 수는 없습니다. 다만 등장 시기와 여러 문헌에서 반복되는 표현을 고려하면, 초판의 용법이 이후 Java/J2EE 문헌의 표현에도 어느 정도 영향을 미치지 않았을까 추정합니다. 2판에서 이름을 개칭한 지 20년이 넘은 지금까지도 그 관행은 남아 있습니다.
 
@@ -145,11 +145,11 @@ getter/setter만 가진 데이터 홀더를 VO라고 이해하고 있다면 이�
 * https://wiki.c2.com/?ValueObjectsShouldBeImmutable[C2 Wiki: Value Objects Should Be Immutable]
 * https://en.wikipedia.org/wiki/Value_object[Wikipedia: Value object]
 * https://learn.microsoft.com/ko-kr/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/implement-value-objects[Microsoft: 값 개체 구현]
-* Martin Fowler, link:https://www.informit.com/store/patterns-of-enterprise-application-architecture-9780321127426['Patterns of Enterprise Application Architecture'], 486쪽
-* Eric Evans, link:https://www.informit.com/store/domain-driven-design-tackling-complexity-in-the-heart-9780321125217['Domain-Driven Design'], 99~103쪽
-* 김우근, link:https://wikibook.co.kr/pragmatic-programming/['자바/스프링 개발자를 위한 실용주의 프로그래밍'], 43쪽
-* Joshua Bloch, link:https://www.informit.com/store/effective-java-9780134685991['Effective Java'] 3판, Item 10·11·17
-* Vaughn Vernon, link:https://www.informit.com/store/implementing-domain-driven-design-9780133039894['Implementing Domain-Driven Design'], 6장
+* Martin Fowler, link:https://www.informit.com/store/patterns-of-enterprise-application-architecture-9780321127426[**Patterns of Enterprise Application Architecture**], Addison-Wesley, 2002, 486쪽
+* Eric Evans, link:https://www.informit.com/store/domain-driven-design-tackling-complexity-in-the-heart-9780321125217[**Domain-Driven Design**], Addison-Wesley, 2003, 99~103쪽
+* 김우근, link:https://wikibook.co.kr/pragmatic-programming/[**자바/스프링 개발자를 위한 실용주의 프로그래밍**], 위키북스, 2024, 43쪽
+* Joshua Bloch, link:https://www.informit.com/store/effective-java-9780134685991[**Effective Java**] 3판, Addison-Wesley, 2018, Item 10·11·17
+* Vaughn Vernon, link:https://www.informit.com/store/implementing-domain-driven-design-9780133039894[**Implementing Domain-Driven Design**], Addison-Wesley, 2013, 6장
 * https://c2.com/ppr/checks.html[Ward Cunningham: The CHECKS Pattern Language of Information Integrity - Whole Value]
 * https://openjdk.org/jeps/395[JEP 395: Records]
 * https://openjdk.org/jeps/401[JEP 401: Value Objects (Preview)]
@@ -159,10 +159,10 @@ getter/setter만 가진 데이터 홀더를 VO라고 이해하고 있다면 이�
 
 * https://martinfowler.com/eaaCatalog/dataTransferObject.html[Martin Fowler: Data Transfer Object]
 * https://martinfowler.com/bliki/LocalDTO.html[Martin Fowler: LocalDTO]
-* Martin Fowler, link:https://www.informit.com/store/patterns-of-enterprise-application-architecture-9780321127426['Patterns of Enterprise Application Architecture'], 401쪽
-* Deepak Alur 외, link:https://www.amazon.com/Core-J2EE-Patterns-Practices-Strategies/dp/0130648841['Core J2EE Patterns'] 초판(2001)
-* Rod Johnson, link:https://www.wiley.com/en-us/Expert+One+on+One+J2EE+Design+and+Development-p-9780764543852['Expert One-on-One J2EE Design and Development'], 265쪽
-* Rod Johnson·Juergen Hoeller, link:https://www.wiley.com/en-us/Expert+One+on+One+J2EE+Development+without+EJB-p-9780764573903['Expert One-on-One J2EE Development without EJB'], 27쪽
+* Martin Fowler, link:https://www.informit.com/store/patterns-of-enterprise-application-architecture-9780321127426[**Patterns of Enterprise Application Architecture**], Addison-Wesley, 2002, 401쪽
+* Deepak Alur·John Crupi·Dan Malks, link:https://www.amazon.com/Core-J2EE-Patterns-Practices-Strategies/dp/0130648841[**Core J2EE Patterns: Best Practices and Design Strategies**] 초판, Prentice Hall, 2001
+* Rod Johnson, link:https://www.wiley.com/en-us/Expert+One+on+One+J2EE+Design+and+Development-p-9780764543852[**Expert One-on-One J2EE Design and Development**], Wrox, 2002, 265쪽
+* Rod Johnson·Juergen Hoeller, link:https://www.wiley.com/en-us/Expert+One+on+One+J2EE+Development+without+EJB-p-9780764573903[**Expert One-on-One J2EE Development without EJB**], Wrox, 2004, 27쪽
 * https://www.oracle.com/java/technologies/transfer-object.html[Oracle: Core J2EE Patterns - Transfer Object]
 * http://www.adam-bien.com/roller/abien/entry/value_object_vs_data_transfer[Adam Bien: Value Object vs. Data Transfer Object (VO vs. DTO)]
 
