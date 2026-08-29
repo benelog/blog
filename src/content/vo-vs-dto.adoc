@@ -163,6 +163,8 @@ getter/setter만 가진 데이터 홀더를 VO라고 이해하고 있다면 이�
 * Deepak Alur·John Crupi·Dan Malks, link:https://www.amazon.com/Core-J2EE-Patterns-Practices-Strategies/dp/0130648841[**Core J2EE Patterns: Best Practices and Design Strategies**] 초판, Prentice Hall, 2001
 * Rod Johnson, link:https://www.wiley.com/en-us/Expert+One+on+One+J2EE+Design+and+Development-p-9780764543852[**Expert One-on-One J2EE Design and Development**], Wrox, 2002, 265쪽
 * Rod Johnson·Juergen Hoeller, link:https://www.wiley.com/en-us/Expert+One+on+One+J2EE+Development+without+EJB-p-9780764573903[**Expert One-on-One J2EE Development without EJB**], Wrox, 2004, 27쪽
+* Murat Yener·Alex Theedom, link:https://www.wiley.com/en-us/Professional+Java+EE+Design+Patterns-p-9781118843413[**Professional Java EE Design Patterns**], Wrox, 2014, 12장
+* Derek C. Ashmore, link:https://www.amazon.com/Java-Architects-Handbook-Second-applications/dp/0972954880[**The Java EE Architect's Handbook, Second Edition**], DVT Press, 2014, 5장
 * https://www.oracle.com/java/technologies/transfer-object.html[Oracle: Core J2EE Patterns - Transfer Object]
 * http://www.adam-bien.com/roller/abien/entry/value_object_vs_data_transfer[Adam Bien: Value Object vs. Data Transfer Object (VO vs. DTO)]
 
