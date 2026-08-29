@@ -9,9 +9,9 @@
 :idprefix:
 :toc:
 
-`int` 와 ``java.lang.Integer``를 섞어 쓰면 컴파일러가 auto boxing과 unboxing 코드를 대신 넣어 줍니다. 그 변환이 어떤 메서드 호출로 바뀌는지 알아 두면 `==` 비교의 결과나 반복문에서 생기는 객체 생성 비용을 예측할 수 있습니다.
+`int` 와 ``java.lang.Integer``를 섞어 쓰면 JDK의 ``javac``이 auto boxing과 unboxing 코드를 대신 넣어 줍니다. 그 변환이 어떤 메서드 호출로 바뀌는지 알아 두면 `==` 비교의 결과나 반복문에서 생기는 객체 생성 비용을 예측할 수 있습니다.
 
-변환 방식 자체는 JDK 5에서 auto boxing이 도입된 뒤로 바뀌지 않았지만, 캐시의 구현과 wrapper 생성자의 deprecation 상태는 버전마다 달라졌습니다. 이 글의 바이트코드와 실행 결과는 JDK 25(Temurin 25+36)에서 확인했습니다.
+``javac``의 변환 방식 자체는 JDK 5에서 auto boxing이 도입된 뒤로 바뀌지 않았지만, 캐시의 구현과 wrapper 생성자의 deprecation 상태는 버전마다 달라졌습니다. 이 글의 바이트코드와 실행 결과는 JDK 25(Temurin 25+36)에서 확인했습니다.
 
 == 박싱과 언박싱으로 컴파일되는 바이트코드
 
@@ -53,7 +53,7 @@ JDK에 포함된 ``javap``으로 `javap -c Boxing.class` 를 실행하면 다음
         ...
 ----
 
-박싱과 언박싱만을 위한 바이트코드 명령은 따로 없습니다. `int` 가 ``Integer``로 바뀔 때는 ``Integer.valueOf()``를, ``Integer``가 `int` 로 바뀔 때는 ``intValue()``를 호출하는 평범한 메서드 호출로 컴파일됩니다. 이 방식은 JDK 5에서 auto boxing이 도입된 이후 JDK 25까지 같습니다.
+박싱과 언박싱만을 위한 바이트코드 명령은 따로 없습니다. JDK의 ``javac``은 `int` 가 ``Integer``로 바뀔 때 ``Integer.valueOf()``를, ``Integer``가 `int` 로 바뀔 때 ``intValue()``를 호출하는 바이트코드로 컴파일합니다. 이 방식은 JDK 5에서 auto boxing이 도입된 이후 JDK 25까지 같습니다.
 
 `a == b` 처럼 한쪽이 `int` 이고 다른 쪽이 ``Integer``이면 ``Integer``쪽이 언박싱되어 값 비교(`if_icmpne`)가 됩니다. 반면 양쪽이 모두 ``Integer``이면 언박싱 없이 참조 비교(`if_acmpne`)가 되므로, 다음 절에서 다루는 캐시 범위에 따라 결과가 달라집니다.
 
@@ -93,7 +93,7 @@ public class Boxing {
 
 == Integer.valueOf()의 캐시와 참조 비교
 
-``new Integer()``로 생성자를 호출하면 매번 새 객체를 만들지만, ``Integer.valueOf()``는 캐시된 인스턴스를 재사용할 수 있습니다. JDK 25의 `java.lang.Integer` 소스를 보면 -128부터 127까지를 `IntegerCache` 에 담아 둡니다.
+``new Integer(int)``로 생성자를 호출하면 매번 새 객체를 만들지만, ``Integer.valueOf()``는 캐시된 인스턴스를 재사용할 수 있습니다. JDK 25의 `java.lang.Integer` 소스를 보면 -128부터 127까지를 `IntegerCache` 에 담아 둡니다.
 
 [source,java]
 .java/lang/Integer.java (JDK 25)
@@ -122,9 +122,9 @@ public class Boxing {
     }
 ----
 
-캐시의 상한은 상수가 아니라 시스템 프로퍼티로 결정되고, 배열 자체는 CDS(Class Data Sharing) 아카이브에 저장된 것을 읽어 옵니다.
+캐시의 기본 상한은 127이고, VM이 보관하는 내부 프로퍼티로 더 늘릴 수 있습니다. CDS(Class Data Sharing) 아카이브를 사용할 수 있으면 아카이브된 배열을 가져옵니다. 아카이브가 없거나 요청된 캐시 크기보다 작으면 캐시 전체 또는 부족한 부분을 실행 시점에 만듭니다.
 
-이 캐시 범위는 구현체의 재량이 아니라 언어 명세가 요구하는 최소 범위입니다. https://docs.oracle.com/javase/specs/jls/se25/html/jls-5.html#jls-5.1.7[JLS 5.1.7]은 박싱 대상이 상수식일 때 아래 조건에서 두 박싱 결과가 반드시 같은 참조여야 한다고 규정합니다.
+JLS는 `IntegerCache` 라는 구현 자체를 요구하지 않습니다. https://docs.oracle.com/javase/specs/jls/se25/html/jls-5.html#jls-5.1.7[JLS 5.1.7]은 박싱 대상이 상수식일 때 아래 조건에서 두 박싱 결과가 반드시 같은 참조여야 한다고 규정하고, JDK는 이 요구를 캐시로 충족합니다. 한편 https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Integer.html#valueOf(int)[``Integer.valueOf(int)``의 API 계약]은 상수식 여부와 관계없이 -128부터 127까지를 항상 캐시한다고 보장합니다.
 
 [quote, 'JLS 5.1.7. Boxing Conversion']
 ____
@@ -156,13 +156,15 @@ c == d : false
 c.equals(d) : true
 ----
 
-128은 캐시 범위 밖이라 매번 새 ``Integer``가 만들어지므로 `c == d` 가 `false` 가 됩니다. 박싱된 타입끼리는 `==` 대신 ``equals()``로 비교해야 하는 이유입니다.
+기본 설정으로 실행한 위 예제에서는 128이 캐시 범위 밖이라 서로 다른 ``Integer``가 반환되므로 `c == d` 가 `false` 가 됩니다. 박싱된 타입끼리는 `==` 대신 ``equals()``로 비교해야 하는 이유입니다.
 
 캐시 범위는 타입마다 다릅니다. JDK 25 기준으로 ``Long``, ``Short``, ``Byte``는 -128~127을, ``Character``는 `'\u0000'` 부터 `'\u007f'` 까지를 캐시합니다. ``Boolean``은 ``Boolean.TRUE``와 ``Boolean.FALSE``를 재사용합니다.
 
 === -XX:AutoBoxCacheMax로 캐시 범위 조정
 
-``Integer``만은 캐시의 상한을 늘릴 수 있습니다. `-XX:AutoBoxCacheMax=<size>` 옵션이나 `java.lang.Integer.IntegerCache.high` 시스템 프로퍼티로 지정하면 됩니다. 앞의 예제를 같은 클래스 파일로 다시 실행하면 결과가 바뀝니다.
+``Integer``만은 공개 VM 옵션인 `-XX:AutoBoxCacheMax=<size>` 로 캐시의 상한을 늘릴 수 있습니다. 앞의 예제를 같은 클래스 파일로 다시 실행하면 결과가 바뀝니다.
+
+OpenJDK 구현에서는 `-Djava.lang.Integer.IntegerCache.high=<size>` 로 지정해도 같은 효과가 나지만, 이 값은 ``System.getProperty()``로 조회하는 공개 시스템 프로퍼티가 아니라 VM이 별도로 보관하는 private saved property입니다. 따라서 이 이름에 의존하기보다는 공개 옵션인 `-XX:AutoBoxCacheMax` 를 쓰는 편이 안전합니다.
 
 [source,shell]
 ----
@@ -229,11 +231,13 @@ Values between -128 and 127 are guaranteed to have corresponding cached instance
 Unless the class must be compatible with JVMs predating Java 5, use either autoboxing or the `valueOf()` method when creating instances of `Long`, `Integer`, `Short`, `Character`, and `Byte`.
 ____
 
+다만 인용문의 '약 3.5배'라는 수치와 캐시 범위 밖에서는 성능이 같다는 설명은 Java API의 보장이 아닙니다. 실제 차이는 확장된 캐시 범위와 JIT 최적화, 실행 환경에 따라 달라질 수 있습니다.
+
 IDE에 내장된 검사로도 잡힙니다. Eclipse는 Java > Compiler > Errors/Warnings의 'Deprecated and restricted API' 아래 'Deprecated API' 항목이 기본값 Warning이라 별도 플러그인 없이 deprecation 경고를 표시합니다. IntelliJ IDEA에는 deprecation 경고와 별개로 'Number constructor call with primitive argument'(`CachedNumberConstructorCall`) 인스펙션이 Java > Numeric issues 그룹에 있습니다. `Long`, `Integer`, `Short`, `Byte` 생성자에 primitive 값을 넘기는 코드를 찾아 ``valueOf()``로 바꾸도록 안내합니다.
 
 == 박싱된 타입을 반복문에 쓸 때의 비용
 
-박싱과 언박싱이 메서드 호출로 컴파일된다는 것을 알면, 반복문에서 박싱된 타입을 누적 변수로 쓸 때 어떤 일이 생기는지도 예측할 수 있습니다. 다음은 Effective Java 3판의 'Item 6: 불필요한 객체 생성을 피하라'에 나오는 예제입니다.
+박싱과 언박싱이 메서드 호출로 컴파일된다는 것을 알면, 반복문에서 박싱된 타입을 누적 변수로 쓸 때 어떤 일이 생기는지도 예측할 수 있습니다. 다음은 Effective Java 3판의 'Item 6: 불필요한 객체 생성을 피하라'에 나오는 예제를 이 글의 측정 코드에 맞게 변형한 것입니다.
 
 [source,java]
 ----
@@ -288,7 +292,7 @@ static long boxed() {
         29: goto          7
 ----
 
-반복할 때마다 ``longValue()``로 값을 꺼내 더한 뒤 ``Long.valueOf()``로 다시 박싱합니다. 누적값은 대부분 캐시 범위 밖이므로 매번 새 ``Long``이 생성됩니다. 누적 변수의 타입만 `long` 으로 바꾸면 박싱이 사라집니다. 두 방식을 JDK 25에서 한 번씩 실행해 걸린 시간을 재 보면 차이가 큽니다.
+반복할 때마다 ``longValue()``로 값을 꺼내 더한 뒤 ``Long.valueOf()``로 다시 박싱합니다. 누적값이 127을 넘은 뒤에는 ``Long.valueOf()``가 캐시되지 않은 ``Long`` 인스턴스를 반환합니다. 다만 실제 객체 할당은 JIT 최적화로 제거될 수도 있습니다. 누적 변수의 타입만 `long` 으로 바꾸면 박싱이 사라집니다. 두 방식을 한 번씩 재는 프로그램을 JDK 25에서 세 번 실행해 보면 이 환경에서는 차이가 크게 벌어집니다.
 
 [source]
 ----
@@ -297,7 +301,7 @@ Long: 4987 ms, long: 516 ms
 Long: 4919 ms, long: 513 ms
 ----
 
-JMH 같은 벤치마크 도구를 쓰지 않고 `System.nanoTime()` 으로 한 번씩 잰 값이라 절대 수치를 그대로 믿을 수는 없습니다. 그래도 자릿수가 달라질 만큼 벌어진다는 점은 확인할 수 있습니다.
+JMH 같은 벤치마크 도구를 쓰지 않고 `System.nanoTime()` 으로 각 실행에서 한 번씩 잰 값이라 절대 수치를 그대로 믿을 수는 없습니다. 그래도 이 측정에서는 자릿수가 달라질 만큼 벌어졌습니다.
 
 == 캐시가 없는 Double과 Float
 
@@ -311,11 +315,11 @@ JMH 같은 벤치마크 도구를 쓰지 않고 `System.nanoTime()` 으로 한 �
     }
 ----
 
-그래서 ``Double``은 값이 작아도 박싱할 때마다 새 객체가 만들어집니다. 실수 계열을 다루는 반복문에서는 박싱된 타입을 누적 변수로 쓰지 않도록 더 주의해야 합니다.
+따라서 JDK 25의 ``Double.valueOf()``는 값이 작아도 캐시된 인스턴스를 반환하지 않습니다. 실수 계열을 다루는 반복문에서는 박싱된 타입을 누적 변수로 쓰지 않도록 더 주의해야 합니다.
 
 == JDK 버전별 변경 이력
 
-박싱과 언박싱이 ``valueOf()``와 ``intValue()`` 호출로 컴파일되는 방식은 JDK 5 이후로 바뀌지 않았습니다. 대신 캐시의 구현과 생성자의 deprecation 상태, 그리고 언어 명세가 보장하는 범위가 아래와 같이 달라졌습니다.
+``javac``이 박싱과 언박싱을 ``valueOf()``와 ``intValue()`` 호출로 컴파일하는 방식은 JDK 5 이후로 바뀌지 않았습니다. 대신 캐시의 구현과 생성자의 deprecation 상태, 그리고 언어 명세가 보장하는 범위가 아래와 같이 달라졌습니다.
 
 [cols="1,4", options="header"]
 |===
@@ -331,7 +335,7 @@ JMH 같은 벤치마크 도구를 쓰지 않고 `System.nanoTime()` 으로 한 �
 |wrapper 클래스의 생성자에 `@Deprecated(since="9")` 부여. JLS 5.1.7의 참조 동일성 보장 대상이 '리터럴'에서 '상수식의 평가 결과'로 확대
 
 |JDK 12
-|`IntegerCache` 를 비롯한 박스 캐시를 CDS 아카이브에 저장하고 실행 시점에 그대로 읽어 오도록 변경 (JDK-8209120, JDK-8213033)
+|`IntegerCache` 를 비롯한 박스 캐시를 CDS 아카이브에 저장하고, 아카이브를 사용할 수 있으면 실행 시점에 읽어 오도록 변경 (JDK-8209120, JDK-8213033)
 
 |JDK 14
 |JLS 5.1.7의 참조 동일성 보장 대상 타입 목록에 `byte` 추가
@@ -345,6 +349,8 @@ JMH 같은 벤치마크 도구를 쓰지 않고 `System.nanoTime()` 으로 한 �
 |JDK 25
 |생성자의 `forRemoval` 표시를 해제. 제거 예정이 아닌 일반 deprecated 상태로 되돌림 (JDK-8354335)
 |===
+
+이 표의 JDK 버전은 OpenJDK mainline 최초 반영을 기준으로 합니다. `IntegerCache` 의 CDS 아카이브 반영(JDK-8209120)은 11.0.6에, 박스 캐시의 `@Stable` 변경(JDK-8295555)은 21.0.2에 backport되었습니다.
 
 `forRemoval` 이 붙어 있던 JDK 16부터 JDK 24까지는 아무 옵션 없이 컴파일해도 removal 경고가 났습니다. JDK 21과 JDK 25에서 같은 코드를 컴파일해 보면 차이가 드러납니다.
 
@@ -375,8 +381,8 @@ Java SE 9부터 이 조건이 상수식의 평가 결과로 넓어졌습니다. 
 
 == 정리
 
-* auto boxing은 ``valueOf()``, unboxing은 ``intValue()`` 계열의 메서드 호출로 컴파일됩니다. 전용 바이트코드 명령은 없습니다.
-* ``Integer.valueOf()``는 -128~127을 캐시합니다. 이 범위는 JLS 5.1.7이 요구하는 최소 범위이고, ``Integer``에 한해 `-XX:AutoBoxCacheMax` 로 넓힐 수 있습니다.
+* JDK의 ``javac``은 auto boxing을 ``valueOf()``, unboxing을 ``intValue()`` 계열의 메서드 호출로 컴파일합니다. 전용 바이트코드 명령은 없습니다.
+* ``Integer.valueOf()``는 -128~127을 항상 캐시하고, JLS 5.1.7은 이 범위에 속하는 상수식의 박싱 결과가 같은 참조여야 한다고 요구합니다. ``Integer``에 한해 `-XX:AutoBoxCacheMax` 로 캐시 상한을 넓힐 수 있습니다.
 * 박싱된 타입끼리는 `==` 가 아니라 ``equals()``로 비교해야 합니다. `==` 의 결과가 값의 크기와 실행 옵션에 따라 달라집니다.
 * wrapper 클래스의 생성자는 JDK 9부터 deprecated 상태입니다. 예전에는 FindBugs 같은 정적 분석기를 따로 붙여야 알 수 있었지만, 지금은 ``javac``과 Eclipse, IntelliJ IDEA가 모두 경고합니다.
 * 되도록 primitive 타입을 쓰고, ``Collection``의 요소나 generics의 타입 인자처럼 객체가 필요한 자리에만 박싱된 타입을 씁니다. (Effective Java 3판, 'Item 61: 박싱된 기본 타입보다는 기본 타입을 사용하라')
@@ -391,6 +397,7 @@ Java SE 9부터 이 조건이 상수식의 평가 결과로 넓어졌습니다. 
 ** 'JDK 버전별 변경 이력' 절을 추가하고, 2009년 원문을 언급하던 서술을 버전 기준 서술로 정리
 ** 제목을 'Java의 auto boxing과 unboxing은 어떻게 컴파일될까?'에서 'Java auto boxing의 컴파일 방식과 Integer 캐시'로 변경
 ** 원문에 있던 역컴파일 결과를 CFR 0.152로 다시 뽑아 수록. 역컴파일러가 박싱을 도로 접는다는 점과 `--sugarboxing` 옵션 설명 추가
+** JLS와 ``Integer.valueOf()``가 보장하는 범위를 구분하고 CDS, 확장 캐시, JIT 및 backport 관련 표현을 보완
 * 2009.02.10
 ** 최초 작성
 
