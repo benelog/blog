@@ -20,7 +20,7 @@ Value Object는 식별성 없이 값이 같으면 같다고 간주되는 객체�
 
 Eric Evans의 'Domain-Driven Design'에서도 'VALUE OBJECT'를 식별성 없이 속성만으로 동일성을 판단하는 객체로 정의합니다.
 
-Java 코드에서는 동등성을 판단할 속성 값을 기준으로 ``equals()``와 ``hashCode()``를 구현하면 Value Object가 됩니다. Java 16부터 정식 기능이 된 record를 사용하면 간결하게 정의할 수 있습니다.
+Java 코드에서는 동등성을 판단할 속성 값을 기준으로 ``equals()``와 ``hashCode()``를 구현하면 Value Object가 됩니다. 이때 지켜야 할 두 메서드의 규약은 Joshua Bloch의 'Effective Java' 3판 Item 10과 Item 11에 정리되어 있습니다. Java 16부터 정식 기능이 된 record를 사용하면 간결하게 정의할 수 있습니다. record를 도입한 link:https://openjdk.org/jeps/395[JEP 395]도 record를 불변 데이터의 투명한 운반자 역할을 하는 클래스("classes that act as transparent carriers for immutable data")로 소개합니다.
 
 [source,java]
 ----
@@ -45,7 +45,7 @@ Java 언어와 JVM에도 DDD 및 Fowler의 Value Object와 핵심 성질을 공�
 
 === 불변성의 위상: 정의 요건과 바람직한 설계
 
-Value Object는 완전한 불변 객체로 만드는 것이 권장됩니다. Fowler는 'Patterns of Enterprise Application Architecture' 486쪽에서 Value Object를 불변으로 만드는 것이 매우 좋은 방법이라고("it's a very good idea to make them immutable") 권고합니다. 그의 Value Object 글도 마찬가지입니다. link:https://web.archive.org/web/20110104080034/http://martinfowler.com/bliki/ValueObject.html[2016년 개정 전 버전]에서는 "A general heuristic is that value objects should be entirely immutable."라고 썼고, 개정된 현재 버전에서도 "value objects should be immutable"를 중요한 규칙으로 제시합니다.
+Value Object는 완전한 불변 객체로 만드는 것이 권장됩니다. Fowler는 'Patterns of Enterprise Application Architecture' 486쪽에서 Value Object를 불변으로 만드는 것이 매우 좋은 방법이라고("it's a very good idea to make them immutable") 권고합니다. 그의 Value Object 글도 마찬가지입니다. link:https://web.archive.org/web/20110104080034/http://martinfowler.com/bliki/ValueObject.html[2016년 개정 전 버전]에서는 "A general heuristic is that value objects should be entirely immutable."라고 썼고, 개정된 현재 버전에서도 "value objects should be immutable"를 중요한 규칙으로 제시합니다. Joshua Bloch도 'Effective Java' 3판의 Item 17 "Minimize mutability"에서 클래스의 가변성을 최소화하고 가능하면 불변으로 만들라고 권고합니다.
 
 VO가 불변이면 여러 객체가 같은 인스턴스를 공유해도 별칭 문제(aliasing bug) 같은 부작용에서 자유롭습니다. Eric Evans도 'Domain-Driven Design' 99~103쪽에서 불변 Value Object를 자유롭게 공유할 수 있다는 점을 설명합니다. Java의 ``java.util.Date``와 ``Calendar``는 값의 성격을 가진 객체인데도 가변으로 설계되어서 공유된 인스턴스가 한쪽에서 수정되는 버그의 원인이 되었습니다. Java 8의 ``java.time`` 패키지가 모든 날짜 클래스를 불변으로 만든 것도 이 교훈의 반영입니다. ``java.util.Date``의 문제는 가변 설계만이 아닙니다. ``java.sql.Date``가 같은 Date라는 이름으로 이를 상속해서 이름까지 겹칩니다. Joshua Bloch와 Neal Gafter는 'Java Puzzlers'의 Puzzle 67(한국어 번역판 171쪽)에서 이 이름 겹침을 플랫폼 설계자의 실수 사례로 들며, 플랫폼 클래스의 이름 재사용을 피하라고 권고합니다.
 
@@ -59,7 +59,7 @@ ____
 
 "가변인 ValueObject를 쓰고 있다면"이라는 가정 자체가 불변이 아닌 Value Object의 존재를 전제합니다. 페이지 이름도 MustBeImmutable이 아니라 ShouldBeImmutable입니다. 기술 명세의 요구 수준 표기 표준인 IETF의 link:https://datatracker.ietf.org/doc/html/rfc2119[RFC 2119]도 MUST는 절대적인 요구 사항("an absolute requirement")으로, SHOULD는 특정 상황에서 타당한 이유가 있으면 충분히 검토한 뒤 따르지 않을 수도 있는 권고로 정의합니다.
 
-반면 불변성을 정의의 일부로 서술하는 자료도 있습니다. 앞에서 인용한 Microsoft의 .NET 아키텍처 문서는 value object의 두 가지 주요 특성으로 식별성 없음과 불변성을 나란히 들고("There are two main characteristics for value objects: They have no identity. They are immutable."), 불변성을 중요한 요건("Immutability is an important requirement.")이라고 씁니다. Wikipedia도 같게 생성된 두 value object가 계속 같아야 한다는 암묵적 계약을 위해 불변성이 요구된다고 서술합니다. 김우근의 '자바/스프링 개발자를 위한 실용주의 프로그래밍'(2024)도 "VO는 이러한 불변성이라는 특징을 갖고 있는 객체를 말합니다"(43쪽)라고 설명하고, 불변성·동등성·자가 검증이라는 세 특성을 만족하는 객체를 VO로 정의합니다. JEP 401의 value object처럼 언어 차원에서 불변성이 강제되는 개념도 있습니다.
+반면 불변성을 정의의 일부로 서술하는 자료도 있습니다. 앞에서 인용한 Microsoft의 .NET 아키텍처 문서는 value object의 두 가지 주요 특성으로 식별성 없음과 불변성을 나란히 들고("There are two main characteristics for value objects: They have no identity. They are immutable."), 불변성을 중요한 요건("Immutability is an important requirement.")이라고 씁니다. Wikipedia도 같게 생성된 두 value object가 계속 같아야 한다는 암묵적 계약을 위해 불변성이 요구된다고 서술합니다. Vaughn Vernon의 'Implementing Domain-Driven Design'(2013) 6장도 Value Object의 특성을 열거하면서 불변성을 그중 하나로 포함합니다. 김우근의 '자바/스프링 개발자를 위한 실용주의 프로그래밍'(2024)도 "VO는 이러한 불변성이라는 특징을 갖고 있는 객체를 말합니다"(43쪽)라고 설명하고, 불변성·동등성·자가 검증이라는 세 특성을 만족하는 객체를 VO로 정의합니다. JEP 401의 value object처럼 언어 차원에서 불변성이 강제되는 개념도 있습니다.
 
 저는 불변성을 VO의 정의 요건이라기보다는 바람직한 설계 규범으로 인식합니다. 어차피 새로 만드는 Value Object는 불변으로 설계할 것이므로, 실무에서 should와 must의 구분이 드러나는 경우는 많지 않습니다. 그래도 이 구분이 무의미하지는 않습니다. ``java.util.Date``처럼 가변으로 만들어진 값 성격의 객체를 만났을 때, 불변성을 정의에 포함하면 그 객체는 VO가 아닌 무언가가 되고, 권고로 보면 불변 권고를 지키지 못한 VO가 됩니다. c2 wiki의 Fowler 문장은 후자의 관점에서 나온 실용적인 조언입니다. 불변 권고를 지키지 못한 VO를 이미 마주쳤을 때, 그것을 VO가 아니라고 배제하는 대신 최소한 불변인 것처럼 다루라는 지침입니다.
 
@@ -71,7 +71,7 @@ DTO의 원래 정의는 원격 호출을 효율화하기 위한 객체입니다.
 
 HTTP API의 요청과 응답처럼 네트워크를 건너는 데이터를 담는 객체는 프로세스 경계를 넘고 직렬화된다는 점에서 이 정의와 통합니다. 다만 모든 HTTP 메시지가 원격 호출 횟수를 줄이기 위해 도입되는 것은 아니므로, 이를 DTO라고 부르는 용법은 원래 정의를 현대적인 API 경계에 확장한 것입니다.
 
-실무에서는 여기에서 더 나아가 이 정의를 폭넓게 해석해서, 원격 호출과 무관하게 같은 프로세스 안에서 계층의 경계를 넘어 데이터를 운반하는 객체까지 DTO라고 부르는 관례가 생겼습니다. DB 조회 결과를 담는 객체, 서비스 계층에서 뷰 렌더링 계층으로 전달하는 객체, JPA 엔티티를 서비스 레이어 바깥에 직접 노출하지 않도록 변환한 응답 전용 객체가 그런 예입니다. 이런 용법은 원래 정의를 한층 더 적극적으로 확장한 것이어서, 원격 호출 횟수를 줄인다는 엄밀한 정의와는 거리가 있으므로 DTO라고 부르기 어렵다는 주장도 충분히 나올 수 있습니다.
+실무에서는 여기에서 더 나아가 이 정의를 폭넓게 해석해서, 원격 호출과 무관하게 같은 프로세스 안에서 계층의 경계를 넘어 데이터를 운반하는 객체까지 DTO라고 부르는 관례가 생겼습니다. DB 조회 결과를 담는 객체, 서비스 계층에서 뷰 렌더링 계층으로 전달하는 객체, JPA 엔티티를 서비스 레이어 바깥에 직접 노출하지 않도록 변환한 응답 전용 객체가 그런 예입니다. 이런 용법은 원래 정의를 한층 더 적극적으로 확장한 것이어서, 원격 호출 횟수를 줄인다는 엄밀한 정의와는 거리가 있으므로 DTO라고 부르기 어렵다는 주장도 충분히 나올 수 있습니다. Fowler 자신도 link:https://martinfowler.com/bliki/LocalDTO.html[LocalDTO]에서 로컬 맥락에서는 DTO가 필요하지 않을 뿐 아니라 오히려 해롭다고("Not just do you not need them in a local context, they are actually harmful") 말합니다.
 
 결국 VO와 DTO를 구분하는 기준은 객체의 특성과 역할입니다. 값 개념을 표현하며 동등성을 값으로 판단하는 것은 VO의 성질이고, 경계를 넘어 데이터를 운반하는 것은 DTO의 역할입니다. 이 둘은 서로 배타적인 분류가 아니므로, 값 동등성을 가진 불변 DTO는 동시에 VO의 성질을 가질 수도 있습니다. 반대로 DTO가 반드시 값 동등성을 가져야 하는 것은 아닙니다.
 
@@ -135,12 +135,17 @@ Value Object
 * Martin Fowler, 'Patterns of Enterprise Application Architecture', 486쪽
 * Eric Evans, 'Domain-Driven Design', 99~103쪽
 * 김우근, link:https://wikibook.co.kr/pragmatic-programming/['자바/스프링 개발자를 위한 실용주의 프로그래밍'], 43쪽
+* Joshua Bloch, 'Effective Java' 3판, Item 10·11·17
+* Vaughn Vernon, 'Implementing Domain-Driven Design', 6장
+* https://c2.com/ppr/checks.html[Ward Cunningham: The CHECKS Pattern Language of Information Integrity - Whole Value]
+* https://openjdk.org/jeps/395[JEP 395: Records]
 * https://openjdk.org/jeps/401[JEP 401: Value Objects (Preview)]
 * https://openjdk.org/jeps/169[JEP 169: Larval State for Value Objects]
 
 Transfer Object / DTO
 
 * https://martinfowler.com/eaaCatalog/dataTransferObject.html[Martin Fowler: Data Transfer Object]
+* https://martinfowler.com/bliki/LocalDTO.html[Martin Fowler: LocalDTO]
 * Martin Fowler, 'Patterns of Enterprise Application Architecture', 401쪽
 * Deepak Alur 외, 'Core J2EE Patterns' 초판(2001)
 * Rod Johnson, 'Expert One-on-One J2EE Design and Development', 265쪽
