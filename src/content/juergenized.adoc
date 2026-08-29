@@ -8,21 +8,10 @@
 :toc:
 :idprefix:
 
-2019년에 한국 스프링 사용자 모임 페이스북 그룹에 spring-framework 저장소에 PR을 올린 경험담이 공유된 적이 있습니다. 그 글에 달린 첫 댓글은 "유게나이즈 당하셨군요. 축하드립니다"였습니다. 뭔가를 당했는데 축하를 받는 묘한 상황이었습니다. 저도 그 대화에 댓글로 참여하면서 관련 자료를 찾아봤는데, 'Jürgenized'라는 용어의 유래와 실제 사례가 흥미로워서 글로 정리합니다.
-
-== '유게나이즈 당하셨군요'라는 축하 댓글
-
-발단이 된 사연은 이렇습니다. 글을 올린 분은 Kotlin으로 개발하다가 DB 같은 리소스를 닫는 시점에 발생한 exception이 Spring의 bean destroy 로직에서 잡혀서 ``info`` 레벨로만 기록되는 상황을 겪었습니다. ``org.springframework``의 로그 레벨을 ``ERROR``로 설정해 두었기에 그 로그를 보지 못했고, 원인을 파악한 뒤 해당 로그를 더 높은 레벨로 남겨달라는 link:https://github.com/spring-projects/spring-framework/pull/23200[PR #23200]을 올렸습니다.
-
-이 PR에 Spring Framework의 리드 개발자인 Juergen Hoeller가 직접 답을 달았고, 그 소식을 커뮤니티에 공유하자 "유게나이즈 당하셨군요"라는 축하 댓글이 달린 것입니다. 이어진 댓글에서 한 분은 이 용어를 아래와 같이 풀이했습니다.
-
-____
-그냥 보면 괜찮아 보이는 이슈나 코드가 유겐이 등장하면 전에 미처 보지 못했던 관점에서 새롭게 문제 제기가 되면서, 최종적으로는 품질이 뛰어난 코드로 변모하게 되는 현상
-____
-
+'Jürgenized'라는 용어의 유래와 실제 사례를 정리합니다.
 == Oliver Drotbohm이 기록한 Jürgenization의 정의
 
-Spring Data 프로젝트를 이끌었던 Oliver Drotbohm은 2013년에 link:https://odrotbohm.de/2013/03/juergenized/[Jürgenized]라는 글에서 이 용어를 사전 항목 형식으로 정의했습니다. footnote:[이 글은 원래 olivergierke.de에 올라왔습니다. 저자가 결혼 후 Oliver Gierke에서 Oliver Drotbohm으로 이름을 바꾸면서 블로그 주소도 바뀌었고, 옛 주소는 새 주소로 리다이렉트됩니다.] 번역하면 아래와 같습니다.
+Spring Data 프로젝트를 이끌었던 Oliver Drotbohm은 2013년에 link:https://odrotbohm.de/2013/03/juergenized/[Jürgenized]라는 글에서 이 용어를 사전 항목 형식으로 정의했습니다.  번역하면 아래와 같습니다.
 
 ____
 Jürgenization (명사)
@@ -52,13 +41,27 @@ spring-framework 저장소의 link:https://github.com/spring-projects/spring-fra
 
 == Rod Johnson이 꼽은 가장 생산적인 프로그래머
 
-Juergen Hoeller의 이런 위상을 보여주는 인터뷰가 있습니다. Ed Burns가 쓴 link:https://www.goodreads.com/book/show/227849.Secrets_of_the_Rock_Star_Programmers[Secrets of the Rock Star Programmers](2008, 번역서 제목은 '세상을 뒤흔든 프로그래머들의 비밀')에 실린 Rod Johnson 인터뷰입니다. 제 기억에 따르면, 함께 일했던 프로그래머 가운데 가장 생산적이었던 사람이 누구냐는 질문에 Rod Johnson은 생각할 것도 없이 Juergen Hoeller라고 답합니다. 이어서 Juergen Hoeller가 개발 속도와 품질 모든 면에서 가장 뛰어난 결과를 보이며, 자신이라면 여러 번의 시행착오를 거쳤을 문제를 그는 한 번에 해결할 것이라고 말합니다. footnote:[번역서를 기억에 의존해 옮긴 것이라 정확한 표현은 책과 다를 수 있습니다.]
+Juergen Hoeller의 이런 위상을 보여주는 인터뷰가 있습니다. Ed Burns가 쓴 link:https://www.goodreads.com/book/show/227849.Secrets_of_the_Rock_Star_Programmers[Secrets of the Rock Star Programmers](2008, 번역서 제목은 '세상을 뒤흔든 프로그래머들의 비밀')에 실린 Rod Johnson 인터뷰입니다. 제 기억에 따르면, 함께 일했던 프로그래머 가운데 가장 생산적이었던 사람이 누구냐는 질문에 Rod Johnson은 생각할 것도 없이 Juergen Hoeller라고 답합니다. 이어서 Juergen Hoeller가 개발 속도와 품질 모든 면에서 가장 뛰어난 결과를 보이며, 자신이라면 여러 번의 시행착오를 거쳤을 문제를 그는 한 번에 해결할 것이라고 말합니다. (번역판 p32~33 쪽)
+
+image::https://image.yes24.com/momo/TopCate80/MidCate07/7963859.jpg[Book cover]
+
+(이미지 출처 : https://www.yes24.com/product/goods/3691866)
+
+원서에서 해당 부분은 15쪽에 있습니다.
+
+____
+Ed: Who is the most productive programmer you've ever worked with? What was it about them that made them that way? Did they just crank out lots of code? Did they get things done faster than everyone else? What do you say about that?
+
+Rod: Jürgen Höller. Undoubtedly.
+
+Ed: And what is it about Jürgen?
+
+Rod: It's basically all of the above, which is kind of demoralizing. Maybe the difference isn't that big between Jürgen and other good people, but I've worked with some people that I would rate as better overall, but I've never worked with or encountered anyone who's better in every way. For example, if I look at the other people in the Spring team, some are faster [than others], but do higher-quality code. Others do higher-quality code, but are slower. Some of them, other than Jürgen, are probably better overall, but, nevertheless, you can break it down and see differences and weaknesses. Whereas, Jürgen, compared to anyone I've ever seen, is faster and his code is better. You asked how does he do it? I don't know. From what I've seen, it's not just my opinion. Jürgen's pretty legendary. What I've seen is that he works in a very different way from me or anyone else that I know. For example, my way of working is very iterated. If it's a really complex problem, my first version would be embarrassing to look back on, my second version wouldn't be too bad, and the third version would be quite good. Jürgen would start with a problem like that, and this would take maybe a lapse time of ten hours' programming if it was a reasonably hard problem. Jürgen would start off by thinking deeply about it for three hours. Then he'd spend two hours writing code, and it'd probably be perfect. I can't work like that.
+____
 
 20년 가까이 지난 인터뷰인데, Juergen Hoeller는 지금도 Spring Framework의 리드로 활동하고 있습니다. 2024년에는 Spring Framework 1.0 릴리스 20주년을 맞아 Rod Johnson과 함께 link:https://spring.io/blog/2024/04/18/a-bootiful-podcast-spring-founders-rod-johnson-and-juergen-hoeller-on-the/[팟캐스트]에 출연했고, link:https://www.youtube.com/watch?v=i_fiHmg1qM0[Spring I/O 2025의 발표 무대]에도 함께 섰습니다. 한 프레임워크를 20년 넘게 같은 기준으로 지켜온 셈이니, 'Jürgenized'라는 용어도 당분간 유효할 듯합니다.
 
 == 참고 자료
-
-    * https://www.facebook.com/groups/springkorea/permalink/2056700451108240/[한국 스프링 사용자 모임의 원글과 댓글]
 * https://odrotbohm.de/2013/03/juergenized/[Oliver Drotbohm - Jürgenized]
 * https://www.slideshare.net/royclarkson/spring-project-infrastructure[Spring Project Infrastructure 슬라이드]
 * https://www.youtube.com/watch?v=m74QsK5XCeQ[Spring Project Infrastructure 발표 영상]
@@ -67,7 +70,4 @@ Juergen Hoeller의 이런 위상을 보여주는 인터뷰가 있습니다. Ed B
 * https://github.com/spring-projects/spring-framework/pull/23200[spring-framework PR #23200]
 * https://github.com/spring-projects/spring-framework/commit/56cc0d02e9[Juergen Hoeller의 반영 커밋]
 * https://www.goodreads.com/book/show/227849.Secrets_of_the_Rock_Star_Programmers[Secrets of the Rock Star Programmers]
-
-'''
-
-이 포스트는 Claude Code와 정상혁이 함께 작성했습니다.
+* https://www.facebook.com/groups/springkorea/permalink/2056700451108240/[한국 스프링 사용자 모임의 원글과 댓글]
