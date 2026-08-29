@@ -3,7 +3,7 @@
 2026-08-23
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: java, performance
+:jbake-tags: java, performance, code-review
 :description: String을 +로 더하는 코드가 javac과 JDK 런타임에서 버전에 따라 어떻게 최적화되는지 정리합니다. JDK 1.4의 StringBuffer 치환, JDK 5의 StringBuilder 치환, JDK 9의 invokedynamic 도입, JDK 15의 대안 전략 제거, JDK 24의 hidden class 기반 구현까지의 변화를 JDK 25에서 확인한 바이트코드와 함께 설명합니다.
 :idprefix:
 :toc:
