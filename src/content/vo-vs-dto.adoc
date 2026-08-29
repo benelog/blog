@@ -54,7 +54,7 @@ Value Object는 완전한 불변 객체로 만드는 것이 권장됩니다. 여
 
 VO가 불변이면 여러 객체가 같은 인스턴스를 공유해도 별칭 문제(aliasing bug) 같은 부작용에서 자유롭습니다. Java의 ``java.util.Date``와 ``Calendar``는 값의 성격을 가진 객체인데도 가변으로 설계되어서 공유된 인스턴스가 한쪽에서 수정되는 버그의 원인이 되었습니다. Java 8의 ``java.time`` 패키지가 모든 날짜 클래스를 불변으로 만든 것도 이 교훈의 반영입니다.
 
-그런데 두 사람의 문장을 자세히 보면 불변성을 VO의 정의에 포함하지는 않았습니다. Fowler가 Value Object의 정의로 제시하는 성질은 값에 의한 동등성이고, 앞에서 인용한 "value objects should be immutable"도 전체 문장을 보면 별칭 문제를 피하기 위해 따르는 규칙("To avoid aliasing bugs I follow a simple but important rule: value objects should be immutable.")으로 등장합니다. 같은 글에서 불변으로 만드는 대신 대입할 때마다 복사해서 별칭 문제를 피할 수도 있다고("it's also possible to avoid them by ensuring assignments always make a copy") 대안까지 언급합니다. Evans의 문장도 명령형의 지침입니다. 'Domain-Driven Design' 99쪽의 "Treat the VALUE OBJECT as immutable."는 VALUE OBJECT가 무엇인지에 대한 정의가 아니라 그것을 다루는 방법에 대한 권고이고, 이어지는 내용은 그렇게 했을 때 얻는 공유와 참조 전달의 안전성입니다.
+그런데 Fowler와 Evans의 문장을 자세히 보면 불변성을 VO의 정의에 포함하지는 않았습니다. Fowler가 Value Object의 정의로 제시하는 성질은 값에 의한 동등성이고, 앞에서 인용한 "value objects should be immutable"도 전체 문장을 보면 별칭 문제를 피하기 위해 따르는 규칙("To avoid aliasing bugs I follow a simple but important rule: value objects should be immutable.")으로 등장합니다. 같은 글에서 불변으로 만드는 대신 대입할 때마다 복사해서 별칭 문제를 피할 수도 있다고("it's also possible to avoid them by ensuring assignments always make a copy") 대안까지 언급합니다. Evans의 문장도 명령형의 지침입니다. 'Domain-Driven Design' 99쪽의 "Treat the VALUE OBJECT as immutable."는 VALUE OBJECT가 무엇인지에 대한 정의가 아니라 그것을 다루는 방법에 대한 권고이고, 이어지는 내용은 그렇게 했을 때 얻는 공유와 참조 전달의 안전성입니다.
 
 Ward Cunningham의 wiki에 있는 link:https://wiki.c2.com/?ValueObjectsShouldBeImmutable[ValueObjectsShouldBeImmutable] 페이지에 Fowler가 남긴 문장은 이 뉘앙스를 더 분명하게 보여줍니다.
 
@@ -113,14 +113,11 @@ link:https://www.oracle.com/java/technologies/transfer-object.html[Oracle의 Tra
 * ORM: Hibernate와 JPA의 ``@Embeddable``은 자체 영속 식별성 없이 소유한 엔티티에 종속되는 객체를 매핑합니다. DDD의 VALUE OBJECT를 매핑할 때 흔히 사용하는 구조이지만, JPA가 값 동등성이나 불변성을 강제하지는 않으므로 모든 ``@Embeddable``이 곧 DDD VALUE OBJECT인 것은 아닙니다.
 * Java 언어·JVM 기능: JEP 401을 비롯한 Project Valhalla의 문서들은 value object라는 용어를 불변이고 객체 식별성이 없으며 필드 값으로 구분되는 객체라는 의미로 씁니다.
 
-getter/setter만 가진 데이터 홀더를 VO라고 이해하고 있다면 이런 자료를 읽을 때 용어가 어긋나서 혼란이 생깁니다. 원격 프로세스 경계를 넘는 데이터 운반 객체는 DTO라고 부르면 Fowler의 정의와도, Core J2EE Patterns 2판 이후의 개칭된 이름과도 자연스럽게 연결됩니다.
+getter/setter만 가진 데이터 홀더를 VO라고 이해하고 있다면 이런 자료를 읽을 때 용어가 어긋나서 혼란이 생깁니다. 원격 프로세스 경계를 넘는 데이터 운반 객체를 DTO라고 부르면 Fowler의 정의와도, Core J2EE Patterns 2판 이후의 개칭된 이름과도 자연스럽게 연결됩니다.
 
-근래의 관례로는 계층 경계를 넘는 데이터 홀더라는 넓은 의미로 DTO를 쓰기도 합니다.
-그러나 클래스 이름에 DTO를 남용했을 때에는 단점이 있습니다.
-HTTP 요청 파라미터를 담는 객체, 통계 쿼리의 결과를 담는 객체까지 모두 DTO라고 부르면 이름만으로는 역할이 드러나지 않습니다.
+앞의 DTO 정의 절에서 본 것처럼 근래의 관례로는 계층 경계를 넘는 데이터 홀더라는 넓은 의미로 DTO를 쓰기도 합니다. 그러나 클래스 이름에 DTO를 남용하면 단점이 있습니다. HTTP 요청 파라미터를 담는 객체, 통계 쿼리의 결과를 담는 객체까지 모두 DTO라고 부르면 이름만으로는 역할이 드러나지 않습니다.
 
-더 좋은 방법은 객체의 역할에 따라서 접미어를 분리하는 것입니다. 이렇게 하면 이름만으로 역할이 드러나고, 원격 호출과 관련되지 않은 계층에서 쓰이는 객체를 DTO라고 부를 때 엄밀한 정의에서 벗어난다는 논쟁도 피할 수 있습니다.
-예를 들면 다음과 같은 이름입니다.
+더 좋은 방법은 객체의 역할에 따라서 접미어를 분리하는 것입니다. 이렇게 하면 이름만으로 역할이 드러나고, 원격 호출과 관련되지 않은 계층에서 쓰이는 객체를 DTO라고 부를 때 엄밀한 정의에서 벗어난다는 논쟁도 피할 수 있습니다. 예를 들면 다음과 같은 이름입니다.
 
 [cols="2,2", options="header"]
 |===
