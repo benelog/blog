@@ -93,9 +93,9 @@ image::img/floating-point-big-decimal/ieee754-double.png[IEEE 754 double의 비�
 반면 0.1 = 1/10처럼 분모에 5가 끼어 있는 십진 소수는 2진수로는 무한히 반복되는 소수가 되어 반올림 오차를 피할 수 없습니다.
 표준에 대한 더 자세한 설명은 https://ko.wikipedia.org/wiki/IEEE_754[IEEE 754 위키백과 문서]를 참고할 수 있습니다.
 
-== 부동소수점 연산이 위험한 경우
+== 소수의 2진수 표현 오차가 위험한 경우
 
-과학 계산처럼 근사값으로 충분한 영역에서는 부동소수점 오차가 문제되지 않습니다.
+과학 계산처럼 근사값으로 충분한 영역에서는 이런 오차가 문제되지 않습니다.
 그러나 돈 계산은 다릅니다.
 금액은 마지막 한 자리까지 정확해야 하고, 오차가 누적되면 장부가 맞지 않습니다.
 위 예제처럼 1.03달러에서 0.42달러를 빼는 단순한 계산도 0.6100000000000001달러가 되어, 반올림 처리 없이는 화면에 그대로 노출되거나 비교 연산이 어긋납니다.
@@ -171,8 +171,44 @@ public static long calculate(long amount, float rate, RoundingMode roundingMode)
 === Java Money (JSR 354)
 
 금액과 통화를 함께 다루는 표준 API로 https://javamoney.github.io/[Java Money]도 있습니다.
-`MonetaryAmount` 인터페이스로 금액과 통화 단위를 묶어서 표현하고, 참조 구현인 Moneta를 사용합니다.
-사용 예제는 https://www.baeldung.com/java-money-and-currency[Baeldung의 Java Money and the Currency API]를 참고할 수 있습니다.
+`MonetaryAmount` 인터페이스로 금액과 통화 단위를 묶어서 표현합니다.
+JSR 354로 표준화됐고 https://jcp.org/en/jsr/detail?id=354[JCP 제안서]에서는 Java SE 9에 포함하는 방안도 검토했지만, 최종적으로 JDK에는 들어가지 않았습니다.
+그래서 API(`javax.money`)와 참조 구현인 https://github.com/JavaMoney/jsr354-ri[Moneta]를 별도 의존성으로 추가해야 사용할 수 있습니다.
+
+[source,groovy]
+.build.gradle
+----
+implementation 'org.javamoney:moneta:1.4.5'
+----
+
+`Money` 구현체는 내부적으로 ``BigDecimal``로 계산하므로, 글 앞부분에서 `double` 로는 0.6100000000000001이 나왔던 1.03 - 0.42도 정확히 0.61이 됩니다.
+
+[source,java]
+----
+MonetaryAmount price = Money.of(new BigDecimal("1.03"), "USD");
+MonetaryAmount result = price.subtract(Money.of(new BigDecimal("0.42"), "USD"));
+System.out.println(result);
+// USD 0.61
+----
+
+`Money.parse()` 를 사용하면 통화와 금액을 문자열 하나로 표현할 수도 있습니다.
+
+[source,java]
+----
+MonetaryAmount parsed = Money.parse("USD 1.03").subtract(Money.parse("USD 0.42"));
+System.out.println(parsed);
+// USD 0.61
+----
+
+통화가 다른 금액끼리 연산하면 예외가 발생하므로, 서로 다른 통화의 금액을 섞어 계산하는 실수도 타입 수준에서 막아줍니다.
+
+[source,java]
+----
+price.add(Money.of(100, "KRW"));
+// MonetaryException: Currency mismatch: USD/KRW
+----
+
+더 많은 사용 예제는 https://www.baeldung.com/java-money-and-currency[Baeldung의 Java Money and the Currency API]를 참고할 수 있습니다.
 
 == BigDecimal이 언제나 정답일까
 
@@ -187,8 +223,8 @@ Chronicle Software의 Peter Lawrey는 https://blog.vanillajava.blog/2014/07/if-b
 Lawrey의 결론은 "`double` 의 반올림을 다루는 법을 모르거나 프로젝트 표준이 `BigDecimal` 을 강제한다면 `BigDecimal` 을 쓰되, 선택할 수 있다면 `BigDecimal` 이 당연히 옳다고 가정하지는 말라"는 것입니다.
 지연 시간에 민감한 금융 시스템 중에는 `BigDecimal` 없이 만들어진 시스템도 많이 돌아가고 있다는 점도 근거로 듭니다.
 
-저는 기본적으로는 여전히 ``BigDecimal``을 권장해야 한다고 생각합니다.
-부동소수점 오차와 반올림을 정확히 통제할 자신이 있는 팀이라면 성능을 위해 `double` 이나 정수형 계산을 선택할 수는 있습니다.
+저는 기본적으로는 여전히 `double`, `int` 자료형보다는 ``BigDecimal``을 권장해야 한다고 생각합니다.
+부동소수점 오차와 반올림을 정확히 통제할 자신이 있는 팀이라면 성능을 위해 `double` 이나 `int` 타입으로 계산을 선택할 수는 있습니다.
 그러나 조직에는 항상 새로운 사람이 들어오기 때문에 모든 사람이 이 글에서 다룬 부동소수점 오차의 특성을 잘 이해하고 있다고 전제하기는 쉽지 않습니다.
 따라서 팀과 프로젝트의 표준으로 `BigDecimal` 사용을 전수하는 편이 더 안전합니다.
 

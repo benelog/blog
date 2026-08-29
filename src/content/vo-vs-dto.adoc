@@ -43,7 +43,7 @@ Java 언어와 JVM에도 DDD 및 Fowler의 Value Object와 핵심 성질을 공�
 
 한편 실무에서는 앞의 정의와 무관하게, 값 동등성과 상관없이 데이터를 담는 객체(data holder)라는 의미로 폭넓게 해석해서 getter/setter만 가진 운반용 객체를 VO라고 부르는 관례도 퍼져 있습니다. 이 관례를 확산시킨 대표적인 출처는 뒤의 Core J2EE Patterns 절에서 살펴봅니다.
 
-=== 불변성의 위상: 정의 요건과 바람직한 설계
+=== 불변성의 위상: 정의 요건 vs 바람직한 설계
 
 Value Object는 완전한 불변 객체로 만드는 것이 권장됩니다. Fowler는 'Patterns of Enterprise Application Architecture' 486쪽에서 Value Object를 불변으로 만드는 것이 매우 좋은 방법이라고("it's a very good idea to make them immutable") 권고합니다. 그의 Value Object 글도 마찬가지입니다. link:https://web.archive.org/web/20110104080034/http://martinfowler.com/bliki/ValueObject.html[2016년 개정 전 버전]에서는 "A general heuristic is that value objects should be entirely immutable."라고 썼고, 개정된 현재 버전에서도 "value objects should be immutable"를 중요한 규칙으로 제시합니다. Joshua Bloch도 'Effective Java' 3판의 Item 17 "Minimize mutability"에서 클래스의 가변성을 최소화하고 가능하면 불변으로 만들라고 권고합니다.
 
