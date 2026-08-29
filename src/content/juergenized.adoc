@@ -3,13 +3,15 @@
 2019-07-04
 :jbake-type: post
 :jbake-status: published
-:jbake-tags: spring, code-review, refactoring
+:jbake-tags: spring
 :description: Spring 커뮤니티에는 기여한 코드가 리드 개발자 Juergen Hoeller의 손을 거쳐 품질이 완성된다는 뜻의 'Jürgenized'라는 용어가 있습니다. 이 용어의 정의와 유래, PR을 직접 커밋으로 반영하는 Juergen Hoeller의 작업 방식, Rod Johnson이 인터뷰에서 밝힌 그의 생산성을 정리합니다.
+:jbake-og: {"image": "img/juergenized/book-covers.jpg"}
 :toc:
 :idprefix:
 
 'Jürgenized'라는 용어의 유래와 실제 사례를 정리합니다.
-== Oliver Drotbohm이 기록한 Jürgenization의 정의
+
+== Jürgenization의 정의
 
 Spring Data 프로젝트를 이끌었던 Oliver Drotbohm은 2013년에 link:https://odrotbohm.de/2013/03/juergenized/[Jürgenized]라는 글에서 이 용어를 사전 항목 형식으로 정의했습니다.  번역하면 아래와 같습니다.
 
@@ -46,6 +48,10 @@ Juergen Hoeller의 이런 위상을 보여주는 인터뷰가 있습니다. Ed B
 image::https://image.yes24.com/momo/TopCate80/MidCate07/7963859.jpg[Book cover]
 
 (이미지 출처 : https://www.yes24.com/product/goods/3691866)
+
+image::https://covers.openlibrary.org/b/isbn/9780071490832-L.jpg[Secrets of the Rock Star Programmers book cover]
+
+(이미지 출처 : https://openlibrary.org/isbn/9780071490832)
 
 원서에서 해당 부분은 15쪽에 있습니다.
 
