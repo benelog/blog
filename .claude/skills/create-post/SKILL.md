@@ -109,6 +109,22 @@ description: 이 블로그의 글 형식·문체·AsciiDoc 규칙을 정리한 �
 * https://example.com[제목 또는 설명]
 ```
 
+참고 자료가 많아서 주제나 출처별로 묶을 때는 2단계 목록을 쓴다. 다만 항상 2단계일 필요는 없다.
+하위 항목이 하나뿐인 묶음은 묶음 제목 없이 1단계 항목으로 둔다.
+
+```adoc
+== 참고 자료
+
+* JDK 문서
+** https://example.com[LinkedList Javadoc]
+** https://example.com[SimpleDateFormat Javadoc]
+* 정적 분석 도구
+** https://example.com[SpotBugs Bug descriptions]
+** https://example.com[Error Prone: GuardedBy]
+* https://example.com[ArchUnit User Guide]
+* link:old-post.html[이 블로그의 관련 글]
+```
+
 ### 작성 주체 표기
 
 AI 도구의 도움을 받아 작성한 글은 본문 끝(참고 자료 다음)에 한 줄 분리선과 함께 누가 어떤 도구로 썼는지 한 줄로 남긴다. 예:

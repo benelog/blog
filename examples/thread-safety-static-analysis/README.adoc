@@ -1,0 +1,52 @@
+= JCIP 계열 애너테이션을 SpotBugs와 Error Prone으로 검사하는 예제
+
+https://blog.benelog.net/thread-safety-annotations.html[스레드 안전성의 문서화와 검증] 글의 '정적 분석 도구의 지원' 절에서 다룬 예제입니다.
+Error Prone 예제는 의도적으로 컴파일이 실패하므로 SpotBugs 예제와 서브프로젝트를 나눴습니다.
+
+== 개발 환경
+
+* JDK 25
+* Gradle 9.3.1 (Gradle Wrapper 포함)
+* SpotBugs 4.10.4 (Gradle 플러그인 6.5.11), Error Prone 2.50.0 (Gradle 플러그인 5.1.1)
+
+== spotbugs 서브프로젝트
+
+* link:spotbugs/src/main/java/net/benelog/Memo.java[Memo.java] : `@Immutable` 인데 final이 아닌 필드가 있어서 `JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS` 로 보고되는 클래스
+* link:spotbugs/src/main/java/net/benelog/Counter.java[Counter.java] : `@GuardedBy("this")` 필드를 lock 없이 수정하지만 SpotBugs가 보고하지 않는 클래스
+* link:spotbugs/build.gradle.kts[build.gradle.kts] : SpotBugs 플러그인 설정. 텍스트 보고서를 콘솔에도 출력
+
+[source,bash]
+----
+./gradlew :spotbugs:spotbugsMain
+----
+
+[source]
+----
+M B JCIP: Memo.content should be final since net.benelog.Memo is marked as Immutable.  In Memo.java
+----
+
+== errorprone 서브프로젝트
+
+같은 코드를 애너테이션 패키지만 바꿔 세 벌 두었습니다.
+
+* link:errorprone/src/main/java/net/benelog/JcipCounter.java[JcipCounter.java] : `net.jcip.annotations` (원본 JCIP). Error Prone이 인식하지 않아 오류 없이 컴파일됨
+* link:errorprone/src/main/java/net/benelog/JsrCounter.java[JsrCounter.java] : `javax.annotation.concurrent` (JSR-305). 컴파일 오류
+* link:errorprone/src/main/java/net/benelog/ErrorProneCounter.java[ErrorProneCounter.java] : `com.google.errorprone.annotations` (Error Prone 자체). 컴파일 오류
+* link:errorprone/build.gradle.kts[build.gradle.kts] : Error Prone 플러그인 설정
+
+[source,bash]
+----
+./gradlew :errorprone:compileJava
+----
+
+[source]
+----
+JsrCounter.java:15: error: [GuardedBy] This access should be guarded by 'this', which is not currently held
+		count++;
+		^
+    (see https://errorprone.info/bugpattern/GuardedBy)
+ErrorProneCounter.java:15: error: [GuardedBy] This access should be guarded by 'this', which is not currently held
+		count++;
+		^
+    (see https://errorprone.info/bugpattern/GuardedBy)
+----
