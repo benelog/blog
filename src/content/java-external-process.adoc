@@ -1,0 +1,456 @@
+= Java에서 외부 프로세스를 실행할 때: JDK 25와 Linux 6.x 기준
+정상혁
+2026-09-03
+:jbake-type: post
+:jbake-status: published
+:jbake-tags: java, jdk, linux
+:description: Java에서 외부 프로세스를 실행할 때 지금도 지켜야 할 규칙을 예제 코드로 정리합니다. 파이프 버퍼 교착, 두 스트림 동시 읽기, 시간제한과 강제 종료를 JDK API, zt-exec, Apache Commons Exec으로 각각 구현하고 두 라이브러리의 유지보수 현황을 비교합니다. JDK 13부터 기본이 된 posix_spawn과 jspawnhelper, 커널 5.2 이후 fork의 메모리 문제, JDK 27의 VFORK 제거, 큰 힙에서의 실행 지연 실측치도 다룹니다.
+:idprefix:
+:toc:
+:examples-repo: https://github.com/benelog/blog/tree/master/examples
+:source-repo: {examples-repo}/java-external-process
+
+Java에서 외부 명령을 실행하는 코드는 ``ProcessBuilder``로 몇 줄이면 됩니다. 그런데 출력을 읽는 순서나 시간제한을 빠뜨린 코드는 개발 중에는 잘 돌다가, 출력이 커지거나 명령이 멈추는 날 애플리케이션까지 함께 멈추게 합니다. 이 글은 JDK 25와 Linux 6.x에서 지금도 지켜야 할 규칙을 예제 코드로 먼저 정리합니다. 이어서 그 규칙을 대신 지켜 주는 라이브러리인 https://github.com/zeroturnaround/zt-exec[zt-exec]과 https://commons.apache.org/proper/commons-exec/[Apache Commons Exec]을 비교합니다. 뒷부분에서는 JDK가 프로세스를 만드는 방식이 ``fork()``, ``vfork()``, ``posix_spawn()``으로 바뀌어 온 과정과 그에 따라 새로 생긴 주의점을 다룹니다.
+
+이 글의 실행 결과는 아래 환경에서 확인했습니다. 예제 코드는 link:{source-repo}[GitHub 저장소]에 있습니다.
+
+[cols="1,2", options="header"]
+|===
+|항목 |버전
+
+|OS
+|Ubuntu 24.04.4 LTS, 커널 6.17
+
+|glibc
+|2.39
+
+|JDK
+|Temurin 25+36
+
+|zt-exec
+|1.13.0
+
+|Apache Commons Exec
+|1.6.0
+|===
+
+== 주의할 점 세 가지
+
+JDK는 `java.lang.Process` 클래스로 외부 프로세스와의 접점을 제공합니다. `Process` 객체는 ``ProcessBuilder.start()``나 ``Runtime.exec()``로 얻고, ``Runtime.exec()``는 내부에서 ``ProcessBuilder``를 만들어 호출하므로 두 방식의 동작은 같습니다. 이 구도는 JDK 5 이후로 바뀌지 않았고, 아래 세 가지 주의점도 JDK 25에서 그대로 유효합니다.
+
+=== 읽지 않은 파이프 버퍼가 부르는 교착
+
+하위 프로세스의 표준 출력과 표준 오류는 기본 설정에서 파이프로 부모 프로세스에 전달됩니다. 부모가 파이프를 읽지 않으면 파이프 버퍼가 차고, 버퍼가 찬 뒤로는 하위 프로세스의 `write()` 호출이 멈춥니다. 이 상태에서 부모가 ``waitFor()``로 하위 프로세스의 종료만 기다리면 서로를 기다리는 교착이 됩니다. JDK 25의 `Process` Javadoc에도 오래전과 같은 문장이 남아 있습니다.
+
+____
+Because some native platforms only provide limited buffer size for standard input and output streams, failure to promptly write the input stream or read the output stream of the process may cause the process to block, or even deadlock.
+____
+
+"limited buffer size"가 Linux에서는 얼마인지 https://man7.org/linux/man-pages/man7/pipe.7.html[pipe(7)] 매뉴얼에 나옵니다. 커널 2.6.11부터 파이프 용량은 16페이지, 즉 4KiB 페이지 기준 64KiB입니다. 아래 코드는 `seq 1 100000` 명령으로 약 590KB를 출력하게 하고 읽지 않은 채 3초를 기다립니다.
+
+[source,java]
+.DeadlockDemo.java
+----
+Process process = new ProcessBuilder("seq", "1", "100000").start();
+boolean finished = process.waitFor(3, TimeUnit.SECONDS);
+System.out.println("finished within 3s: " + finished + ", alive: " + process.isAlive());
+long lines = process.inputReader().lines().count();
+System.out.println("read " + lines + " lines, exit=" + process.waitFor());
+----
+
+실행 결과입니다. 3초가 지나도 `seq` 프로세스는 살아 있고, 부모가 파이프를 읽기 시작해야 끝납니다.
+
+[source,text]
+----
+finished within 3s: false, alive: true
+read 100000 lines, exit=0
+----
+
+``waitFor()``에 제한 시간을 주지 않았다면 이 프로그램은 영원히 멈춰 있었을 것입니다. ``waitFor()``를 먼저 부르고 그다음에 스트림을 읽는 코드가 이 문제를 만듭니다. 스트림을 다 읽은 뒤에 ``waitFor()``를 불러야 합니다. `inputReader()` 메서드는 JDK 17에 추가된 것으로, `getInputStream()` 위에 ``BufferedReader``를 얹는 코드를 대신합니다.
+
+=== 출력이 필요 없을 때의 리다이렉트
+
+출력을 부모 프로세스가 가공할 필요가 없다면 파이프를 만들지 않는 편이 가장 단순합니다. ``ProcessBuilder``의 `redirectOutput()` 메서드와 `redirectError()` 메서드에 ``Redirect.INHERIT``를 지정하면 하위 프로세스가 부모의 표준 출력과 표준 오류에 바로 씁니다. 세 스트림을 모두 물려주는 `inheritIO()` 메서드는 JDK 7부터 있었습니다. JDK 9에 추가된 ``Redirect.DISCARD``는 출력을 ``/dev/null``로 보내고, ``Redirect.to(File)``은 파일로 보냅니다. 표준 오류만 표준 출력에 합치고 싶으면 ``redirectErrorStream(true)``를 씁니다. 이렇게 하면 읽어야 할 파이프가 하나로 줄어서 스레드 하나로 처리할 수 있습니다.
+
+기본값인 ``Redirect.PIPE``를 그대로 두고 ``getInputStream()``을 부르지 않는 코드는 언젠가 출력이 64KiB를 넘는 날 멈춥니다. 출력을 버릴 생각이라면 명시적으로 ``DISCARD``를 지정하는 편이 안전합니다.
+
+=== 두 스트림 동시 읽기와 시간제한
+
+표준 출력과 표준 오류를 따로 받아서 가공해야 한다면 파이프 두 개를 동시에 비워야 합니다. 한 파이프를 다 읽은 뒤에 다른 파이프를 읽는 순차 처리로는 부족합니다. 표준 오류 파이프가 먼저 차면 하위 프로세스는 표준 출력을 더 쓰지 못하고, 부모는 표준 출력의 EOF를 기다리는 교착이 생깁니다. 그래서 스트림마다 스레드가 하나씩 필요합니다.
+
+시간제한도 같이 챙겨야 합니다. 외부 명령이 네트워크나 잠금을 기다리며 멈추면 ``waitFor()``를 부른 스레드도 함께 멈춥니다. JDK 8부터 있는 `waitFor(long, TimeUnit)` 메서드가 ``false``를 돌려주면 ``destroyForcibly()``로 프로세스를 끝내야 합니다. Linux에서 ``destroy()``는 SIGTERM을, ``destroyForcibly()``는 SIGKILL을 보냅니다. 아래는 JDK API만으로 이 규칙을 지킨 예제입니다. 스트림을 읽는 스레드는 JDK 21의 가상 스레드로 만들었습니다.
+
+[source,java]
+.PlainJdkRunner.java
+----
+static void run(String... command) throws IOException, InterruptedException, TimeoutException {
+    Process process = new ProcessBuilder(command).start();
+    StringBuilder stdout = new StringBuilder();
+    StringBuilder stderr = new StringBuilder();
+    Thread outPump = Thread.ofVirtual().start(() -> process.inputReader().lines().forEach(l -> stdout.append(l).append('\n')));
+    Thread errPump = Thread.ofVirtual().start(() -> process.errorReader().lines().forEach(l -> stderr.append(l).append('\n')));
+    if (!process.waitFor(1, TimeUnit.SECONDS)) {
+        process.destroyForcibly().waitFor();
+        throw new TimeoutException("timed out: " + String.join(" ", command));
+    }
+    outPump.join();
+    errPump.join();
+    System.out.println(command[0] + ": exit=" + process.exitValue()
+            + ", stdout chars=" + stdout.length() + ", stderr=" + stderr.toString().trim());
+}
+----
+
+`echo hello`, `seq 1 100000`, `ls /no-such-dir`, `sleep 60` 네 명령을 이 메서드로 실행한 결과입니다. 590KB 출력도 멈추지 않고, 표준 오류는 따로 모이고, 1초를 넘긴 ``sleep``은 예외로 끝납니다.
+
+[source,text]
+----
+echo: exit=0, stdout chars=6, stderr=
+seq: exit=0, stdout chars=588895, stderr=
+ls: exit=2, stdout chars=0, stderr=ls: cannot access '/no-such-dir': No such file or directory
+timed out: sleep 60
+----
+
+이 정도가 최소한이고, 실제로는 더 챙길 것이 있습니다. 출력이 아주 크면 ``StringBuilder``에 다 담지 말고 줄 단위로 처리해야 합니다. 실행한 명령이 다시 자식 프로세스를 만들었다면 ``destroyForcibly()``는 직접 만든 프로세스만 끝내므로, JDK 9의 ``ProcessHandle.descendants()``로 손자 프로세스까지 정리해야 합니다. 출력 인코딩이 UTF-8이 아닌 명령도 있습니다. 이런 것까지 직접 챙기면 코드가 금방 길어지고, 그 자리가 다음 절의 라이브러리가 맡는 영역입니다.
+
+== zt-exec과 Apache Commons Exec
+
+앞 절의 규칙을 프로젝트마다 다시 구현하는 대신 라이브러리를 쓸 수 있습니다. 두 라이브러리 모두 내부는 ``ProcessBuilder``와 스트림마다 하나씩 두는 pump 스레드로 되어 있습니다. zt-exec의 `PumpStreamHandler` 클래스는 소스 파일 상단에 "This file originates from the Apache Commons Exec package"라고 적혀 있을 만큼 Commons Exec의 코드를 가져온 것입니다. 그러니 두 라이브러리의 차이는 파이프를 비우는 방식이 아니라 API의 모양과 기본값에 있습니다.
+
+=== zt-exec
+
+https://github.com/zeroturnaround/zt-exec[zt-exec]은 JRebel을 만든 ZeroTurnaround가 사내 여러 프로젝트에 흩어져 있던 프로세스 실행 코드를 하나로 합쳐서 2013년에 공개한 라이브러리입니다. README는 `ProcessExecutor` 클래스 하나로 ``ProcessBuilder``와 Commons Exec의 기능을 모두 제공하는 것이 목표라고 설명합니다. 의존성은 slf4j-api 하나이고 최소 Java 버전은 8입니다.
+
+[source,xml]
+----
+<dependency>
+    <groupId>org.zeroturnaround</groupId>
+    <artifactId>zt-exec</artifactId>
+    <version>1.13.0</version>
+</dependency>
+----
+
+써 보니 장점은 네 가지로 정리됩니다.
+
+* **기본값이 안전합니다.** 아무 설정 없이 ``execute()``만 부르면 표준 오류를 표준 출력에 합치고 그 출력을 버립니다. 파이프를 읽지 않아서 생기는 교착이 기본값에서는 일어나지 않습니다. 출력이 필요하면 ``readOutput(true)``를 켜고 결과의 ``outputUTF8()``로 문자열을 받거나, ``redirectOutput()``에 줄 단위로 문자열을 처리하는 함수를 람다 표현식으로 넘깁니다.
+* **시간제한이 예외 타입으로 구분됩니다.** ``timeout()``으로 지정한 시간을 넘기면 프로세스를 ``destroy()``로 끝내고 ``TimeoutException``을 던집니다. 종료 코드가 잘못된 경우와 시간 초과를 예외 타입만으로 구분할 수 있습니다.
+* **종료 코드 검사를 선언합니다.** 기본값은 모든 종료 코드를 허용하고, ``exitValueNormal()``이나 ``exitValues(0, 1)``로 허용 범위를 지정하면 그 밖의 값에서 ``InvalidExitValueException``이 납니다. 예외 객체의 ``getResult()``로 그때까지의 출력도 볼 수 있어서 오류 메시지를 로그에 남기기 좋습니다.
+* **부수 기능이 메서드 하나씩입니다.** ``start().getFuture()``로 비동기 실행, ``destroyOnExit()``로 JVM 종료 시 하위 프로세스 정리, ``redirectOutputAsInfo()``로 SLF4J 로거에 출력 전달을 각각 메서드 호출 하나로 켭니다.
+
+앞 절의 네 명령을 zt-exec으로 실행한 예제입니다.
+
+[source,java]
+.ZtExecRunner.java
+----
+static void captureOutput() throws IOException, InterruptedException, TimeoutException {
+    ProcessResult result = new ProcessExecutor()
+            .command("echo", "hello")
+            .readOutput(true)
+            .exitValueNormal()
+            .execute();
+    System.out.println("output=" + result.outputUTF8().trim() + ", exit=" + result.getExitValue());
+}
+
+static void largeOutput() throws IOException, InterruptedException, TimeoutException {
+    AtomicLong lines = new AtomicLong();
+    ProcessResult result = new ProcessExecutor()
+            .command("seq", "1", "100000")
+            .redirectOutput(line -> lines.incrementAndGet())
+            .timeout(3, TimeUnit.SECONDS)
+            .execute();
+    System.out.println("seq lines=" + lines.get() + ", exit=" + result.getExitValue());
+}
+
+static void timeout() throws IOException, InterruptedException {
+    try {
+        new ProcessExecutor()
+                .command("sleep", "60")
+                .timeout(1, TimeUnit.SECONDS)
+                .execute();
+    } catch (TimeoutException e) {
+        System.out.println("timeout: " + e.getMessage());
+    }
+}
+
+static void exitValue() throws IOException, InterruptedException, TimeoutException {
+    try {
+        new ProcessExecutor()
+                .command("ls", "/no-such-dir")
+                .readOutput(true)
+                .exitValueNormal()
+                .execute();
+    } catch (InvalidExitValueException e) {
+        System.out.println("exit=" + e.getExitValue() + ", output=" + e.getResult().outputUTF8().trim());
+    }
+}
+----
+
+실행 결과입니다. ``TimeoutException``의 메시지에 실행한 명령과 제한 시간이 들어 있고, ``ls``의 오류 메시지는 표준 오류가 표준 출력에 합쳐지는 기본값 덕분에 ``outputUTF8()``로 읽힙니다. 시간 초과 뒤에 `sleep` 프로세스가 남아 있지 않은 것도 확인했습니다.
+
+[source,text]
+----
+output=hello, exit=0
+seq lines=100000, exit=0
+timeout: Timed out waiting for Process[pid=294823, exitValue="not exited"] to finish, timeout: 1 second, executed command [sleep, 60]
+exit=2, output=ls: cannot access '/no-such-dir': No such file or directory
+----
+
+주의할 점도 있습니다. ``readOutput(true)``는 pump 스레드가 읽은 바이트를 전부 ``ByteArrayOutputStream``에 복사해 두었다가 ``outputUTF8()``을 부를 때 문자열로 바꿉니다. 명령이 수백 MB를 출력하면 그만큼이 힙에 통째로 올라가고, 문자열로 바꾸는 순간에는 바이트 배열과 ``String``이 함께 있어서 두 배까지 늘어납니다. 그래서 크기를 예측할 수 없는 출력은 위 예제의 ``largeOutput()``처럼 ``readOutput``을 켜지 않고 ``redirectOutput()``에 줄 단위로 문자열을 처리하는 함수를 람다 표현식으로 넘겨야 합니다. pump 스레드가 읽은 바이트를 줄바꿈 단위로 잘라 그 함수에 넘기고, 함수가 끝난 줄은 보관하지 않으므로 메모리 사용량이 출력 크기와 무관하게 유지됩니다. 예제는 줄 수만 셌지만 각 줄을 파싱해서 집계하거나 파일에 쓰는 일도 이 함수 안에서 하면 됩니다. 클래스패스에 SLF4J 구현체가 없으면 실행할 때마다 "No SLF4J providers were found" 경고가 표준 오류에 세 줄 찍힙니다. 이미 SLF4J를 쓰는 애플리케이션이라면 문제가 없지만, 그렇지 않다면 slf4j-nop 같은 구현체를 넣어야 합니다.
+
+=== Apache Commons Exec
+
+https://commons.apache.org/proper/commons-exec/[Apache Commons Exec]은 2015년 글에서도 소개한 라이브러리입니다. 그때 최신이던 1.3은 2014년 11월에 나왔고, 그다음 버전인 1.4.0은 10년 뒤인 2024년 1월에 나왔습니다. 이후 2025년 5월에 1.5.0, 2025년 11월에 1.6.0이 나왔습니다. 1.4.0부터 최소 Java 버전이 8이 됐고, `DefaultExecutor` 와 `ExecuteWatchdog` 의 생성자가 deprecated로 표시되면서 builder API가 그 자리를 대신합니다. 시간제한 인자도 밀리초 대신 ``Duration``을 받습니다. 의존성은 없습니다.
+
+[source,xml]
+----
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-exec</artifactId>
+    <version>1.6.0</version>
+</dependency>
+----
+
+같은 네 명령을 1.6.0으로 실행한 예제입니다. 스트림 처리를 맡는 `PumpStreamHandler` 클래스는 기본으로 ``System.out``과 ``System.err``에 출력하므로, 출력을 모으려면 아래처럼 ``OutputStream``을 직접 넘깁니다.
+
+[source,java]
+.CommonsExecRunner.java
+----
+static void run(String... command) throws IOException {
+    CommandLine cmdLine = new CommandLine(command[0]);
+    cmdLine.addArguments(Arrays.copyOfRange(command, 1, command.length), false);
+    ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+    ByteArrayOutputStream stderr = new ByteArrayOutputStream();
+    ExecuteWatchdog watchdog = ExecuteWatchdog.builder().setTimeout(Duration.ofSeconds(1)).get();
+    DefaultExecutor executor = DefaultExecutor.builder().get();
+    executor.setStreamHandler(new PumpStreamHandler(stdout, stderr));
+    executor.setWatchdog(watchdog);
+    try {
+        int exitValue = executor.execute(cmdLine);
+        System.out.println(command[0] + ": exit=" + exitValue + ", stdout bytes=" + stdout.size());
+    } catch (ExecuteException e) {
+        System.out.println(command[0] + ": exit=" + e.getExitValue()
+                + ", killed by watchdog=" + watchdog.killedProcess()
+                + ", stderr=" + stderr.toString().trim());
+    }
+}
+----
+
+[source,text]
+----
+echo: exit=0, stdout bytes=6
+seq: exit=0, stdout bytes=588895
+sleep: exit=143, killed by watchdog=true, stderr=
+ls: exit=2, killed by watchdog=false, stderr=ls: cannot access '/no-such-dir': No such file or directory
+----
+
+zt-exec과 비교하면 API의 나이가 드러나는 부분이 있습니다. ``DefaultExecutor``는 종료 코드가 0이 아니면 무조건 ``ExecuteException``을 던지고, 시간 초과도 같은 예외로 알립니다. 위 결과의 ``sleep``은 watchdog이 보낸 SIGTERM으로 끝나서 종료 코드가 143입니다. 시간 초과인지 명령 자체의 실패인지는 예외를 잡은 뒤 ``watchdog.killedProcess()``를 따로 물어봐야 구분됩니다. ``CommandLine.addArguments(String)``는 문자열 하나를 받아 공백으로 나누므로 따옴표로 감싸지 않은 인자에 공백이 있으면 깨지고, 배열을 받는 메서드의 기본 동작은 공백이 든 인자를 따옴표로 감싸서 그대로 넘깁니다. 그래서 위 예제는 두 번째 인자를 ``false``로 준 배열 메서드를 썼습니다.
+
+=== 유지보수 현황과 선택
+
+이 글을 쓰기 전에는 Commons Exec이 업그레이드가 잘 안 되는 라이브러리이니 zt-exec이 낫다고 생각했습니다. 그런데 Maven Central의 릴리스 기록을 확인해 보니 그 인상은 2023년까지만 맞았습니다.
+
+[cols="1,2,2", options="header"]
+|===
+|항목 |zt-exec |Apache Commons Exec
+
+|최신 버전
+|1.13.0 (2026-07-10)
+|1.6.0 (2025-11-27)
+
+|그 이전 릴리스
+|1.12 (2020-09-02), 1.11 (2019-07-05)
+|1.5.0 (2025-05-16), 1.4.0 (2024-01-01), 1.3 (2014-11-03)
+
+|최근 5년간 릴리스 수
+|1회
+|3회
+
+|최소 Java 버전
+|8
+|8
+
+|의존성
+|slf4j-api
+|없음
+
+|기본 출력 처리
+|버림 (표준 오류는 표준 출력에 합침)
+|``System.out``, ``System.err``로 전달
+
+|시간 초과 알림
+|``TimeoutException``
+|``ExecuteException`` + ``watchdog.killedProcess()``
+
+|0이 아닌 종료 코드
+|기본 허용, ``exitValues()``로 지정 시 ``InvalidExitValueException``
+|기본 ``ExecuteException``
+|===
+
+Commons Exec은 2014년부터 2023년까지 릴리스가 없었지만, 2024년부터 Apache Commons의 유지보수자인 Gary Gregory가 builder API와 ``Duration`` 지원을 넣고 2년 사이에 세 번 릴리스했습니다. 반대로 zt-exec은 2020년 9월의 1.12 이후 2026년 7월의 1.13.0까지 6년 가까이 릴리스가 없었습니다. 1.13.0에서 빌드를 Maven에서 Gradle로 옮기고 JPMS 모듈 정보를 넣었고, 그 뒤로 dependabot 커밋이 이어지고 있으니 관리가 재개된 것은 맞습니다. 그래도 최근 2년만 보면 릴리스가 더 잦은 쪽은 Commons Exec입니다.
+
+그러니 zt-exec을 고를 이유는 유지보수 빈도가 아니라 API 설계에 있습니다. 시간 초과와 종료 코드 오류를 예외 타입으로 구분하고, 출력을 문자열로 받는 데 메서드 호출 하나면 되고, 아무 설정 없이 써도 교착이 나지 않는 기본값을 가진 쪽이 zt-exec입니다. 저는 새로 쓰는 코드라면 zt-exec을 고르겠습니다. 다만 의존성을 하나도 늘리고 싶지 않거나 Apache 프로젝트의 거버넌스를 선호한다면 Commons Exec 1.6.0도 builder API로 쓸 만합니다. 이미 Commons Exec을 쓰고 있는 코드를 zt-exec으로 바꿀 만큼 큰 차이는 아닙니다.
+
+== fork의 메모리 문제, 그 후
+
+2015년 글의 핵심은 힙이 큰 Java 프로세스가 외부 프로세스를 실행하면 `Cannot allocate memory` 예외가 날 수 있다는 것이었습니다. 원인은 ``fork()``에 있었습니다. ``fork()``는 부모와 같은 자식 프로세스를 만드는데, Linux는 쓰기 시 복사(copy-on-write)로 실제 페이지 복사는 미루지만 페이지 테이블은 복사하고, 커널의 메모리 overcommit 정책에 따라 자식이 쓸지도 모르는 메모리를 미리 계산해서 거절하기도 합니다. 자식은 곧바로 ``exec()``로 작은 프로그램으로 바뀔 테지만 커널은 그 사실을 알 수 없습니다.
+
+이 문제는 JDK 쪽과 Linux 쪽에서 각각 해소됐습니다.
+
+=== JDK의 실행 방식 변천
+
+JDK가 Linux에서 하위 프로세스를 만드는 방식은 `jdk.lang.Process.launchMechanism` 시스템 속성으로 정해집니다. 기본값의 변천은 아래와 같습니다.
+
+[cols="1,3", options="header"]
+|===
+|JDK |Linux에서의 변화
+
+|6
+|``fork()`` + ``exec()``
+
+|7
+|``vfork()``가 기본값이 됨 (https://bugs.openjdk.org/browse/JDK-6868160[JDK-6868160])
+
+|12
+|``POSIX_SPAWN``을 선택 옵션으로 추가 (https://bugs.openjdk.org/browse/JDK-8212828[JDK-8212828]). 11.0.4에도 백포트
+
+|13
+|``POSIX_SPAWN``이 기본값이 됨 (https://bugs.openjdk.org/browse/JDK-8213192[JDK-8213192])
+
+|25
+|``VFORK``를 지정하면 deprecated 경고 출력 (https://bugs.openjdk.org/browse/JDK-8357180[JDK-8357180])
+
+|27
+|``VFORK`` 제거. 지정하면 ``FORK``로 동작 (https://bugs.openjdk.org/browse/JDK-8357090[JDK-8357090])
+|===
+
+2015년에는 "JDK 7부터 Linux에서 ``vfork()``를 쓰니 메모리 문제는 피할 수 있다"가 결론이었습니다. ``vfork()``는 페이지 테이블을 복사하지 않고 자식이 부모의 메모리 이미지 안에서 ``exec()``까지만 실행하므로 메모리 문제는 없습니다. 대신 자식이 ``exec()`` 전에 부모의 스택이나 시그널 처리를 건드릴 위험이 있고, JDK는 그 사이에 파일 디스크립터 정리 같은 작업을 해야 해서 ``vfork()``의 사용 규칙을 어길 수밖에 없었습니다. JDK-8357090의 설명대로 그 위험 때문에 JDK 27부터 ``VFORK`` 옵션이 사라집니다. JDK 25에서 이 옵션을 지정하면 아래 경고가 표준 오류에 출력됩니다.
+
+[source,text]
+----
+$ java -Djdk.lang.Process.launchMechanism=VFORK ProcessRunner
+VFORK MODE DEPRECATED
+The VFORK launch mechanism has been deprecated for being dangerous.
+It will be removed in a future java version. Either remove the
+jdk.lang.Process.launchMechanism property (preferred) or use FORK mode
+instead (-Djdk.lang.Process.launchMechanism=FORK).
+----
+
+지금의 기본값인 ``posix_spawn()``은 시스템 콜이 아니라 C 라이브러리 함수입니다. fork와 exec, 그 사이의 준비 작업을 한 묶음으로 제공한다는 점에서 Windows의 ``CreateProcess()``와 닮았습니다. JDK는 이 함수로 `jspawnhelper` 라는 작은 실행 파일을 먼저 띄우고, `jspawnhelper` 가 파이프로 넘겨받은 설정에 따라 파일 디스크립터와 작업 디렉터리를 정리한 뒤 실제 명령을 다시 ``exec()``합니다. 이 구조는 JDK 소스의 https://github.com/openjdk/jdk/blob/master/src/java.base/unix/native/libjava/ProcessImpl_md.c[ProcessImpl_md.c] 상단 주석에 설명되어 있습니다.
+
+strace로 보면 두 번의 `execve` 가 그대로 드러납니다. 아래는 `echo hello` 를 실행하는 link:{source-repo}/ProcessRunner.java[ProcessRunner.java]를 기본 설정으로 실행했을 때의 시스템 콜 중 프로세스 생성과 관련된 부분입니다. 경로는 줄였습니다.
+
+[source,text]
+----
+$ strace -f -e trace=clone,clone3,vfork,execve -o trace.txt java ProcessRunner
+$ grep -v CLONE_THREAD trace.txt | grep -E 'clone|vfork|execve'
+285583 clone3({flags=CLONE_VM|CLONE_VFORK|CLONE_CLEAR_SIGHAND, exit_signal=SIGCHLD, stack=..., stack_size=0x9000}, 88 <unfinished ...>
+285603 execve("$JAVA_HOME/lib/jspawnhelper", ["$JAVA_HOME/lib/jspawnhelper", "25+36-LTS", "10:11:13"], ...) = 0
+285603 execve("/usr/bin/echo", ["echo", "hello"], ...) = 0
+----
+
+``vfork()`` 시스템 콜은 나오지 않습니다. glibc 2.39의 ``posix_spawn()``은 `clone3` 시스템 콜에 `CLONE_VM` 과 `CLONE_VFORK` 플래그를 주어 ``vfork()``와 같은 효과를 냅니다. 이것이 다음 절의 내용입니다. 같은 프로그램을 `-Djdk.lang.Process.launchMechanism=FORK` 로 실행하면 `CLONE_VM` 플래그 없이 `clone` 시스템 콜을 부르고, `jspawnhelper` 없이 곧바로 `/usr/bin/echo` 를 ``execve``합니다.
+
+=== glibc와 커널의 변화
+
+JDK가 ``posix_spawn()``으로 옮겨 갈 수 있었던 배경에는 glibc의 변화가 있습니다. https://man7.org/linux/man-pages/man3/posix_spawn.3.html[posix_spawn(3)] 매뉴얼에 따르면 glibc 2.24(2016년 8월)부터 ``posix_spawn()``은 `CLONE_VM` 과 `CLONE_VFORK` 플래그로 ``clone()``을 호출합니다. 자식에게 따로 할당한 스택을 주고 시그널을 막아 두기 때문에 ``vfork()``의 위험 요소 두 가지, 즉 부모 스택 손상과 시그널 오배달이 없습니다. JDK 소스의 주석은 이를 "vfork의 성능을 위험 없이 흉내 낸다"고 표현합니다. Alpine Linux가 쓰는 musl은 처음부터 같은 방식이었습니다. 2015년 글에서 "glibc가 ``posix_spawn()``을 구현할 때 가능하면 ``vfork()``를 쓴다"고 적었는데, 그 글이 나온 이듬해에 glibc가 ``vfork()``를 버린 것입니다.
+
+``vfork()`` 시스템 콜 자체는 Linux 커널에 그대로 있습니다. https://man7.org/linux/man-pages/man2/vfork.2.html[vfork(2)] 매뉴얼은 여전히 ``vfork()``를 `CLONE_VM | CLONE_VFORK | SIGCHLD` 플래그를 준 ``clone()``과 같다고 설명하고, POSIX.1-2008에서 명세가 삭제됐다는 사실도 함께 적고 있습니다. 즉 JDK가 ``VFORK``를 없앤 이유는 커널이 바뀌어서가 아니라 JDK 자신이 ``vfork()``와 ``exec()`` 사이에서 하던 작업이 안전하지 않아서입니다.
+
+커널 쪽에서는 overcommit 휴리스틱이 바뀌었습니다. `vm.overcommit_memory` 의 기본값 0은 "명백한 overcommit만 거절하는" 모드입니다. 커널 5.2 이전에는 이 판정에 여유 메모리, 페이지 캐시, 스왑 여유분 등을 합산한 값을 썼습니다. 힙 매핑이 여유 메모리보다 크면 ``fork()``가 그 매핑을 복제할 때 요구하는 크기가 이 값을 넘어서 `ENOMEM` 이 났습니다. 2015년 글에 나온 `Cannot allocate memory` 가 바로 이 경우입니다. 커널 5.2에 들어간 https://lkml.iu.edu/hypermail/linux/kernel/1904.1/05420.html[mm: fix false-positive OVERCOMMIT_GUESS failures] 패치는 이 계산을 "요청 크기가 전체 RAM과 스왑의 합을 넘는지"만 보도록 단순화했습니다. 그래서 지금의 기본 설정에서는 ``FORK`` 모드를 써도 힙 크기 때문에 ``fork()``가 실패하는 일이 거의 없습니다. 다만 `vm.overcommit_memory=2` 로 overcommit을 금지한 서버에서는 ``fork()`` 시점에 부모 크기만큼의 commit이 여전히 계산되므로 예전 문제가 그대로 재현됩니다. 데이터베이스 서버 권고 설정을 따라 이 값을 2로 둔 장비에 Java 애플리케이션이 함께 올라가는 경우가 있습니다.
+
+=== 큰 힙에서 FORK와 POSIX_SPAWN의 실행 지연
+
+메모리 할당 실패가 사라졌어도 ``fork()``가 페이지 테이블을 복사한다는 사실은 변하지 않았습니다. 힙이 클수록 복사할 페이지 테이블도 커집니다. 힙을 미리 할당한 상태에서 `true` 명령을 30번 실행하는 데 걸린 시간을 실행 방식별로 재 봤습니다. 측정 코드는 link:{source-repo}/SpawnBench.java[SpawnBench.java]이고, `-XX:+AlwaysPreTouch` 옵션으로 힙 전체를 실제 메모리에 올린 뒤 측정했습니다. 두 번 실행한 값입니다.
+
+[cols="1,2,2", options="header"]
+|===
+|힙 크기 |POSIX_SPAWN (ms/회) |FORK (ms/회)
+
+|256MB
+|1.5, 1.2
+|15.9, 20.2
+
+|2GB
+|1.6, 1.9
+|120.8, 140.7
+
+|8GB
+|2.0, 2.1
+|243.5, 231.2
+|===
+
+``POSIX_SPAWN``은 힙 크기와 무관하게 약 2ms이고, ``FORK``는 힙에 비례해서 늘어나 8GB에서는 100배가 넘게 차이가 났습니다. ``fork()``가 페이지 테이블을 복사하는 동안 커널은 부모 프로세스의 주소 공간 잠금(mmap_lock)을 쓰기 모드로 잡습니다. 그래서 호출한 스레드만 멈추는 것이 아니라 같은 시간에 메모리 매핑을 바꾸려는 다른 스레드도 기다립니다. 웹 애플리케이션이 요청마다 외부 명령을 실행한다면 이 차이는 응답 시간에 그대로 나타납니다. ``POSIX_SPAWN`` 기본값을 굳이 ``FORK``로 바꿀 이유가 없는 또 하나의 근거입니다.
+
+=== jspawnhelper와 관련된 새 주의점
+
+``posix_spawn()`` 방식은 `jspawnhelper` 실행 파일에 의존하기 때문에 예전에는 없던 실패 유형이 하나 생겼습니다. JDK가 실행 중인 상태에서 같은 경로의 JDK가 새 버전으로 덮어씌워지면, 이미 메모리에 올라간 JVM이 새 버전의 `jspawnhelper` 를 실행하게 됩니다. Ubuntu의 unattended-upgrades처럼 패키지를 자동으로 갱신하는 환경에서 실제로 일어나는 일입니다. JDK 23의 https://bugs.openjdk.org/browse/JDK-8325621[JDK-8325621]부터 `jspawnhelper` 가 자신을 실행한 JVM과 버전이 같은지 검사해서 다르면 아래와 같은 예외를 던집니다. 이 검사는 22.0.2, 21.0.4, 17.0.13에도 백포트됐습니다.
+
+JDK 25 디렉터리를 복사해서 Java 프로그램을 띄운 뒤, 실행 중에 `lib/jspawnhelper` 를 JDK 17의 것으로 바꿔치기해서 이 상황을 재현했습니다. 표준 오류에 `jspawnhelper` 의 메시지가 먼저 찍히고, 이어서 원인 후보와 해결책까지 적힌 예외가 납니다.
+
+[source,text]
+----
+Incorrect Java version: 25+36-LTS
+jspawnhelper version 17.0.16+8
+This command is not for general use and should only be run as the result of a call to
+ProcessBuilder.start() or Runtime.exec() in a java application
+Exception in thread "main" java.io.IOException: Cannot run program "echo": Failed to exec spawn helper: pid: 288611, exit code: 1, error: 0 (none)
+Possible reasons:
+  - Spawn helper ran into JDK version mismatch
+  - Spawn helper ran into unexpected internal error
+  - Spawn helper was terminated by another process
+Possible solutions:
+  - Restart JVM, especially after in-place JDK updates
+  - Check system logs for JDK-related errors
+  - Re-install JDK to fix permission/versioning problems
+  - Switch to legacy launch mechanism with -Djdk.lang.Process.launchMechanism=FORK
+----
+
+앞의 strace 출력에서 `jspawnhelper` 의 두 번째 인자로 `25+36-LTS` 가 넘어간 것이 이 버전 검사입니다. 검사가 없던 버전에서는 명령이 조용히 실패하거나 엉뚱하게 동작했으니 예외가 나는 편이 낫습니다. 이 예외를 만나면 메시지대로 JVM을 재시작하는 것 말고는 방법이 없습니다. 운영 관점에서는 JDK를 버전이 들어간 별도 경로에 설치하고 심볼릭 링크만 바꾸거나, 자동 갱신에서 JDK 패키지를 제외하는 것이 예방책입니다.
+
+JDK 소스의 주석은 ``posix_spawn()``이 libc 구현에 따라 버그가 있을 수 있어서 ``FORK`` 모드를 예비로 남겨 둔다고 설명합니다. `jspawnhelper` 관련 오류가 반복되는데 원인을 바로 찾기 어렵다면 `-Djdk.lang.Process.launchMechanism=FORK` 로 임시 회피할 수 있습니다. 위에서 본 실행 지연을 감수하는 선택입니다.
+
+== 2015년의 대처 방안 다시 보기
+
+2015년 글에서는 네 가지 대처 방안을 들었습니다. 지금 기준으로 다시 평가하면 다음과 같습니다.
+
+* **JNI로 직접 시스템 콜 호출**: 필요 없어졌습니다. JDK가 ``posix_spawn()``을 기본으로 쓰므로 직접 네이티브 코드를 쓸 이유가 없습니다.
+* **Java Service Wrapper, java_posix_spawn 같은 외부 라이브러리**: 마찬가지로 필요 없어졌습니다. https://github.com/axiak/java_posix_spawn[java_posix_spawn] 저장소의 마지막 커밋은 2014년 8월입니다.
+* **외부 프로세스 실행 전용 데몬**: 메모리 문제 때문이라면 필요 없지만, 격리 목적으로는 여전히 의미가 있습니다. Security Manager가 사라진 지금 웹 애플리케이션 프로세스 안에서 외부 명령 실행을 막을 JDK 수준의 수단은 없습니다. 원격 코드 실행 취약점의 피해 범위를 줄이려면 명령을 실행하는 프로세스를 따로 두고 컨테이너나 systemd 단위, 별도 사용자 계정으로 권한을 좁히는 것이 남은 방법입니다.
+* **JDK 버전 올리기**: 지금도 첫 번째 답입니다. Linux에서는 JDK 13 이상이면 기본값이 ``posix_spawn()``이고, `jspawnhelper` 버전 검사까지 포함하려면 17.0.13, 21.0.4 이상입니다. JDK 11은 11.0.4부터 ``POSIX_SPAWN``을 옵션으로 지정할 수 있지만 기본값은 ``vfork()``입니다. JDK 8에는 이 옵션이 백포트되지 않았습니다.
+
+`jdk.lang.Process.launchMechanism` 속성은 지정하지 않는 것이 좋습니다. 예전 문서를 보고 `VFORK` 를 명시한 실행 스크립트가 남아 있다면 JDK 25에서 경고가 나오고 JDK 27에서는 `FORK` 로 바뀌어 위에서 본 실행 지연을 겪게 됩니다.
+
+== 마치며
+
+파이프 버퍼 교착은 2015년과 똑같이 남아 있습니다. Linux의 파이프 용량은 여전히 64KiB이고, 출력을 읽지 않는 코드는 출력이 그 크기를 넘는 날 멈춥니다. 출력이 필요 없으면 ``Redirect.DISCARD``나 ``inheritIO()``로 파이프를 만들지 말고, 필요하면 스트림마다 스레드를 두고 시간제한과 강제 종료까지 챙겨야 합니다. 그 일을 대신 맡기려면 zt-exec이나 Commons Exec을 씁니다. Commons Exec이 방치된 라이브러리라는 인상은 2024년 이후로는 맞지 않았고, zt-exec을 고를 이유는 유지보수 빈도가 아니라 예외 타입과 기본값을 정리한 API에 있었습니다.
+
+메모리 할당 실패는 JDK 13의 ``posix_spawn()`` 기본값, glibc 2.24의 ``clone(CLONE_VM|CLONE_VFORK)`` 구현, 커널 5.2의 overcommit 휴리스틱 변경이 겹쳐서 기본 설정에서는 사라졌습니다. 대신 ``fork()``의 페이지 테이블 복사 비용, `jspawnhelper` 의 버전 검사, JDK 27의 `VFORK` 제거처럼 새로 알아 둘 내용이 생겼습니다. 힙이 큰 프로세스가 외부 명령을 직접 실행하지 않는 편이 낫다는 2015년의 권고는, 이제 메모리보다는 보안 격리와 실행 지연의 관점에서 유효합니다.
+
+== 참고 자료
+
+* JDK 문서
+** https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Process.html[Process (Java SE 25)]
+** https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/ProcessBuilder.html[ProcessBuilder (Java SE 25)]
+** https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Runtime.html[Runtime (Java SE 25)]: `exec(String)` 계열의 deprecation 사유
+** https://github.com/openjdk/jdk/blob/master/src/java.base/unix/native/libjava/ProcessImpl_md.c[ProcessImpl_md.c]: 실행 방식별 장단점과 glibc, musl의 ``posix_spawn()`` 구현을 설명한 주석
+* 라이브러리
+** https://github.com/zeroturnaround/zt-exec[zt-exec]: README의 사용 예
+** https://github.com/zeroturnaround/zt-exec/blob/main/CHANGELOG.md[zt-exec CHANGELOG]: 1.13.0의 변경 사항과 릴리스 날짜
+** https://commons.apache.org/proper/commons-exec/[Apache Commons Exec]
+** https://commons.apache.org/proper/commons-exec/changes.html[Apache Commons Exec Changes]: 1.4.0 이후의 builder API와 ``Duration`` 도입
+* OpenJDK 이슈
+** https://bugs.openjdk.org/browse/JDK-6868160[JDK-6868160 (process) Use vfork, not fork, on Linux to avoid swap exhaustion]
+** https://bugs.openjdk.org/browse/JDK-8212828[JDK-8212828 (process) Provide a way for Runtime.exec to use posix_spawn on linux]
+** https://bugs.openjdk.org/browse/JDK-8213192[JDK-8213192 (process) Change the Process launch mechanism default on Linux to be posix_spawn]
+** https://bugs.openjdk.org/browse/JDK-8325621[JDK-8325621 Improve jspawnhelper version checks]
+** https://bugs.openjdk.org/browse/JDK-8357180[JDK-8357180 Deprecate VFORK launch mechanism from Process implementation (linux)]
+** https://bugs.openjdk.org/browse/JDK-8357090[JDK-8357090 Remove VFORK launch mechanism from Process implementation (linux)]
+** https://openjdk.org/jeps/486[JEP 486: Permanently Disable the Security Manager]
+* Linux 매뉴얼과 커널
+** https://man7.org/linux/man-pages/man7/pipe.7.html[pipe(7)]: 파이프 용량
+** https://man7.org/linux/man-pages/man2/vfork.2.html[vfork(2)]
+** https://man7.org/linux/man-pages/man3/posix_spawn.3.html[posix_spawn(3)]: glibc 2.24 이후의 구현
+** https://www.kernel.org/doc/html/latest/mm/overcommit-accounting.html[Overcommit Accounting]
+** https://lkml.iu.edu/hypermail/linux/kernel/1904.1/05420.html[mm: fix false-positive OVERCOMMIT_GUESS failures]: 커널 5.2의 휴리스틱 변경 패치
+* https://www.infoworld.com/article/2157336/when-runtime-exec-won-t.html[When Runtime.exec() won't]: 2000년에 나온 Michael Daconta의 글
+* https://d2.naver.com/helloworld/1113548[Java에서 외부 프로세스를 실행할 때]: 2015년의 글
+* link:{source-repo}[이 글의 예제 코드]
