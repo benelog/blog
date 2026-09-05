@@ -5,6 +5,7 @@
 :jbake-status: published
 :jbake-tags: ftp, go, 자작도구, test
 :description: 설정 파일 없이 명령행 옵션만으로 실행하는 FTP 서버 one-ftpserver를 소개합니다. 단일 바이너리 실행, --ssl 옵션 하나로 되는 FTPS, 접속 기록 로그, 자동 종료, JSON 출력을 정리하고 Java로 만들었던 첫 버전을 Go로 다시 쓰면서 바뀐 부분을 설명합니다.
+:jbake-last_updated: 2026-09-05
 :idprefix:
 :toc:
 :source-repo: https://github.com/benelog/one-ftpserver
@@ -26,7 +27,7 @@ Python이 설치된 서버라면 ``python3 -m http.server``로 웹 서버를 띄
 이 글은 2026년 8월에 나온 2.2.0을 기준으로 씁니다.
 
 * 설정 파일을 읽지도, 쓰지도 않습니다. 모든 설정은 명령행 옵션이고, ``--help``가 전체 목록입니다.
-* 설치할 것이 없습니다. Linux와 Windows용으로 amd64, arm64 바이너리를 릴리스에 올려 둡니다.
+* 바이너리 파일 하나로 실행됩니다. Linux와 Windows용으로 amd64, arm64 바이너리가 제공됩니다.
 * FTPS에 key store가 필요 없습니다. ``--ssl``만 주면 인증서를 실행할 때 메모리에서 만듭니다.
 * 사용자 데이터베이스가 없습니다. 사용자는 `--id`, ``--password``로 지정하는 한 명뿐입니다.
 * 클라이언트가 올린 파일과 접속 기록 로그 외에는 아무것도 남기지 않습니다.
@@ -42,8 +43,14 @@ mv one-ftpserver-linux-amd64 one-ftpserver
 chmod +x one-ftpserver
 ----
 
-배포하는 파일은 `one-ftpserver-linux-amd64`, `one-ftpserver-linux-arm64`, `one-ftpserver-windows-amd64.exe`, `one-ftpserver-windows-arm64.exe` 네 개입니다.
-macOS용 바이너리는 올리지 않습니다. 서명하지 않은 실행 파일은 Gatekeeper가 막기 때문에, macOS에서는 ``go build``로 직접 빌드하는 편이 낫습니다.
+배포하는 파일은 다음의 4개입니다.
+
+* `one-ftpserver-linux-amd64`
+* `one-ftpserver-linux-arm64`
+* `one-ftpserver-windows-amd64.exe`
+* `one-ftpserver-windows-arm64.exe`
+
+macOS에서는 ``go build``로 직접 빌드하셔서 사용하실 수 있습니다.
 
 아무 옵션 없이 실행하면 현재 디렉터리를 2121번 포트로 공유하고 익명 사용자(anonymous) 로그인을 받습니다.
 
@@ -59,7 +66,7 @@ one-ftpserver
 one-ftpserver --port=10021 --id=benelog --password=1234 --home=/srv/files
 ----
 
-서버가 뜨면 적용된 설정과 함께, 그 설정에 맞는 클라이언트 명령을 계정 정보까지 채워서 출력합니다.
+서버가 실행되면 적용된 설정과 함께, 그 설정에 맞는 클라이언트 명령을 계정 정보까지 채워서 출력합니다.
 
 [source]
 ----
@@ -82,7 +89,6 @@ FTP server started : ftp://192.168.0.10:10021
 ----
 
 이 명령을 그대로 복사해서 다른 PC에서 실행하면 파일을 주고받을 수 있습니다.
-저는 FTP 클라이언트 프로그램보다 wget과 curl을 즐겨 쓰는데, 서버가 그 명령을 직접 출력하니 옵션을 다시 찾아볼 일이 없습니다.
 
 == 명령행 옵션
 
@@ -150,7 +156,7 @@ FTP server started : ftp://192.168.0.10:10021
 one-ftpserver --ssl
 ----
 
-``--ssl``을 주면 implicit FTPS로 동작합니다. `ftps://` URL이 가리키는 방식입니다.
+``--ssl``을 주면 implicit FTPS로 동작합니다. `ftps://` URL로 사용하는 방식입니다.
 인증서는 서버가 시작할 때 메모리에서 만듭니다. 유효기간은 1년이고 ``localhost``와 그 장비의 IP 주소를 담으며, 서버를 다시 띄우면 새로 만듭니다.
 아무도 서명하지 않은 인증서라서 클라이언트가 검증할 방법이 없고, 그래서 서버가 출력하는 `curl` 명령에는 ``-k``가 붙습니다.
 
@@ -281,7 +287,7 @@ one-ftpserver --id=benelog --json
 
 ``--port=0``과 같이 쓰면 포트를 정하지 않고 여러 대를 동시에 띄울 수 있습니다. 각 서버가 배정받은 포트를 출력합니다.
 
-== Java 버전에서 달라진 점
+== v0.1 Java 버전과 달라진 점
 
 2.0.0은 Java로 만들었던 0.1을 Go로 다시 쓴 버전입니다. 실행 방법과 옵션 형식이 함께 바뀌었습니다.
 
@@ -295,7 +301,7 @@ one-ftpserver --id=benelog --json
 == 구현에서 눈여겨본 부분
 
 FTP 프로토콜은 https://github.com/fclairamb/ftpserverlib[ftpserverlib]가 처리하고, 파일 시스템은 https://github.com/spf13/afero[afero]로 감쌉니다.
-이 저장소가 더하는 부분은 사용자 한 명을 인증하는 driver, 실행할 때 만드는 인증서, 그리고 설정 요약 출력입니다.
+One FTP Server가 더하는 부분은 사용자 한 명을 인증하는 driver, 실행할 때 만드는 인증서, 그리고 설정 요약 출력입니다.
 
 === 한 명만 인증하는 driver
 
@@ -312,8 +318,9 @@ func (d *driver) authenticate(user, pass string) bool {
 		return user == AnonymousID || user == "ftp"
 	}
 
-	// Constant time, so a wrong password cannot be found one character at a
-	// time by measuring how long the answer takes.
+	// Constant time by contract. Go's == makes no such promise: it happens to
+	// compare 8 bytes at a time, so a short password gives an attacker nothing
+	// to time today, but that is an implementation detail and not a guarantee.
 	sameUser := subtle.ConstantTimeCompare([]byte(user), []byte(d.config.ID)) == 1
 	samePassword := subtle.ConstantTimeCompare([]byte(pass), []byte(d.config.Password)) == 1
 
@@ -321,7 +328,15 @@ func (d *driver) authenticate(user, pass string) bool {
 }
 ----
 
-`==` 대신 ``crypto/subtle``의 ``ConstantTimeCompare``를 쓴 이유는 비교에 걸리는 시간으로 비밀번호를 한 글자씩 알아내지 못하게 하기 위해서입니다.
+`==` 대신 ``crypto/subtle``의 ``ConstantTimeCompare``를 쓴 이유는 상수 시간 비교를 보장받기 위해서입니다.
+비교가 다른 바이트를 만나는 순간 멈추면 걸린 시간에 앞에서 몇 글자가 맞았는지가 드러난다는 것이 상수 시간 비교를 권하는 흔한 이유입니다.
+다만 Go의 ``==``가 실제로 그렇게 새지는 않습니다.
+16바이트 문자열을 Go 1.26.7에서 재 보면 불일치 위치가 0~7일 때 3.11ns, 8~15일 때 3.82ns로 두 값뿐이고 완전히 일치할 때는 그 사이인 3.48ns입니다.
+``runtime.memequal``이 바이트 단위가 아니라 8바이트씩 한 번에 비교하기 때문에 글자마다 시간이 늘어나는 구간이 없고, 오래 걸렸다고 더 많이 맞은 것도 아닙니다.
+원격에서 응답 시간을 측정할 수 있는 한계가 LAN에서 100ns 수준이라는 보고를 감안하면 이 정도 차이는 신호가 되지 못합니다.
+그래도 ``ConstantTimeCompare``를 쓰는 이유는 ``==``가 상수 시간을 약속하지 않는다는 데 있습니다.
+길이나 아키텍처, 런타임 구현이 바뀌면 위와 같이 다시 재야 하는데, 보장이 문서에 적힌 API를 쓰면 그럴 일이 없습니다.
+
 로그인을 거절할 때는 아이디가 틀렸는지 비밀번호가 틀렸는지 구분하지 않고 같은 오류를 돌려줍니다.
 
 === 홈 디렉터리 밖을 감추는 파일 시스템
@@ -386,6 +401,7 @@ FTPS 테스트도 같은 클라이언트를 ``tls.Dial``로 연결해서 씁니�
 * https://github.com/benelog/one-ftpserver[one-ftpserver 저장소]
 ** https://github.com/benelog/one-ftpserver/blob/main/CHANGELOG.md[CHANGELOG.md]
 ** https://github.com/benelog/one-ftpserver/blob/main/DEVELOPMENT.md[DEVELOPMENT.md]
+* https://www.cs.rice.edu/~dwallach/pub/crosby-timing2009.pdf[Opportunities and Limits of Remote Timing Attacks] (원격 타이밍 측정의 한계를 다룬 논문)
 * Go 라이브러리
 ** https://github.com/fclairamb/ftpserverlib[fclairamb/ftpserverlib]
 ** https://github.com/spf13/afero[spf13/afero]
@@ -395,6 +411,8 @@ FTPS 테스트도 같은 클라이언트를 ``tls.Dial``로 연결해서 씁니�
 * link:2864739.html[간단하게 서버에 파일을 올리기 + MockMultipartFile을 이용한 테스트]
 
 .주요 변경이력
+* 2026.09.05
+** ``ConstantTimeCompare``를 쓴 이유를 실측 결과로 다시 씀
 * 2026.08.16
 ** Go로 다시 만든 2.x 기준으로 새로 씀
 * 2012.05.17
