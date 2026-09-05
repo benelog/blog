@@ -4,7 +4,7 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: java, concurrency, static-analysis, archunit, spring
-:description: 스레드 안전성을 Javadoc에서 어떻게 표시하는 것이 좋을지와 애너테이션과 정적 분석 도구, 테스트로 멀티스레드에서 위험한 코드가 배포되지 않도록 방어하는 방법을 정리합니다.
+:description: 스레드 안전성을 Javadoc에서 어떻게 표시하는 것이 좋을지와 멀티스레드에서 위험한 코드가 배포되지 않도록 애너테이션과 정적 분석 도구, 테스트로 방어하는 방법을 정리합니다.
 :jbake-last_updated: 2026-09-05
 :jbake-og: {"image": "img/thread-safety-annotations/og-intellij-inspections.png"}
 :idprefix:
