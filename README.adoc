@@ -96,7 +96,7 @@ a|
 |https://blog.benelog.net/2999108.html[Java에서 여러줄에 걸친 문자열 선언을 편하게 하는 @Multiline]
 
 |https://github.com/benelog/one-ftpserver[one-ftpserver]
-|https://blog.benelog.net/2930401.html[초간단한 FTP server, One-FTPServer]
+|https://blog.benelog.net/one-ftpserver.html[설정 파일이 없는 FTP 서버, one-ftpserver]
 
 |https://github.com/benelog/egloos-migration[egloos-migration]
 |https://blog.benelog.net/migration-to-static-site.html[정적 사이트로 블로그 마이그레이션]
@@ -113,7 +113,7 @@ a|https://github.com/benelog/uploader[uploader]
 a|
 * https://blog.benelog.net/2864739.html[간단하게 서버에 파일을 올리기 + MockMultipartFile을 이용한 테스트]
 * https://blog.benelog.net/2875999.html[Winstone, 경량 Servlet container]
-* https://blog.benelog.net/2930401.html[초간단한 FTP server, One-FTPServer]
+* https://blog.benelog.net/one-ftpserver.html[설정 파일이 없는 FTP 서버, one-ftpserver]
 
 a|https://github.com/benelog/dumper[dumper]
 a|
