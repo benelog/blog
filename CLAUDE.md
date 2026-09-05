@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Korean-language static blog ("개발수양록") by 정상혁, built with JBake 2.7.0 and Gradle. Deployed via Netlify.
+Korean-language static blog ("개발수양록") by 정상혁, built with JBake 2.6.7 (via the `org.jbake.site` Gradle plugin 5.5.0). Deployed via Netlify.
 
 ## Build Commands
 

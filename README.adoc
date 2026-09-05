@@ -8,7 +8,7 @@ https://blog.benelog.net/
 
 == 사용 기술
 
-* http://jbake.org/[JBake] 2.6.7
+* http://jbake.org/[JBake] 2.6.7 (Gradle 플러그인 `org.jbake.site` 5.5.0)
 * Gradle
 
 == 환경 요구사항
@@ -75,6 +75,15 @@ a|
 
 |link:examples/benchmark-test/[benchmark-test]
 |https://blog.benelog.net/junit-benchmarks.html[junit-benchmarks로 HTTP API의 응답 시간 측정하기]
+
+|link:examples/thread-safety-static-analysis/[thread-safety-static-analysis]
+|https://blog.benelog.net/thread-safety-annotations.html[스레드 안전성의 문서화와 검증] ('정적 분석 도구의 지원' 절)
+
+|link:examples/thread-safety-archunit/[thread-safety-archunit]
+|https://blog.benelog.net/thread-safety-annotations.html[스레드 안전성의 문서화와 검증] ('ArchUnit으로 검증하는 컨트롤러 필드 규칙' 절)
+
+|link:examples/java-external-process/[java-external-process]
+|https://blog.benelog.net/java-external-process.html[Java에서 외부 프로세스를 실행할 때: JDK 25와 Linux 6.x 기준]
 |===
 
 === 별도 저장소로 유지하는 예제
