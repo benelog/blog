@@ -10,7 +10,8 @@
 :source-repo: https://github.com/benelog/blog/tree/master/examples/btrace-scripts
 :source-link-base: {source-repo}
 
-예전에 쓰던 BTrace 스크립트를 모아둔 저장소를 이 블로그 저장소의 {source-repo}[examples/btrace-scripts]로 옮겼습니다. 저장소에 README가 없어서 어떤 스크립트인지 이 글로 설명을 남깁니다. 이 스크립트는 실행 중인 애플리케이션에 붙어서 MySQL JDBC 드라이버(Connector/J) 내부 메서드의 호출 횟수와 평균 실행 시간을 집계합니다.
+BTrace로 실행 중인 애플리케이션의 MySQL JDBC 드라이버(Connector/J) 내부 메서드의 호출 횟수와 평균 실행 시간을 집계할 수 있습니다.
+이를 수행하는 스크립트는 {source-repo}[examples/btrace-scripts]에 있습니다.
 
 == BTrace 소개
 
@@ -103,7 +104,7 @@ btrace <pid> ConnectionMonitor.java
 
 link:{source-link-base}/pom.xml[pom.xml]에 선언한 `btrace-client` 의존성은 빌드용이 아니라 IDE에서 BTrace API의 자동완성과 컴파일 검증을 받기 위한 것입니다. 실제 실행은 위처럼 BTrace 클라이언트가 스크립트 파일을 직접 받아서 처리합니다.
 
-== 지금 다시 쓴다면 (JDK 25 기준)
+== JDK 25 기준의 선택
 
 이 스크립트는 BTrace 1.2와 Connector/J 5.1, JDK 6~8 시절에 작성했습니다. 최신 LTS인 JDK 25 기준으로는 상황이 꽤 다릅니다.
 
