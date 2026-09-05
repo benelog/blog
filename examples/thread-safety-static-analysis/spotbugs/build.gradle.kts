@@ -20,6 +20,10 @@ java {
 spotbugs {
 	toolVersion.set("4.10.4")
 	ignoreFailures.set(true)
+	if (project.hasProperty("reportLow")) {
+		// 낮은 우선순위 경고까지 보고한다. 기본값은 medium 이상만 보고한다.
+		reportLevel.set(com.github.spotbugs.snom.Confidence.LOW)
+	}
 }
 
 tasks.spotbugsMain {

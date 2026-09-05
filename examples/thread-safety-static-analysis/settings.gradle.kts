@@ -1,3 +1,3 @@
 rootProject.name = "thread-safety-static-analysis"
 
-include("spotbugs", "errorprone")
+include("spotbugs", "errorprone", "threadsafe-check")

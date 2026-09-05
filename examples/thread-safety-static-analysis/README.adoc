@@ -12,8 +12,9 @@ Error Prone 예제는 의도적으로 컴파일이 실패하므로 SpotBugs 예�
 == spotbugs 서브프로젝트
 
 * link:spotbugs/src/main/java/net/benelog/Memo.java[Memo.java] : `@Immutable` 인데 final이 아닌 필드가 있어서 `JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS` 로 보고되는 클래스
-* link:spotbugs/src/main/java/net/benelog/Counter.java[Counter.java] : `@GuardedBy("this")` 필드를 lock 없이 수정하지만 SpotBugs가 보고하지 않는 클래스
-* link:spotbugs/build.gradle.kts[build.gradle.kts] : SpotBugs 플러그인 설정. 텍스트 보고서를 콘솔에도 출력
+* link:spotbugs/src/main/java/net/benelog/Counter.java[Counter.java] : `@GuardedBy("this")` 필드를 lock 없이 수정하지만 lock을 잡은 접근이 33%라서 기본 보고 수준에서는 보고되지 않는 클래스
+* link:spotbugs/src/main/java/net/benelog/LockedCounter.java[LockedCounter.java] : 같은 위반에 synchronized 메서드를 더해 lock을 잡은 접근이 60%가 되어 `IS_FIELD_NOT_GUARDED` 로 보고되는 클래스
+* link:spotbugs/build.gradle.kts[build.gradle.kts] : SpotBugs 플러그인 설정. 텍스트 보고서를 콘솔에도 출력. `-PreportLow` 를 주면 낮은 우선순위까지 보고
 
 [source,bash]
 ----
@@ -22,17 +23,33 @@ Error Prone 예제는 의도적으로 컴파일이 실패하므로 SpotBugs 예�
 
 [source]
 ----
+H M IS: LockedCounter.count not guarded against concurrent access; locked 60% of time  Unsynchronized access at LockedCounter.java:[line 16]
+M B JCIP: Memo.content should be final since net.benelog.Memo is marked as Immutable.  In Memo.java
+----
+
+[source,bash]
+----
+./gradlew :spotbugs:spotbugsMain -PreportLow
+----
+
+[source]
+----
+L M IS: Counter.count not guarded against concurrent access; locked 33% of time  Unsynchronized access at Counter.java:[line 16]
+H M IS: LockedCounter.count not guarded against concurrent access; locked 60% of time  Unsynchronized access at LockedCounter.java:[line 16]
 M B JCIP: Memo.content should be final since net.benelog.Memo is marked as Immutable.  In Memo.java
 ----
 
 == errorprone 서브프로젝트
 
-같은 코드를 애너테이션 패키지만 바꿔 세 벌 두었습니다.
+`@GuardedBy` 예제는 같은 코드를 애너테이션 패키지만 바꿔 세 벌, `@Immutable` 예제는 두 벌 두었습니다.
 
-* link:errorprone/src/main/java/net/benelog/JcipCounter.java[JcipCounter.java] : `net.jcip.annotations` (원본 JCIP). Error Prone이 인식하지 않아 오류 없이 컴파일됨
-* link:errorprone/src/main/java/net/benelog/JsrCounter.java[JsrCounter.java] : `javax.annotation.concurrent` (JSR-305). 컴파일 오류
-* link:errorprone/src/main/java/net/benelog/ErrorProneCounter.java[ErrorProneCounter.java] : `com.google.errorprone.annotations` (Error Prone 자체). 컴파일 오류
-* link:errorprone/build.gradle.kts[build.gradle.kts] : Error Prone 플러그인 설정
+* link:errorprone/src/main/java/net/benelog/JcipCounter.java[JcipCounter.java] : `net.jcip.annotations` (원본 JCIP)의 `@GuardedBy`. Error Prone이 인식하지 않아 오류 없이 컴파일됨
+* link:errorprone/src/main/java/net/benelog/JsrCounter.java[JsrCounter.java] : `javax.annotation.concurrent` (JSR-305)의 `@GuardedBy`. 컴파일 오류
+* link:errorprone/src/main/java/net/benelog/ErrorProneCounter.java[ErrorProneCounter.java] : `com.google.errorprone.annotations` (Error Prone 자체)의 `@GuardedBy`. 컴파일 오류
+* link:errorprone/src/main/java/net/benelog/JsrMemo.java[JsrMemo.java] : JSR-305의 `@Immutable`. Error Prone이 인식하지 않아 오류 없이 컴파일됨
+* link:errorprone/src/main/java/net/benelog/ErrorProneMemo.java[ErrorProneMemo.java] : Error Prone 자체의 `@Immutable`. final이 아닌 필드와 가변 타입 필드가 컴파일 오류
+* link:errorprone/src/main/java/net/benelog/ErrorProneRegistry.java[ErrorProneRegistry.java] : Error Prone 자체의 `@ThreadSafe`. 기본 설정에서는 검사하지 않아 오류 없이 컴파일됨
+* link:errorprone/build.gradle.kts[build.gradle.kts] : Error Prone 플러그인 설정. `-PthreadSafeCheck` 를 주면 threadsafe-check 서브프로젝트를 플러그인 검사로 등록
 
 [source,bash]
 ----
@@ -49,4 +66,39 @@ ErrorProneCounter.java:15: error: [GuardedBy] This access should be guarded by '
 		count++;
 		^
     (see https://errorprone.info/bugpattern/GuardedBy)
+ErrorProneMemo.java:13: error: [Immutable] type annotated with @Immutable could not be proven immutable: 'ErrorProneMemo' has non-final field 'content'
+	private String content;
+	               ^
+    (see https://errorprone.info/bugpattern/Immutable)
+  Did you mean 'private final String content;'?
+ErrorProneMemo.java:14: error: [Immutable] type annotated with @Immutable could not be proven immutable: 'ErrorProneMemo' has field 'tags' of type 'java.util.List<java.lang.String>', 'List' is mutable
+	private final List<String> tags;
+	                           ^
+    (see https://errorprone.info/bugpattern/Immutable)
+----
+
+== threadsafe-check 서브프로젝트
+
+Error Prone 2.50.0에는 `ThreadSafeChecker` 클래스가 들어 있지만 내장 검사 목록(`BuiltInCheckerSuppliers`)에 등록되어 있지 않아서 `-Xep:ThreadSafe` 로 켤 수 없습니다.
+이 서브프로젝트는 그 검사기를 상속한 link:threadsafe-check/src/main/java/com/google/errorprone/bugpatterns/threadsafety/ThreadSafeCheck.java[ThreadSafeCheck]를 `META-INF/services` 로 등록해 플러그인 검사로 불러오는 실험용 코드입니다.
+패키지 전용 생성자와 ServiceLoader의 기본 생성자 요구 등 2.50.0 내부 구조에 기대고 있으므로 실제 프로젝트에 쓰라는 코드는 아닙니다.
+
+[source,bash]
+----
+./gradlew :errorprone:compileJava -PthreadSafeCheck
+----
+
+위 오류에 더해 다음이 보고됩니다.
+
+[source]
+----
+ErrorProneRegistry.java:16: error: [ThreadSafe] @ThreadSafe class fields should be final or annotated with @GuardedBy. See https://errorprone.info/bugpattern/ThreadSafe for details.
+	private int count;
+	            ^
+    (see https://errorprone.info/bugpattern/ThreadSafe)
+  Did you mean 'private final int count;'?
+ErrorProneRegistry.java:17: error: [ThreadSafe] @ThreadSafe class has non-thread-safe field, 'Map' is not thread-safe
+	private final Map<String, String> entries = new HashMap<>();
+	                                  ^
+    (see https://errorprone.info/bugpattern/ThreadSafe)
 ----

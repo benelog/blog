@@ -22,7 +22,7 @@ class ThreadSafetyArchTest {
 	static final ArchRule controllers_should_not_hold_not_thread_safe_types =
 			fields().that().areDeclaredInClassesThat().areAnnotatedWith(RestController.class)
 					.should().notHaveRawType(annotatedWith(NotThreadSafe.class))
-					.because("controller는 singleton이라 모든 요청 스레드가 필드를 공유한다");
+					.because("controller는 기본 scope가 singleton이라 모든 요청 스레드가 필드를 공유한다");
 
 	private static final DescribedPredicate<JavaClass> KNOWN_NOT_THREAD_SAFE_JDK_TYPES =
 			assignableTo(Format.class)
