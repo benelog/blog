@@ -4,6 +4,7 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: java, jdk, linux
+:jbake-last_updated: 2026-09-12
 :description: JDK 25와 Linux 6.x에서 외부 프로세스를 실행할 때 필요한 출력 처리, 시간제한, 종료 정책을 예제로 정리합니다. zt-exec과 Apache Commons Exec의 API와 기본값을 비교하고, 기본 실행 방식인 posix_spawn의 동작, 큰 힙에서의 실행 지연과 실행 방식 설정의 변경 이력을 다룹니다.
 :idprefix:
 :toc:
@@ -303,7 +304,7 @@ stdin 닫음: finished within 1s=true, exit=0
 입력 후 닫음: echoed=hello, exit=0
 ----
 
-첫 번째 `cat` 은 ``destroy()``로 끝냈습니다. 정리하지 않으면 남은 예제가 실행되는 동안 계속 살아 있습니다. 다만 부모 JVM이 끝나면 파이프의 쓰기 끝도 함께 닫히므로 그 시점에는 `cat` 도 EOF를 받고 종료합니다. 마지막 예제에 쓴 ``outputWriter()``는 ``inputReader()``와 함께 JDK 17에 추가된 메서드로, ``getOutputStream()``을 ``OutputStreamWriter``로 감싸는 코드를 대신합니다. Javadoc은 두 방식을 함께 쓸 때 ``OutputStream``에 쓰기 전에 ``BufferedWriter.flush()``를 부르라고 안내합니다.
+첫 번째 ``cat``은 ``destroy()``로 끝냈습니다. 정리하지 않으면 남은 예제가 실행되는 동안 계속 살아 있습니다. 다만 부모 JVM이 끝나면 파이프의 쓰기 끝도 함께 닫히므로 그 시점에는 ``cat``도 EOF를 받고 종료합니다. 마지막 예제에 쓴 ``outputWriter()``는 ``inputReader()``와 함께 JDK 17에 추가된 메서드로, ``getOutputStream()``을 ``OutputStreamWriter``로 감싸는 코드를 대신합니다. Javadoc은 두 방식을 함께 쓸 때 ``OutputStream``에 쓰기 전에 ``BufferedWriter.flush()``를 부르라고 안내합니다.
 
 === 시간제한과 종료 정책
 
