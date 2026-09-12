@@ -88,7 +88,7 @@ AsciiDoc으로 작성된 포스트의 원본은 https://github.com/benelog/blog/
 그래서 이 블로그는 https://benelog.github.io/blog 로도 접근이 가능합니다.
 
 빌드 스크립트는 https://github.com/benelog/blog/blob/main/build.gradle[build.gradle]에서 확인이 가능합니다.
-Travis CI 설정인 https://github.com/benelog/blog/blob/main/.travis.yml[.travis.yml]은 아래와 같이 단순합니다.
+Travis CI 설정인 ``.travis.yml``은 아래와 같이 단순합니다.
 
 [source,yml]
 ----
