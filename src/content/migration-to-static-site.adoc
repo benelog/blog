@@ -82,13 +82,13 @@ Egloos는 무난한 블로깅 플랫폼입니다. 그러나 개발과 관련된 
 
 === Git 저장소, 빌드/배포
 Git 저장소는 많이 쓰이는 GitHub를 무난하게 선택했습니다.
-AsciiDoc으로 작성된 포스트의 원본은 https://github.com/benelog/blog/tree/master/src/content[github/benelog/blog/src/content] 에서 이력을 관리합니다.
+AsciiDoc으로 작성된 포스트의 원본은 https://github.com/benelog/blog/tree/main/src/content[github/benelog/blog/src/content] 에서 이력을 관리합니다.
 
 처음에는 https://travis-ci.org/[Travis CI]와 Githb Page를 활용해서  빌드/배포를 구성하고 커스텀 도메인과 HTTPS를 적용하려고 했었습니다.
 그래서 이 블로그는 https://benelog.github.io/blog 로도 접근이 가능합니다.
 
-빌드 스크립트는 https://github.com/benelog/blog/blob/master/build.gradle[build.gradle]에서 확인이 가능합니다.
-Travis CI 설정인 https://github.com/benelog/blog/blob/master/.travis.yml[.travis.yml]은 아래와 같이 단순합니다.
+빌드 스크립트는 https://github.com/benelog/blog/blob/main/build.gradle[build.gradle]에서 확인이 가능합니다.
+Travis CI 설정인 https://github.com/benelog/blog/blob/main/.travis.yml[.travis.yml]은 아래와 같이 단순합니다.
 
 [source,yml]
 ----

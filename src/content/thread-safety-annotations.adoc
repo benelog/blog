@@ -9,7 +9,7 @@
 :jbake-og: {"image": "img/thread-safety-annotations/og-intellij-inspections.png"}
 :idprefix:
 :toc:
-:examples-repo: https://github.com/benelog/blog/tree/master/examples
+:examples-repo: https://github.com/benelog/blog/tree/main/examples
 :source-repo: {examples-repo}/thread-safety-archunit
 :source-link-base: {source-repo}
 :static-analysis-repo: {examples-repo}/thread-safety-static-analysis

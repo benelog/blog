@@ -9,7 +9,7 @@
 :idprefix:
 :toc:
 :sectnums:
-:source-repo: https://github.com/benelog/blog/tree/master/examples/jackson-experiment
+:source-repo: https://github.com/benelog/blog/tree/main/examples/jackson-experiment
 :source-link-base: {source-repo}
 
 * 변경이력

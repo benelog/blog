@@ -89,7 +89,7 @@ for (int i = 0; i < 10; i++) {
 str2 = sb.toString();
 ----
 
-두 방식의 차이를 JDK 25(Temurin 25+36)에서 간단히 측정해 보았습니다. 4글자 문자열을 n회 누적하는 코드를 JIT 워밍업 후 여러 번 실행해서 가장 짧은 시간을 기록한 결과입니다. 측정에 쓴 코드는 link:https://github.com/benelog/blog/tree/master/examples/string-concat[examples/string-concat]에 있습니다. footnote:[JMH를 쓰지 않은 `System.nanoTime()` 기반의 단순 측정이라 미세한 수치는 부정확할 수 있지만, 수백 배 이상의 차이라 결론에는 영향이 없습니다.]
+두 방식의 차이를 JDK 25(Temurin 25+36)에서 간단히 측정해 보았습니다. 4글자 문자열을 n회 누적하는 코드를 JIT 워밍업 후 여러 번 실행해서 가장 짧은 시간을 기록한 결과입니다. 측정에 쓴 코드는 link:https://github.com/benelog/blog/tree/main/examples/string-concat[examples/string-concat]에 있습니다. footnote:[JMH를 쓰지 않은 `System.nanoTime()` 기반의 단순 측정이라 미세한 수치는 부정확할 수 있지만, 수백 배 이상의 차이라 결론에는 영향이 없습니다.]
 
 [cols="1,1,1,1", options="header"]
 |===

@@ -7,7 +7,7 @@
 :description: 실행 중인 JVM에 붙어서 MySQL Connector/J 내부 메서드의 호출 횟수와 평균 실행 시간을 집계하는 BTrace 스크립트 예제를 설명합니다.
 :idprefix:
 :toc:
-:source-repo: https://github.com/benelog/blog/tree/master/examples/btrace-scripts
+:source-repo: https://github.com/benelog/blog/tree/main/examples/btrace-scripts
 :source-link-base: {source-repo}
 
 BTrace로 실행 중인 애플리케이션의 MySQL JDBC 드라이버(Connector/J) 내부 메서드의 호출 횟수와 평균 실행 시간을 집계할 수 있습니다.

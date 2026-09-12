@@ -8,7 +8,7 @@
 :jbake-last_updated: 2026-08-29
 :idprefix:
 :toc:
-:source-repo: https://github.com/benelog/blog/tree/master/examples/benchmark-test
+:source-repo: https://github.com/benelog/blog/tree/main/examples/benchmark-test
 :source-link-base: {source-repo}
 
 예전 예제 저장소들을 정리하면서 `benelog/benchmark` 저장소를 이 블로그 저장소의 {source-repo}[examples/benchmark-test]로 옮겼습니다. 원래 저장소에 README가 없어서 어떤 코드인지 이 글로 설명을 남깁니다. 이 예제는 JUnit 4 확장 라이브러리인 junit-benchmarks로 HTTP API에 동시 요청을 보내 응답 시간을 측정합니다. 2012년경 사내 API 서버가 동시 요청을 받았을 때의 응답 시간을 확인하려고 작성했습니다.

@@ -8,7 +8,7 @@
 :idprefix:
 :toc:
 :jbake-last_updated: 2026-08-15
-:source-repo: https://github.com/benelog/blog/tree/master/examples/tomcat-bed
+:source-repo: https://github.com/benelog/blog/tree/main/examples/tomcat-bed
 :source-link-base: {source-repo}/tomcat-bed-test
 
 [NOTE]

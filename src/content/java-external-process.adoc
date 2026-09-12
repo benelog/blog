@@ -8,7 +8,7 @@
 :idprefix:
 :toc:
 :toclevels: 3
-:examples-repo: https://github.com/benelog/blog/tree/master/examples
+:examples-repo: https://github.com/benelog/blog/tree/main/examples
 :source-repo: {examples-repo}/java-external-process
 
 이 글은 JDK 25와 Linux 6.x를 기준으로 Java에서 외부 프로세스를 실행하는 코드를 작성할 때 주의해야 할 요소와 활용할 수 있는 라이브러리를 소개합니다.
