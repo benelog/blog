@@ -5,6 +5,9 @@
 | 파일 | 내용 |
 |---|---|
 | `DeadlockDemo.java` | 파이프 출력을 읽지 않고 `waitFor()`만 부르면 하위 프로세스가 멈추는 현상 재현 |
+| `SequentialReadDemo.java` | 표준 출력을 다 읽은 뒤에 표준 오류를 읽는 순차 처리가 교착에 빠지는 현상 재현 (끝나지 않으므로 Ctrl+C로 중단) |
+| `MergedReadDemo.java` | `redirectErrorStream(true)`로 두 출력을 합쳐 파이프 하나로 읽는 예 |
+| `RedirectDemo.java` | `Redirect.INHERIT`, `inheritIO()`, `Redirect.DISCARD`, `Redirect.to(File)`로 읽지 않을 출력을 내보내는 예 |
 | `PlainJdkRunner.java` | JDK API만으로 표준 출력과 표준 오류를 동시에 읽고 시간제한과 강제 종료까지 처리하는 예 |
 | `ZtExecRunner.java` | zt-exec 1.13.0으로 출력 수집, 시간제한, 종료 코드 검사를 처리하는 예 |
 | `CommonsExecRunner.java` | Apache Commons Exec 1.6.0의 builder API로 같은 일을 처리하는 예 |
@@ -15,8 +18,15 @@
 
 ```bash
 java DeadlockDemo.java
+java MergedReadDemo.java
 java PlainJdkRunner.java
 java ProcessRunner.java
+
+# 교착에 빠져 끝나지 않는 예제. Ctrl+C로 중단
+java SequentialReadDemo.java
+
+# 표준 출력으로 200,000줄을 내보내므로 파일로 받는다
+java RedirectDemo.java > redirect-demo.log
 
 # zt-exec 예제는 zt-exec와 slf4j-api jar가 필요
 curl -sLO https://repo1.maven.org/maven2/org/zeroturnaround/zt-exec/1.13.0/zt-exec-1.13.0.jar

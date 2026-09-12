@@ -7,6 +7,7 @@ public class DeadlockDemo {
         boolean finished = process.waitFor(3, TimeUnit.SECONDS);
         System.out.println("finished within 3s: " + finished + ", alive: " + process.isAlive());
         long lines = process.inputReader().lines().count();
-        System.out.println("read " + lines + " lines, exit=" + process.waitFor());
+        int exitCode = process.waitFor();
+        System.out.println("read " + lines + " lines, exit=" + exitCode + ", alive: " + process.isAlive());
     }
 }
