@@ -80,8 +80,6 @@ Runtime.getRuntime().exec(new String[]{"cat", "my file.txt"});
 new ProcessBuilder("cat", "my file.txt").start();
 ----
 
-배열을 받는 ``Runtime.exec(String[])`` 계열은 deprecated가 아닙니다. 기존 코드가 인자 배열을 올바르게 전달하고 출력을 처리한다면, 프로세스 생성 구현 때문에 바꿀 필요는 없습니다. 대신 새 코드에서는 실행 설정을 명시하기 편한 ``ProcessBuilder``를 쓰면 됩니다.
-
 === ``ProcessBuilder`` 기본 옵션의 한계
 
 Java에서는 다음과 같이 ``ProcessBuilder`` 클래스를 호출하는 단순한 몇 줄의 코드로 외부 프로세스를 실행할 수 있습니다.
@@ -109,19 +107,21 @@ System.out.println("exit=" + exitCode);
 * 해당 스트림을 읽을 필요가 없다면 파일이나 부모의 출력, 폐기 대상으로 리다이렉트해야 합니다.
 
 앞에서 나온 '기본 옵션으로 `ProcessBuilder` 호출' 코드는 위와 같은 고려가 되어 있지 않습니다.
-그래서 출력이 많아 파이프 버퍼가 차면 하위 프로세스는 쓰기를 마치지 못하고, 부모는 ``waitFor()``에서 하위 프로세스가 끝나기만 기다리게 됩니다.
-시간제한도 없으므로 외부 명령이 네트워크나 잠금을 기다리며 멈추면 호출한 스레드도 계속 대기합니다.
-
 이어지는 단락에서 이 문제를 더 자세히 분석하고 해결하는 방법을 설명합니다.
 
 ==== 읽지 않은 파이프 버퍼가 부르는 교착
 
-하위 프로세스의 표준 출력과 표준 오류는 기본 설정에서 각각 별도의 파이프로 부모 프로세스에 전달됩니다. 부모가 파이프를 읽지 않으면 파이프 버퍼가 차고, 버퍼가 찬 뒤로는 하위 프로세스의 `write()` 호출이 멈춥니다.
+하위 프로세스의 표준 출력과 표준 오류는 기본 설정에서 각각 별도의 파이프로 부모 프로세스에 전달됩니다. 부모가 파이프를 읽지 않으면 파이프 버퍼가 차고, 하위 프로세스는 쓰기를 마치지 못합니다.
 
 **``waitFor()``를 호출하지 않아도 이 문제는 생깁니다.** 부모는 다음 코드를 실행할 수 있지만, 하위 프로세스는 버퍼에 빈자리가 생기기를 기다리느라 작업을 마치지 못할 수 있습니다. 여기에 부모가 ``waitFor()``로 하위 프로세스의 종료만 기다리면 서로를 기다리는 교착이 됩니다. 따라서 ``waitFor()``를 빼는 것으로 해결할 수 없고, 출력 파이프를 읽거나 리다이렉트해야 합니다. JDK 25의 `Process` Javadoc은 이 멈춤과 교착 가능성을 경고합니다.
 
 ____
 Because some native platforms only provide limited buffer size for standard input and output streams, failure to promptly write the input stream or read the output stream of the process may cause the process to block, or even deadlock.
+____
+
+.번역
+____
+일부 네이티브 플랫폼은 표준 입력과 표준 출력 스트림에 제한된 크기의 버퍼만 제공하므로, 프로세스의 입력 스트림에 즉시 쓰지 않거나 출력 스트림을 즉시 읽지 않으면 프로세스가 멈추거나 교착에 빠질 수 있습니다.
 ____
 
 "limited buffer size"가 Linux에서는 얼마인지 https://man7.org/linux/man-pages/man7/pipe.7.html[pipe(7)] 매뉴얼에 나옵니다. 커널 2.6.11부터 기본 파이프 용량은 16페이지, 즉 4KiB 페이지 기준 64KiB입니다. 다만 사용자별 파이프 메모리 한도나 시스템 설정에 따라 더 작아질 수 있고, ``F_SETPIPE_SZ``로 바꿀 수도 있으므로 64KiB를 고정 한계로 가정하면 안 됩니다.
@@ -147,7 +147,7 @@ finished within 3s: false, alive: true
 read 100000 lines, exit=0, alive: false
 ----
 
-예제의 부모 프로세스가 3초 동안 대기를 마친 후에도 자식 프로세스는 살아있습니다. 파이프를 끝까지 읽은 뒤에 다시 호출한 ``isAlive()``는 ``false``를 돌려줍니다. 하위 프로세스가 출력을 마칠 수 있게 한 것은 그 사이에 파이프를 읽은 동작입니다. 제한 시간이 없었다면 부모도 ``waitFor()``에서 계속 기다렸을 것입니다. 실제 실행 코드에서는 하위 프로세스가 출력하는 동안 파이프를 비우거나, 처음부터 출력을 리다이렉트해야 합니다.
+예제의 부모 프로세스가 3초 동안 대기를 마친 후에도 자식 프로세스는 살아있습니다. 파이프를 끝까지 읽은 뒤에 다시 호출한 ``isAlive()``는 ``false``를 돌려줍니다. 하위 프로세스가 출력을 마칠 수 있게 한 것은 그 사이에 파이프를 읽은 동작입니다. 제한 시간이 없었다면 부모도 ``waitFor()``에서 계속 기다렸을 것입니다.
 
 예제에 쓴 `inputReader()` 메서드는 JDK 17에 추가됐습니다. 그 전에는 ``getInputStream()``을 ``InputStreamReader``와 ``BufferedReader``로 감싸야 했습니다.
 
@@ -262,6 +262,48 @@ Java 코드가 비워야 할 파이프가 없기 때문입니다.
 앞의 Javadoc 인용문이 출력과 함께 경고한 표준 입력(stdin)도 기본값은 파이프입니다. 부모 JVM이 이 파이프의 쓰기 끝을 열어 둔 채로 있으면 하위 프로세스는 EOF를 받지 못합니다. 인자 없이 실행한 ``cat``처럼 표준 입력을 끝까지 읽는 명령은 더 올 입력이 없는데도 계속 기다리고, 부모는 ``waitFor()``에서 그 명령이 끝나기를 기다립니다. 출력 파이프를 모두 비워도 이 대기는 풀리지 않습니다.
 
 입력을 보낼 일이 없으면 ``start()`` 직후에 ``process.getOutputStream().close()``로 쓰기 끝을 닫거나, ``redirectInput(new File("/dev/null"))``처럼 빈 입력을 지정합니다. 입력을 보내야 한다면 다 쓴 뒤에 스트림을 닫아야 합니다. 뒤에서 살펴볼 zt-exec과 Apache Commons Exec은 입력을 지정하지 않으면 하위 프로세스의 표준 입력을 바로 닫습니다.
+
+아래 예제는 ``cat``을 네 번 실행하면서 표준 입력을 다루는 방식만 바꿉니다.
+
+[source,java]
+.StdinEofDemo.java
+----
+Process opened = new ProcessBuilder("cat").start();
+System.out.println("stdin 열어 둠: finished within 1s=" + opened.waitFor(1, TimeUnit.SECONDS)
+        + ", alive=" + opened.isAlive());
+opened.destroy();
+opened.waitFor();
+
+Process closed = new ProcessBuilder("cat").start();
+closed.getOutputStream().close();
+System.out.println("stdin 닫음: finished within 1s=" + closed.waitFor(1, TimeUnit.SECONDS)
+        + ", exit=" + closed.exitValue());
+
+Process devNull = new ProcessBuilder("cat")
+        .redirectInput(new File("/dev/null"))
+        .start();
+System.out.println("/dev/null 입력: finished within 1s=" + devNull.waitFor(1, TimeUnit.SECONDS)
+        + ", exit=" + devNull.exitValue());
+
+Process fed = new ProcessBuilder("cat").start();
+try (Writer writer = fed.outputWriter()) {
+    writer.write("hello\n");
+}
+String echoed = fed.inputReader().readLine();
+System.out.println("입력 후 닫음: echoed=" + echoed + ", exit=" + fed.waitFor());
+----
+
+실행 결과입니다. 쓰기 끝을 열어 둔 첫 번째만 1초 안에 끝나지 못했고, 나머지 셋은 EOF를 받아 바로 종료했습니다.
+
+[source,text]
+----
+stdin 열어 둠: finished within 1s=false, alive=true
+stdin 닫음: finished within 1s=true, exit=0
+/dev/null 입력: finished within 1s=true, exit=0
+입력 후 닫음: echoed=hello, exit=0
+----
+
+첫 번째 `cat` 은 ``destroy()``로 끝냈습니다. 정리하지 않으면 남은 예제가 실행되는 동안 계속 살아 있습니다. 다만 부모 JVM이 끝나면 파이프의 쓰기 끝도 함께 닫히므로 그 시점에는 `cat` 도 EOF를 받고 종료합니다. 마지막 예제에 쓴 ``outputWriter()``는 ``inputReader()``와 함께 JDK 17에 추가된 메서드로, ``getOutputStream()``을 ``OutputStreamWriter``로 감싸는 코드를 대신합니다. Javadoc은 두 방식을 함께 쓸 때 ``OutputStream``에 쓰기 전에 ``BufferedWriter.flush()``를 부르라고 안내합니다.
 
 === 시간제한과 종료 정책
 
