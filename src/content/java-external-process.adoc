@@ -304,7 +304,52 @@ stdin 닫음: finished within 1s=true, exit=0
 입력 후 닫음: echoed=hello, exit=0
 ----
 
-첫 번째 ``cat``은 ``destroy()``로 끝냈습니다. 정리하지 않으면 남은 예제가 실행되는 동안 계속 살아 있습니다. 다만 부모 JVM이 끝나면 파이프의 쓰기 끝도 함께 닫히므로 그 시점에는 ``cat``도 EOF를 받고 종료합니다. 마지막 예제에 쓴 ``outputWriter()``는 ``inputReader()``와 함께 JDK 17에 추가된 메서드로, ``getOutputStream()``을 ``OutputStreamWriter``로 감싸는 코드를 대신합니다. Javadoc은 두 방식을 함께 쓸 때 ``OutputStream``에 쓰기 전에 ``BufferedWriter.flush()``를 부르라고 안내합니다.
+첫 번째 ``cat``은 ``destroy()``로 끝냈습니다. 정리하지 않으면 남은 예제가 실행되는 동안 계속 살아 있습니다.
+다만 부모 JVM이 끝나면 파이프의 쓰기 끝도 함께 닫히므로 그 시점에는 ``cat``도 EOF를 받고 종료합니다.
+마지막 예제에 쓴 ``outputWriter()``는 ``inputReader()``와 함께 JDK 17에 추가된 메서드로, ``getOutputStream()``을 ``OutputStreamWriter``와 ``BufferedWriter``로 감싸는 코드를 대신합니다.
+인자 없이 부르면 `native.encoding` 시스템 속성의 문자 집합을 쓰고, `outputWriter(Charset)` 메서드로 직접 지정할 수도 있습니다.
+Javadoc은 이 ``BufferedWriter``와 ``getOutputStream()``에 번갈아 쓸 때 ``OutputStream``에 쓰기 전에 ``BufferedWriter.flush()``를 부르라고 안내합니다.
+``BufferedWriter``에 쓴 내용은 버퍼에 남아 있다가 ``flush()``나 ``close()`` 시점에 파이프로 나가는데, ``getOutputStream()``에 직접 쓴 바이트는 버퍼를 거치지 않고 바로 나가기 때문입니다.
+
+아래 예제는 ``cat``을 세 번 실행합니다. 첫 번째는 JDK 17 이전처럼 ``getOutputStream()``을 직접 감싸고, 두 번째와 세 번째는 ``outputWriter()``와 ``getOutputStream()``에 한 줄씩 번갈아 쓰되 ``flush()`` 호출 여부만 다릅니다.
+
+[source,java]
+.OutputWriterDemo.java
+----
+Process wrapped = new ProcessBuilder("cat").start();
+try (BufferedWriter writer = new BufferedWriter(
+        new OutputStreamWriter(wrapped.getOutputStream(), StandardCharsets.UTF_8))) {
+    writer.write("hello\n");
+}
+System.out.println("직접 감싼 Writer: echoed=" + wrapped.inputReader().readLine()
+        + ", exit=" + wrapped.waitFor());
+
+Process unflushed = new ProcessBuilder("cat").start();
+BufferedWriter writer = unflushed.outputWriter();
+writer.write("1 writer\n");
+unflushed.getOutputStream().write("2 stream\n".getBytes(StandardCharsets.UTF_8));
+writer.close();
+System.out.println("flush 없이 섞어 씀: echoed=" + unflushed.inputReader().lines().toList()
+        + ", exit=" + unflushed.waitFor());
+
+Process flushed = new ProcessBuilder("cat").start();
+writer = flushed.outputWriter();
+writer.write("1 writer\n");
+writer.flush();
+flushed.getOutputStream().write("2 stream\n".getBytes(StandardCharsets.UTF_8));
+writer.close();
+System.out.println("flush 후 섞어 씀: echoed=" + flushed.inputReader().lines().toList()
+        + ", exit=" + flushed.waitFor());
+----
+
+실행 결과입니다. ``flush()``를 빠뜨린 두 번째 실행에서는 ``getOutputStream()``에 나중에 쓴 `2 stream` 줄이 먼저 도착했습니다. ``BufferedWriter``에 먼저 쓴 `1 writer` 줄은 ``close()`` 시점에야 파이프로 나갔기 때문입니다.
+
+[source,text]
+----
+직접 감싼 Writer: echoed=hello, exit=0
+flush 없이 섞어 씀: echoed=[2 stream, 1 writer], exit=0
+flush 후 섞어 씀: echoed=[1 writer, 2 stream], exit=0
+----
 
 === 시간제한과 종료 정책
 
