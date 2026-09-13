@@ -1,7 +1,7 @@
 # java-external-process.adoc 사실 관계 검증
 
 - 최초 검증일: 2026-09-06 (Asia/Seoul)
-- 추가 검증일: 2026-09-13 (Asia/Seoul). 아래 1~6절은 최초 검증 당시의 기록이며, 현재 원고에 대한 재검증 결과와 패치 상태는 7절에 기록했다.
+- 추가 검증일: 2026-09-13 (Asia/Seoul). 아래 1~6절은 최초 검증 당시의 기록이며, 현재 원고에 대한 재검증 결과와 패치 상태는 7~9절에 기록했다.
 - 대상: [src/content/java-external-process.adoc](../../src/content/java-external-process.adoc)
 - 범위: 본문의 JDK API, 라이브러리 동작과 릴리스, Linux/glibc 구현, 예제 실행 결과, 벤치마크 해석, 운영상 결론.
 - 방법: 공식 API 문서, OpenJDK 이슈와 소스, Maven Central 배포물, 라이브러리 소스, Linux 소스를 대조하고 로컬에서 재현했다. 웹으로 읽히지 않은 OpenJDK 이슈는 공개 REST API `/rest/api/2/issue/JDK-번호`로 조회했다.
@@ -342,3 +342,109 @@ within1s=false, alive=true
 - `./gradlew bake`: **성공**. JRuby의 `--add-opens` 경고만 나왔다.
 - 생성된 `output/java-external-process.html`에서 환경 표와 수정한 세 문단을 찾아 백틱이 노출되지 않았음을 확인했다.
 - 새 실행 실험은 하지 않았다. glibc 소스 확인은 GitHub의 `glibc-2.39` 태그 파일 네 개를 내려받아 대조했다.
+
+## 9. 2026-09-13 후속 재검증
+
+검토 기준은 후속 패치와 zt-exec 이름 보완까지 반영한 `2adc01df09ec1579f63fb95fe1eda7b41e283f77`이다. 행 번호는 이 커밋 기준이다. 7절의 6건과 8절의 2건은 현재 본문에 반영되어 있음을 확인했다. **동작 조건 보완 2건, 표현 정밀화 1건**을 새로 확인했고, 핵심 결론을 바꿀 오류는 발견하지 못했다. 세 건은 패치 `java-external-process-2026-09-13-recheck.patch`로 작성한 뒤 같은 날 본문에 적용했다. 적용 결과는 이 절 끝에 있다.
+
+### 1. zt-exec 비동기 실행에는 timeout 설정이 적용되지 않음
+
+**위치: 422행의 시간제한 설명과 424행의 `start().getFuture()` 소개. 판정: 기능 조합의 조건 누락.**
+
+본문은 `timeout()`과 비동기 실행을 같은 장점 목록에서 소개하지만, 둘을 함께 쓰면 시간제한이 적용되지 않는다는 조건을 빠뜨렸다. 개별 설명은 맞지만, 동기 예제를 비동기로 바꾸는 독자가 설정이 유지된다고 오해할 수 있다.
+
+zt-exec 1.13.0의 `ProcessExecutor.start()` Javadoc은 `timeout(long, TimeUnit)`에 전달한 값을 무시한다고 명시한다. 구현도 `execute()`의 시간제한 대기 경로를 거치지 않고 작업을 제출한 뒤 Future를 반환한다.
+
+다음 설정으로 실제 실행했다.
+
+```java
+StartedProcess started = new ProcessExecutor().command("sleep", "30")
+        .timeout(100, TimeUnit.MILLISECONDS).start();
+boolean exited = started.getProcess().waitFor(600, TimeUnit.MILLISECONDS);
+```
+
+```text
+timeout=100ms, waited=600ms, exited=false, futureDone=false
+```
+
+비동기 실행에서는 `Future.get(timeout, unit)`으로 대기 시간을 제한하거나 별도 타이머를 두어야 한다. `get`의 시간 초과 자체는 프로세스를 종료하지 않으므로, 시간 초과 때 `future.cancel(true)`로 작업 스레드를 인터럽트해 stopper 실행을 유도하거나 보관한 Process에 종료 정책을 적용해야 한다. 기본 stopper의 SIGTERM 한계는 그대로 남는다.
+
+근거: [zt-exec 1.13.0 배포 소스](https://repo.maven.apache.org/maven2/org/zeroturnaround/zt-exec/1.13.0/zt-exec-1.13.0-sources.jar)의 `ProcessExecutor.start()`, `waitFor(WaitForProcess)`, `WaitForProcess.call()`. `start()`의 소스 행 번호는 967행, 시간제한 무시를 명시한 Javadoc은 960행이다.
+
+### 2. 프로세스 그룹 종료는 그 그룹에 남은 후손만 대상으로 함
+
+**위치: 388~390행, 결론의 후손 정리 문장. 판정: 적용 범위 보완.**
+
+`setsid`로 만든 그룹 전체에 시그널을 보내는 방법은 유효하다. 다만 프로세스 그룹은 후손 관계를 계속 추적하는 장치가 아니다. 후손이 `setsid()`로 새 세션을 만들거나 허용된 조건에서 `setpgid()`로 그룹을 바꾸면 원래 그룹에 보내는 시그널을 받지 않는다. 데몬화하는 프로그램도 이런 경로를 쓸 수 있다.
+
+새 세션의 직접 자식이 `sleep` 두 개를 실행하되 하나만 다시 새 세션으로 분리하는 실험을 했다. 원래 그룹에 SIGTERM을 보내자 같은 그룹의 sleep은 종료했고, 새 세션의 sleep은 살아 있었다.
+
+```text
+sameGroupExit=-15, escapedAlive=True
+```
+
+`-15`는 Python subprocess가 SIGTERM 종료를 나타내는 방식이다. 본문의 Java 종료 코드 143과 모순되지 않는다. 실험의 직접 자식은 결과 확인과 후손 회수를 위해 SIGTERM 핸들러를 두었다. 두 sleep은 기본 시그널 처리를 사용했다.
+
+cgroup도 대상 작업을 처음부터 해당 cgroup 안에서 시작하고 그 밖으로 이동할 권한과 종료 정책을 관리한다는 전제가 있다. cgroup v2의 `cgroup.kill`은 해당 cgroup과 하위 cgroup의 프로세스에 SIGKILL을 보내며 동시 fork와 종료 중 migration을 처리한다. `systemd-run`이나 컨테이너를 사용했다는 사실만으로 모든 종료 설정이 동일해지는 것은 아니다. 이번에는 systemd나 컨테이너 설정을 실행 검증하지 않았다.
+
+근거: [setsid(2)](https://man7.org/linux/man-pages/man2/setsid.2.html), [setpgid(2)](https://man7.org/linux/man-pages/man2/setpgid.2.html), [kill(2)](https://man7.org/linux/man-pages/man2/kill.2.html), [cgroup v2의 cgroup.kill](https://docs.kernel.org/admin-guide/cgroup-v2.html).
+
+### 3. zt-exec의 시간 초과 예외와 stopper는 서로 다른 스레드에서 처리됨
+
+**위치: 422행의 “종료를 요청하고 호출자에게 TimeoutException을 던집니다”. 판정: 표현 정밀화.**
+
+이 문장은 종료 요청을 먼저 마친 뒤 예외가 전달되는 순서로 읽힐 수 있다. 실제 1.13.0 구현에서 호출 스레드는 Future 대기의 시간 초과를 처리하고 `finally`의 `service.shutdownNow()`로 작업 스레드를 인터럽트한다. 작업 스레드는 `WaitForProcess.call()`의 `finally`에서 stopper를 호출한다. 호출 스레드는 stopper 완료를 기다리지 않는다.
+
+따라서 `TimeoutException`을 잡았다는 사실만으로 `destroy()` 호출이나 사용자 정의 stopper의 유예 대기·강제 종료가 완료됐다고 볼 수 없다. 이미 본문에 있는 “SIGTERM을 무시하면 살아 있을 수 있다”와는 별개로, 두 스레드의 실행 순서에 관한 문제다.
+
+사용자 정의 stopper가 latch를 기다린 뒤 `destroy()`를 호출하도록 하고, 호출 스레드가 예외를 잡은 뒤 latch를 풀도록 구성했다. 예외 처리에 도달했을 때 stopper가 아직 완료되지 않았고 자식도 살아 있음을 확인했다.
+
+```text
+timeoutCaught=true, stopperDone=false, childAlive=true
+```
+
+이 실험은 기본 stopper가 언제나 예외보다 늦게 실행된다는 뜻이 아니다. **호출자가 stopper 완료를 기다리는 보장이 없다는 반례**다.
+
+근거: [zt-exec 1.13.0 배포 소스](https://repo.maven.apache.org/maven2/org/zeroturnaround/zt-exec/1.13.0/zt-exec-1.13.0-sources.jar)의 `ProcessExecutor.waitFor()` 1098~1154행과 `WaitForProcess.call()` 94~126행.
+
+### 재확인한 결론과 논리 흐름
+
+본문의 흐름은 출력 교착 → stdin EOF → 시간제한과 종료 정책 → 라이브러리 → OS 생성 방식과 운영 순서로 연결되어 있다. 이전에 빠졌던 jspawnhelper 갱신 설명은 복원되어 FORK 임시 우회 권고의 이유가 드러난다. PlainJdkRunner의 한계도 예제 바로 뒤에 명시되어 있어, 범용 실행기의 완성 코드라고 오인할 위험은 이전보다 줄었다.
+
+| 항목 | 이번 확인 |
+|---|---|
+| 인코딩과 Process API | JDK 25 Process 문서·소스의 `native.encoding`, reader/writer의 JDK 17 도입, 강제 종료 뒤 대기 필요성을 확인했다. 본문의 인코딩 선택 조건과 일치한다. |
+| 라이브러리 기본값 | 이전에 내려받은 1.13.0/1.6.0 배포 소스의 실행·종료 경로를 대조했다. Commons Exec watchdog이 `destroy()`를 호출하고, SIGTERM 무시 시 대기를 끝내지 못한다는 설명은 유효하다. |
+| 릴리스와 이름 | Maven Central metadata를 새로 조회해 최신 버전 1.13.0/1.6.0을 확인했다. 공식 변경 기록의 날짜도 기존 표와 일치한다. 검토 중 추가된 ZT Process Executor 이름은 v1.13.0 README 제목과 대조했다. |
+| POSIX_SPAWN와 helper | JDK 25+36의 `ProcessImpl_md.c`를 새로 내려받아 두 번 exec하는 구조, 구버전 glibc 분기, 준비 작업을 첫 exec 뒤로 옮기는 이유를 확인했다. |
+| glibc clone3 대체 | glibc 2.39의 `spawni.c`를 새로 내려받았다. JDK처럼 별도 cgroup attribute 없이 호출하는 경우 ENOSYS/EINVAL 뒤 clone 대체 경로가 본문과 일치한다. |
+| JDK 27 VFORK 제거 | JBS REST 응답에서 Fixed·Fix Version 27·미출시·예정일 2026-09-15를 재확인했다. 실제 구현 커밋의 ProcessImpl에서도 VFORK 문자열의 FORK 치환을 확인했다. “개발 버전에 반영”이라는 표현은 검증일 기준 타당하다. |
+| FORK 비용과 벤치마크 해석 | 이전에 보관한 Linux 6.17 소스의 모드 0 판정과 `dup_mmap()` 잠금·페이지 테이블 복제를 대조했다. SpawnBench가 5회 예열 후 `start().waitFor()` 전체를 측정한다는 설명과 코드가 일치한다. 절대 수치와 배율은 관측값으로 한정되어 있다. |
+
+근거: [Process API](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Process.html), [Commons Exec 1.6.0 소스](https://repo.maven.apache.org/maven2/org/apache/commons/commons-exec/1.6.0/commons-exec-1.6.0-sources.jar), [zt-exec metadata](https://repo.maven.apache.org/maven2/org/zeroturnaround/zt-exec/maven-metadata.xml), [Commons Exec metadata](https://repo.maven.apache.org/maven2/org/apache/commons/commons-exec/maven-metadata.xml), [zt-exec 변경 기록](https://github.com/zeroturnaround/zt-exec/blob/main/CHANGELOG.md), [Commons Exec 변경 기록](https://commons.apache.org/proper/commons-exec/changes.html), [zt-exec README](https://github.com/zeroturnaround/zt-exec/blob/v1.13.0/README.md), [JDK 25 네이티브 구현](https://github.com/openjdk/jdk/blob/jdk-25%2B36/src/java.base/unix/native/libjava/ProcessImpl_md.c), [glibc 2.39 spawni.c](https://github.com/bminor/glibc/blob/glibc-2.39/sysdeps/unix/sysv/linux/spawni.c), [JDK-8357089](https://bugs.openjdk.org/browse/JDK-8357089), [VFORK 제거 구현](https://github.com/openjdk/jdk/blob/ca3fe721ba23a1304089b71c1b58940f16a0d053/src/java.base/unix/classes/java/lang/ProcessImpl.java), [Linux 6.17 mmap.c](https://github.com/torvalds/linux/blob/v6.17/mm/mmap.c), [Linux 6.17 util.c](https://github.com/torvalds/linux/blob/v6.17/mm/util.c).
+
+### 실행 범위와 한계
+
+새로 실행한 것은 위의 세 경계 조건 실험이다. Java 실험은 로컬 Temurin 25+36-LTS, zt-exec 1.13.0, SLF4J API 2.0.17로 실행했다. SLF4J provider가 없어 경고가 나왔지만 검증 결과에는 영향이 없었다. 실험에서 만든 프로세스는 종료 후 대기하여 정리했다.
+
+임시 재현 코드는 `/tmp/java-process-review-0913/`의 `ZtAsyncTimeoutProbe.java`, `ZtStopperOrderProbe.java`, `process_group_probe.py`에 있다. 이 경로는 영구 보존되는 저장소 산출물이 아니다.
+
+이전 검증의 본문 예제 전체, 큰 힙 벤치마크, strace, helper 교체 실험은 반복하지 않았다. 구버전 JDK·glibc 바이너리와 원래 서버의 장애도 재현하지 않았다.
+
+### 패치 적용 결과
+
+세 보완점과 결론의 후손 정리 문장을 반영한 패치는 본문 한 파일만 수정했다. 4개 hunk를 검토한 뒤 `git apply`로 적용했고, 패치 파일은 반영을 마친 뒤 작업 공간에서 삭제했다.
+
+| hunk | 판정 | 적용 내용 |
+|---|---|---|
+| 389행, 후손 정리 문단 | **채택** | `setsid` 그룹 시그널을 “후손이 같은 프로세스 그룹에 남는 명령”으로 한정하고, 후손이 `setsid()`나 `setpgid()`로 이동하면 시그널을 받지 않는다는 문장을 넣었다. cgroup 방식에는 대상 작업을 해당 cgroup 안에서 시작하고 이동 권한과 종료 정책을 함께 관리해야 한다는 전제를 덧붙였다. |
+| 422행, 시간제한 장점 | **채택** | 호출자가 `TimeoutException`을 받고 작업 스레드가 stopper로 종료를 시도한다는 두 스레드 구조로 고쳤다. 예외를 잡은 시점에 종료 처리 완료가 보장되지 않는다는 문장을 추가했고, “기본 stopper는 `destroy()`만 호출하므로”로 SIGTERM 한계의 이유를 드러냈다. |
+| 424행, 부수 기능 | **채택** | `start()`가 `timeout()` 설정을 무시하므로 `Future.get(timeout, unit)` 등으로 대기를 제한하고 시간 초과 때 취소·종료 처리를 따로 해야 하며, `get()`의 시간 초과만으로 프로세스가 종료되지는 않는다고 적었다. |
+| 826행, 결론 | **채택** | 후손 정리를 “같은 그룹에 남은 프로세스에 시그널을 보내는 방법이나 cgroup 단위의 종료”로 표현해 본문의 적용 범위와 맞췄다. |
+
+적용 후 검증 결과는 다음과 같다.
+
+- `git apply --check --whitespace=error-all`, `git apply`: 성공. 적용 대상은 본문 한 파일이다.
+- `./gradlew bake`: **성공**. JRuby의 `--add-opens` 경고만 나왔다.
+- 생성된 `output/java-external-process.html`에서 `setpgid()` 문장과 `start()`의 `timeout()` 무시 문장이 코드 마크업과 함께 렌더링된 것을 확인했다.
+- 이번 적용에서 새 실행 실험은 하지 않았다.
