@@ -674,9 +674,9 @@ JDK 25의 https://github.com/openjdk/jdk/blob/jdk-25%2B36/src/java.base/unix/cla
 |===
 
 ``VFORK``가 없어진 사정과 남은 설정의 정리는 이 장의 마지막 절에서 다룹니다.
-JDK 13부터 기본값인 ``POSIX_SPAWN``이 준비 작업을 별도 프로세스로 옮기는 구조는 다음 절에서 `jspawnhelper` 와 함께 살펴봅니다.
+JDK 13부터 기본값인 ``POSIX_SPAWN``이 준비 작업을 별도 프로세스로 옮기는 구조는 다음 절에서 살펴봅니다.
 
-=== POSIX_SPAWN과 jspawnhelper의 동작
+=== POSIX_SPAWN의 동작
 
 ``posix_spawn()``은 자식 생성과 ``execve()``, 그 사이의 준비 작업을 한 묶음으로 제공합니다.
 Windows의 ``CreateProcess()``와 유사합니다.
@@ -713,9 +713,9 @@ JDK 25 소스의 주석도 이 이유로 glibc 2.24 이상의 방식을 가장 �
 
 https://bugs.openjdk.org/browse/JDK-8357090[JDK-8357090의 CSR]은 ``posix_spawn()``의 예기치 않은 문제를 우회할 수 있도록 ``FORK``를 대안으로 둔다고 설명합니다.
 `jspawnhelper` 관련 오류가 반복되는데 원인을 바로 찾기 어렵다면 JVM 시작 옵션에 `-Djdk.lang.Process.launchMechanism=FORK` 를 주어 임시 회피할 수 있습니다.
-다음 두 절에서 살펴볼 overcommit 정책에 따른 메모리 부담과 실행 지연을 감수하는 선택이며, 실행 중인 JVM에 즉시 적용하는 설정은 아닙니다.
+다음 절에서 살펴볼 overcommit 정책에 따른 메모리 부담과 실행 지연을 감수하는 선택이며, 실행 중인 JVM에 즉시 적용하는 설정은 아닙니다.
 
-=== FORK의 메모리 비용과 overcommit
+=== FORK의 메모리 비용과 실행 지연
 
 ``FORK``를 선택하면 부모 JVM의 주소 공간 복제 비용을 고려해야 합니다.
 ``fork()``는 부모의 가상 주소 공간을 그대로 복제한 자식 프로세스를 만드는데, Linux는 쓰기 시 복사(copy-on-write)로 실제 페이지 복사는 미루지만 페이지 테이블은 복사합니다.
@@ -732,9 +732,8 @@ https://bugs.openjdk.org/browse/JDK-8357090[JDK-8357090의 CSR]은 ``posix_spawn
 
 그럼에도 ``FORK``가 항상 성공하는 것은 아닙니다. 모드 2에서는 Java 힙처럼 큰 익명 private writable 매핑이 비용에 포함되므로 남은 commit 한도를 넘으면 프로세스 생성이 실패하고, 모드 0에서도 페이지 테이블 등 커널 메모리의 실제 할당은 실패할 수 있습니다.
 
-=== 큰 힙에서 FORK와 POSIX_SPAWN의 실행 지연
-
-앞 절에서 살펴본 것처럼 overcommit 판정이 완화됐어도 ``fork()``가 페이지 테이블을 복사한다는 사실은 변하지 않았습니다.
+생성이 거절되지 않더라도 시간 비용은 남습니다.
+overcommit 판정이 완화됐어도 ``fork()``가 페이지 테이블을 복사한다는 사실은 변하지 않았습니다.
 실제로 접근한 힙 영역과 페이지 크기 등에 따라 복사 비용이 달라집니다.
 반면 ``POSIX_SPAWN``은 `CLONE_VM` 으로 주소 공간을 공유하므로 이 복사가 없습니다.
 힙을 미리 할당한 상태에서 `true` 명령을 30번 실행하는 데 걸린 시간을 실행 방식별로 재 봤습니다.
@@ -768,7 +767,7 @@ https://bugs.openjdk.org/browse/JDK-8357090[JDK-8357090의 CSR]은 ``posix_spawn
 요청 처리 중 외부 명령을 동기 실행하는 웹 애플리케이션이라면 이 비용이 응답 시간에 더해질 수 있습니다.
 ``jspawnhelper`` 문제를 임시로 피하는 경우가 아니라면, 지금은 이런 단점을 감수하면서 기본값을 ``FORK``로 바꿀 만한 이유가 없습니다.
 
-=== 남아 있는 VFORK 설정의 정리
+=== JVM 업그레이드 때 정리할 VFORK 설정
 
 JVM 버전을 25 이상으로 업그레이드할 때는 특히 java 실행 스크립트에 ``-Djdk.lang.Process.launchMechanism=VFORK``가 남아 있다면 제거하는 편이 좋습니다.
 이 설정이 남아 있을 만한 자리는 JVM 실행 스크립트와 Dockerfile의 ``JAVA_OPTS``, 애플리케이션 서버의 기동 옵션입니다.
@@ -783,7 +782,7 @@ JDK 13 당시에는 glibc 2.24 미만에서 ``posix_spawn()``이 내부적으로
 https://man7.org/linux/man-pages/man2/vfork.2.html[vfork(2)] 매뉴얼의 STANDARDS 항목은 "None"이고, HISTORY 항목은 3.0BSD에서 등장한 이 함수가 POSIX.1-2001에 OBSOLETE로 표시됐다가 POSIX.1-2008에서 명세가 삭제됐다고 적습니다.
 4.4BSD는 ``vfork()``를 아예 ``fork()``와 같은 것으로 만들었고, Linux도 2.2.0-pre6 무렵까지는 ``fork()``와 같게 동작하다가 2.2.0-pre9부터 독립된 시스템 콜이 됐습니다.
 그래도 없어진 쪽은 커널의 ``vfork()``가 아니라 JDK의 ``VFORK`` 모드입니다.
-표준에서 빠져서도 커널이 바뀌어서도 아니라, 앞 절에서 본 대로 JDK 자신이 ``vfork()``와 ``execve()`` 사이에서 하던 작업이 안전하지 않아서입니다.
+표준에서 빠져서도 커널이 바뀌어서도 아니라, 앞에서 본 대로 JDK 자신이 ``vfork()``와 ``execve()`` 사이에서 하던 작업이 안전하지 않아서입니다.
 
 JDK 25에서 이 옵션을 지정하면 아래 경고가 표준 오류에 출력됩니다.
 
