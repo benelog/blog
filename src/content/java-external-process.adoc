@@ -701,10 +701,10 @@ https://bugs.openjdk.org/browse/JDK-8357090[JDK-8357090의 CSR]은 ``posix_spawn
 
 커널은 이 판정이 지나치게 엄격해지지 않도록 몇 가지 장치를 두고 있고, 버전이 올라가면서 보강되기도 했습니다. 두 가지 예를 들면 다음과 같습니다.
 
-* 커널 5.2에 들어간 https://lkml.iu.edu/hypermail/linux/kernel/1904.1/05420.html[mm: fix false-positive OVERCOMMIT_GUESS failures] 패치는 모드 0의 판정을 "요청 크기가 전체 RAM과 스왑의 합을 넘는지"로 단순화했습니다. 여유 메모리가 적다는 이유만으로 큰 매핑의 복제를 거절하던 조건이 완화된 것입니다.
 * `vm.overcommit_memory=2` 로 commit 한도를 엄격히 적용한 서버에서도 ``fork()`` 시점의 commit 검사는 부모의 전체 주소 공간 크기를 무조건 더하지는 않습니다. private writable 매핑처럼 커널이 commit 총량에 넣어 세는 매핑의 크기만 비용으로 계산합니다.
+* 커널 5.2에 들어간 https://lkml.iu.edu/hypermail/linux/kernel/1904.1/05420.html[mm: fix false-positive OVERCOMMIT_GUESS failures] 패치는 모드 0의 판정을 "요청 크기가 전체 RAM과 스왑의 합을 넘는지"로 단순화했습니다. 여유 메모리가 적다는 이유만으로 큰 매핑의 복제를 거절하던 조건이 완화된 것입니다.
 
-그럼에도 ``FORK``가 항상 성공하는 것은 아닙니다. 모드 0에서도 페이지 테이블 등 커널 메모리의 실제 할당은 실패할 수 있고, 모드 2에서는 Java 힙처럼 큰 익명 private writable 매핑이 비용에 포함되므로 남은 commit 한도를 넘으면 프로세스 생성이 실패합니다.
+그럼에도 ``FORK``가 항상 성공하는 것은 아닙니다. 모드 2에서는 Java 힙처럼 큰 익명 private writable 매핑이 비용에 포함되므로 남은 commit 한도를 넘으면 프로세스 생성이 실패하고, 모드 0에서도 페이지 테이블 등 커널 메모리의 실제 할당은 실패할 수 있습니다.
 
 === 큰 힙에서 FORK와 POSIX_SPAWN의 실행 지연
 
