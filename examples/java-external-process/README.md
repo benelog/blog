@@ -1,6 +1,6 @@
 # java-external-process
 
-[Java에서 외부 프로세스를 실행할 때: JDK 25와 Linux 6.x 기준](https://blog.benelog.net/java-external-process.html) 글에서 쓴 예제와 측정 코드입니다.
+[Java에서 외부 프로세스를 실행하기: JDK 25와 Linux 6.x 기준](https://blog.benelog.net/java-external-process.html) 글에서 쓴 예제와 측정 코드입니다.
 
 | 파일 | 내용 |
 |---|---|
@@ -31,7 +31,7 @@ java SequentialReadDemo.java
 # 표준 출력으로 200,000줄을 내보내므로 파일로 받는다
 java RedirectDemo.java > redirect-demo.log
 
-# zt-exec 예제는 zt-exec와 slf4j-api jar가 필요
+# zt-exec 예제는 zt-exec과 slf4j-api jar가 필요
 curl -sLO https://repo1.maven.org/maven2/org/zeroturnaround/zt-exec/1.13.0/zt-exec-1.13.0.jar
 curl -sLO https://repo1.maven.org/maven2/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar
 java -cp zt-exec-1.13.0.jar:slf4j-api-2.0.17.jar ZtExecRunner.java
