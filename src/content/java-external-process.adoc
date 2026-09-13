@@ -654,9 +654,13 @@ OpenJDK는 이 세 방식을 차례로 거쳤습니다. 처음에는 ``fork()``�
 Windows의 ``CreateProcess()``와 유사합니다.
 JDK는 이 함수로 `jspawnhelper` 라는 작은 실행 파일을 먼저 띄우고, `jspawnhelper` 가 파이프로 넘겨받은 설정에 따라 파일 디스크립터와 작업 디렉터리를 정리한 뒤 실제 명령을 다시 ``execve()``합니다. 이 구조는 JDK 25 소스의 https://github.com/openjdk/jdk/blob/jdk-25%2B36/src/java.base/unix/native/libjava/ProcessImpl_md.c[ProcessImpl_md.c] 상단 주석에 설명되어 있습니다.
 
-helper를 한 번 더 거치는 이유는 앞 절에서 본 안전 문제 때문입니다. 파일 디스크립터 닫기와 작업 디렉터리 변경 같은 준비 작업을 첫 번째 ``execve()``로 실행된 jspawnhelper, 즉 부모와 메모리를 공유하지 않는 별도 프로세스 안에서 하면 ``vfork()``의 제약을 어길 일이 없습니다. 같은 주석은 이를 "준비 작업을 첫 exec 뒤로 옮겨 취약한 시간 창을 줄인다"고 설명합니다. 뒤에서 살펴볼 JDK 갱신 시의 버전 불일치와 ``VFORK`` 제거는 모두 이 설계에서 나온 결과입니다.
+helper를 한 번 더 거치는 이유는 앞 절에서 본 안전 문제 때문입니다.
+파일 디스크립터 닫기와 작업 디렉터리 변경 같은 준비 작업을 첫 번째 ``execve()``로 실행된 jspawnhelper, 즉 부모와 메모리를 공유하지 않는 별도 프로세스 안에서 하면 ``vfork()``의 제약을 어기지 않게 됩니다.
+같은 주석은 이를 "준비 작업을 첫 exec 뒤로 옮겨 취약한 시간 창을 줄인다"고 설명합니다.
+뒤에서 살펴볼 JDK 갱신 시의 버전 불일치와 ``VFORK`` 제거는 모두 이 설계에서 나온 결과입니다.
 
-strace로 보면 두 번의 `execve` 가 그대로 드러납니다. 아래는 `echo hello` 를 실행하는 link:{source-repo}/ProcessRunner.java[ProcessRunner.java]를 기본 설정으로 실행했을 때의 시스템 콜 중 프로세스 생성과 관련된 부분입니다. 경로는 줄였습니다.
+프로그램이 호출하는 시스템 콜을 순서대로 기록하는 도구인 strace로 보면 두 번의 `execve` 가 그대로 드러납니다.
+아래는 `echo hello` 를 실행하는 link:{source-repo}/ProcessRunner.java[ProcessRunner.java]를 기본 설정으로 실행했을 때의 시스템 콜 중 프로세스 생성과 관련된 부분입니다. 경로는 줄였습니다.
 
 [source,text]
 ----
