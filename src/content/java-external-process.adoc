@@ -326,9 +326,14 @@ try (BufferedWriter writer = process.outputWriter()) {
 
 === 시간제한과 종료 정책
 
-출력 파이프를 처리해도 외부 명령이 네트워크나 잠금을 기다리며 멈출 수 있으므로 시간제한과 종료 정책은 별도로 필요합니다. 이때 ``waitFor()``를 부른 스레드도 함께 멈춥니다. JDK 8부터 있는 `waitFor(long, TimeUnit)` 메서드는 시간이 지나면 ``false``를 돌려줄 뿐 프로세스를 종료하지 않습니다. 그때는 ``destroy()``로 정상 종료를 요청하고 유예 시간 뒤에도 살아 있으면 ``destroyForcibly()``를 쓰거나, 아래 예제처럼 바로 강제 종료할 수 있습니다. Linux의 OpenJDK 구현에서 ``destroy()``는 SIGTERM을, ``destroyForcibly()``는 SIGKILL을 보냅니다. 프로세스는 SIGTERM을 핸들러로 받아서 임시 파일 삭제나 잠금 해제, 자신이 만든 자식 프로세스 정리 같은 마무리를 한 뒤에 끝날 수 있습니다. SIGKILL은 커널이 프로세스를 즉시 끝내므로 그런 기회가 없고, 정리하지 못한 파일과 후손 프로세스가 남을 수 있습니다. 그래서 정리할 것이 있는 명령에는 ``destroy()``를 먼저 보내고 유예 시간을 두는 편이 안전합니다. 아래 예제는 ``sleep``처럼 정리할 것이 없는 명령만 실행하므로 바로 강제 종료합니다.
-
-아래는 두 출력 스트림을 각각 JDK 21의 가상 스레드에서 읽으면서, 종료 대기에 1초 제한을 둔 예제입니다.
+지금까지 설명한 것처럼 여러 3개의 파이프를 처리해도 외부 명령이 네트워크나 잠금을 기다리며 멈출 수 있으므로 시간제한과 종료 정책은 별도로 필요합니다.
+그동안 ``waitFor()``를 부른 스레드는 외부 명령이 끝날 때까지 블로킹됩니다. JDK 8부터 있는 `waitFor(long, TimeUnit)` 메서드는 시간이 지나면 ``false``를 돌려줄 뿐 프로세스를 종료하지 않습니다.
+그때는 ``destroy()``로 정상 종료를 요청하고 유예 시간 뒤에도 살아 있으면 ``destroyForcibly()``를 쓰거나, 아래 예제처럼 바로 강제 종료할 수 있습니다.
+Linux의 OpenJDK 구현에서 ``destroy()``는 SIGTERM을, ``destroyForcibly()``는 SIGKILL을 보냅니다.
+프로세스는 SIGTERM을 핸들러로 받아서 임시 파일 삭제나 잠금 해제, 자신이 만든 자식 프로세스 정리 같은 마무리를 한 뒤에 끝날 수 있습니다.
+SIGKILL은 커널이 프로세스를 즉시 끝내므로 그런 기회가 없고, 정리하지 못한 파일과 후손 프로세스가 남을 수 있습니다. 그래서 정리할 것이 있는 명령에는 ``destroy()``를 먼저 보내고 유예 시간을 두는 편이 안전합니다.
+아래 예제는 ``sleep``처럼 정리할 것이 없는 명령만 실행하므로 바로 강제 종료합니다.
+두 출력 스트림을 각각 JDK 21의 가상 스레드에서 읽으면서, 종료 대기에 1초 제한을 둔 예제입니다.
 
 [source,java]
 .PlainJdkRunner.java
@@ -531,46 +536,9 @@ ls: exit=2, killed by watchdog=false, stderr=ls: cannot access '/no-such-dir': N
 강제 종료가 필요하면 시간 초과 뒤 남은 프로세스를 ``ProcessHandle``로 찾아 ``destroyForcibly()``를 부르는 코드를 따로 두어야 합니다.
 SIGTERM을 무시하면 ``execute()``가 계속 기다릴 수 있고, 종료 처리를 수행한 명령이 허용된 코드로 끝나면 시간 초과 뒤에도 예외 없이 반환될 수 있으므로 정상 반환 경로에서도 확인해야 합니다.
 
-``CommandLine.addArguments(String)``는 따옴표를 해석하며 인자를 나누므로, 공백을 포함한 인자를 문자열로 조립할 때 주의해야 합니다.
-배열을 받는 메서드도 기본적으로 인자에 따옴표를 추가할 수 있습니다.
-Linux의 ``Runtime.exec(String[])``는 셸을 거치지 않으므로 그 따옴표가 인자의 일부로 전달될 수 있습니다.
-그래서 위 예제는 이미 분리된 인자 배열에 두 번째 인자를 ``false``로 주어 추가 quoting을 껐습니다.
-
-아래 예제는 `printf '[%s]\n' "hello world"` 명령을 ``CommandLine``으로 세 가지 방식으로 조립해 실행합니다. 셸에서 이 명령을 실행하면 `[hello world]`가 출력됩니다.
-
-[source,java]
-.CommandLineQuotingDemo.java
-----
-CommandLine parsed = new CommandLine("printf").addArguments("[%s]\\n \"hello world\"");
-run("문자열을 나눔", parsed);
-
-CommandLine quoted = new CommandLine("printf").addArgument("[%s]\\n").addArgument("hello world");
-run("배열, quoting 기본값", quoted);
-
-CommandLine raw = new CommandLine("printf").addArgument("[%s]\\n").addArgument("hello world", false);
-run("배열, quoting 끔", raw);
-----
-
-``run()`` 메서드는 ``cmdLine.getArguments()``로 실제 전달되는 인자 배열을 찍고, ``DefaultExecutor``로 실행한 출력을 함께 보여줍니다.
-
-[source,text]
-.CommandLineQuotingDemo.java 실행 결과
-----
-문자열을 나눔: args=[[%s]\n, "hello world"] -> printf 출력=["hello world"]
-배열, quoting 기본값: args=[[%s]\n, "hello world"] -> printf 출력=["hello world"]
-배열, quoting 끔: args=[[%s]\n, hello world] -> printf 출력=[hello world]
-----
-
-첫 번째는 문자열을 나누면서 따옴표를 벗겨 `hello world`를 하나의 인자로 인식했지만, 공백이 있다는 이유로 다시 큰따옴표를 붙여서 넘겼습니다.
-두 번째처럼 이미 나뉜 인자를 넘겨도 quoting 기본값이 ``true``라서 결과는 같습니다.
-셸이라면 그 따옴표를 해석해서 벗겨 주지만 ``Runtime.exec(String[])``는 인자를 그대로 전달하므로, ``printf``는 따옴표까지 포함한 `"hello world"`를 받습니다.
-세 번째처럼 quoting을 꺼야 셸에서 실행한 것과 같은 결과가 나옵니다.
-
 === 유지보수 현황과 선택
 
-zt-exec은 README에서 ``ProcessBuilder``와 Commons Exec을 언급하며, 스트림 처리와 시간제한, 종료 코드 검사를 개선한 대안으로 자신을 소개합니다. Commons Exec은 2014년의 1.3 이후 10년 가까이 릴리스가 없었으므로, zt-exec을 더 활발히 유지보수되는 쪽으로 여기기 쉽습니다. 아래 현황은 그 인상과 다릅니다.
-
-라이브러리를 고를 때는 출력 처리와 종료 코드의 기본값, 시간 초과를 알리는 방식, 의존성을 함께 비교해야 합니다. 아래는 Maven Central의 버전 목록과 각 프로젝트의 변경 기록으로 2026-09-06에 확인한 현황입니다. 릴리스 날짜는 변경 기록을 기준으로 했습니다.
+다음은 Maven Central의 버전 목록과 각 프로젝트의 변경 기록으로 2026-09-06에 확인한 두 라이브러리의 현황입니다.
 
 [cols="1,2,2", options="header"]
 |===
@@ -613,9 +581,10 @@ zt-exec은 README에서 ``ProcessBuilder``와 Commons Exec을 언급하며, 스�
 |``destroy()`` 고정
 |===
 
-최근 5년간 릴리스 수는 Commons Exec이 3회, zt-exec이 1회입니다. Commons Exec은 1.4.0부터 builder API와 ``Duration``을 지원하고, zt-exec은 1.13.0에서 빌드를 Gradle로 옮기고 JPMS 모듈 정보를 추가했습니다. 릴리스 횟수만으로 유지보수 품질 전체를 판단할 수는 없지만, zt-exec이 더 자주 갱신된다고 볼 근거는 없습니다.
-
-제가 zt-exec에서 선호하는 부분은 API 설계입니다. 시간 초과와 종료 코드 오류를 예외 타입으로 구분하고, 출력을 문자열로 받는 데 메서드 호출 하나면 되고, 기본 설정에서 출력 파이프를 읽지 않아 생기는 교착을 피할 수 있습니다. 저는 새로 쓰는 코드라면 zt-exec을 고르겠습니다. 다만 라이브러리의 전이 의존성을 늘리고 싶지 않거나 Apache 프로젝트의 거버넌스를 선호한다면 Commons Exec 1.6.0도 builder API로 쓸 만합니다. 이미 Commons Exec을 쓰고 있는 코드를 zt-exec으로 바꿀 만큼 큰 차이는 아닙니다. 두 라이브러리 모두 기본 종료 요청은 ``destroy()``입니다. zt-exec은 ``stopper()``로 강제 종료 정책을 넣을 수 있지만 Commons Exec은 별도 코드가 필요합니다. 후손 프로세스 정리는 두 라이브러리 모두 앞 절에서 본 OS 수준의 방법을 더해야 합니다.
+둘 중에서 저는 zt-exec를 더 추천합니다.
+API 설계가 주는 장점이 크기 때문입니다.
+시간 초과와 종료 코드 오류를 예외 타입으로 구분하고, 출력을 문자열로 받는 데 메서드 호출 하나면 되고, 기본 설정에서 출력 파이프를 읽지 않아 생기는 교착을 피할 수 있습니다.
+두 라이브러리 모두 기본 종료 요청은 ``destroy()``입니다. zt-exec은 ``stopper()``로 강제 종료 정책을 넣을 수 있지만 Commons Exec은 별도 코드가 필요합니다.
 
 == Linux에서의 프로세스 생성과 운영
 
