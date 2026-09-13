@@ -645,9 +645,11 @@ OpenJDK는 이 세 방식을 차례로 거쳤습니다. 처음에는 ``fork()``�
 
 === POSIX_SPAWN과 jspawnhelper의 동작
 
-자식 생성과 ``exec()``, 그 사이의 준비 작업을 한 묶음으로 제공한다는 점에서 ``posix_spawn()``은 Windows의 ``CreateProcess()``와 닮았습니다. JDK는 이 함수로 `jspawnhelper` 라는 작은 실행 파일을 먼저 띄우고, `jspawnhelper` 가 파이프로 넘겨받은 설정에 따라 파일 디스크립터와 작업 디렉터리를 정리한 뒤 실제 명령을 다시 ``exec()``합니다. 이 구조는 JDK 25 소스의 https://github.com/openjdk/jdk/blob/jdk-25%2B36/src/java.base/unix/native/libjava/ProcessImpl_md.c[ProcessImpl_md.c] 상단 주석에 설명되어 있습니다.
+``posix_spawn()``은 자식 생성과 ``execve()``, 그 사이의 준비 작업을 한 묶음으로 제공합니다.
+Windows의 ``CreateProcess()``와 유사합니다.
+JDK는 이 함수로 `jspawnhelper` 라는 작은 실행 파일을 먼저 띄우고, `jspawnhelper` 가 파이프로 넘겨받은 설정에 따라 파일 디스크립터와 작업 디렉터리를 정리한 뒤 실제 명령을 다시 ``execve()``합니다. 이 구조는 JDK 25 소스의 https://github.com/openjdk/jdk/blob/jdk-25%2B36/src/java.base/unix/native/libjava/ProcessImpl_md.c[ProcessImpl_md.c] 상단 주석에 설명되어 있습니다.
 
-helper를 한 번 더 거치는 이유는 앞 절에서 본 안전 문제 때문입니다. 파일 디스크립터 닫기와 작업 디렉터리 변경 같은 준비 작업을 첫 번째 ``exec()``으로 실행된 jspawnhelper, 즉 부모와 메모리를 공유하지 않는 별도 프로세스 안에서 하면 ``vfork()``의 제약을 어길 일이 없습니다. 같은 주석은 이를 "준비 작업을 첫 exec 뒤로 옮겨 취약한 시간 창을 줄인다"고 설명합니다. 뒤에서 살펴볼 JDK 갱신 시의 버전 불일치와 ``VFORK`` 제거는 모두 이 설계에서 나온 결과입니다.
+helper를 한 번 더 거치는 이유는 앞 절에서 본 안전 문제 때문입니다. 파일 디스크립터 닫기와 작업 디렉터리 변경 같은 준비 작업을 첫 번째 ``execve()``로 실행된 jspawnhelper, 즉 부모와 메모리를 공유하지 않는 별도 프로세스 안에서 하면 ``vfork()``의 제약을 어길 일이 없습니다. 같은 주석은 이를 "준비 작업을 첫 exec 뒤로 옮겨 취약한 시간 창을 줄인다"고 설명합니다. 뒤에서 살펴볼 JDK 갱신 시의 버전 불일치와 ``VFORK`` 제거는 모두 이 설계에서 나온 결과입니다.
 
 strace로 보면 두 번의 `execve` 가 그대로 드러납니다. 아래는 `echo hello` 를 실행하는 link:{source-repo}/ProcessRunner.java[ProcessRunner.java]를 기본 설정으로 실행했을 때의 시스템 콜 중 프로세스 생성과 관련된 부분입니다. 경로는 줄였습니다.
 
@@ -660,7 +662,7 @@ $ grep -v CLONE_THREAD trace.txt | grep -E 'clone|vfork|execve'
 285603 execve("/usr/bin/echo", ["echo", "hello"], ...) = 0
 ----
 
-``vfork()`` 시스템 콜은 나오지 않습니다. glibc 2.39의 ``posix_spawn()``은 `clone3` 시스템 콜에 `CLONE_VM` 과 `CLONE_VFORK` 플래그를 주어 ``vfork()``와 같은 효과를 냅니다. `CLONE_VM` 은 자식이 부모의 주소 공간을 그대로 공유한다는 뜻이므로, 힙 매핑과 페이지 테이블을 복사하지 않습니다. `CLONE_VFORK` 는 자식이 ``exec()``하거나 끝날 때까지 부모의 호출 스레드를 멈춥니다. `CLONE_VM` 덕분에 생성 비용은 힙 크기와 거의 무관합니다. 뒤의 측정에서 이를 확인합니다. 같은 프로그램을 `-Djdk.lang.Process.launchMechanism=FORK` 로 실행하면 `CLONE_VM` 플래그 없이 `clone` 시스템 콜을 불러 주소 공간을 복제하고, `jspawnhelper` 없이 곧바로 `/usr/bin/echo` 를 ``execve``합니다.
+``vfork()`` 시스템 콜은 나오지 않습니다. glibc 2.39의 ``posix_spawn()``은 `clone3` 시스템 콜에 `CLONE_VM` 과 `CLONE_VFORK` 플래그를 주어 ``vfork()``와 같은 효과를 냅니다. `CLONE_VM` 은 자식이 부모의 주소 공간을 그대로 공유한다는 뜻이므로, 힙 매핑과 페이지 테이블을 복사하지 않습니다. `CLONE_VFORK` 는 자식이 ``execve()``하거나 끝날 때까지 부모의 호출 스레드를 멈춥니다. `CLONE_VM` 덕분에 생성 비용은 힙 크기와 거의 무관합니다. 뒤의 측정에서 이를 확인합니다. 같은 프로그램을 `-Djdk.lang.Process.launchMechanism=FORK` 로 실행하면 `CLONE_VM` 플래그 없이 `clone` 시스템 콜을 불러 주소 공간을 복제하고, `jspawnhelper` 없이 곧바로 `/usr/bin/echo` 를 ``execve``합니다.
 
 https://man7.org/linux/man-pages/man3/posix_spawn.3.html[posix_spawn(3)] 매뉴얼에 따르면 glibc 2.24부터 ``posix_spawn()``은 `CLONE_VM` 과 `CLONE_VFORK` 플래그로 ``clone()``을 호출합니다. 자식 프로세스에 별도 스택을 주고, 생성 과정에서 시그널을 차단하고 자식의 핸들러를 정리해 부모 스택과 시그널 처리에 관한 위험을 줄입니다. JDK 25 소스의 주석도 이 이유로 glibc 2.24 이상의 방식을 가장 좋은 선택으로 설명하며, musl 역시 이 ``clone()`` 방식을 사용해 왔다고 적었습니다. ``vfork()`` 함수 자체가 glibc에서 없어진 것은 아닙니다.
 
@@ -668,7 +670,7 @@ https://bugs.openjdk.org/browse/JDK-8357090[JDK-8357090의 CSR]은 ``posix_spawn
 
 === FORK의 메모리 비용과 overcommit
 
-``FORK``를 선택하면 부모 JVM의 주소 공간 복제 비용을 고려해야 합니다. ``fork()``는 부모와 같은 자식 프로세스를 만드는데, Linux는 쓰기 시 복사(copy-on-write)로 실제 페이지 복사는 미루지만 페이지 테이블은 복사합니다. 커널의 메모리 overcommit 정책에 따라 자식이 쓸지도 모르는 메모리를 미리 계산해서 생성을 거절할 수도 있습니다. 자식이 곧바로 ``exec()``로 작은 프로그램으로 바뀌더라도 이 검사를 거칩니다.
+``FORK``를 선택하면 부모 JVM의 주소 공간 복제 비용을 고려해야 합니다. ``fork()``는 부모와 같은 자식 프로세스를 만드는데, Linux는 쓰기 시 복사(copy-on-write)로 실제 페이지 복사는 미루지만 페이지 테이블은 복사합니다. 커널의 메모리 overcommit 정책에 따라 자식이 쓸지도 모르는 메모리를 미리 계산해서 생성을 거절할 수도 있습니다. 자식이 곧바로 ``execve()``로 작은 프로그램으로 바뀌더라도 이 검사를 거칩니다.
 
 `vm.overcommit_memory` 의 기본값 0은 "명백한 overcommit만 거절하는" 모드입니다. 커널 5.1의 코드는 이 판정에 여유 메모리, 페이지 캐시, 스왑 여유분 등을 반영했습니다. ``fork()``가 힙 매핑을 복제할 때 요구하는 크기가 이 계산값을 넘으면 `ENOMEM` 으로 거절될 수 있었습니다.
 
@@ -714,7 +716,7 @@ OpenJDK가 Linux에서 자식 프로세스를 만드는 방식은 구현 전용 
 |JDK |Linux에서의 변화
 
 |6
-|``fork()`` + ``exec()``
+|``fork()`` + ``execve()``
 
 |7
 |``vfork()``가 기본값이 됨 (https://bugs.openjdk.org/browse/JDK-6868160[JDK-6868160])
@@ -732,7 +734,7 @@ OpenJDK가 Linux에서 자식 프로세스를 만드는 방식은 구현 전용 
 |개발 버전에서 ``VFORK`` 제거. 지정하면 경고 후 ``FORK``로 동작 (https://bugs.openjdk.org/browse/JDK-8357089[JDK-8357089], https://bugs.openjdk.org/browse/JDK-8357090[CSR])
 |===
 
-앞에서 정리한 대로 ``vfork()``는 ``fork()``의 주소 공간 복제 비용을 피하는 대신, 자식이 ``exec()`` 전에 부모의 스택이나 시그널 처리를 건드릴 위험을 안습니다. JDK는 그 사이에 파일 디스크립터 정리 같은 작업을 하며 이 규칙을 어겼고, JDK-8357090은 이를 제거 이유로 설명합니다. 앞에서 본 jspawnhelper는 바로 이 작업을 ``exec()`` 뒤로 옮긴 장치입니다.
+앞에서 정리한 대로 ``vfork()``는 ``fork()``의 주소 공간 복제 비용을 피하는 대신, 자식이 ``execve()`` 전에 부모의 스택이나 시그널 처리를 건드릴 위험을 안습니다. JDK는 그 사이에 파일 디스크립터 정리 같은 작업을 하며 이 규칙을 어겼고, JDK-8357090은 이를 제거 이유로 설명합니다. 앞에서 본 jspawnhelper는 바로 이 작업을 ``execve()`` 뒤로 옮긴 장치입니다.
 
 ``vfork()``를 기본값으로 삼은 이 선택은 당시에도 논란거리였습니다. ``vfork()``는 표준 함수가 아닙니다. https://man7.org/linux/man-pages/man2/vfork.2.html[vfork(2)] 매뉴얼의 STANDARDS 항목은 "None"이고, HISTORY 항목은 3.0BSD에서 등장한 이 함수가 POSIX.1-2001에 OBSOLETE로 표시됐다가 POSIX.1-2008에서 명세가 삭제됐다고 적습니다. 4.4BSD는 ``vfork()``를 아예 ``fork()``와 같은 것으로 만들었고, Linux도 2.2.0-pre6 무렵까지는 ``fork()``와 같게 동작하다가 2.2.0-pre9부터 독립된 시스템 콜이 됐습니다. 앞에서 인용한 D2 글은 이 점을 짚어 POSIX 매뉴얼이 사용을 권장하지 않고 Solaris 10에서는 deprecated됐으며, 당시 Ubuntu 매뉴얼에는 Linux가 이 명세를 살린 것이 유감이라는 언급까지 있다고 적었습니다. 그러면서도 GCC가 ``vfork()``를 계속 쓰고 교체 주장이 받아들여지지 않은 점, glibc가 ``posix_spawn()``을 구현할 때 가능하면 ``vfork()``를 쓰는 점을 들어 Linux 커널에서는 ``vfork()``가 건재하니 JDK의 기본 실행 방식을 써도 괜찮다고 결론지었습니다. 커널에 대해서는 이 예상이 맞았습니다.
 
@@ -748,7 +750,7 @@ jdk.lang.Process.launchMechanism property (preferred) or use FORK mode
 instead (-Djdk.lang.Process.launchMechanism=FORK).
 ----
 
-``vfork()`` 시스템 콜 자체는 Linux 커널에 그대로 있습니다. vfork(2) 매뉴얼은 여전히 ``vfork()``를 `CLONE_VM | CLONE_VFORK | SIGCHLD` 플래그를 준 ``clone()``과 같다고 설명합니다. 없어진 쪽은 커널의 ``vfork()``가 아니라 JDK의 ``VFORK`` 모드였습니다. 표준에서 빠져서도 커널이 바뀌어서도 아니라, JDK 자신이 ``vfork()``와 ``exec()`` 사이에서 하던 작업이 안전하지 않아서입니다.
+``vfork()`` 시스템 콜 자체는 Linux 커널에 그대로 있습니다. vfork(2) 매뉴얼은 여전히 ``vfork()``를 `CLONE_VM | CLONE_VFORK | SIGCHLD` 플래그를 준 ``clone()``과 같다고 설명합니다. 없어진 쪽은 커널의 ``vfork()``가 아니라 JDK의 ``VFORK`` 모드였습니다. 표준에서 빠져서도 커널이 바뀌어서도 아니라, JDK 자신이 ``vfork()``와 ``execve()`` 사이에서 하던 작업이 안전하지 않아서입니다.
 
 이 글의 예제와 측정은 JDK 25 기준입니다. 구버전 JDK에 적용할 때는 실행 방식과 API 지원 범위를 따로 확인해야 합니다. 예를 들어 OpenJDK 11u는 11.0.4부터 ``POSIX_SPAWN``을 옵션으로 지정할 수 있지만 기본값은 ``vfork()``이고, OpenJDK 8u의 Linux 구현은 검증일 현재 이 옵션을 지원하지 않습니다. 어느 버전이든 사용하는 JDK 계열의 최신 보안 업데이트를 적용해야 합니다.
 
