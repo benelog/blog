@@ -667,17 +667,31 @@ $ grep -v CLONE_THREAD trace.txt | grep -E 'clone|vfork|execve'
 285603 execve("/usr/bin/echo", ["echo", "hello"], ...) = 0
 ----
 
-``vfork()`` 시스템 콜은 나오지 않습니다. glibc 2.39의 ``posix_spawn()``은 `clone3` 시스템 콜에 `CLONE_VM` 과 `CLONE_VFORK` 플래그를 주어 ``vfork()``와 같은 효과를 냅니다. `CLONE_VM` 은 자식이 부모의 주소 공간을 그대로 공유한다는 뜻이므로, 힙 매핑과 페이지 테이블을 복사하지 않습니다. `CLONE_VFORK` 는 자식이 ``execve()``하거나 끝날 때까지 부모의 호출 스레드를 멈춥니다. `CLONE_VM` 덕분에 생성 비용은 힙 크기와 거의 무관합니다. 뒤의 측정에서 이를 확인합니다. 같은 프로그램을 `-Djdk.lang.Process.launchMechanism=FORK` 로 실행하면 `CLONE_VM` 플래그 없이 `clone` 시스템 콜을 불러 주소 공간을 복제하고, `jspawnhelper` 없이 곧바로 `/usr/bin/echo` 를 ``execve``합니다.
+``vfork()`` 시스템 콜은 나오지 않습니다.
+glibc 2.39의 ``posix_spawn()``은 `clone3` 시스템 콜에 `CLONE_VM` 과 `CLONE_VFORK` 플래그를 주어 ``vfork()``와 같은 효과를 냅니다.
+`CLONE_VM` 은 자식이 부모의 주소 공간을 그대로 공유한다는 뜻이므로, 힙 매핑과 페이지 테이블을 복사하지 않습니다.
+`CLONE_VFORK` 는 자식이 ``execve()``하거나 끝날 때까지 부모의 호출 스레드를 멈춥니다.
+`CLONE_VM` 덕분에 생성 비용은 힙 크기와 거의 무관합니다.
+뒤의 측정에서 이를 확인합니다. 같은 프로그램을 `-Djdk.lang.Process.launchMechanism=FORK` 로 실행하면 `CLONE_VM` 플래그 없이 `clone` 시스템 콜을 불러 주소 공간을 복제하고, `jspawnhelper` 없이 곧바로 `/usr/bin/echo` 를 ``execve``합니다.
 
-https://man7.org/linux/man-pages/man3/posix_spawn.3.html[posix_spawn(3)] 매뉴얼에 따르면 glibc 2.24부터 ``posix_spawn()``은 `CLONE_VM` 과 `CLONE_VFORK` 플래그로 ``clone()``을 호출합니다. 자식 프로세스에 별도 스택을 주고, 생성 과정에서 시그널을 차단하고 자식의 핸들러를 정리해 부모 스택과 시그널 처리에 관한 위험을 줄입니다. JDK 25 소스의 주석도 이 이유로 glibc 2.24 이상의 방식을 가장 좋은 선택으로 설명하며, musl 역시 이 ``clone()`` 방식을 사용해 왔다고 적었습니다. ``vfork()`` 함수 자체가 glibc에서 없어진 것은 아닙니다.
+https://man7.org/linux/man-pages/man3/posix_spawn.3.html[posix_spawn(3)] 매뉴얼에 따르면 glibc 2.24부터 ``posix_spawn()``은 `CLONE_VM` 과 `CLONE_VFORK` 플래그로 ``clone()``을 호출합니다.
+자식 프로세스에 별도 스택을 주고, 생성 과정에서 시그널을 차단하고 자식의 핸들러를 정리해 부모 스택과 시그널 처리에 관한 위험을 줄입니다.
+JDK 25 소스의 주석도 이 이유로 glibc 2.24 이상의 방식을 가장 좋은 선택으로 설명하며, musl 역시 이 ``clone()`` 방식을 사용해 왔다고 적었습니다.
+``vfork()`` 함수 자체가 glibc에서 없어진 것은 아닙니다.
 
-https://bugs.openjdk.org/browse/JDK-8357090[JDK-8357090의 CSR]은 ``posix_spawn()``의 예기치 않은 문제를 우회할 수 있도록 ``FORK``를 대안으로 둔다고 설명합니다. `jspawnhelper` 관련 오류가 반복되는데 원인을 바로 찾기 어렵다면 JVM 시작 옵션에 `-Djdk.lang.Process.launchMechanism=FORK` 를 주어 임시 회피할 수 있습니다. 다음 두 절에서 살펴볼 overcommit 정책에 따른 메모리 부담과 실행 지연을 감수하는 선택이며, 실행 중인 JVM에 즉시 적용하는 설정은 아닙니다.
+https://bugs.openjdk.org/browse/JDK-8357090[JDK-8357090의 CSR]은 ``posix_spawn()``의 예기치 않은 문제를 우회할 수 있도록 ``FORK``를 대안으로 둔다고 설명합니다.
+`jspawnhelper` 관련 오류가 반복되는데 원인을 바로 찾기 어렵다면 JVM 시작 옵션에 `-Djdk.lang.Process.launchMechanism=FORK` 를 주어 임시 회피할 수 있습니다.
+다음 두 절에서 살펴볼 overcommit 정책에 따른 메모리 부담과 실행 지연을 감수하는 선택이며, 실행 중인 JVM에 즉시 적용하는 설정은 아닙니다.
 
 === FORK의 메모리 비용과 overcommit
 
-``FORK``를 선택하면 부모 JVM의 주소 공간 복제 비용을 고려해야 합니다. ``fork()``는 부모와 같은 자식 프로세스를 만드는데, Linux는 쓰기 시 복사(copy-on-write)로 실제 페이지 복사는 미루지만 페이지 테이블은 복사합니다. 커널의 메모리 overcommit 정책에 따라 자식이 쓸지도 모르는 메모리를 미리 계산해서 생성을 거절할 수도 있습니다. 자식이 곧바로 ``execve()``로 작은 프로그램으로 바뀌더라도 이 검사를 거칩니다.
+``FORK``를 선택하면 부모 JVM의 주소 공간 복제 비용을 고려해야 합니다.
+``fork()``는 부모와 같은 자식 프로세스를 만드는데, Linux는 쓰기 시 복사(copy-on-write)로 실제 페이지 복사는 미루지만 페이지 테이블은 복사합니다.
+커널의 메모리 overcommit 정책에 따라 자식이 쓸지도 모르는 메모리를 미리 계산해서 생성을 거절할 수도 있습니다.
+자식이 곧바로 ``execve()``로 작은 프로그램으로 바뀌더라도 이 검사를 거칩니다.
 
-`vm.overcommit_memory` 의 기본값 0은 "명백한 overcommit만 거절하는" 모드입니다. 커널 5.1의 코드는 이 판정에 여유 메모리, 페이지 캐시, 스왑 여유분 등을 반영했습니다. ``fork()``가 힙 매핑을 복제할 때 요구하는 크기가 이 계산값을 넘으면 `ENOMEM` 으로 거절될 수 있었습니다.
+Linux 커널의 sysctl 설정인 `vm.overcommit_memory` 의 기본값 0은 "명백한 overcommit만 거절하는" 모드입니다.
+커널 5.1의 코드는 이 판정에 여유 메모리, 페이지 캐시, 스왑 여유분 등을 반영했습니다. ``fork()``가 힙 매핑을 복제할 때 요구하는 크기가 이 계산값을 넘으면 `ENOMEM` 으로 거절될 수 있었습니다.
 
 커널 5.2에 들어간 https://lkml.iu.edu/hypermail/linux/kernel/1904.1/05420.html[mm: fix false-positive OVERCOMMIT_GUESS failures] 패치는 모드 0의 판정을 "요청 크기가 전체 RAM과 스왑의 합을 넘는지"로 단순화했습니다. 여유 메모리가 적다는 이유만으로 큰 매핑의 복제를 거절하던 조건이 완화된 것입니다. ``FORK``가 항상 성공한다는 뜻은 아니며, 페이지 테이블 등 커널 메모리의 실제 할당은 여전히 실패할 수 있습니다.
 
