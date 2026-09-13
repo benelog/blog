@@ -256,7 +256,7 @@ new ProcessBuilder("seq", "1", "100000")
 Java 코드가 비워야 할 파이프가 없기 때문입니다.
 출력을 버릴 생각이라면 표준 출력과 표준 오류 모두 명시적으로 ``DISCARD``를 지정하는 편이 안전합니다. ``Redirect.to(File)``은 파일이 이미 있으면 기존 내용을 지우고 덮어쓰므로, 실행할 때마다 뒤에 이어 붙이려면 ``Redirect.appendTo(File)``을 씁니다.
 
-==== 표준 입력의 EOF 전달
+==== 표준 입력 닫기와 EOF
 
 앞의 Javadoc 인용문이 출력과 함께 경고한 표준 입력(stdin)도 기본값은 파이프입니다. 부모 JVM이 이 파이프의 쓰기 끝을 열어 둔 채로 있으면 자식 프로세스는 EOF를 받지 못합니다. 인자 없이 실행한 ``cat``처럼 표준 입력을 끝까지 읽는 명령은 더 올 입력이 없는데도 계속 기다리고, 부모는 ``waitFor()``에서 그 명령이 끝나기를 기다립니다. 출력 파이프를 모두 비워도 이 대기는 풀리지 않습니다.
 
@@ -350,9 +350,10 @@ static void run(String... command) throws IOException, InterruptedException, Tim
 }
 ----
 
-`echo hello`, `seq 1 100000`, `ls /no-such-dir`, `sleep 60` 네 명령을 이 메서드로 실행한 결과입니다. 590KB 출력도 멈추지 않고, 표준 오류는 따로 모이고, 1초를 넘긴 ``sleep``은 예외로 끝납니다.
+다음은 `echo hello`, `seq 1 100000`, `ls /no-such-dir`, `sleep 60` 네 명령을 이 메서드로 실행한 결과입니다. 590KB 출력도 멈추지 않고, 표준 오류는 따로 모이고, 1초를 넘긴 ``sleep``은 예외로 끝납니다.
 
 [source,text]
+.PlainJdkRunner.java의 실행 결과
 ----
 echo: exit=0, stdout chars=6, stderr=
 seq: exit=0, stdout chars=588895, stderr=
@@ -360,19 +361,38 @@ ls: exit=2, stdout chars=0, stderr=ls: cannot access '/no-such-dir': No such fil
 timed out: sleep 60
 ----
 
-이 예제는 입력을 요구하지 않고 후손 프로세스를 만들지 않는 명령을 대상으로 합니다. 실제로는 더 챙길 것이 있습니다. 위 코드는 표준 입력을 닫지 않으므로, 표준 입력을 읽는 명령에는 앞 절의 EOF 처리를 더해야 합니다. 읽기 스레드의 예외를 호출 스레드에 전달하고, 인터럽트나 시간 초과 때도 프로세스와 스트림을 정리해야 합니다. 위 코드의 1초 제한은 ``waitFor()``에만 적용되며, ``start()``나 뒤이은 종료 대기와 ``join()``까지 포함한 전체 시간제한은 아닙니다.
+이 예제는 입력을 요구하지 않고 후손 프로세스를 만들지 않는 명령을 대상으로 합니다.
+모든 경우에 안전하게 외부 프로세스를 실행하려면 더 챙길 것이 있습니다.
+표준 입력을 읽는 명령에는 앞 절의 EOF 처리를 더해야 합니다.
+읽기 스레드의 예외를 호출 스레드에 전달하고, 인터럽트나 시간 초과 때도 프로세스와 스트림을 정리해야 합니다.
+위 코드의 1초 제한은 ``waitFor()``에만 적용되며, ``start()``나 뒤이은 종료 대기와 ``join()``까지 포함한 전체 시간제한은 아닙니다.
+출력이 아주 크면 ``StringBuilder``에 다 담지 말고 줄 단위나 고정 크기 버퍼로 처리해야 합니다.
+출력 인코딩이 UTF-8이 아닌 명령도 있습니다.
 
-출력이 아주 크면 ``StringBuilder``에 다 담지 말고 줄 단위나 고정 크기 버퍼로 처리해야 합니다. 출력 인코딩이 UTF-8이 아닌 명령도 있습니다.
-
-``destroyForcibly()``는 직접 만든 프로세스만 끝냅니다. ``sh -c``로 여러 명령을 이어서 실행하거나, 실행한 명령이 다시 자식 프로세스를 만드는 경우가 대표적입니다. 셸만 끝나고 손자 프로세스가 남아서 물려받은 출력 파이프를 계속 열고 있으면, 읽기 스레드는 EOF를 받지 못하고 ``join()``도 끝나지 않습니다. JDK 9의 ``ProcessHandle.descendants()``로 후손을 조회해 하나씩 종료할 수 있지만 그 결과는 스냅샷이므로, 조회와 종료 사이에 생기거나 부모 종료 뒤 재부모화된 프로세스까지 확실하게 정리하지는 못합니다. 후손까지 한 번에 끝내려면 OS 수준에서 묶어야 합니다. ``setsid`` 명령으로 새 세션과 프로세스 그룹을 만들어 실행하고 시간 초과 때 그 그룹 전체에 시그널을 보내거나, ``systemd-run``이나 컨테이너처럼 cgroup 단위로 정리하는 방법이 있습니다. JDK API에는 프로세스 그룹을 만들거나 그룹에 시그널을 보내는 기능이 없으므로, 프로세스 그룹 방식은 ``setsid``와 ``kill`` 명령을 함께 실행하는 식으로 구성해야 합니다. 다음 절의 라이브러리는 출력 처리와 시간제한 코드를 줄여 주지만, 이런 조건까지 모두 해결해 주지는 않습니다.
+``destroyForcibly()``는 직접 만든 프로세스만 끝냅니다.
+``sh -c``로 여러 명령을 이어서 실행하거나, 실행한 명령이 다시 자식 프로세스를 만드는 경우가 대표적입니다.
+셸만 끝나고 손자 프로세스가 남아서 물려받은 출력 파이프를 계속 열고 있으면, 읽기 스레드는 EOF를 받지 못하고 ``join()``도 끝나지 않습니다.
+JDK 9의 ``ProcessHandle.descendants()``로 후손을 조회해 하나씩 종료할 수 있지만 그 결과는 스냅샷이므로, 조회와 종료 사이에 생기거나 부모 종료 뒤 재부모화된 프로세스까지 확실하게 정리하지는 못합니다.
+후손까지 한 번에 끝내려면 OS 수준에서 묶어야 합니다.
+``setsid`` 명령으로 새 세션과 프로세스 그룹을 만들어 실행하고 시간 초과 때 그 그룹 전체에 시그널을 보내거나, ``systemd-run``이나 컨테이너처럼 cgroup 단위로 정리하는 방법이 있습니다.
+JDK API에는 프로세스 그룹을 만들거나 그룹에 시그널을 보내는 기능이 없으므로, 프로세스 그룹 방식은 ``setsid``와 ``kill`` 명령을 함께 실행하는 식으로 구성해야 합니다.
+다음 절의 라이브러리들도 출력 처리와 시간제한 코드를 줄여 주지만, 이런 조건까지 모두 해결해 주지는 않습니다.
 
 == zt-exec과 Apache Commons Exec의 활용
 
-출력 파이프 처리와 시간제한 코드를 프로젝트마다 다시 구현하는 대신 라이브러리를 쓸 수 있습니다. zt-exec은 ``ProcessBuilder``를, Commons Exec의 일반적인 Java 실행 경로는 ``Runtime.exec()``를 사용하며, 결국 JDK의 프로세스 생성 구현을 거칩니다. 두 라이브러리 모두 pump 스레드로 출력 파이프를 비우고, 입력을 지정하지 않으면 ``PumpStreamHandler``가 자식 프로세스의 표준 입력을 닫아 EOF를 전달합니다. zt-exec의 `PumpStreamHandler` 클래스는 소스 파일 상단에 "This file originates from the Apache Commons Exec package"라고 적혀 있을 만큼 Commons Exec의 코드를 가져온 것입니다. 이 글에서 비교할 주요 차이는 API의 모양과 기본값입니다.
+앞서 설명하듯이, 여러 경우를 다 감안하여 외부 프로세스를 안정하게 실행하는 코드를 작성하기란 쉽지 않습니다.
+지금까지 설명한 지식을 잘 이해한다고해도 출력 파이프 처리와 시간제한 코드를 프로젝트마다 다시 구현한다면 번거로움이 커집니다.
+노하우가 잘 반영된 라이브러리를 사용하는 편이 실무에서는 실용적입니다.
+
+이 분야의 대표적인 라이브러리가 zt-exec와 Apache Commons Exec입니다.
+두 라이브러리 모두 별도의 스레드로 출력 파이프를 비우고, 입력을 지정하지 않으면 ``PumpStreamHandler``라는 클래스가 자식 프로세스의 표준 입력을 닫아서 자식이 EOF를 받게 합니다.
+zt-exec의 `PumpStreamHandler` 클래스는 소스 파일 상단에 "This file originates from the Apache Commons Exec package"라고 적혀 있을 만큼 Commons Exec의 코드를 가져온 것입니다. 이 글에서 비교할 주요 차이는 API의 형태와 기본값입니다.
 
 === zt-exec
 
-https://github.com/zeroturnaround/zt-exec[zt-exec]은 JRebel을 만든 ZeroTurnaround가 사내 여러 프로젝트에 흩어져 있던 프로세스 실행 코드를 하나로 합쳐서 2013년에 공개한 라이브러리입니다. README는 `ProcessExecutor` 클래스 하나로 ``ProcessBuilder``와 Commons Exec의 기능을 모두 제공하는 것이 목표라고 설명합니다. 의존성은 slf4j-api 하나이고 최소 Java 버전은 8입니다.
+https://github.com/zeroturnaround/zt-exec[zt-exec]은 JRebel을 만든 ZeroTurnaround가 사내 여러 프로젝트에 흩어져 있던 프로세스 실행 코드를 하나로 합쳐서 2013년에 공개한 라이브러리입니다.
+README는 `ProcessExecutor` 클래스 하나로 ``ProcessBuilder``와 Commons Exec의 기능을 모두 제공하는 것이 목표라고 설명합니다.
+의존성은 slf4j-api 하나이고 최소 Java 버전은 8입니다.
 
 [source,xml]
 ----
@@ -383,7 +403,7 @@ https://github.com/zeroturnaround/zt-exec[zt-exec]은 JRebel을 만든 ZeroTurna
 </dependency>
 ----
 
-써 보니 장점은 네 가지로 정리됩니다.
+zt-exec의 장점은 다음과 같습니다.
 
 * **기본값이 안전합니다.** 아무 설정 없이 ``execute()``만 부르면 표준 오류를 표준 출력에 합치고 그 출력을 버립니다. 파이프를 읽지 않아서 생기는 교착이 기본값에서는 일어나지 않습니다. 출력이 필요하면 ``readOutput(true)``를 켜고 결과의 ``outputUTF8()``로 문자열을 받거나, ``redirectOutput()``에 줄 단위로 문자열을 처리하는 함수를 람다 표현식으로 넘깁니다.
 * **시간제한이 예외 타입으로 구분됩니다.** ``timeout()``으로 지정한 시간을 넘기면 기본 stopper가 ``destroy()``로 종료를 요청하고 호출자에게 ``TimeoutException``을 던집니다. 종료 코드가 잘못된 경우와 시간 초과를 예외 타입만으로 구분할 수 있습니다. 다만 기본 stopper는 Linux에서 SIGTERM을 무시하는 프로세스까지 강제 종료하지는 않습니다. 종료 방식은 ``stopper()``로 바꿀 수 있습니다. ``ProcessStopper`` 인터페이스를 구현해서 ``destroy()`` 뒤에 유예 시간을 두고 ``destroyForcibly()``를 부르는 정책을 넣으면 됩니다.
@@ -438,9 +458,10 @@ static void exitValue() throws IOException, InterruptedException, TimeoutExcepti
 }
 ----
 
-실행 결과입니다. ``TimeoutException``의 메시지에 실행한 명령과 제한 시간이 들어 있고, ``ls``의 오류 메시지는 표준 오류가 표준 출력에 합쳐지는 기본값 덕분에 ``outputUTF8()``로 읽힙니다. 시간 초과 뒤에 `sleep` 프로세스가 남아 있지 않은 것도 확인했습니다.
+다음은 실행 결과입니다. ``TimeoutException``의 메시지에 실행한 명령과 제한 시간이 들어 있고, ``ls``의 오류 메시지는 표준 오류가 표준 출력에 합쳐지는 기본값 덕분에 ``outputUTF8()``로 읽힙니다. 시간 초과 뒤에 `sleep` 프로세스가 남아 있지 않은 것도 확인했습니다.
 
 [source,text]
+.ZtExecRunner.java 실행 결과
 ----
 output=hello, exit=0
 seq lines=100000, exit=0
@@ -448,11 +469,11 @@ timeout: Timed out waiting for Process[pid=294823, exitValue="not exited"] to fi
 exit=2, output=ls: cannot access '/no-such-dir': No such file or directory
 ----
 
-주의할 점도 있습니다. ``readOutput(true)``는 pump 스레드가 읽은 바이트를 전부 ``ByteArrayOutputStream``에 저장합니다. 결과를 만들 때 ``toByteArray()``로 한 번 더 복사하고, ``outputUTF8()``을 부르면 문자열도 만듭니다. 내부 버퍼의 여유 공간과 문자열 표현에 따라 최대 메모리 사용량이 달라지므로, 출력 크기의 두 배를 상한으로 생각하면 안 됩니다.
+주의할 점도 있습니다. ``readOutput(true)``는 출력 파이프를 읽는 스레드가 읽은 바이트를 전부 ``ByteArrayOutputStream``에 저장합니다. 결과를 만들 때 ``toByteArray()``로 한 번 더 복사하고, ``outputUTF8()``을 부르면 문자열도 만듭니다. 내부 버퍼의 여유 공간과 문자열 표현에 따라 최대 메모리 사용량이 달라지므로, 출력 크기의 두 배를 상한으로 생각하면 안 됩니다.
 
 전체 출력을 보관할 필요가 없다면 위 예제의 ``largeOutput()``처럼 ``readOutput``을 켜지 않고 ``redirectOutput()``에 줄 단위 처리 함수를 넘길 수 있습니다. 이 방식의 버퍼 크기는 총 출력량보다는 가장 긴 줄의 크기에 좌우됩니다. 줄바꿈 없는 거대한 출력에는 여전히 메모리가 많이 들고, 처리 함수가 느리면 자식 프로세스의 출력도 밀립니다. 그런 출력은 파일이나 고정 크기 버퍼로 처리하는 ``OutputStream``으로 보내는 편이 낫습니다.
 
-이 예제는 SLF4J API 2.0.17을 사용했으므로 구현체가 없을 때 초기화 과정에서 "No SLF4J providers were found"를 포함한 경고가 세 줄 나왔습니다. zt-exec 1.13.0의 POM이 선언한 의존성은 SLF4J API 1.7.32이며, 이 버전의 경고 문구는 다릅니다. 로그가 필요 없으면 사용 중인 SLF4J API에 맞는 ``slf4j-nop``을 추가해 경고를 없앨 수 있습니다.
+이 예제는 SLF4J API 2.0.17을 사용했으므로 구현체가 없을 때 초기화 과정에서 "No SLF4J providers were found"를 포함한 경고가 세 줄 나왔습니다. zt-exec 1.13.0의 POM이 선언한 의존성은 SLF4J API 1.7.32이며, 이 버전의 경고 문구는 다릅니다. 로그가 필요 없다면 사용 중인 SLF4J API에 맞는 ``slf4j-nop``을 추가해 경고를 없앨 수 있습니다.
 
 === Apache Commons Exec
 
@@ -493,6 +514,7 @@ static void run(String... command) throws IOException {
 ----
 
 [source,text]
+.CommonsExecRunner.java 실행 결과
 ----
 echo: exit=0, stdout bytes=6
 seq: exit=0, stdout bytes=588895
@@ -500,9 +522,49 @@ sleep: exit=143, killed by watchdog=true, stderr=
 ls: exit=2, killed by watchdog=false, stderr=ls: cannot access '/no-such-dir': No such file or directory
 ----
 
-``DefaultExecutor``는 Linux에서 기본적으로 0이 아닌 종료 코드에 ``ExecuteException``을 던집니다. 허용 코드는 ``setExitValue()``나 ``setExitValues()``로 바꿀 수 있고, ``setExitValues(null)``로 검사를 끌 수도 있습니다. 위 결과의 ``sleep``은 watchdog이 보낸 SIGTERM으로 끝나서 종료 코드가 143입니다. 이 예제에서는 예외를 잡은 뒤 ``watchdog.killedProcess()``로 watchdog의 개입 여부를 구분합니다. 다만 이 메서드는 ``destroy()`` 호출 여부를 나타내며 실제 종료를 보장하지 않습니다. 1.6.0의 ``ExecuteWatchdog``는 시간 초과 때 ``destroy()``만 호출하고 강제 종료로 넘어가는 API가 없습니다. 강제 종료가 필요하면 시간 초과 뒤 남은 프로세스를 ``ProcessHandle``로 찾아 ``destroyForcibly()``를 부르는 코드를 따로 두어야 합니다. SIGTERM을 무시하면 ``execute()``가 계속 기다릴 수 있고, 종료 처리를 수행한 명령이 허용된 코드로 끝나면 시간 초과 뒤에도 예외 없이 반환될 수 있으므로 정상 반환 경로에서도 확인해야 합니다.
+``DefaultExecutor``는 Linux에서 기본적으로 0이 아닌 종료 코드에 ``ExecuteException``을 던집니다.
+에러로 처리하지 않을 종료 코드는 ``setExitValue()``나 ``setExitValues()``로 바꿀 수 있고, ``setExitValues(null)``로 검사를 끌 수도 있습니다.
+위 결과의 ``sleep``은 watchdog이 보낸 SIGTERM으로 끝나서 종료 코드가 143입니다.
+이 예제에서는 예외를 잡은 뒤 ``watchdog.killedProcess()``로 watchdog의 개입 여부를 구분합니다.
+다만 이 메서드는 ``destroy()`` 호출 여부를 나타내며 실제 종료를 보장하지 않습니다.
+1.6.0의 ``ExecuteWatchdog``는 시간 초과 때 ``destroy()``만 호출하고 강제 종료로 넘어가는 API가 없습니다.
+강제 종료가 필요하면 시간 초과 뒤 남은 프로세스를 ``ProcessHandle``로 찾아 ``destroyForcibly()``를 부르는 코드를 따로 두어야 합니다.
+SIGTERM을 무시하면 ``execute()``가 계속 기다릴 수 있고, 종료 처리를 수행한 명령이 허용된 코드로 끝나면 시간 초과 뒤에도 예외 없이 반환될 수 있으므로 정상 반환 경로에서도 확인해야 합니다.
 
-``CommandLine.addArguments(String)``는 따옴표를 해석하며 인자를 나누므로, 공백을 포함한 인자를 문자열로 조립할 때 주의해야 합니다. 배열을 받는 메서드도 기본적으로 인자에 따옴표를 추가할 수 있습니다. Linux의 ``Runtime.exec(String[])``는 셸을 거치지 않으므로 그 따옴표가 인자의 일부로 전달될 수 있습니다. 그래서 위 예제는 이미 분리된 인자 배열에 두 번째 인자를 ``false``로 주어 추가 quoting을 껐습니다.
+``CommandLine.addArguments(String)``는 따옴표를 해석하며 인자를 나누므로, 공백을 포함한 인자를 문자열로 조립할 때 주의해야 합니다.
+배열을 받는 메서드도 기본적으로 인자에 따옴표를 추가할 수 있습니다.
+Linux의 ``Runtime.exec(String[])``는 셸을 거치지 않으므로 그 따옴표가 인자의 일부로 전달될 수 있습니다.
+그래서 위 예제는 이미 분리된 인자 배열에 두 번째 인자를 ``false``로 주어 추가 quoting을 껐습니다.
+
+아래 예제는 `printf '[%s]\n' "hello world"` 명령을 ``CommandLine``으로 세 가지 방식으로 조립해 실행합니다. 셸에서 이 명령을 실행하면 `[hello world]`가 출력됩니다.
+
+[source,java]
+.CommandLineQuotingDemo.java
+----
+CommandLine parsed = new CommandLine("printf").addArguments("[%s]\\n \"hello world\"");
+run("문자열을 나눔", parsed);
+
+CommandLine quoted = new CommandLine("printf").addArgument("[%s]\\n").addArgument("hello world");
+run("배열, quoting 기본값", quoted);
+
+CommandLine raw = new CommandLine("printf").addArgument("[%s]\\n").addArgument("hello world", false);
+run("배열, quoting 끔", raw);
+----
+
+``run()`` 메서드는 ``cmdLine.getArguments()``로 실제 전달되는 인자 배열을 찍고, ``DefaultExecutor``로 실행한 출력을 함께 보여줍니다.
+
+[source,text]
+.CommandLineQuotingDemo.java 실행 결과
+----
+문자열을 나눔: args=[[%s]\n, "hello world"] -> printf 출력=["hello world"]
+배열, quoting 기본값: args=[[%s]\n, "hello world"] -> printf 출력=["hello world"]
+배열, quoting 끔: args=[[%s]\n, hello world] -> printf 출력=[hello world]
+----
+
+첫 번째는 문자열을 나누면서 따옴표를 벗겨 `hello world`를 하나의 인자로 인식했지만, 공백이 있다는 이유로 다시 큰따옴표를 붙여서 넘겼습니다.
+두 번째처럼 이미 나뉜 인자를 넘겨도 quoting 기본값이 ``true``라서 결과는 같습니다.
+셸이라면 그 따옴표를 해석해서 벗겨 주지만 ``Runtime.exec(String[])``는 인자를 그대로 전달하므로, ``printf``는 따옴표까지 포함한 `"hello world"`를 받습니다.
+세 번째처럼 quoting을 꺼야 셸에서 실행한 것과 같은 결과가 나옵니다.
 
 === 유지보수 현황과 선택
 
@@ -722,7 +784,7 @@ instead (-Djdk.lang.Process.launchMechanism=FORK).
 
 == 마치며
 
-외부 프로세스 실행 코드는 출력 처리, 시간제한, 종료 정책을 함께 설계해야 합니다. 출력을 가공할 필요가 없으면 ``Redirect.DISCARD``나 ``inheritIO()``를 쓰고, 표준 출력과 표준 오류를 따로 받아야 하면 두 스트림을 동시에 읽어야 합니다. 표준 입력을 읽는 명령에는 EOF를 전달해야 합니다. 시간제한 뒤에는 종료 요청뿐 아니라 강제 종료 여부와 자원 정리까지 챙겨야 합니다.
+외부 프로세스 실행 코드는 출력 처리, 시간제한, 종료 정책을 함께 설계해야 합니다. 출력을 가공할 필요가 없으면 ``Redirect.DISCARD``나 ``inheritIO()``를 쓰고, 표준 출력과 표준 오류를 따로 받아야 하면 두 스트림을 동시에 읽어야 합니다. 표준 입력을 읽는 명령에는 입력을 다 쓴 뒤 스트림을 닫아 EOF를 받게 해야 합니다. 시간제한 뒤에는 종료 요청뿐 아니라 강제 종료 여부와 자원 정리까지 챙겨야 합니다.
 
 zt-exec과 Commons Exec은 이 코드를 줄여 줍니다. 출력과 종료 코드의 기본값, 시간 초과를 알리는 방식, 의존성을 비교해 프로젝트에 맞는 쪽을 고르면 됩니다. 두 라이브러리 모두 기본 ``destroy()``만으로 강제 종료까지 보장하지는 않으며, 후손 프로세스 정리는 프로세스 그룹이나 cgroup 같은 OS 수준의 묶음이 필요합니다.
 
