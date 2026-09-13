@@ -4,7 +4,7 @@
 
 | 파일 | 내용 |
 |---|---|
-| `DeadlockDemo.java` | 파이프 출력을 읽지 않고 `waitFor()`만 부르면 하위 프로세스가 멈추는 현상 재현 |
+| `DeadlockDemo.java` | 파이프 출력을 읽지 않고 `waitFor()`만 부르면 자식 프로세스가 멈추는 현상 재현 |
 | `SequentialReadDemo.java` | 표준 출력을 다 읽은 뒤에 표준 오류를 읽는 순차 처리가 교착에 빠지는 현상 재현 (끝나지 않으므로 Ctrl+C로 중단) |
 | `MergedReadDemo.java` | `redirectErrorStream(true)`로 두 출력을 합쳐 파이프 하나로 읽는 예 |
 | `RedirectDemo.java` | `Redirect.INHERIT`, `inheritIO()`, `Redirect.DISCARD`, `Redirect.to(File)`로 읽지 않을 출력을 내보내는 예 |

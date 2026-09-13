@@ -13,7 +13,7 @@
 :source-repo: {examples-repo}/java-external-process
 
 이 글은 JDK 25와 Linux 6.x를 기준으로 Java에서 외부 프로세스를 실행하는 코드를 작성할 때 주의해야 할 요소와 활용할 수 있는 라이브러리를 소개합니다.
-이어서 Linux에서 JVM이 하위 프로세스를 만드는 방식인 ``posix_spawn()``과 ``jspawnhelper``의 동작, 큰 힙에서 나타나는 실행 지연, 실행 방식을 바꾸는 설정까지 살펴봅니다.
+이어서 Linux에서 JVM이 자식 프로세스를 만드는 방식인 ``posix_spawn()``과 ``jspawnhelper``의 동작, 큰 힙에서 나타나는 실행 지연, 실행 방식을 바꾸는 설정까지 살펴봅니다.
 이 글의 실행 결과는 아래 환경에서 확인했습니다. 예제 코드는 link:{source-repo}[GitHub 저장소]에 있습니다.
 
 [cols="1,2", options="header"]
@@ -98,7 +98,7 @@ System.out.println("exit=" + exitCode);
 
 === 표준 출력과 표준 오류의 파이프 처리
 
-**하위 프로세스가 표준 출력(stdout)과 표준 오류(stderr)의 한정된 파이프 용량을 다 채우면 그 프로세스는 멈춥니다.**
+**자식 프로세스가 표준 출력(stdout)과 표준 오류(stderr)의 한정된 파이프 용량을 다 채우면 그 프로세스는 멈춥니다.**
 그런 상황을 막기 위해 표준 출력과 표준 오류를 계속 소비하는 장치가 필요합니다.
 다음 중 하나의 조치를 취해야 합니다.
 
@@ -112,10 +112,11 @@ System.out.println("exit=" + exitCode);
 
 ==== 읽지 않은 파이프 버퍼가 부르는 교착
 
-하위 프로세스의 표준 출력과 표준 오류는 기본 설정에서 각각 별도의 파이프로 부모 프로세스에 전달됩니다. 부모가 파이프를 읽지 않으면 파이프 버퍼가 차고, 하위 프로세스는 쓰기를 마치지 못합니다.
+자식 프로세스의 표준 출력과 표준 오류는 ``ProcessBuilder``에서도 기본값으로는 각각 별도의 파이프로 부모 프로세스에 전달됩니다. 부모가 파이프를 읽지 않으면 파이프 버퍼가 차고, 자식 프로세스는 쓰기를 마치지 못합니다.
 
-**``waitFor()``를 호출하지 않아도 이 문제는 생깁니다.** 부모는 다음 코드를 실행할 수 있지만, 하위 프로세스는 버퍼에 빈자리가 생기기를 기다리느라 작업을 마치지 못할 수 있습니다. 여기에 부모가 ``waitFor()``로 하위 프로세스의 종료만 기다리면 서로를 기다리는 교착이 됩니다. 따라서 ``waitFor()``를 빼는 것으로 해결할 수 없고, 출력 파이프를 읽거나 리다이렉트해야 합니다. JDK 25의 `Process` Javadoc은 이 멈춤과 교착 가능성을 경고합니다.
+**``waitFor()``를 호출하지 않아도 이 문제는 생깁니다.** 부모는 자식 프로세스 시작 후 이어지는 코드를 실행할 수 있지만, 자식 프로세스는 버퍼에 빈자리가 생기기를 기다리느라 작업을 마치지 못할 수 있습니다. 여기에 부모가 ``waitFor()``로 자식 프로세스의 종료만 기다리면 서로를 기다리는 교착이 됩니다. 따라서 ``waitFor()``를 빼는 것으로 해결할 수 없고, 출력 파이프를 읽거나 리다이렉트해야 합니다. JDK 25의 `Process` Javadoc은 이 멈춤과 교착 가능성을 경고합니다.
 
+.`Process` 클래스의 Javadoc 중
 ____
 Because some native platforms only provide limited buffer size for standard input and output streams, failure to promptly write the input stream or read the output stream of the process may cause the process to block, or even deadlock.
 ____
@@ -125,7 +126,7 @@ ____
 일부 네이티브 플랫폼은 표준 입력과 표준 출력 스트림에 제한된 크기의 버퍼만 제공하므로, 프로세스의 입력 스트림에 제때 쓰지 않거나 출력 스트림을 제때 읽지 않으면 프로세스가 멈추거나 심하면 교착에 빠질 수 있습니다.
 ____
 
-"limited buffer size"가 Linux에서는 얼마인지 https://man7.org/linux/man-pages/man7/pipe.7.html[pipe(7)] 매뉴얼에 나옵니다. 커널 2.6.11부터 기본 파이프 용량은 16페이지, 즉 4KiB 페이지 기준 64KiB입니다. 다만 사용자별 파이프 메모리 한도나 시스템 설정에 따라 더 작아질 수 있고, ``F_SETPIPE_SZ``로 바꿀 수도 있으므로 64KiB를 고정 한계로 가정하면 안 됩니다.
+Javadoc에 언급된 "limited buffer size"가 Linux에서는 얼마인지 https://man7.org/linux/man-pages/man7/pipe.7.html[pipe(7)] 매뉴얼에 나옵니다. 커널 2.6.11부터 기본 파이프 용량은 16페이지, 즉 4KiB 페이지 기준 64KiB입니다. 다만 사용자별 파이프 메모리 한도나 시스템 설정에 따라 더 작아질 수 있고, ``F_SETPIPE_SZ``로 바꿀 수도 있으므로 64KiB를 고정 한계로 가정하면 안 됩니다.
 
 아래 코드는 `seq 1 100000` 명령으로 588,895바이트를 출력하게 하고 읽지 않은 채 3초를 기다립니다.
 
@@ -148,7 +149,7 @@ finished within 3s: false, alive: true
 read 100000 lines, exit=0, alive: false
 ----
 
-예제의 부모 프로세스가 3초 동안 대기를 마친 후에도 자식 프로세스는 살아있습니다. 파이프를 끝까지 읽은 뒤에 다시 호출한 ``isAlive()``는 ``false``를 돌려줍니다. 하위 프로세스가 출력을 마칠 수 있게 한 것은 그 사이에 파이프를 읽은 동작입니다. 제한 시간이 없었다면 부모도 ``waitFor()``에서 계속 기다렸을 것입니다.
+예제의 부모 프로세스가 3초 동안 대기를 마친 후에도 자식 프로세스는 살아있습니다. 파이프를 끝까지 읽은 뒤에 다시 호출한 ``isAlive()``는 ``false``를 돌려줍니다. 자식 프로세스가 출력을 마칠 수 있게 한 것은 그 사이에 파이프를 읽은 동작입니다. 제한 시간이 없었다면 부모도 ``waitFor()``에서 계속 기다렸을 것입니다.
 
 예제에 쓴 `inputReader()` 메서드는 JDK 17에 추가됐습니다. 그 전에는 ``getInputStream()``을 ``InputStreamReader``와 ``BufferedReader``로 감싸야 했습니다.
 
@@ -164,11 +165,11 @@ long lines = reader.lines().count();
 long lines = process.inputReader().lines().count();
 ----
 
-두 코드가 쓰는 인코딩은 다릅니다. ``inputReader()``는 `native.encoding` 시스템 속성이 가리키는 인코딩으로 디코딩하고, 인자를 넘기지 않은 ``InputStreamReader``는 ``Charset.defaultCharset()``을 씁니다. JDK 18부터 기본 문자 인코딩이 UTF-8로 고정됐으므로, 운영체제 인코딩이 UTF-8이 아닌 환경에서는 하위 프로세스의 출력을 ``inputReader()``가 더 정확하게 읽습니다.
+두 코드가 쓰는 인코딩은 다릅니다. ``inputReader()``는 `native.encoding` 시스템 속성이 가리키는 인코딩으로 디코딩하고, 인자를 넘기지 않은 ``InputStreamReader``는 ``Charset.defaultCharset()``을 씁니다. JDK 18부터 기본 문자 인코딩이 UTF-8로 고정됐으므로, 운영체제 인코딩이 UTF-8이 아닌 환경에서는 자식 프로세스의 출력을 ``inputReader()``가 더 정확하게 읽습니다.
 
 ==== 출력을 읽을 때는 두 스트림을 동시에 처리
 
-표준 출력과 표준 오류를 따로 받아서 가공해야 한다면 파이프 두 개를 동시에 비워야 합니다. 한 파이프를 다 읽은 뒤에 다른 파이프를 읽는 순차 처리로는 부족합니다. 표준 오류 파이프가 먼저 차면 하위 프로세스는 표준 출력을 더 쓰지 못하고, 부모는 표준 출력의 EOF를 기다리는 교착이 생깁니다. 이 경우에는 ``waitFor()``에 도달하기도 전에 읽기 작업에서 멈춥니다.
+표준 출력과 표준 오류를 따로 받아서 가공해야 한다면 파이프 두 개를 동시에 비워야 합니다. 한 파이프를 다 읽은 뒤에 다른 파이프를 읽는 순차 처리로는 부족합니다. 표준 오류 파이프가 먼저 차면 자식 프로세스는 표준 출력을 더 쓰지 못하고, 부모는 표준 출력의 EOF를 기다리는 교착이 생깁니다. 이 경우에는 ``waitFor()``에 도달하기도 전에 읽기 작업에서 멈춥니다.
 
 아래 코드는 표준 오류에 588,895바이트를 쏟은 뒤에 표준 출력에 한 줄을 쓰는 명령을 실행하고, 표준 출력을 끝까지 읽은 다음에 표준 오류를 읽습니다.
 
@@ -182,7 +183,7 @@ long errLines = process.errorReader().lines().count();
 System.out.println("stdout " + outLines + ", stderr " + errLines + ", exit=" + process.waitFor());
 ----
 
-실행 결과입니다. 첫 줄을 출력한 뒤로는 아무리 기다려도 다음 줄이 나오지 않고, ``ps``로 확인하면 하위 `seq` 프로세스도 그대로 살아 있습니다.
+실행 결과입니다. 첫 줄을 출력한 뒤로는 아무리 기다려도 다음 줄이 나오지 않고, ``ps``로 확인하면 자식 `seq` 프로세스도 그대로 살아 있습니다.
 
 [source,text]
 ----
@@ -210,15 +211,11 @@ System.out.println("read " + lines + " lines, exit=" + process.waitFor());
 read 100001 lines, exit=0
 ----
 
-합친 뒤에도 그 파이프를 계속 읽거나, 다음 절처럼 출력 대상을 리다이렉트해야 합니다.
-
 ==== Java 프로세스에서 읽지 않을 출력은 리다이렉트
 
-``ProcessBuilder``는 `redirectOutput()`, `redirectError()` 메서드로 하위 프로세스의 출력을 어떻게 다룰지 지정할 수 있습니다.
-앞의 두 절에서 본 프로세스 멈춤은 두 메서드로 값을 지정하지 않고 기본값인 ``Redirect.PIPE``를 쓰면서 출력 스트림을 따로 읽지 않아서 생긴 현상입니다. ``getInputStream()``을 호출하는 것만으로는 부족하고 실제로 읽어야 합니다.
-출력을 부모 프로세스가 가공할 필요가 없다면 Java 코드가 읽어야 할 파이프를 만들지 않는 편이 가장 단순합니다. 기본값인 ``Redirect.PIPE`` 대신 쓸 수 있는 선택지는 다음과 같습니다.
+자식 프로세스의 출력을 부모 프로세스가 참조하거나 가공할 필요가 없다면 Java 코드가 읽어야 할 파이프를 만들지 않는 편이 가장 단순합니다. 기본값인 ``Redirect.PIPE`` 대신 쓸 수 있는 선택지는 다음과 같습니다.
 
-* ``Redirect.INHERIT`` : 하위 프로세스가 부모의 표준 출력과 표준 오류에 바로 씁니다. (JDK 7부터 지원)
+* ``Redirect.INHERIT`` : 자식 프로세스가 부모의 표준 출력과 표준 오류에 바로 씁니다. (JDK 7부터 지원)
 ** `inheritIO()` 메서드는 부모 프로세스의 세 스트림(표준 입력, 표준 출력, 표준 오류)을 한 번에 물려줍니다. (JDK 7부터 지원)
 * ``Redirect.DISCARD`` : 출력을 ``/dev/null``로 보냅니다. (JDK 9부터 지원)
 * ``Redirect.to(File)`` : 출력을 파일로 보냅니다. (JDK 7부터 지원)
@@ -260,9 +257,9 @@ Java 코드가 비워야 할 파이프가 없기 때문입니다.
 
 ==== 표준 입력의 EOF 전달
 
-앞의 Javadoc 인용문이 출력과 함께 경고한 표준 입력(stdin)도 기본값은 파이프입니다. 부모 JVM이 이 파이프의 쓰기 끝을 열어 둔 채로 있으면 하위 프로세스는 EOF를 받지 못합니다. 인자 없이 실행한 ``cat``처럼 표준 입력을 끝까지 읽는 명령은 더 올 입력이 없는데도 계속 기다리고, 부모는 ``waitFor()``에서 그 명령이 끝나기를 기다립니다. 출력 파이프를 모두 비워도 이 대기는 풀리지 않습니다.
+앞의 Javadoc 인용문이 출력과 함께 경고한 표준 입력(stdin)도 기본값은 파이프입니다. 부모 JVM이 이 파이프의 쓰기 끝을 열어 둔 채로 있으면 자식 프로세스는 EOF를 받지 못합니다. 인자 없이 실행한 ``cat``처럼 표준 입력을 끝까지 읽는 명령은 더 올 입력이 없는데도 계속 기다리고, 부모는 ``waitFor()``에서 그 명령이 끝나기를 기다립니다. 출력 파이프를 모두 비워도 이 대기는 풀리지 않습니다.
 
-입력을 보낼 일이 없으면 ``start()`` 직후에 ``process.getOutputStream().close()``로 쓰기 끝을 닫거나, ``redirectInput(new File("/dev/null"))``처럼 빈 입력을 지정합니다. 입력을 보내야 한다면 다 쓴 뒤에 스트림을 닫아야 합니다. 뒤에서 살펴볼 zt-exec과 Apache Commons Exec은 입력을 지정하지 않으면 하위 프로세스의 표준 입력을 바로 닫습니다.
+입력을 보낼 일이 없으면 ``start()`` 직후에 ``process.getOutputStream().close()``로 쓰기 끝을 닫거나, ``redirectInput(new File("/dev/null"))``처럼 빈 입력을 지정합니다. 입력을 보내야 한다면 다 쓴 뒤에 스트림을 닫아야 합니다. 뒤에서 살펴볼 zt-exec과 Apache Commons Exec은 입력을 지정하지 않으면 자식 프로세스의 표준 입력을 바로 닫습니다.
 
 아래 예제는 ``cat``을 네 번 실행하면서 표준 입력을 다루는 방식만 바꿉니다.
 
@@ -353,7 +350,7 @@ flush 후 섞어 씀: echoed=[1 writer, 2 stream], exit=0
 
 === 시간제한과 종료 정책
 
-출력 파이프를 처리해도 외부 명령이 네트워크나 잠금을 기다리며 멈출 수 있으므로 시간제한과 종료 정책은 별도로 필요합니다. 이때 ``waitFor()``를 부른 스레드도 함께 멈춥니다. JDK 8부터 있는 `waitFor(long, TimeUnit)` 메서드는 시간이 지나면 ``false``를 돌려줄 뿐 프로세스를 종료하지 않습니다. 그때는 ``destroy()``로 정상 종료를 요청하고 유예 시간 뒤에도 살아 있으면 ``destroyForcibly()``를 쓰거나, 아래 예제처럼 바로 강제 종료할 수 있습니다. Linux의 OpenJDK 구현에서 ``destroy()``는 SIGTERM을, ``destroyForcibly()``는 SIGKILL을 보냅니다. 프로세스는 SIGTERM을 핸들러로 받아서 임시 파일 삭제나 잠금 해제, 자신이 만든 하위 프로세스 정리 같은 마무리를 한 뒤에 끝날 수 있습니다. SIGKILL은 커널이 프로세스를 즉시 끝내므로 그런 기회가 없고, 정리하지 못한 파일과 후손 프로세스가 남을 수 있습니다. 그래서 정리할 것이 있는 명령에는 ``destroy()``를 먼저 보내고 유예 시간을 두는 편이 안전합니다. 아래 예제는 ``sleep``처럼 정리할 것이 없는 명령만 실행하므로 바로 강제 종료합니다.
+출력 파이프를 처리해도 외부 명령이 네트워크나 잠금을 기다리며 멈출 수 있으므로 시간제한과 종료 정책은 별도로 필요합니다. 이때 ``waitFor()``를 부른 스레드도 함께 멈춥니다. JDK 8부터 있는 `waitFor(long, TimeUnit)` 메서드는 시간이 지나면 ``false``를 돌려줄 뿐 프로세스를 종료하지 않습니다. 그때는 ``destroy()``로 정상 종료를 요청하고 유예 시간 뒤에도 살아 있으면 ``destroyForcibly()``를 쓰거나, 아래 예제처럼 바로 강제 종료할 수 있습니다. Linux의 OpenJDK 구현에서 ``destroy()``는 SIGTERM을, ``destroyForcibly()``는 SIGKILL을 보냅니다. 프로세스는 SIGTERM을 핸들러로 받아서 임시 파일 삭제나 잠금 해제, 자신이 만든 자식 프로세스 정리 같은 마무리를 한 뒤에 끝날 수 있습니다. SIGKILL은 커널이 프로세스를 즉시 끝내므로 그런 기회가 없고, 정리하지 못한 파일과 후손 프로세스가 남을 수 있습니다. 그래서 정리할 것이 있는 명령에는 ``destroy()``를 먼저 보내고 유예 시간을 두는 편이 안전합니다. 아래 예제는 ``sleep``처럼 정리할 것이 없는 명령만 실행하므로 바로 강제 종료합니다.
 
 아래는 두 출력 스트림을 각각 JDK 21의 가상 스레드에서 읽으면서, 종료 대기에 1초 제한을 둔 예제입니다.
 
@@ -391,11 +388,11 @@ timed out: sleep 60
 
 출력이 아주 크면 ``StringBuilder``에 다 담지 말고 줄 단위나 고정 크기 버퍼로 처리해야 합니다. 출력 인코딩이 UTF-8이 아닌 명령도 있습니다.
 
-``destroyForcibly()``는 직접 만든 프로세스만 끝냅니다. ``sh -c``로 여러 명령을 이어서 실행하거나, 실행한 명령이 다시 하위 프로세스를 만드는 경우가 대표적입니다. 셸만 끝나고 손자 프로세스가 남아서 물려받은 출력 파이프를 계속 열고 있으면, 읽기 스레드는 EOF를 받지 못하고 ``join()``도 끝나지 않습니다. JDK 9의 ``ProcessHandle.descendants()``로 후손을 조회해 하나씩 종료할 수 있지만 그 결과는 스냅샷이므로, 조회와 종료 사이에 생기거나 부모 종료 뒤 재부모화된 프로세스까지 확실하게 정리하지는 못합니다. 후손까지 한 번에 끝내려면 OS 수준에서 묶어야 합니다. ``setsid`` 명령으로 새 세션과 프로세스 그룹을 만들어 실행하고 시간 초과 때 그 그룹 전체에 시그널을 보내거나, ``systemd-run``이나 컨테이너처럼 cgroup 단위로 정리하는 방법이 있습니다. JDK API에는 프로세스 그룹을 만들거나 그룹에 시그널을 보내는 기능이 없으므로, 프로세스 그룹 방식은 ``setsid``와 ``kill`` 명령을 함께 실행하는 식으로 구성해야 합니다. 다음 절의 라이브러리는 출력 처리와 시간제한 코드를 줄여 주지만, 이런 조건까지 모두 해결해 주지는 않습니다.
+``destroyForcibly()``는 직접 만든 프로세스만 끝냅니다. ``sh -c``로 여러 명령을 이어서 실행하거나, 실행한 명령이 다시 자식 프로세스를 만드는 경우가 대표적입니다. 셸만 끝나고 손자 프로세스가 남아서 물려받은 출력 파이프를 계속 열고 있으면, 읽기 스레드는 EOF를 받지 못하고 ``join()``도 끝나지 않습니다. JDK 9의 ``ProcessHandle.descendants()``로 후손을 조회해 하나씩 종료할 수 있지만 그 결과는 스냅샷이므로, 조회와 종료 사이에 생기거나 부모 종료 뒤 재부모화된 프로세스까지 확실하게 정리하지는 못합니다. 후손까지 한 번에 끝내려면 OS 수준에서 묶어야 합니다. ``setsid`` 명령으로 새 세션과 프로세스 그룹을 만들어 실행하고 시간 초과 때 그 그룹 전체에 시그널을 보내거나, ``systemd-run``이나 컨테이너처럼 cgroup 단위로 정리하는 방법이 있습니다. JDK API에는 프로세스 그룹을 만들거나 그룹에 시그널을 보내는 기능이 없으므로, 프로세스 그룹 방식은 ``setsid``와 ``kill`` 명령을 함께 실행하는 식으로 구성해야 합니다. 다음 절의 라이브러리는 출력 처리와 시간제한 코드를 줄여 주지만, 이런 조건까지 모두 해결해 주지는 않습니다.
 
 == zt-exec과 Apache Commons Exec의 활용
 
-출력 파이프 처리와 시간제한 코드를 프로젝트마다 다시 구현하는 대신 라이브러리를 쓸 수 있습니다. zt-exec은 ``ProcessBuilder``를, Commons Exec의 일반적인 Java 실행 경로는 ``Runtime.exec()``를 사용하며, 결국 JDK의 프로세스 생성 구현을 거칩니다. 두 라이브러리 모두 pump 스레드로 출력 파이프를 비우고, 입력을 지정하지 않으면 ``PumpStreamHandler``가 하위 프로세스의 표준 입력을 닫아 EOF를 전달합니다. zt-exec의 `PumpStreamHandler` 클래스는 소스 파일 상단에 "This file originates from the Apache Commons Exec package"라고 적혀 있을 만큼 Commons Exec의 코드를 가져온 것입니다. 이 글에서 비교할 주요 차이는 API의 모양과 기본값입니다.
+출력 파이프 처리와 시간제한 코드를 프로젝트마다 다시 구현하는 대신 라이브러리를 쓸 수 있습니다. zt-exec은 ``ProcessBuilder``를, Commons Exec의 일반적인 Java 실행 경로는 ``Runtime.exec()``를 사용하며, 결국 JDK의 프로세스 생성 구현을 거칩니다. 두 라이브러리 모두 pump 스레드로 출력 파이프를 비우고, 입력을 지정하지 않으면 ``PumpStreamHandler``가 자식 프로세스의 표준 입력을 닫아 EOF를 전달합니다. zt-exec의 `PumpStreamHandler` 클래스는 소스 파일 상단에 "This file originates from the Apache Commons Exec package"라고 적혀 있을 만큼 Commons Exec의 코드를 가져온 것입니다. 이 글에서 비교할 주요 차이는 API의 모양과 기본값입니다.
 
 === zt-exec
 
@@ -415,7 +412,7 @@ https://github.com/zeroturnaround/zt-exec[zt-exec]은 JRebel을 만든 ZeroTurna
 * **기본값이 안전합니다.** 아무 설정 없이 ``execute()``만 부르면 표준 오류를 표준 출력에 합치고 그 출력을 버립니다. 파이프를 읽지 않아서 생기는 교착이 기본값에서는 일어나지 않습니다. 출력이 필요하면 ``readOutput(true)``를 켜고 결과의 ``outputUTF8()``로 문자열을 받거나, ``redirectOutput()``에 줄 단위로 문자열을 처리하는 함수를 람다 표현식으로 넘깁니다.
 * **시간제한이 예외 타입으로 구분됩니다.** ``timeout()``으로 지정한 시간을 넘기면 기본 stopper가 ``destroy()``로 종료를 요청하고 호출자에게 ``TimeoutException``을 던집니다. 종료 코드가 잘못된 경우와 시간 초과를 예외 타입만으로 구분할 수 있습니다. 다만 기본 stopper는 Linux에서 SIGTERM을 무시하는 프로세스까지 강제 종료하지는 않습니다. 종료 방식은 ``stopper()``로 바꿀 수 있습니다. ``ProcessStopper`` 인터페이스를 구현해서 ``destroy()`` 뒤에 유예 시간을 두고 ``destroyForcibly()``를 부르는 정책을 넣으면 됩니다.
 * **종료 코드 검사를 선언합니다.** 기본값은 모든 종료 코드를 허용하고, ``exitValueNormal()``이나 ``exitValues(0, 1)``로 허용 범위를 지정하면 그 밖의 값에서 ``InvalidExitValueException``이 납니다. 예외 객체의 ``getResult()``로 그때까지의 출력도 볼 수 있어서 오류 메시지를 로그에 남기기 좋습니다.
-* **부수 기능을 간단히 설정합니다.** ``start().getFuture()``로 비동기 실행을 하고, ``destroyOnExit()``로 JVM의 shutdown hook에서 하위 프로세스에 종료를 요청합니다. ``redirectOutputAsInfo()``로 SLF4J 로거에 출력을 전달할 수도 있지만, 이 메서드는 deprecated이며 ``redirectOutput(Slf4jStream.of(logger).asInfo())``가 권장 API입니다.
+* **부수 기능을 간단히 설정합니다.** ``start().getFuture()``로 비동기 실행을 하고, ``destroyOnExit()``로 JVM의 shutdown hook에서 자식 프로세스에 종료를 요청합니다. ``redirectOutputAsInfo()``로 SLF4J 로거에 출력을 전달할 수도 있지만, 이 메서드는 deprecated이며 ``redirectOutput(Slf4jStream.of(logger).asInfo())``가 권장 API입니다.
 
 앞 절의 네 명령을 zt-exec으로 실행한 예제입니다.
 
@@ -477,7 +474,7 @@ exit=2, output=ls: cannot access '/no-such-dir': No such file or directory
 
 주의할 점도 있습니다. ``readOutput(true)``는 pump 스레드가 읽은 바이트를 전부 ``ByteArrayOutputStream``에 저장합니다. 결과를 만들 때 ``toByteArray()``로 한 번 더 복사하고, ``outputUTF8()``을 부르면 문자열도 만듭니다. 내부 버퍼의 여유 공간과 문자열 표현에 따라 최대 메모리 사용량이 달라지므로, 출력 크기의 두 배를 상한으로 생각하면 안 됩니다.
 
-전체 출력을 보관할 필요가 없다면 위 예제의 ``largeOutput()``처럼 ``readOutput``을 켜지 않고 ``redirectOutput()``에 줄 단위 처리 함수를 넘길 수 있습니다. 이 방식의 버퍼 크기는 총 출력량보다는 가장 긴 줄의 크기에 좌우됩니다. 줄바꿈 없는 거대한 출력에는 여전히 메모리가 많이 들고, 처리 함수가 느리면 하위 프로세스의 출력도 밀립니다. 그런 출력은 파일이나 고정 크기 버퍼로 처리하는 ``OutputStream``으로 보내는 편이 낫습니다.
+전체 출력을 보관할 필요가 없다면 위 예제의 ``largeOutput()``처럼 ``readOutput``을 켜지 않고 ``redirectOutput()``에 줄 단위 처리 함수를 넘길 수 있습니다. 이 방식의 버퍼 크기는 총 출력량보다는 가장 긴 줄의 크기에 좌우됩니다. 줄바꿈 없는 거대한 출력에는 여전히 메모리가 많이 들고, 처리 함수가 느리면 자식 프로세스의 출력도 밀립니다. 그런 출력은 파일이나 고정 크기 버퍼로 처리하는 ``OutputStream``으로 보내는 편이 낫습니다.
 
 이 예제는 SLF4J API 2.0.17을 사용했으므로 구현체가 없을 때 초기화 과정에서 "No SLF4J providers were found"를 포함한 경고가 세 줄 나왔습니다. zt-exec 1.13.0의 POM이 선언한 의존성은 SLF4J API 1.7.32이며, 이 버전의 경고 문구는 다릅니다. 로그가 필요 없으면 사용 중인 SLF4J API에 맞는 ``slf4j-nop``을 추가해 경고를 없앨 수 있습니다.
 
@@ -702,7 +699,7 @@ Linux 6.17의 ``dup_mmap()``은 부모 프로세스의 주소 공간 잠금(mmap
 
 이 설정이 남아 있을 만한 자리는 JVM 실행 스크립트와 Dockerfile의 ``JAVA_OPTS``, 애플리케이션 서버의 기동 옵션입니다. Linux에서는 JDK 7부터 12까지 ``vfork()``가 기본이었으므로, JDK 13에서 기본값이 ``POSIX_SPAWN``으로 바뀔 때 이전 동작을 유지하려고 이 속성을 명시적으로 적어 둔 경우가 있습니다. 값은 대소문자를 구분하지 않으니 소문자 `vfork` 로 적힌 설정도 같은 대상입니다. 지금은 이 값을 지정할 이유가 없으므로 속성을 지우고 기본값으로 돌아가면 됩니다.
 
-OpenJDK가 Linux에서 하위 프로세스를 만드는 방식은 구현 전용 시스템 속성인 `jdk.lang.Process.launchMechanism` 으로 선택할 수 있습니다. 기본값의 변천은 아래와 같습니다. JDK 27 항목은 정식 출시 결과가 아니라 2026-09-06 현재 개발 버전에 반영된 내용입니다.
+OpenJDK가 Linux에서 자식 프로세스를 만드는 방식은 구현 전용 시스템 속성인 `jdk.lang.Process.launchMechanism` 으로 선택할 수 있습니다. 기본값의 변천은 아래와 같습니다. JDK 27 항목은 정식 출시 결과가 아니라 2026-09-06 현재 개발 버전에 반영된 내용입니다.
 
 [cols="1,3", options="header"]
 |===
