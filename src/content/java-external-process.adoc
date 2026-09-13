@@ -13,7 +13,7 @@
 :source-repo: {examples-repo}/java-external-process
 
 이 글은 JDK 25와 Linux 6.x를 기준으로 Java에서 외부 프로세스를 실행하는 코드를 작성할 때 주의해야 할 요소와 활용할 수 있는 라이브러리를 소개합니다.
-이어서 Linux에서 JVM이 자식 프로세스를 만드는 방식인 ``posix_spawn()``과 ``jspawnhelper``의 동작, 큰 힙에서 나타나는 실행 지연, 실행 방식을 바꾸는 설정까지 살펴봅니다.
+이어서 Linux에서 JVM이 자식 프로세스를 만드는 방식인 ``posix_spawn()`` 함수와 JDK에 포함된 작은 실행 파일인 ``jspawnhelper``의 동작, 큰 힙에서 나타나는 실행 지연, 실행 방식을 바꾸는 설정까지 살펴봅니다.
 이 글의 실행 결과는 아래 환경에서 확인했습니다. 예제 코드는 link:{source-repo}[GitHub 저장소]에 있습니다.
 
 [cols="1,2", options="header"]
