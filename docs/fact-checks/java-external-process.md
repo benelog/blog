@@ -256,9 +256,9 @@ java -Xms8g -Xmx8g -XX:+AlwaysPreTouch -Djdk.lang.Process.launchMechanism=FORK e
 
 ### 패치 검토와 적용 결과
 
-위 6건을 반영한 [java-external-process-2026-09-13.patch](java-external-process-2026-09-13.patch)를 생성했다. 패치 대상은 `src/content/java-external-process.adoc` 한 파일이다. 생성 시점에는 `git apply --check --whitespace=error-all`이 성공했고, 임시 복사본에 적용한 결과가 의도한 수정문과 바이트 단위로 일치했다.
+위 6건을 반영한 패치 `java-external-process-2026-09-13.patch`를 생성했다. 패치 대상은 `src/content/java-external-process.adoc` 한 파일이다. 생성 시점에는 `git apply --check --whitespace=error-all`이 성공했고, 임시 복사본에 적용한 결과가 의도한 수정문과 바이트 단위로 일치했다.
 
-같은 날 패치의 8개 hunk를 항목별로 다시 검토한 뒤 `git apply`로 본문에 적용했다. 패치 파일은 검토 기록으로 남긴다. 검토 결과는 다음과 같다.
+같은 날 패치의 8개 hunk를 항목별로 다시 검토한 뒤 `git apply`로 본문에 적용했다. 패치 파일은 커밋 `fc14993`에 남아 있고, 후속 패치 반영 때 작업 공간에서 삭제했다. 검토 결과는 다음과 같다.
 
 | hunk | 판정 | 검토 내용 |
 |---|---|---|
@@ -280,3 +280,65 @@ java -Xms8g -Xmx8g -XX:+AlwaysPreTouch -Djdk.lang.Process.launchMechanism=FORK e
 - `./gradlew bake`: **성공**. 최초 검증 때와 같은 JRuby의 `--add-opens` 경고만 나왔다.
 - 생성된 `output/java-external-process.html`에서 수정한 여덟 문단을 찾아 백틱이나 별표가 노출되지 않았음을 확인했다.
 - 이번 적용에서 새 실행 실험은 하지 않았다. JDK 13 소스 확인은 GitHub의 `jdk-13+33` 태그 파일을 내려받아 대조했다.
+
+## 8. 2026-09-13 패치 반영 후 재검토
+
+검토 기준은 패치와 검증 기록을 반영한 `fc149935a2a1f02511576f9648ebce0fd1eeadf0`이다. 7절의 6건은 모두 해결됐고, 적용 과정에서 조정한 문장도 검증 취지에 맞는다. helper 버전 불일치의 설명과 FORK 우회, VFORK 제거의 인과관계도 연결된다. 아래 두 항목은 이전 패치가 새로 만든 문제가 아니라, 이번에 추가로 확인한 기존 설명의 적용 범위 문제다. 본문은 수정하지 않았다.
+
+### 1. 리다이렉트가 모든 출력 대기를 없애지는 않음
+
+**위치: 본문 257~258행.** 네 방식 모두 `waitFor()`에서 멈추지 않는다는 문장은 관측한 실행 결과로는 맞지만, 원인을 “Java 코드가 비워야 할 파이프가 없기 때문”이라고만 쓰면 INHERIT가 모든 파이프 대기를 제거한다고 읽힐 수 있다.
+
+`Redirect.INHERIT`와 `inheritIO()`는 부모의 실제 입출력 대상을 물려준다. 부모 stdout 자체가 다른 프로그램으로 연결된 파이프라면 자식도 그 파이프에 쓰며, 소비자가 읽지 않으면 자식의 쓰기가 막힌다. 따라서 피하는 것은 부모 JVM과 자식 사이에 새로 만든 출력 파이프를 읽지 않아 생기는 교착이다.
+
+같은 JDK 25에서 `new ProcessBuilder("seq", "1", "100000").inheritIO().start()`로 실행하고, JVM의 stdout 연결만 바꾸어 `waitFor(1, SECONDS)`를 확인했다. 결과는 stderr로 받았다.
+
+```text
+# JVM stdout을 /dev/null에 연결
+within1s=true, alive=false
+
+# JVM stdout을 검증 프로그램이 읽지 않는 파이프에 연결
+within1s=false, alive=true
+```
+
+시간 초과 시 검증 코드가 직접 자식을 `destroyForcibly().waitFor()`로 정리했다. 같은 출력량과 같은 명령에서도 상속한 대상에 따라 대기한다는 반례다.
+
+수정 제안: “이 환경에서는 네 방식 모두 정상 종료했습니다. 부모 JVM이 직접 읽어야 하는 자식 출력 파이프를 만들지 않기 때문입니다. 다만 INHERIT로 물려받은 출력 대상이 파이프라면 그 소비자의 처리 속도에 따라 쓰기가 지연될 수 있습니다.”
+
+근거: [Redirect.INHERIT API](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/ProcessBuilder.Redirect.html#INHERIT), [pipe(7)](https://man7.org/linux/man-pages/man7/pipe.7.html). 임시 재현 코드는 `/tmp/java-process-review-0913/InheritedOutputProbe.java`에 있다.
+
+### 2. 시스템 콜 설명에 아키텍처와 실행 환경을 명시해야 함
+
+**위치: 본문 608행, 707~708행, 환경 표.** “glibc 2.39의 vfork 함수는 별도 vfork 시스템 콜을 그대로 호출한다”는 설명은 이번 x86-64 환경에 해당한다. 같은 glibc 2.39의 AArch64 구현은 `CLONE_VM | CLONE_VFORK | SIGCHLD` 플래그로 `clone` 시스템 콜을 호출한다. libc 버전만으로 모든 Linux 아키텍처의 시스템 콜 이름을 결정할 수 없다.
+
+또한 glibc 2.39의 내부 clone 래퍼에는 `clone3`가 ENOSYS로 실패하면 `clone`으로 대체하는 경로가 있다. 따라서 본문의 clone3 trace도 이 환경에서 관측한 결과로 한정하면 정확하다. 이 점은 최초 검증 기록에도 환경 한계로 적었으나 본문의 문장은 여전히 일반적인 구현 설명처럼 되어 있다.
+
+수정 제안: 실행 환경 표에 **아키텍처 x86-64**를 추가하고, 608행은 “이 글의 x86-64/glibc 2.39 환경에서는”으로 범위를 한정한다. 708행은 “이 실행에서는 glibc 2.39의 posix_spawn()이 clone3를 사용했습니다”로 표현하고, 환경에 따라 clone 경로를 사용할 수 있음을 덧붙인다.
+
+근거: [glibc 2.39 x86-64 vfork.S](https://github.com/bminor/glibc/blob/glibc-2.39/sysdeps/unix/sysv/linux/x86_64/vfork.S), [glibc 2.39 AArch64 vfork.S](https://github.com/bminor/glibc/blob/glibc-2.39/sysdeps/unix/sysv/linux/aarch64/vfork.S), [clone-internal.c](https://github.com/bminor/glibc/blob/glibc-2.39/sysdeps/unix/sysv/linux/clone-internal.c). AArch64 구현은 해당 태그의 소스로 확인했으며 AArch64 장비에서 실행하지 않았다. 로컬 `uname -m`은 `x86_64`였다.
+
+### 검토 범위와 상태
+
+이번에는 본문 전체와 적용 diff, 갱신된 검증 기록을 대조하고 위 반례만 추가 실행했다. 이전에 성공한 예제 전체와 사이트 빌드는 반복하지 않았다. 핵심 실행 정책과 라이브러리 비교 결론을 바꿀 추가 문제는 발견하지 못했다. 7절의 적용 완료 상태는 유지한다. 이 절의 두 보완 사항은 아래 후속 패치로 본문에 적용했다.
+
+두 보완 사항을 반영한 추가 패치 `java-external-process-2026-09-13-followup.patch`를 생성했다. 이 패치는 7절의 기존 패치가 반영된 본문을 기준으로 하며, 본문 한 파일만 수정한다. `git apply --check --whitespace=error-all`과 임시 복사본 적용·수정문 비교를 통과했다.
+
+### 후속 패치 검토와 적용 결과
+
+후속 패치의 4개 hunk를 검토한 뒤 `git apply`로 본문에 적용했다. 두 패치 파일은 반영을 마친 뒤 작업 공간에서 삭제했다. 검토 결과는 다음과 같다.
+
+| hunk | 판정 | 검토 내용 |
+|---|---|---|
+| 환경 표 | **채택** | 아키텍처 행을 추가하고 표 머리글을 “버전”에서 “값”으로 바꿨다. 아키텍처는 버전이 아니므로 머리글 변경이 맞다. |
+| 257행, 리다이렉트 결과 | **채택·표현 조정** | INHERIT가 부모의 실제 입출력 대상을 물려준다는 API 설명과 위 반례에 부합한다. 원안의 “만들지 않아, 이를 읽지 않아서 생기는 교착을 피합니다”는 “만들지 않으므로, 파이프를 읽지 않아서 생기는 교착이 없습니다”로, 소비자에 관한 두 문장은 “그 파이프를 읽는 쪽에 따라 자식의 쓰기가 막히거나 늦어질 수 있습니다” 한 문장으로 줄였다. |
+| 608행, vfork 함수의 시스템 콜 | **채택** | glibc 2.39 소스를 내려받아 대조했다. x86-64의 `vfork.S`는 `vfork` 시스템 콜을 직접 호출하고, AArch64의 `vfork.S`는 `CLONE_VM \| CLONE_VFORK \| SIGCHLD`(0x4111) 플래그로 `clone` 시스템 콜을 호출한다. “x86-64/glibc 2.39 환경”은 “환경인 x86-64의 glibc 2.39”로 풀었다. |
+| 708행, clone3 대체 경로 | **채택·근거 정정** | 원안은 `clone-internal.c`의 내부 래퍼가 `ENOSYS`일 때 대체한다고 적었으나, glibc 2.39의 `posix_spawn()`은 그 래퍼를 거치지 않는다. `spawni.c`가 `__clone3()`를 직접 부르고 `ENOSYS` 또는 `EINVAL`일 때 `__clone_internal_fallback()`으로 `clone`을 호출한다. 소스 주석은 clone3가 Linux 5.3, `CLONE_CLEAR_SIGHAND`가 5.5에 추가됐다는 점을 `EINVAL` 처리의 이유로 든다. 본문의 링크를 `spawni.c`로 바꾸고 실패 조건에 `EINVAL`을 추가했다. |
+
+근거: [glibc 2.39 x86-64 vfork.S](https://github.com/bminor/glibc/blob/glibc-2.39/sysdeps/unix/sysv/linux/x86_64/vfork.S), [glibc 2.39 AArch64 vfork.S](https://github.com/bminor/glibc/blob/glibc-2.39/sysdeps/unix/sysv/linux/aarch64/vfork.S), [glibc 2.39 spawni.c](https://github.com/bminor/glibc/blob/glibc-2.39/sysdeps/unix/sysv/linux/spawni.c), [glibc 2.39 clone-internal.c](https://github.com/bminor/glibc/blob/glibc-2.39/sysdeps/unix/sysv/linux/clone-internal.c).
+
+적용 후 검증 결과는 다음과 같다.
+
+- `git apply`, `git diff --check`: 성공.
+- `./gradlew bake`: **성공**. JRuby의 `--add-opens` 경고만 나왔다.
+- 생성된 `output/java-external-process.html`에서 환경 표와 수정한 세 문단을 찾아 백틱이 노출되지 않았음을 확인했다.
+- 새 실행 실험은 하지 않았다. glibc 소스 확인은 GitHub의 `glibc-2.39` 태그 파일 네 개를 내려받아 대조했다.

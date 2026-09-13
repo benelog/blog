@@ -18,10 +18,13 @@
 
 [cols="1,2", options="header"]
 |===
-|항목 |버전
+|항목 |값
 
 |OS
 |Ubuntu 24.04.4 LTS, 커널 6.17
+
+|아키텍처
+|x86-64
 
 |glibc
 |2.39
@@ -254,8 +257,9 @@ new ProcessBuilder("seq", "1", "100000")
         .waitFor();
 ----
 
-네 방식 모두 앞의 교착 예제와 같은 588,895바이트를 출력하지만 ``waitFor()``에서 멈추지 않습니다.
-Java 코드가 비워야 할 파이프가 없기 때문입니다.
+이 환경에서는 네 방식 모두 앞의 교착 예제와 같은 588,895바이트를 출력하고 정상 종료했습니다.
+부모 JVM이 직접 읽어야 하는 자식 출력 파이프를 만들지 않으므로, 파이프를 읽지 않아서 생기는 교착이 없습니다.
+다만 ``INHERIT``로 물려받은 출력 대상이 파이프라면, 그 파이프를 읽는 쪽에 따라 자식의 쓰기가 막히거나 늦어질 수 있습니다.
 출력을 버릴 생각이라면 표준 출력과 표준 오류 모두 명시적으로 ``DISCARD``를 지정하는 편이 안전합니다. ``Redirect.to(File)``은 파일이 이미 있으면 기존 내용을 지우고 덮어쓰므로, 실행할 때마다 뒤에 이어 붙이려면 ``Redirect.appendTo(File)``을 씁니다.
 
 ==== 표준 입력 닫기와 EOF
@@ -605,7 +609,7 @@ Linux에서 다른 프로그램을 실행하려면 자식 프로세스를 만드
 * ``vfork()`` : 주소 공간을 복제하지 않고 부모와 공유하는 자식을 만드는 시스템 콜입니다.
 * ``posix_spawn()`` : 자식 생성과 ``execve()``를 한 묶음으로 제공하는 C 라이브러리 함수입니다.
 
-Linux 커널은 ``fork()``, ``vfork()``, ``clone()`` 시스템 콜을 모두 같은 함수인 ``kernel_clone()``으로 처리하고, 부모와 무엇을 공유할지는 플래그로 정해집니다. glibc 2.39의 ``fork()`` 함수는 ``clone()`` 시스템 콜을 호출하도록 구현되어 있고, ``vfork()`` 함수는 별도의 ``vfork()`` 시스템 콜을 그대로 호출합니다. https://man7.org/linux/man-pages/man2/vfork.2.html[vfork(2)] 매뉴얼은 ``vfork()``를 `CLONE_VM | CLONE_VFORK | SIGCHLD` 플래그를 준 ``clone()``과 같다고 설명합니다. 뒤에 나올 strace 결과에서 이 플래그를 직접 보게 됩니다.
+Linux 커널은 ``fork()``, ``vfork()``, ``clone()`` 시스템 콜을 모두 같은 함수인 ``kernel_clone()``으로 처리하고, 부모와 무엇을 공유할지는 플래그로 정해집니다. 이 글의 환경인 x86-64의 glibc 2.39에서 ``fork()`` 함수는 ``clone()`` 시스템 콜을 호출하고, ``vfork()`` 함수는 별도의 ``vfork()`` 시스템 콜을 그대로 호출합니다. 같은 glibc 2.39라도 https://github.com/bminor/glibc/blob/glibc-2.39/sysdeps/unix/sysv/linux/aarch64/vfork.S[AArch64의 vfork 구현]은 ``clone()`` 시스템 콜을 사용하므로 아키텍처에 따라 호출 경로가 다릅니다. https://man7.org/linux/man-pages/man2/vfork.2.html[vfork(2)] 매뉴얼은 ``vfork()``를 `CLONE_VM | CLONE_VFORK | SIGCHLD` 플래그를 준 ``clone()``과 같다고 설명합니다. 뒤에 나올 strace 결과에서 이 플래그를 직접 보게 됩니다.
 
 ``posix_spawn()``만 계층이 다릅니다. POSIX가 명세하고 C 라이브러리가 구현한 함수여서 대응하는 시스템 콜이 없고, 내부에서는 결국 앞의 두 방식 중 하나를 골라 씁니다.
 세 방식 모두 JDK가 직접 구현하지 않고 glibc의 함수를 호출합니다.
@@ -704,8 +708,9 @@ $ grep -v CLONE_THREAD trace.txt | grep -E 'clone|vfork|execve'
 285603 execve("/usr/bin/echo", ["echo", "hello"], ...) = 0
 ----
 
-``vfork()`` 시스템 콜은 나오지 않습니다.
-glibc 2.39의 ``posix_spawn()``은 `clone3` 시스템 콜에 `CLONE_VM` 과 `CLONE_VFORK` 플래그를 주어 ``vfork()``와 같은 효과를 냅니다.
+이 실행에서는 ``vfork()`` 시스템 콜이 나오지 않았습니다.
+glibc 2.39의 ``posix_spawn()``이 `clone3` 시스템 콜에 `CLONE_VM` 과 `CLONE_VFORK` 플래그를 주어 자식을 생성했습니다.
+환경에 따라 ``clone()`` 시스템 콜을 쓸 수도 있습니다. glibc 2.39의 https://github.com/bminor/glibc/blob/glibc-2.39/sysdeps/unix/sysv/linux/spawni.c[posix_spawn 구현]은 `clone3` 호출이 ``ENOSYS``나 ``EINVAL``로 실패하면 ``clone()``으로 대체합니다.
 `CLONE_VM` 은 자식이 부모의 주소 공간을 그대로 공유한다는 뜻이므로, 힙 매핑과 페이지 테이블을 복사하지 않습니다.
 `CLONE_VFORK` 는 자식이 ``execve()``하거나 끝날 때까지 부모의 호출 스레드를 멈춥니다.
 `CLONE_VM` 덕분에 생성 비용은 힙 크기와 거의 무관합니다.
