@@ -141,9 +141,8 @@ int exitCode = process.waitFor();
 System.out.println("read " + lines + " lines, exit=" + exitCode + ", alive: " + process.isAlive());
 ----
 
-다음은 실행 결과입니다.
-
 [source,text]
+.DeadlockDemo.java의 실행 결과
 ----
 finished within 3s: false, alive: true
 read 100000 lines, exit=0, alive: false
@@ -183,9 +182,10 @@ long errLines = process.errorReader().lines().count();
 System.out.println("stdout " + outLines + ", stderr " + errLines + ", exit=" + process.waitFor());
 ----
 
-실행 결과입니다. 첫 줄을 출력한 뒤로는 아무리 기다려도 다음 줄이 나오지 않고, ``ps``로 확인하면 자식 `seq` 프로세스도 그대로 살아 있습니다.
+위의 코드를 실행하면 첫 줄을 출력한 뒤로는 아무리 기다려도 다음 줄이 나오지 않고, ``ps``로 확인하면 자식 `seq` 프로세스도 그대로 살아 있습니다.
 
 [source,text]
+.SequentialReadDemo.java의 실행 결과
 ----
 reading stdout...
 ----
@@ -207,6 +207,7 @@ System.out.println("read " + lines + " lines, exit=" + process.waitFor());
 같은 명령이지만 이번에는 끝까지 진행합니다. 100,001줄은 표준 오류로 나온 100,000줄과 표준 출력의 `done` 한 줄을 합한 수입니다.
 
 [source,text]
+.MergedReadDemo.java의 실행 결과
 ----
 read 100001 lines, exit=0
 ----
@@ -291,9 +292,10 @@ String echoed = fed.inputReader().readLine();
 System.out.println("입력 후 닫음: echoed=" + echoed + ", exit=" + fed.waitFor());
 ----
 
-실행 결과입니다. 쓰기 끝을 열어 둔 첫 번째만 1초 안에 끝나지 못했고, 나머지 셋은 EOF를 받아 바로 종료했습니다.
+다음은 실행 결과입니다. stdin로 쓰는 스트림을 열어 둔 첫 번째만 1초 안에 끝나지 못했고, 나머지 셋은 EOF를 받아 바로 종료했습니다.
 
 [source,text]
+.StdinEofDemo.java 실행 결과
 ----
 stdin 열어 둠: finished within 1s=false, alive=true
 stdin 닫음: finished within 1s=true, exit=0
@@ -303,49 +305,23 @@ stdin 닫음: finished within 1s=true, exit=0
 
 첫 번째 ``cat``은 ``destroy()``로 끝냈습니다. 정리하지 않으면 남은 예제가 실행되는 동안 계속 살아 있습니다.
 다만 부모 JVM이 끝나면 파이프의 쓰기 끝도 함께 닫히므로 그 시점에는 ``cat``도 EOF를 받고 종료합니다.
+
 마지막 예제에 쓴 ``outputWriter()``는 ``inputReader()``와 함께 JDK 17에 추가된 메서드로, ``getOutputStream()``을 ``OutputStreamWriter``와 ``BufferedWriter``로 감싸는 코드를 대신합니다.
 인자 없이 부르면 `native.encoding` 시스템 속성의 문자 집합을 쓰고, `outputWriter(Charset)` 메서드로 직접 지정할 수도 있습니다.
-Javadoc은 이 ``BufferedWriter``와 ``getOutputStream()``에 번갈아 쓸 때 ``OutputStream``에 쓰기 전에 ``BufferedWriter.flush()``를 부르라고 안내합니다.
-``BufferedWriter``에 쓴 내용은 버퍼에 남아 있다가 ``flush()``나 ``close()`` 시점에 파이프로 나가는데, ``getOutputStream()``에 직접 쓴 바이트는 버퍼를 거치지 않고 바로 나가기 때문입니다.
-
-아래 예제는 ``cat``을 세 번 실행합니다. 첫 번째는 JDK 17 이전처럼 ``getOutputStream()``을 직접 감싸고, 두 번째와 세 번째는 ``outputWriter()``와 ``getOutputStream()``에 한 줄씩 번갈아 쓰되 ``flush()`` 호출 여부만 다릅니다.
 
 [source,java]
-.OutputWriterDemo.java
+.``outputWriter()``의 활용
 ----
-Process wrapped = new ProcessBuilder("cat").start();
+// JDK 17 이전
 try (BufferedWriter writer = new BufferedWriter(
-        new OutputStreamWriter(wrapped.getOutputStream(), StandardCharsets.UTF_8))) {
+        new OutputStreamWriter(process.getOutputStream()))) {
     writer.write("hello\n");
 }
-System.out.println("직접 감싼 Writer: echoed=" + wrapped.inputReader().readLine()
-        + ", exit=" + wrapped.waitFor());
 
-Process unflushed = new ProcessBuilder("cat").start();
-BufferedWriter writer = unflushed.outputWriter();
-writer.write("1 writer\n");
-unflushed.getOutputStream().write("2 stream\n".getBytes(StandardCharsets.UTF_8));
-writer.close();
-System.out.println("flush 없이 섞어 씀: echoed=" + unflushed.inputReader().lines().toList()
-        + ", exit=" + unflushed.waitFor());
-
-Process flushed = new ProcessBuilder("cat").start();
-writer = flushed.outputWriter();
-writer.write("1 writer\n");
-writer.flush();
-flushed.getOutputStream().write("2 stream\n".getBytes(StandardCharsets.UTF_8));
-writer.close();
-System.out.println("flush 후 섞어 씀: echoed=" + flushed.inputReader().lines().toList()
-        + ", exit=" + flushed.waitFor());
-----
-
-실행 결과입니다. ``flush()``를 빠뜨린 두 번째 실행에서는 ``getOutputStream()``에 나중에 쓴 `2 stream` 줄이 먼저 도착했습니다. ``BufferedWriter``에 먼저 쓴 `1 writer` 줄은 ``close()`` 시점에야 파이프로 나갔기 때문입니다.
-
-[source,text]
-----
-직접 감싼 Writer: echoed=hello, exit=0
-flush 없이 섞어 씀: echoed=[2 stream, 1 writer], exit=0
-flush 후 섞어 씀: echoed=[1 writer, 2 stream], exit=0
+// JDK 17 이후
+try (BufferedWriter writer = process.outputWriter()) {
+    writer.write("hello\n");
+}
 ----
 
 === 시간제한과 종료 정책
