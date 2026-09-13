@@ -9,7 +9,6 @@
 | `MergedReadDemo.java` | `redirectErrorStream(true)`로 두 출력을 합쳐 파이프 하나로 읽는 예 |
 | `RedirectDemo.java` | `Redirect.INHERIT`, `inheritIO()`, `Redirect.DISCARD`, `Redirect.to(File)`로 읽지 않을 출력을 내보내는 예 |
 | `StdinEofDemo.java` | 표준 입력의 쓰기 끝을 열어 두면 `cat`이 EOF를 받지 못하는 현상과, 스트림 닫기·`/dev/null` 입력·입력 후 닫기로 끝내는 예 |
-| `OutputWriterDemo.java` | `outputWriter()`가 `getOutputStream()`을 감싸는 코드를 대신하는 예와, `BufferedWriter`와 `OutputStream`에 번갈아 쓸 때 `flush()`를 빠뜨리면 순서가 뒤바뀌는 현상 재현 |
 | `PlainJdkRunner.java` | JDK API만으로 표준 출력과 표준 오류를 동시에 읽고 시간제한과 강제 종료까지 처리하는 예 |
 | `ZtExecRunner.java` | zt-exec 1.13.0으로 출력 수집, 시간제한, 종료 코드 검사를 처리하는 예 |
 | `CommonsExecRunner.java` | Apache Commons Exec 1.6.0의 builder API로 같은 일을 처리하는 예 |
@@ -22,7 +21,6 @@
 java DeadlockDemo.java
 java MergedReadDemo.java
 java StdinEofDemo.java
-java OutputWriterDemo.java
 java PlainJdkRunner.java
 java ProcessRunner.java
 
