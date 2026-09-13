@@ -403,6 +403,7 @@ zt-exec의 `PumpStreamHandler` 클래스는 소스 파일 상단에 "This file o
 === zt-exec
 
 https://github.com/zeroturnaround/zt-exec[zt-exec]은 JRebel을 만든 ZeroTurnaround가 사내 여러 프로젝트에 흩어져 있던 프로세스 실행 코드를 하나로 합쳐서 2013년에 공개한 라이브러리입니다.
+정식 이름은 https://github.com/zeroturnaround/zt-exec/blob/v1.13.0/README.md[README]의 제목대로 ZT Process Executor이지만, GitHub 저장소와 Maven artifactId가 zt-exec이어서 보통 zt-exec으로 부릅니다. 이 글에서도 zt-exec으로 씁니다.
 README는 `ProcessExecutor` 클래스 하나로 ``ProcessBuilder``와 Commons Exec의 기능을 모두 제공하는 것이 목표라고 설명합니다.
 의존성은 slf4j-api 하나이고 최소 Java 버전은 8입니다.
 
