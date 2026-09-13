@@ -46,9 +46,10 @@ java -Xms8g -Xmx8g -XX:+AlwaysPreTouch -Djdk.lang.Process.launchMechanism=POSIX_
 java -Xms8g -Xmx8g -XX:+AlwaysPreTouch -Djdk.lang.Process.launchMechanism=FORK SpawnBench.java 30
 ```
 
-시스템 콜 확인:
+시스템 콜 확인 (글의 출력 예시와 같이 컴파일한 클래스를 실행):
 
 ```bash
-strace -f -e trace=clone,clone3,vfork,execve -o trace.txt java ProcessRunner.java
+javac ProcessRunner.java
+strace -f -e trace=clone,clone3,vfork,execve -o trace.txt java ProcessRunner
 grep -v CLONE_THREAD trace.txt | grep -E 'clone|vfork|execve'
 ```
