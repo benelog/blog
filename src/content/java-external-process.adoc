@@ -646,7 +646,9 @@ glibc가 아닌 musl에 링크된 JDK라면 같은 자리에 musl의 구현이 �
 
 OpenJDK는 이 세 방식을 차례로 거쳤습니다. 처음에는 ``fork()``를 썼지만 큰 힙에서 생성 비용이 문제가 되자 JDK 7에서 ``vfork()``를 기본값으로 바꿨습니다. 그런데 JDK는 ``vfork()``와 ``execve()`` 사이에서 파일 디스크립터를 닫고 작업 디렉터리를 바꾸는 준비 작업을 했고, 이는 방금 본 ``vfork()``의 제약을 어기는 것이었습니다. 실행 비용은 줄였지만 안전성을 희생한 선택이었습니다. JDK 13에서 기본값이 된 ``POSIX_SPAWN``은 이 준비 작업을 부모와 메모리를 공유하지 않는 별도 프로세스로 옮겨서, ``fork()``의 복사 비용과 ``vfork()``의 제약 위반을 함께 피합니다. 그 구조가 다음 절에서 볼 `jspawnhelper` 입니다.
 
-세 방식은 구현 전용 시스템 속성인 `jdk.lang.Process.launchMechanism` 에 각각 ``FORK``, ``VFORK``, ``POSIX_SPAWN`` 으로 대응합니다. JDK 25의 https://github.com/openjdk/jdk/blob/jdk-25%2B36/src/java.base/unix/classes/java/lang/ProcessImpl.java[ProcessImpl.java]에 이 세 값이 선언되어 있고, Linux에서는 셋 다 지정할 수 있되 ``VFORK``에는 경고가 따릅니다. 버전별 변경 이력과 ``VFORK``가 없어지는 과정은 이 장의 마지막 절에서 정리합니다.
+세 방식은 구현 전용 시스템 속성인 `jdk.lang.Process.launchMechanism` 에 각각 ``FORK``, ``VFORK``, ``POSIX_SPAWN`` 으로 대응합니다.
+JDK 25의 https://github.com/openjdk/jdk/blob/jdk-25%2B36/src/java.base/unix/classes/java/lang/ProcessImpl.java[ProcessImpl.java]에 이 세 값이 선언되어 있고, Linux에서는 셋 다 지정할 수 있되 ``VFORK``에는 경고가 따릅니다.
+버전별 변경 이력과 ``VFORK``가 없어지는 과정은 이 장의 마지막 절에서 정리합니다.
 
 === POSIX_SPAWN과 jspawnhelper의 동작
 
@@ -706,7 +708,7 @@ https://bugs.openjdk.org/browse/JDK-8357090[JDK-8357090의 CSR]은 ``posix_spawn
 
 === 큰 힙에서 FORK와 POSIX_SPAWN의 실행 지연
 
-overcommit 판정이 완화됐어도 ``fork()``가 페이지 테이블을 복사한다는 사실은 변하지 않았습니다. 실제로 접근한 힙 영역과 페이지 크기 등에 따라 복사 비용이 달라집니다. 반면 ``POSIX_SPAWN``은 `CLONE_VM` 으로 주소 공간을 공유하므로 이 복사가 없습니다. 힙을 미리 할당한 상태에서 `true` 명령을 30번 실행하는 데 걸린 시간을 실행 방식별로 재 봤습니다. 측정 코드는 link:{source-repo}/SpawnBench.java[SpawnBench.java]이고, ``-Xms``와 ``-Xmx``를 같은 값으로 맞추고 `-XX:+AlwaysPreTouch` 옵션으로 힙을 미리 접근한 뒤 측정했습니다. 각 실행에서 5회 예열 후 30회의 ``start().waitFor()`` 평균을 구했으므로, 순수한 생성 시간뿐 아니라 명령 실행과 종료 대기도 포함합니다. 아래는 글 작성 당시 두 번 실행한 값입니다.
+앞 절에서 살펴본 것처럼 overcommit 판정이 완화됐어도 ``fork()``가 페이지 테이블을 복사한다는 사실은 변하지 않았습니다. 실제로 접근한 힙 영역과 페이지 크기 등에 따라 복사 비용이 달라집니다. 반면 ``POSIX_SPAWN``은 `CLONE_VM` 으로 주소 공간을 공유하므로 이 복사가 없습니다. 힙을 미리 할당한 상태에서 `true` 명령을 30번 실행하는 데 걸린 시간을 실행 방식별로 재 봤습니다. 측정 코드는 link:{source-repo}/SpawnBench.java[SpawnBench.java]이고, ``-Xms``와 ``-Xmx``를 같은 값으로 맞추고 `-XX:+AlwaysPreTouch` 옵션으로 힙을 미리 접근한 뒤 측정했습니다. 각 실행에서 5회 예열 후 30회의 ``start().waitFor()`` 평균을 구했으므로, 순수한 생성 시간뿐 아니라 명령 실행과 종료 대기도 포함합니다. 아래는 글 작성 당시 두 번 실행한 값입니다.
 
 [cols="1,2,2", options="header"]
 |===
