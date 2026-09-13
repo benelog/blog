@@ -590,7 +590,7 @@ API 설계가 주는 장점이 크기 때문입니다.
 
 **현재 Linux에서 JDK 25를 쓰는 Java 개발자는 `jdk.lang.Process.launchMechanism` 옵션을 별도로 지정하지 않고 기본값인 ``POSIX_SPAWN``을 유지하면 됩니다.** JDK 13부터 이 방식이 기본입니다.
 
-=== 프로세스 생성 방식 세 가지와 JVM의 선택
+=== 프로세스 생성 방식 세 가지와 JDK 기본값의 변천
 
 애플리케이션의 외부 프로세스 실행 코드는 JVM을 거쳐 커널의 시스템 콜이나 C 라이브러리의 함수 호출로 이어집니다.
 어떤 함수 호출로 자식 프로세스를 만드는지가 중요한 이유는 이 선택이 과거에 실제 장애로 이어졌기 때문입니다. 힙을 크게 잡은 JVM이 외부 명령 하나를 실행하려다 메모리 할당에 실패하는 문제가 대표적입니다. 2015년 NAVER D2의 https://d2.naver.com/helloworld/1113548[Java에서 외부 프로세스를 실행할 때]는 힙을 크게 설정한 Tomcat 서버에서 외부 프로세스 실행이 ``Cannot allocate memory`` 예외로 실패하는 사례를 소개합니다. OpenJDK 이슈에도 그 이력이 남아 있습니다. JDK 7에 반영된 https://bugs.openjdk.org/browse/JDK-6868160[JDK-6868160]의 제목은 "(process) Use vfork, not fork, on Linux to avoid swap exhaustion"입니다. 자식 프로세스를 만드는 호출을 바꾼 것이 스왑 고갈을 피하려는 조치였다는 뜻입니다. 지금 기본값을 그대로 두면 되는 것도 이런 문제들이 차례로 해결된 결과입니다.
@@ -648,7 +648,31 @@ OpenJDK는 이 세 방식을 차례로 거쳤습니다. 처음에는 ``fork()``�
 
 세 방식은 구현 전용 시스템 속성인 `jdk.lang.Process.launchMechanism` 에 각각 ``FORK``, ``VFORK``, ``POSIX_SPAWN`` 으로 대응합니다.
 JDK 25의 https://github.com/openjdk/jdk/blob/jdk-25%2B36/src/java.base/unix/classes/java/lang/ProcessImpl.java[ProcessImpl.java]에 이 세 값이 선언되어 있고, Linux에서는 셋 다 지정할 수 있되 ``VFORK``에는 경고가 따릅니다.
-버전별 변경 이력과 ``VFORK``가 없어지는 과정은 이 장의 마지막 절에서 정리합니다.
+``VFORK``가 없어진 사정과 남은 설정의 정리는 이 장의 마지막 절에서 다룹니다.
+기본값의 변천은 아래와 같습니다. JDK 27 항목은 정식 출시 결과가 아니라 2026-09-06 현재 개발 버전에 반영된 내용입니다.
+
+[cols="1,3", options="header"]
+|===
+|JDK |Linux에서의 변화
+
+|6
+|``fork()`` + ``execve()``
+
+|7
+|``vfork()``가 기본값이 됨 (https://bugs.openjdk.org/browse/JDK-6868160[JDK-6868160])
+
+|12
+|``POSIX_SPAWN``을 선택 옵션으로 추가 (https://bugs.openjdk.org/browse/JDK-8212828[JDK-8212828]). 11.0.4에도 백포트
+
+|13
+|``POSIX_SPAWN``이 기본값이 됨 (https://bugs.openjdk.org/browse/JDK-8213192[JDK-8213192])
+
+|25
+|``VFORK``를 지정하면 deprecated 경고 출력 (https://bugs.openjdk.org/browse/JDK-8357180[JDK-8357180])
+
+|27
+|개발 버전에서 ``VFORK`` 제거. 지정하면 경고 후 ``FORK``로 동작 (https://bugs.openjdk.org/browse/JDK-8357089[JDK-8357089], https://bugs.openjdk.org/browse/JDK-8357090[CSR])
+|===
 
 === POSIX_SPAWN과 jspawnhelper의 동작
 
@@ -742,32 +766,7 @@ https://bugs.openjdk.org/browse/JDK-8357090[JDK-8357090의 CSR]은 ``posix_spawn
 요청 처리 중 외부 명령을 동기 실행하는 웹 애플리케이션이라면 이 비용이 응답 시간에 더해질 수 있습니다.
 ``jspawnhelper`` 문제를 임시로 피하는 경우가 아니라면, 지금은 이런 단점을 감수하면서 기본값을 ``FORK``로 바꿀 만한 이유가 없습니다.
 
-=== 실행 방식의 변경 이력과 VFORK 설정
-
-OpenJDK가 Linux에서 자식 프로세스를 만드는 방식은 구현 전용 시스템 속성인 `jdk.lang.Process.launchMechanism` 으로 선택할 수 있습니다. 기본값의 변천은 아래와 같습니다. JDK 27 항목은 정식 출시 결과가 아니라 2026-09-06 현재 개발 버전에 반영된 내용입니다.
-
-[cols="1,3", options="header"]
-|===
-|JDK |Linux에서의 변화
-
-|6
-|``fork()`` + ``execve()``
-
-|7
-|``vfork()``가 기본값이 됨 (https://bugs.openjdk.org/browse/JDK-6868160[JDK-6868160])
-
-|12
-|``POSIX_SPAWN``을 선택 옵션으로 추가 (https://bugs.openjdk.org/browse/JDK-8212828[JDK-8212828]). 11.0.4에도 백포트
-
-|13
-|``POSIX_SPAWN``이 기본값이 됨 (https://bugs.openjdk.org/browse/JDK-8213192[JDK-8213192])
-
-|25
-|``VFORK``를 지정하면 deprecated 경고 출력 (https://bugs.openjdk.org/browse/JDK-8357180[JDK-8357180])
-
-|27
-|개발 버전에서 ``VFORK`` 제거. 지정하면 경고 후 ``FORK``로 동작 (https://bugs.openjdk.org/browse/JDK-8357089[JDK-8357089], https://bugs.openjdk.org/browse/JDK-8357090[CSR])
-|===
+=== 남아 있는 VFORK 설정의 정리
 
 JVM 버전을 25 이상으로 업그레이드할 때는 특히 java 실행 스크립트에 ``-Djdk.lang.Process.launchMechanism=VFORK``가 남아 있다면 제거하는 편이 좋습니다.
 이 설정이 남아 있을 만한 자리는 JVM 실행 스크립트와 Dockerfile의 ``JAVA_OPTS``, 애플리케이션 서버의 기동 옵션입니다.
