@@ -836,8 +836,8 @@ Linux의 JDK 25에서는 기본값인 ``POSIX_SPAWN``을 유지하는 편이 무
 ** https://github.com/openjdk/jdk/blob/jdk-25%2B36/src/java.base/share/classes/java/lang/Runtime.java[Runtime.java (JDK 25+36)]: ``exec()``의 ``ProcessBuilder`` 위임 구현
 ** https://github.com/openjdk/jdk/blob/jdk-25%2B36/src/java.base/unix/native/libjava/ProcessImpl_md.c[ProcessImpl_md.c (JDK 25+36)]: 실행 방식별 장단점과 glibc, musl의 ``posix_spawn()`` 구현을 설명한 주석
 * 라이브러리
-** https://github.com/zeroturnaround/zt-exec[zt-exec]: README의 사용 예
-** https://github.com/zeroturnaround/zt-exec/blob/main/CHANGELOG.md[zt-exec CHANGELOG]: 1.13.0의 변경 사항과 릴리스 날짜
+** https://github.com/zeroturnaround/zt-exec[ZT Process Executor (zt-exec)]: README의 사용 예
+** https://github.com/zeroturnaround/zt-exec/blob/main/CHANGELOG.md[ZT Process Executor CHANGELOG]: 1.13.0의 변경 사항과 릴리스 날짜
 ** https://commons.apache.org/proper/commons-exec/[Apache Commons Exec]
 ** https://commons.apache.org/proper/commons-exec/changes.html[Apache Commons Exec Changes]: 1.4.0 이후의 builder API와 ``Duration`` 도입
 * OpenJDK 이슈
