@@ -4,7 +4,7 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: java, jdk, linux
-:jbake-last_updated: 2026-09-12
+:jbake-last_updated: 2026-09-13
 :description: JDK 25와 Linux 6.x에서 외부 프로세스를 실행할 때 필요한 출력 처리, 시간제한, 종료 정책을 예제로 정리합니다. zt-exec과 Apache Commons Exec의 API와 기본값을 비교하고, 기본 실행 방식인 posix_spawn의 동작, 큰 힙에서의 실행 지연과 실행 방식 설정의 변경 이력을 다룹니다.
 :idprefix:
 :toc:
@@ -42,7 +42,7 @@
 
 JDK는 `java.lang.Process` 클래스로 외부 프로세스와의 접점을 제공합니다. `Process` 객체는 ``ProcessBuilder.start()``나 ``Runtime.exec()``로 얻습니다. ``ProcessBuilder``는 https://docs.oracle.com/javase/1.5.0/docs/guide/lang/enhancements.html[JDK 5.0(Java 1.5)에 추가]되었고, Sun JDK의 ``Runtime.exec()``도 이때부터 내부에서 ``ProcessBuilder``에 위임하도록 바뀌었습니다. https://www.javainthebox.net/laboratory/J2SE1.5/TinyTips/ProcessBuilder/ProcessBuilder.html[JDK 1.5.0-beta2의 소스를 확인한 당시 자료]에도 이 구현이 나옵니다. OpenJDK 25의 https://github.com/openjdk/jdk/blob/jdk-25%2B36/src/java.base/share/classes/java/lang/Runtime.java[Runtime 소스]에서도 ``ProcessBuilder``를 만들어 ``start()``를 호출합니다. 따라서 두 API는 프로세스 생성 구현을 공유하며, 주요 차이는 실행 설정을 다루는 방법입니다.
 
-**새로 작성하는 코드에는 ``ProcessBuilder``를 권장합니다.** 이 클래스에서는 환경 변수와 작업 디렉터리, 출력 리다이렉트를 지정하는 더 편리한 API를 제공합니다. 이 글에서 다룰 출력 파이프 처리도 ``redirectOutput()``, ``redirectError()``, ``redirectErrorStream()`` 등으로 구성할 수 있습니다.
+**새로 작성하는 코드에는 ``ProcessBuilder``를 권장합니다.** 이 클래스는 환경 변수와 작업 디렉터리, 출력 리다이렉트를 지정하는 더 편리한 API를 제공합니다. 이 글에서 다룰 출력 파이프 처리도 ``redirectOutput()``, ``redirectError()``, ``redirectErrorStream()`` 등으로 구성할 수 있습니다.
 
 [cols="1,2,2", options="header"]
 |===
@@ -83,7 +83,7 @@ new ProcessBuilder("cat", "my file.txt").start();
 
 === ``ProcessBuilder`` 기본 옵션의 한계
 
-Java에서는 다음과 같이 ``ProcessBuilder`` 클래스를 호출하는 단순한 몇 줄의 코드로 외부 프로세스를 실행할 수 있습니다.
+Java에서는 다음과 같이 ``ProcessBuilder`` 클래스를 사용하는 단순한 몇 줄의 코드로 외부 프로세스를 실행할 수 있습니다.
 
 [source,java]
 .기본 옵션으로 `ProcessBuilder` 호출
@@ -148,7 +148,7 @@ finished within 3s: false, alive: true
 read 100000 lines, exit=0, alive: false
 ----
 
-예제의 부모 프로세스가 3초 동안 대기를 마친 후에도 자식 프로세스는 살아있습니다. 파이프를 끝까지 읽은 뒤에 다시 호출한 ``isAlive()``는 ``false``를 돌려줍니다. 자식 프로세스가 출력을 마칠 수 있게 한 것은 그 사이에 파이프를 읽은 동작입니다. 제한 시간이 없었다면 부모도 ``waitFor()``에서 계속 기다렸을 것입니다.
+예제의 부모 프로세스가 3초 동안 대기를 마친 후에도 자식 프로세스는 살아 있습니다. 파이프를 끝까지 읽은 뒤에 다시 호출한 ``isAlive()``는 ``false``를 돌려줍니다. 자식 프로세스가 출력을 마칠 수 있게 한 것은 그 사이에 파이프를 읽은 동작입니다. 제한 시간이 없었다면 부모도 ``waitFor()``에서 계속 기다렸을 것입니다.
 
 예제에 쓴 `inputReader()` 메서드는 JDK 17에 추가됐습니다. 그 전에는 ``getInputStream()``을 ``InputStreamReader``와 ``BufferedReader``로 감싸야 했습니다.
 
@@ -292,7 +292,7 @@ String echoed = fed.inputReader().readLine();
 System.out.println("입력 후 닫음: echoed=" + echoed + ", exit=" + fed.waitFor());
 ----
 
-다음은 실행 결과입니다. stdin로 쓰는 스트림을 열어 둔 첫 번째만 1초 안에 끝나지 못했고, 나머지 셋은 EOF를 받아 바로 종료했습니다.
+다음은 실행 결과입니다. stdin에 쓰는 스트림을 열어 둔 첫 번째만 1초 안에 끝나지 못했고, 나머지 셋은 EOF를 받아 바로 종료했습니다.
 
 [source,text]
 .StdinEofDemo.java 실행 결과
@@ -326,14 +326,14 @@ try (BufferedWriter writer = process.outputWriter()) {
 
 === 시간제한과 종료 정책
 
-지금까지 설명한 것처럼 여러 3개의 파이프를 처리해도 외부 명령이 네트워크나 잠금을 기다리며 멈출 수 있으므로 시간제한과 종료 정책은 별도로 필요합니다.
+지금까지 설명한 것처럼 자식 프로세스와 연결되는 3개의 파이프를 처리해도 외부 명령이 네트워크나 잠금을 기다리며 멈출 수 있으므로 시간제한과 종료 정책은 별도로 필요합니다.
 그동안 ``waitFor()``를 부른 스레드는 외부 명령이 끝날 때까지 블로킹됩니다. JDK 8부터 있는 `waitFor(long, TimeUnit)` 메서드는 시간이 지나면 ``false``를 돌려줄 뿐 프로세스를 종료하지 않습니다.
 그때는 ``destroy()``로 정상 종료를 요청하고 유예 시간 뒤에도 살아 있으면 ``destroyForcibly()``를 쓰거나, 아래 예제처럼 바로 강제 종료할 수 있습니다.
 Linux의 OpenJDK 구현에서 ``destroy()``는 SIGTERM을, ``destroyForcibly()``는 SIGKILL을 보냅니다.
 프로세스는 SIGTERM을 핸들러로 받아서 임시 파일 삭제나 잠금 해제, 자신이 만든 자식 프로세스 정리 같은 마무리를 한 뒤에 끝날 수 있습니다.
 SIGKILL은 커널이 프로세스를 즉시 끝내므로 그런 기회가 없고, 정리하지 못한 파일과 후손 프로세스가 남을 수 있습니다. 그래서 정리할 것이 있는 명령에는 ``destroy()``를 먼저 보내고 유예 시간을 두는 편이 안전합니다.
 아래 예제는 ``sleep``처럼 정리할 것이 없는 명령만 실행하므로 바로 강제 종료합니다.
-두 출력 스트림을 각각 JDK 21의 가상 스레드에서 읽으면서, 종료 대기에 1초 제한을 둔 예제입니다.
+두 출력 스트림을 각각 JDK 21의 가상 스레드에서 읽으면서 종료 대기에 1초 제한을 둡니다.
 
 [source,java]
 .PlainJdkRunner.java
@@ -385,11 +385,11 @@ JDK API에는 프로세스 그룹을 만들거나 그룹에 시그널을 보내�
 
 == zt-exec과 Apache Commons Exec의 활용
 
-앞서 설명하듯이, 여러 경우를 다 감안하여 외부 프로세스를 안정하게 실행하는 코드를 작성하기란 쉽지 않습니다.
-지금까지 설명한 지식을 잘 이해한다고해도 출력 파이프 처리와 시간제한 코드를 프로젝트마다 다시 구현한다면 번거로움이 커집니다.
+앞서 설명했듯이, 여러 경우를 다 감안하여 외부 프로세스를 안전하게 실행하는 코드를 작성하기란 쉽지 않습니다.
+지금까지 설명한 지식을 잘 이해한다고 해도 출력 파이프 처리와 시간제한 코드를 프로젝트마다 다시 구현한다면 번거로움이 커집니다.
 노하우가 잘 반영된 라이브러리를 사용하는 편이 실무에서는 실용적입니다.
 
-이 분야의 대표적인 라이브러리가 zt-exec와 Apache Commons Exec입니다.
+이 분야의 대표적인 라이브러리가 zt-exec과 Apache Commons Exec입니다.
 두 라이브러리 모두 별도의 스레드로 출력 파이프를 비우고, 입력을 지정하지 않으면 ``PumpStreamHandler``라는 클래스가 자식 프로세스의 표준 입력을 닫아서 자식이 EOF를 받게 합니다.
 zt-exec의 `PumpStreamHandler` 클래스는 소스 파일 상단에 "This file originates from the Apache Commons Exec package"라고 적혀 있을 만큼 Commons Exec의 코드를 가져온 것입니다. 이 글에서 비교할 주요 차이는 API의 형태와 기본값입니다.
 
@@ -581,7 +581,7 @@ SIGTERM을 무시하면 ``execute()``가 계속 기다릴 수 있고, 종료 처
 |``destroy()`` 고정
 |===
 
-둘 중에서 저는 zt-exec를 더 추천합니다.
+둘 중에서 저는 zt-exec을 더 추천합니다.
 API 설계가 주는 장점이 크기 때문입니다.
 시간 초과와 종료 코드 오류를 예외 타입으로 구분하고, 출력을 문자열로 받는 데 메서드 호출 하나면 되고, 기본 설정에서 출력 파이프를 읽지 않아 생기는 교착을 피할 수 있습니다.
 두 라이브러리 모두 기본 종료 요청은 ``destroy()``입니다. zt-exec은 ``stopper()``로 강제 종료 정책을 넣을 수 있지만 Commons Exec은 별도 코드가 필요합니다.
@@ -594,7 +594,8 @@ API 설계가 주는 장점이 크기 때문입니다.
 
 === 프로세스 생성 방식 세 가지와 JVM의 선택
 
-어떤 호출로 자식 프로세스를 만드는지가 중요한 이유는 이 선택이 과거에 실제 장애로 이어졌기 때문입니다. 힙을 크게 잡은 JVM이 외부 명령 하나를 실행하려다 메모리 할당에 실패하는 문제가 대표적입니다. 2015년 NAVER D2의 https://d2.naver.com/helloworld/1113548[Java에서 외부 프로세스를 실행할 때]는 힙을 크게 설정한 Tomcat 서버에서 외부 프로세스 실행이 ``Cannot allocate memory`` 예외로 실패하는 사례를 소개합니다. OpenJDK 이슈 제목에도 그 사정이 남아 있습니다. JDK 7에 반영된 https://bugs.openjdk.org/browse/JDK-6868160[JDK-6868160]의 제목은 "(process) Use vfork, not fork, on Linux to avoid swap exhaustion"입니다. 자식 프로세스를 만드는 호출을 바꾼 것이 스왑 고갈을 피하려는 조치였다는 뜻입니다. 지금 기본값을 그대로 두면 되는 것도 이런 문제들이 차례로 정리된 결과입니다.
+애플리케이션의 외부 프로세스 실행 코드는 JVM을 거쳐 커널의 시스템 콜이나 C 라이브러리의 함수 호출로 이어집니다.
+어떤 함수 호출로 자식 프로세스를 만드는지가 중요한 이유는 이 선택이 과거에 실제 장애로 이어졌기 때문입니다. 힙을 크게 잡은 JVM이 외부 명령 하나를 실행하려다 메모리 할당에 실패하는 문제가 대표적입니다. 2015년 NAVER D2의 https://d2.naver.com/helloworld/1113548[Java에서 외부 프로세스를 실행할 때]는 힙을 크게 설정한 Tomcat 서버에서 외부 프로세스 실행이 ``Cannot allocate memory`` 예외로 실패하는 사례를 소개합니다. OpenJDK 이슈에도 그 이력이 남아 있습니다. JDK 7에 반영된 https://bugs.openjdk.org/browse/JDK-6868160[JDK-6868160]의 제목은 "(process) Use vfork, not fork, on Linux to avoid swap exhaustion"입니다. 자식 프로세스를 만드는 호출을 바꾼 것이 스왑 고갈을 피하려는 조치였다는 뜻입니다. 지금 기본값을 그대로 두면 되는 것도 이런 문제들이 차례로 정리된 결과입니다.
 
 Linux에서 다른 프로그램을 실행하려면 자식 프로세스를 만드는 호출과 그 자식을 다른 프로그램으로 바꾸는 ``execve()``를 짝지어야 합니다. 선택의 여지가 있는 쪽은 앞의 절반, 즉 자식을 만드는 방법입니다. 후보는 세 가지입니다.
 
