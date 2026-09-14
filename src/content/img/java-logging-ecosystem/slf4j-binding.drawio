@@ -1,0 +1,68 @@
+<mxfile host="app.diagrams.net" agent="claude-code">
+  <diagram id="slf4j-binding" name="SLF4J 구현체 탐색 방식">
+    <mxGraphModel dx="1200" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="520" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="zone1" value="SLF4J 1.x: 정해진 이름의 클래스를 찾는다" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#b3b3b3;dashed=1;verticalAlign=top;align=left;fontSize=13;fontStyle=1;spacingLeft=10;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="30" y="30" width="550" height="460" as="geometry" />
+        </mxCell>
+        <mxCell id="zone2" value="SLF4J 2.0: ServiceLoader로 provider를 찾는다" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#b3b3b3;dashed=1;verticalAlign=top;align=left;fontSize=13;fontStyle=1;spacingLeft=10;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="620" y="30" width="550" height="460" as="geometry" />
+        </mxCell>
+        <mxCell id="lf1" value="slf4j-api 1.7.x&lt;br&gt;LoggerFactory" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="195" y="80" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="sb" value="org.slf4j.impl.StaticLoggerBinder&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;패키지와 클래스 이름이 고정&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="195" y="200" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p1" value="logback-classic 1.2.x" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="60" y="340" width="145" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p2" value="slf4j-log4j12" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="232" y="340" width="145" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p3" value="slf4j-test (lidalia)&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;테스트 의존성&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="404" y="340" width="145" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="note1" value="둘 이상 있으면 경고를 내고 그중 하나로 연결. 어느 것인지는 JVM이 정하므로 무작위로 보아야 한다." style="text;html=1;fontSize=11;align=center;verticalAlign=middle;fontColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="50" y="420" width="510" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="e_lf1_sb" value="getResources(&quot;org/slf4j/impl/StaticLoggerBinder.class&quot;)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="lf1" target="sb">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" x="0" y="-12"/></mxGeometry>
+        </mxCell>
+        <mxCell id="e_p1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=0;entryX=0.2;entryY=1;" edge="1" parent="1" source="p1" target="sb"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_p2" value="같은 이름의 클래스를 제각각 제공" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;exitX=0.5;exitY=0;entryX=0.5;entryY=1;" edge="1" parent="1" source="p2" target="sb">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" x="0" y="8"/></mxGeometry>
+        </mxCell>
+        <mxCell id="e_p3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=0;entryX=0.8;entryY=1;" edge="1" parent="1" source="p3" target="sb"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="lf2" value="slf4j-api 2.0.x&lt;br&gt;LoggerFactory" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="785" y="80" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="sl" value="ServiceLoader.load(SLF4JServiceProvider.class)&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;META-INF/services/org.slf4j.spi.SLF4JServiceProvider&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="740" y="200" width="310" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="q1" value="logback-classic 1.5+&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;LogbackServiceProvider&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="650" y="340" width="145" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="q2" value="log4j-slf4j2-impl&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;SLF4JServiceProvider&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="822" y="340" width="145" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="q3" value="slf4j-test 3.x (valfirst)&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;테스트 의존성&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="994" y="340" width="145" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="note2" value="둘 이상 있으면 경고를 내고 목록의 첫 번째를 사용. 2.0.9부터는 slf4j.provider 시스템 프로퍼티로 직접 지정할 수 있다." style="text;html=1;fontSize=11;align=center;verticalAlign=middle;fontColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="640" y="420" width="510" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="e_lf2_sl" value="표준 API로 provider 목록 조회" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="lf2" target="sl">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" x="0" y="-12"/></mxGeometry>
+        </mxCell>
+        <mxCell id="e_q1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=0;entryX=0.2;entryY=1;" edge="1" parent="1" source="q1" target="sl"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e_q2" value="각자 다른 이름의 클래스를 등록 파일로 선언" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#ffffff;exitX=0.5;exitY=0;entryX=0.5;entryY=1;" edge="1" parent="1" source="q2" target="sl">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" x="0" y="8"/></mxGeometry>
+        </mxCell>
+        <mxCell id="e_q3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=0.5;exitY=0;entryX=0.8;entryY=1;" edge="1" parent="1" source="q3" target="sl"><mxGeometry relative="1" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,55 @@
+<mxfile host="app.diagrams.net" agent="claude-code">
+  <diagram id="boot-logging" name="Spring Boot 기본 로깅 구성">
+    <mxGraphModel dx="1200" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1160" pageHeight="470" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="zone_src" value="로그를 남기는 쪽" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#b3b3b3;dashed=1;verticalAlign=top;align=left;fontSize=13;fontStyle=1;spacingLeft=10;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="30" y="30" width="300" height="420" as="geometry" />
+        </mxCell>
+        <mxCell id="zone_bridge" value="SLF4J로 모으는 연결 모듈" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#b3b3b3;dashed=1;verticalAlign=top;align=left;fontSize=13;fontStyle=1;spacingLeft=10;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="390" y="30" width="280" height="320" as="geometry" />
+        </mxCell>
+        <mxCell id="a1" value="Spring Framework 내부 코드&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;JCL API 호출 (commons-logging 1.3+)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="50" y="70" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a2" value="Log4j API를 쓰는 라이브러리&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;log4j-api 호출&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="50" y="160" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a3" value="JUL을 쓰는 라이브러리와 JDK&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;java.util.logging 호출&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="50" y="250" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a4" value="애플리케이션 코드&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;slf4j-api 직접 호출&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="50" y="370" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="b1" value="Slf4jLogFactory&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;commons-logging 1.3+에 내장&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="410" y="70" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="b2" value="log4j-to-slf4j&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;starter 의존성&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="410" y="160" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="b3" value="jul-to-slf4j&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;SLF4JBridgeHandler, starter 의존성&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="410" y="250" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="slf4j" value="SLF4J&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;slf4j-api&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="720" y="150" width="150" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="logback" value="Logback&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;logback-classic, starter 의존성&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="980" y="150" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="a1" target="b1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="a2" target="b2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="a3" target="b3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="f1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.25;" edge="1" parent="1" source="b1" target="slf4j"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="f2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="b2" target="slf4j"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="f3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.75;" edge="1" parent="1" source="b3" target="slf4j"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="f4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;exitX=1;exitY=0.5;entryX=0.5;entryY=1;" edge="1" parent="1" source="a4" target="slf4j">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="795" y="400"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="g1" value="직접 구현" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="slf4j" target="logback">
+          <mxGeometry relative="1" as="geometry"><mxPoint as="offset" x="0" y="-12"/></mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
