@@ -450,7 +450,7 @@ ____
 
 참조 타입 파라미터가 어떻게 초기화되는지는 참조 바인딩 규칙이 따로 정합니다. Call by value와 call by reference는 특정 언어의 표준 용어가 아니라 여러 언어의 인자 전달 방식을 비교하기 위한 프로그래밍 언어론의 용어입니다.
 
-=== C#의 참조 파라미터
+== C#
 
 C#도 {cpp}처럼 call by reference를 문법으로 지원합니다. https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/method-parameters[C# 레퍼런스의 Method parameters 문서]는 C#이 기본적으로 인자를 값으로 전달한다고 밝히고, struct 같은 값 타입은 값의 복사본을, class 같은 참조 타입은 참조의 복사본을 메서드가 받는다고 설명합니다.
 
