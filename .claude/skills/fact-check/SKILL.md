@@ -34,7 +34,7 @@ Codex는 읽기 전용 샌드박스에서 돌기 때문에 파일을 쓰지 못�
 
 기록 파일 이름은 글의 slug(확장자를 뺀 `.adoc` 파일 이름)에 오늘 날짜를 붙인다.
 같은 글의 이전 기록이 `fact-checks/`에 있으면 머리말에서 링크하고, 이전 판정을 승계하지 않고 다시 대조한다.
-같은 날 같은 글을 두 번 검증하면 두 번째 파일에 `-2` 접미사를 붙이고(예: `call-by-value-2026-09-19-2.md`), 제목에도 "(2차)"를 적는다.
+같은 날 같은 글을 두 번 검증하면 두 번째 파일에 `-2` 접미사를 붙이고(예: `call-by-value-vs-call-by-reference-2026-09-19-2.md`), 제목에도 "(2차)"를 적는다.
 
 ## 2. Codex 적대적 리뷰
 
@@ -75,7 +75,7 @@ Codex가 문제없다고 넘긴 부분도 글의 핵심 인용은 다시 본다.
 
 ## 4. 기록 작성 (Claude가 직접)
 
-형식은 [references/record-template.md](references/record-template.md)를 따른다. 실제 예는 `fact-checks/call-by-value-2026-09-19.md`와 `fact-checks/java-external-process-2026-09-13.md`다.
+형식은 [references/record-template.md](references/record-template.md)를 따른다. 실제 예는 `fact-checks/call-by-value-vs-call-by-reference-2026-09-19.md`와 `fact-checks/java-external-process-2026-09-13.md`다.
 
 지켜야 할 점:
 

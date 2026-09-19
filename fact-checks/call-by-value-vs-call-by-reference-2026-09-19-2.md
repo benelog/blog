@@ -3,7 +3,7 @@
 - 대상: [call-by-value-vs-call-by-reference.adoc](../src/content/call-by-value-vs-call-by-reference.adoc)
 - 검토 기준 커밋: `0e528009787fab1d30eac12af154029eb6679f36`
 - 참고: 이 기록에 적은 검토 기준 커밋과 반영 커밋은 이후 하나의 커밋으로 합쳐져 현재 이력에서는 해시로 찾을 수 없다. 검증 당시 글은 `call-by-value.adoc`이었고, 합칠 때 지금 파일명으로 바꿨다.
-- 이전 기록: [2026-09-19 1차 검증](call-by-value-2026-09-19.md). 같은 날 앞선 커밋 `ce4bac9`를 검증한 기록이다.
+- 이전 기록: [2026-09-19 1차 검증](call-by-value-vs-call-by-reference-2026-09-19.md). 같은 날 앞선 커밋 `ce4bac9`를 검증한 기록이다.
 - 범위: 위 커밋에서 추가한 Python 절과 Ruby 절, Rust 절의 첫 문장, 'Call by reference 지원' 열 중심으로 재구성한 정리 표. 1차 기록에서 확인한 C·C++·Go·Ada 절의 인용은 다시 대조하지 않았다.
 - 방법: Codex 적대적 리뷰(`adversarial-review --base HEAD~1`)로 의심 지점을 모은 뒤, Claude가 Python 공식 튜토리얼과 FAQ, Ruby 공식 FAQ, Ada Reference Manual 원문을 WebFetch로 받아 대조했다. Python·Ruby 예제는 로컬에서 실행했다.
 - 결과: **우선 수정할 사항 1건.** Python·Ruby 절의 인용과 예제, Rust가 call by reference를 지원하지 않는다는 서술은 타당하다. 문제는 정리 표의 Ada 행이 참조 전달 여부를 파라미터 모드가 정하는 것처럼 요약한 부분이다.

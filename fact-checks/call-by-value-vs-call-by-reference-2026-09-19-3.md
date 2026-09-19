@@ -3,7 +3,7 @@
 - 대상: [call-by-value-vs-call-by-reference.adoc](../src/content/call-by-value-vs-call-by-reference.adoc)
 - 검토 기준 커밋: `3ceb9c3054aca07b603cac326a80f77c9a5e50c6`
 - 참고: 이 기록에 적은 검토 기준 커밋과 반영 커밋은 이후 하나의 커밋으로 합쳐져 현재 이력에서는 해시로 찾을 수 없다. 검증 당시 글은 `call-by-value.adoc`이었고, 합칠 때 지금 파일명으로 바꿨다.
-- 이전 기록: [2026-09-19 1차 검증](call-by-value-2026-09-19.md), [2026-09-19 2차 검증](call-by-value-2026-09-19-2.md). 2차 이후 절 순서 조정, C# 절과 MDN 인용, Ada 비교 예제, 인용 블록 전환 등 큰 수정이 있어 글 전체를 다시 봤다.
+- 이전 기록: [2026-09-19 1차 검증](call-by-value-vs-call-by-reference-2026-09-19.md), [2026-09-19 2차 검증](call-by-value-vs-call-by-reference-2026-09-19-2.md). 2차 이후 절 순서 조정, C# 절과 MDN 인용, Ada 비교 예제, 인용 블록 전환 등 큰 수정이 있어 글 전체를 다시 봤다.
 - 범위: 글 전체. 두 용어의 정의와 출처, 언어별 절의 사양 인용과 예제, 정리 표의 각 칸, 참고 자료의 절 이름.
 - 방법: Codex 적대적 리뷰(`task`, 글 전체)로 의심 지점을 모은 뒤, Claude가 언어 사양·공식 문서·논문 원문을 WebFetch와 curl로 받아 대조했다. 예제는 Java 25, Node 24.6, Python 3.12.3, GCC 13.3, Go 1.27.1, Kotlin 2.4.20으로 로컬에서 실행했고, Rust 1.98.1, .NET SDK 8.0.425, GNAT 13.3은 도커 이미지로 실행했다. 이전 기록의 판정은 승계하지 않고 다시 대조했다.
 - 결과: **우선 수정할 사항 6건, 표현을 보완할 사항 10건.** 핵심 결론인 "Java·JavaScript는 객체를 전달할 때도 참조값의 복사본을 전달하는 call by value이며, 객체 상태 공유는 호출자 변수의 별칭 전달과 다르다"는 타당하다. 오류는 이번 세션에 추가한 C# 절과 Flanagan 인용 블록, Go 사양의 절 이름, Ada 절의 타입 분류와 aliased 예시 문장에 몰려 있다.
