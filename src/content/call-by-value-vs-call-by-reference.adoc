@@ -5,7 +5,7 @@
 :jbake-status: published
 :jbake-tags: java, javascript
 :description: Call by value와 call by reference의 정의를 정리하고, Java, Kotlin, JavaScript, C, {cpp}, C#, Python, Go, Rust, Ada가 인자를 어떻게 전달하는지 비교합니다.
-:jbake-last_updated: 2026-09-19
+:jbake-last_updated: 2026-09-20
 :toc:
 :idprefix:
 
@@ -194,7 +194,9 @@ The reference values (often just references) are pointers to these objects, and 
 참조값(흔히 그냥 참조라고 부른다)은 이 객체들을 가리키는 포인터이고, 여기에 어떤 객체도 가리키지 않는 특별한 null 참조가 있다.
 ____
 
-다만 이는 언어 수준의 의미를 설명하는 표현이지, 참조값이 원시 메모리 주소와 같은 형식이라고 보장하는 문장은 아닙니다. https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-2.html#jvms-2.7[Java Virtual Machine Specification 2.7]은 객체의 내부 구조를 특정하지 않으며, Oracle의 일부 구현에서는 참조가 객체 데이터가 아니라 핸들을 가리킬 수도 있다고 설명합니다. 여기서 핸들은 참조와 객체 데이터 사이에 놓인 작은 중간 구조입니다. 참조는 핸들을 가리키고, 핸들 안의 포인터가 다시 객체 데이터와 메서드 테이블을 가리킵니다. 참조값이 객체가 놓인 메모리 주소 그 자체가 아닐 수도 있다는 뜻입니다.
+다만 이는 언어 수준의 의미를 설명하는 표현이지, 참조값이 원시 메모리 주소와 같은 형식이라고 보장하는 문장은 아닙니다. https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-2.html#jvms-2.7[Java Virtual Machine Specification 2.7]은 객체의 내부 구조를 특정하지 않으며, 일부 구현에서는 참조가 객체 데이터가 아니라 핸들을 가리킬 수도 있다고 설명합니다. 여기서 핸들은 참조와 객체 데이터 사이에 놓인 작은 중간 구조입니다. 참조는 핸들을 가리키고, 핸들 안의 포인터가 다시 객체 데이터와 메서드 테이블을 가리킵니다. 참조값이 객체가 놓인 메모리 주소 그 자체가 아닐 수도 있다는 뜻입니다.
+
+이 문장은 Sun 시절의 Classic VM을 염두에 둔 것입니다. Java SE 6판 JVMS의 같은 내용은 "Sun의 일부 구현"이라고 적혀 있었고, 이후 판에서 회사 이름만 Oracle로 바뀌었습니다. 현재 Oracle JDK와 OpenJDK가 공통으로 쓰는 HotSpot은 핸들 없이 객체를 직접 가리키는 포인터를 씁니다. https://www.oracle.com/java/technologies/whitepaper.html[The Java HotSpot Performance Engine Architecture]의 'Handleless Objects' 절은 Classic VM이 간접 핸들을 썼던 것과 대비해, HotSpot에서는 Java 코드가 핸들을 쓰지 않고 객체 참조를 직접 포인터로 구현한다고 설명합니다.
 
 메서드 호출 시의 전달 방식은 https://docs.oracle.com/javase/specs/jls/se26/html/jls-8.html#jls-8.4.1[8.4.1. Formal Parameters] 절에 있습니다.
 인자 표현식의 '값'이 새로 만들어진 파라미터 변수를 초기화한다고 설명할 뿐입니다. 앞에서 정의한 call by reference처럼 파라미터가 호출한 쪽 변수의 별칭이 된다는 서술은 없습니다.
@@ -724,6 +726,8 @@ after By_Reference: Original = 2
 ** https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-2.html#jvms-2.6[Java Virtual Machine Specification - 2.6. Frames]
 ** https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-2.html#jvms-2.6.1[Java Virtual Machine Specification - 2.6.1. Local Variables]
 ** https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-2.html#jvms-2.7[Java Virtual Machine Specification - 2.7. Representation of Objects]
+** https://docs.oracle.com/javase/specs/jvms/se6/html/Overview.doc.html#16066[Java Virtual Machine Specification (Java SE 6) - 3.7 Representation of Objects]
+** https://www.oracle.com/java/technologies/whitepaper.html[The Java HotSpot Performance Engine Architecture - Handleless Objects]
 ** https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-6.html#jvms-6.5.invokestatic[Java Virtual Machine Specification - 6.5. invokestatic]
 ** https://dev.java/learn/classes-objects/calling-methods-constructors/[Dev.java - Calling Methods and Constructors]
 ** Ken Arnold, James Gosling, David Holmes, link:https://www.informit.com/store/java-programming-language-9780321349804[**The Java Programming Language**] 4판, Addison-Wesley, 2006
