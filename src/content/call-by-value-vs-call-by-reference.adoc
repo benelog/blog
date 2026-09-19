@@ -237,7 +237,7 @@ The Java Virtual Machine uses local variables to pass parameters on method invoc
 Java Virtual Machine은 메서드를 호출할 때 지역 변수로 파라미터를 전달한다. 클래스 메서드를 호출하면 파라미터는 0번 지역 변수부터 차례로 전달된다. 인스턴스 메서드를 호출하면 0번 지역 변수는 항상 그 인스턴스 메서드가 호출된 객체의 참조(Java 프로그래밍 언어의 this)를 전달하는 데 쓰인다. 파라미터는 그다음 1번 지역 변수부터 차례로 전달된다.
 ____
 
-앞의 ``reassign`` 예제를 이 구조에 대입하면 다음 그림과 같습니다. ``reassign``은 static 메서드이므로 파라미터 ``tv``는 ``reassign`` 프레임의 0번 지역 변수입니다. ``main`` 프레임의 1번 지역 변수인 ``myTv``에 담긴 참조값이 이 칸으로 복사됩니다. 바이트코드 수준에서는 ``aload_1`` 명령이 이 참조값을 ``main`` 프레임의 operand stack에 올리고, https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-6.html#jvms-6.5.invokestatic[`invokestatic`] 명령이 그 값을 꺼내 새 프레임의 0번 지역 변수에 넣습니다. 두 칸은 서로 다른 프레임에 속한 별개의 저장 공간이므로 ``tv``에 새 객체를 대입해도 ``main`` 프레임의 ``myTv``는 여전히 처음의 객체를 가리킵니다.
+앞의 ``reassign`` 예제를 이 구조에 대입하면 다음 그림과 같습니다. ``reassign``은 static 메서드이므로 파라미터 ``tv``는 ``reassign`` 프레임의 0번 지역 변수입니다. javac가 ``main`` 프레임의 1번 지역 변수에 배정한 ``myTv``에 담긴 참조값이 이 칸으로 복사됩니다. 파라미터가 0번부터 들어가는 것은 JVMS가 정하지만, 파라미터가 아닌 지역 변수를 몇 번 칸에 둘지는 컴파일러가 정합니다. 바이트코드 수준에서는 ``aload_1`` 명령이 이 참조값을 ``main`` 프레임의 operand stack에 올리고, https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-6.html#jvms-6.5.invokestatic[`invokestatic`] 명령이 그 값을 꺼내 새 프레임의 0번 지역 변수에 넣습니다. 두 칸은 서로 다른 프레임에 속한 별개의 저장 공간이므로 ``tv``에 새 객체를 대입해도 ``main`` 프레임의 ``myTv``는 여전히 처음의 객체를 가리킵니다.
 
 image::img/call-by-value/java-stack-frames.png[reassign 메서드의 프레임과 main 메서드의 프레임이 각자의 지역 변수 배열을 가지고 참조값만 복사되는 구조,width=800]
 
@@ -593,7 +593,7 @@ swap(&a, &b) // <2>
 
 다만 메서드 호출에서는 호출 지점에 ``&``가 없어도 됩니다. https://go.dev/ref/spec#Calls[Go 사양의 Calls 절]은 ``x``가 주소를 구할 수 있는 값이고 ``&x``의 메서드 집합에 ``m``이 있으면 ``x.m()``이 ``(&x).m()``의 축약 표기라고 규정합니다. 포인터 수신자 메서드는 이 규칙에 따라 컴파일러가 주소를 대신 구해 넘기므로, 호출식의 모양만으로 호출한 쪽 변수가 바뀌는지 판단할 수는 없습니다. 이때도 전달되는 것은 포인터 값이라는 점은 같습니다.
 
-같은 FAQ는 맵과 슬라이스 값이 내부 데이터를 가리키는 포인터를 담은 서술자(descriptor)라서 포인터처럼 동작한다고 설명합니다. 맵이나 슬라이스 값을 복사해도 그 값이 가리키는 데이터는 복사되지 않습니다. 함수 안에서 파라미터로 받은 맵에 키를 추가하면 호출한 쪽 맵에서도 그 키를 읽을 수 있지만, 파라미터에 새 맵을 대입해도 호출한 쪽의 변수는 그대로입니다. Java에서 객체의 참조값을 전달할 때와 동일한 개념입니다. 함수 안에서 슬라이스에 ``append``한 결과가 호출한 쪽에 보이지 않는 것도 같은 원리입니다. ``append``는 넘겨받은 슬라이스 값을 바꾸지 않고 길이가 늘어난 새 슬라이스 값을 반환하므로, 그 결과를 파라미터에 대입하는 것은 파라미터에 새 맵을 대입하는 것과 같습니다. 호출한 쪽에 반영하려면 반환해서 다시 대입해야 합니다.
+같은 FAQ는 맵과 슬라이스 값이 내부 데이터를 가리키는 포인터를 담은 서술자(descriptor)라서 포인터처럼 동작한다고 설명합니다. 맵이나 슬라이스 값을 복사해도 그 값이 가리키는 데이터는 복사되지 않습니다. 함수 안에서 파라미터로 받은 맵에 키를 추가하면 호출한 쪽 맵에서도 그 키를 읽을 수 있지만, 파라미터에 새 맵을 대입해도 호출한 쪽의 변수는 그대로입니다. Java에서 객체의 참조값을 전달할 때와 동일한 개념입니다. 함수 안에서 슬라이스에 ``append``해도 늘어난 길이가 호출한 쪽 슬라이스에 반영되지 않는 것도 같은 원리입니다. ``append``는 넘겨받은 슬라이스 값을 바꾸지 않고 길이가 늘어난 새 슬라이스 값을 반환하므로, 그 결과를 파라미터에 대입하는 것은 파라미터에 새 맵을 대입하는 것과 같습니다. 호출한 쪽에 반영하려면 반환해서 다시 대입해야 합니다.
 
 [source,go]
 .Go 슬라이스 파라미터의 요소 변경과 append
@@ -615,7 +615,7 @@ nums = appendFour(nums) // <3>
 fmt.Println(nums, len(nums)) // [100 2 3 4] 4
 ----
 <1> 파라미터 ``s``는 호출한 쪽의 ``nums``와 같은 배열을 가리키므로, 요소를 바꾸면 ``nums``에서도 100이 보입니다.
-<2> ``append``는 길이가 4인 새 슬라이스 값을 돌려주고 그 값은 지역 변수 ``s``에만 대입됩니다. 호출한 쪽의 ``nums``는 길이가 3인 원래 슬라이스 값 그대로입니다. 용량이 남아 있어 새 요소가 같은 배열에 쓰이더라도 ``nums``의 길이는 바뀌지 않으므로, ``nums``로는 그 요소를 읽을 수 없습니다.
+<2> ``append``는 길이가 4인 새 슬라이스 값을 돌려주고 그 값은 지역 변수 ``s``에만 대입됩니다. 호출한 쪽의 ``nums``는 길이가 3인 원래 슬라이스 값 그대로입니다. 용량이 남아 있어 새 요소가 같은 배열에 쓰이더라도 ``nums``의 길이는 3 그대로이므로 ``nums[3]``은 범위를 벗어납니다. ``nums[:4]``처럼 용량까지 다시 슬라이싱해야 그 요소가 보입니다.
 <3> 호출한 쪽에 반영하려면 ``append``한 슬라이스를 반환해서 다시 대입합니다. 내장 함수 ``append``가 결과를 반환하도록 설계된 것도 이 때문입니다.
 
 == Rust
@@ -629,7 +629,7 @@ Passing a variable to a function will move or copy, just as assignment does.
 변수를 함수에 넘기면 대입과 마찬가지로 이동하거나 복사된다.
 ____
 
-``String``처럼 ``Copy``가 아닌 타입의 값은 소유권이 파라미터로 이동하고, ``i32``처럼 ``Copy``인 타입의 값은 복사됩니다.
+``String``처럼 ``Copy``가 아닌 타입의 값은 소유권이 파라미터로 이동하고, ``i32``처럼 ``Copy``인 타입의 값은 복사됩니다. 다만 ``&mut T`` 타입의 변수를 ``&mut T`` 파라미터에 넘기면 컴파일러가 암묵적으로 재대여(reborrow)하므로, ``&mut T``가 ``Copy``가 아니어도 호출 뒤에 그 변수를 다시 쓸 수 있습니다.
 
 ``Copy``는 값을 다른 변수에 대입해도 원래 변수를 계속 쓸 수 있는 타입에 붙는 트레이트입니다. https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#stack-only-data-copy[Rust Book의 Stack-Only Data: Copy 절]은 ``Copy``를 구현한 타입의 변수는 이동하지 않고 그대로 복사되어 다른 변수에 대입한 뒤에도 유효하다고 설명합니다. 정수, 실수, ``bool``, ``char``, 그리고 ``Copy``인 타입만 담은 튜플이 여기에 속합니다. 반면 ``String``이나 ``Vec``처럼 힙 메모리를 할당하거나 자원을 소유하는 타입은 ``Copy``가 될 수 없고, 값이 스코프를 벗어날 때 정리 작업을 하는 ``Drop``을 구현한 타입에 ``Copy``를 붙이면 컴파일 오류가 납니다. 메모리를 그대로 복제해도 안전한 타입만 ``Copy``가 되는 셈입니다. 그래서 ``let t = s;``에서 ``s``가 ``i32``이면 이후에도 ``s``를 쓸 수 있지만, ``String``이면 소유권이 ``t``로 이동해 ``s``를 더 쓸 수 없습니다.
 
@@ -660,7 +660,7 @@ swap(&mut a, &mut b); // <3>
 
 정의 절에서 '파라미터에 새 값을 대입했을 때 호출한 쪽의 변수가 바뀌는가'라는 기준만으로는 모든 전달 방식을 분류할 수 없다고 했습니다. Ada가 그 예입니다. Ada는 파라미터에 `in`, `in out`, `out` 모드를 선언하고, ``in out``이나 ``out`` 파라미터에 대입한 값은 호출한 쪽 변수에 반영됩니다. 호출 지점만 보면 {cpp}의 참조 파라미터와 같습니다.
 
-그런데 https://ada-lang.io/docs/arm/AA-6/AA-6.2/[Ada Reference Manual 6.2]는 복사로 전달할지 참조로 전달할지를 모드가 아니라 타입으로 정합니다. ``Integer`` 같은 elementary type은 by-copy type이라 복사로 전달하고, tagged type 등 by-reference type은 참조로 전달하며, ``aliased``로 선언한 형식 파라미터는 타입과 관계없이 참조로 전달합니다. 복사로 전달된 `in out`, `out` 파라미터는 https://ada-lang.io/docs/arm/AA-6/AA-6.4[6.4.1]에 따라 서브프로그램이 정상 종료할 때 그 값을 실제 인자에 되돌려 씁니다. 이것이 정의 절에서 언급한 call by copy-restore입니다. 호출한 쪽의 변수가 바뀐다는 결과는 call by reference와 같지만 실제 전달은 복사입니다.
+그런데 https://ada-lang.io/docs/arm/AA-6/AA-6.2/[Ada Reference Manual 6.2]는 복사로 전달할지 참조로 전달할지를 모드가 아니라 주로 타입으로 정합니다. ``Integer`` 같은 elementary type은 by-copy type이라 복사로 전달하고, tagged type 등 by-reference type은 참조로 전달하며, ``aliased``로 선언한 형식 파라미터는 타입과 관계없이 참조로 전달합니다. 어느 쪽에도 해당하지 않는 파라미터는 복사와 참조 중 어느 방식으로 전달할지 규정하지 않고 구현에 맡깁니다. 복사로 전달된 `in out`, `out` 파라미터는 https://ada-lang.io/docs/arm/AA-6/AA-6.4[6.4.1]에 따라 서브프로그램이 정상 종료할 때 그 값을 실제 인자에 되돌려 씁니다. 이것이 정의 절에서 언급한 call by copy-restore입니다. 호출한 쪽의 변수가 바뀐다는 결과는 call by reference와 같지만 실제 전달은 복사입니다.
 
 복사 전달과 참조 전달의 차이는 프로시저 안에서 실제 인자로 넘긴 변수를 직접 읽어 보면 드러납니다. 아래 예제는 같은 변수 ``Original``을 by-copy로 받는 프로시저와 ``aliased``로 받는 프로시저에 각각 넘기고, 파라미터에 대입한 직후 ``Original``을 읽습니다.
 
@@ -722,11 +722,11 @@ after By_Reference: Original = 2
 |JavaScript|아니오|call by value. Object 값을 별도의 파라미터 바인딩에 대입|없음. 객체 상태 변경만 공유
 |C|아니오|call by value|포인터를 넘김(`swap(&a, &b)`)
 |{cpp}|예. 참조 파라미터(`int&`)에 한함|기본은 call by value. 참조 파라미터만 call by reference|참조 파라미터 선언. C처럼 포인터를 넘길 수도 있음
-|C#|예. `ref`, `out` 파라미터에 한함. `in`, `ref readonly`도 참조로 전달하지만 대입은 불가|기본은 call by value. class 인스턴스는 참조의 복사본 전달|`ref`, `out` 파라미터 선언. 호출 지점에도 `ref`, `out` 표기
+|C#|예. `ref`, `out`, `in`, `ref readonly` 파라미터. 이 중 파라미터에 대입할 수 있는 것은 `ref`, `out`|기본은 call by value. class 인스턴스는 참조의 복사본 전달|`ref`, `out` 파라미터 선언. 호출 지점에도 `ref`, `out` 표기
 |Python|아니오|call by value. 값은 항상 객체 참조|없음. 객체 상태 변경만 공유
 |Go|아니오|call by value. 맵·슬라이스 값은 포인터처럼 동작|포인터를 넘김(`swap(&a, &b)`). 포인터 수신자 메서드는 ``&``를 자동으로 붙임
 |Rust|아니오|call by value. 대입과 같이 타입에 따라 이동 또는 복사하며, 가변 참조 ``&mut T``도 값으로 전달|가변 참조를 넘김(`swap(&mut a, &mut b)`). 메서드 호출은 수신자를 자동으로 대여
-|Ada|부분적으로. `in out`, `out` 파라미터 중 by-reference 타입이거나 ``aliased``로 선언한 것은 call by reference. by-copy 타입은 정상 종료 시 파라미터 값을 되돌려 씀(copy-restore)|타입에 따라 by-copy 또는 by-reference|`in out`, `out` 모드 선언
+|Ada|부분적으로. by-reference 타입이나 ``aliased``로 선언한 파라미터는 모드와 관계없이 참조로 전달. 그 밖의 타입은 명세가 정하지 않음. by-copy 타입의 `in out`, `out`은 정상 종료 시 값을 되돌려 씀(copy-restore)|타입에 따라 by-copy 또는 by-reference|`in out`, `out` 모드 선언
 |===
 
 * Java, Kotlin, JavaScript, Python은 인자 값으로 별도의 파라미터 변수 또는 바인딩을 초기화합니다. 호출자 변수 자체가 파라미터의 별칭이 되는 call by reference를 지원하지 않습니다.
