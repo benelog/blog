@@ -27,6 +27,12 @@ Requires JDK 25 (configured via `.sdkmanrc` as `25-tem`). Use `sdk env` if using
 - **Output**: `output/` (gitignored).
 - **Fact checks**: `fact-checks/` — 글별 사실 관계 검증 기록(`<slug>-<YYYY-MM-DD>.md`). `/fact-check` 스킬이 작성한다.
 
+## Commit Conventions
+
+커밋 메시지 제목(첫 줄)은 공백을 포함해 50자 이내로 쓴다. Git 공식 문서(`git commit` 매뉴얼의 DISCUSSION)가 권하는 길이이고, 이 저장소 커밋 제목의 중간값(48자)에도 맞는다. 한글은 터미널에서 2칸을 차지하므로 `git log --oneline`에서 잘리지 않게 하려면 이 한도 안에서도 짧을수록 좋다.
+
+제목에는 무엇을 바꿨는지만 적고, 바꾼 이유나 세부 항목은 빈 줄 뒤 본문에 적는다. 본문은 항목이 여러 개면 문단이나 목록으로 나눈다.
+
 ## Content Conventions
 
 New posts go in `src/content/` as `.adoc` files with this header format:
