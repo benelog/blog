@@ -107,7 +107,7 @@ public class ReassignTest {
 <1> main 메서드의 ``myTv``에 담긴 참조값이 복사되어 reassign 메서드의 파라미터 ``tv``에 대입됩니다. 두 변수는 같은 객체를 가리키지만 서로 다른 변수입니다.
 <2> 파라미터 ``tv``에 새 객체를 대입합니다. 파라미터 ``tv``만 새 객체를 가리키게 되고, main 메서드의 ``myTv``는 원래 객체를 그대로 가리킵니다. 그래서 출력은 ``Classic``입니다.
 
-image::img/call-by-value/java-reassign.svg[참조값이 복사된 뒤 파라미터만 새 객체를 가리키게 되는 과정,width=640]
+image::img/call-by-value/java-reassign.png[참조값이 복사된 뒤 파라미터만 새 객체를 가리키게 되는 과정,width=700]
 
 === 오해의 근원인 객체 상태 변경
 
@@ -134,7 +134,7 @@ public class ChangeStateTest {
 <2> 파라미터 ``tv``를 재할당하지 않고, 파라미터가 가리키는 객체의 채널을 ``Rock``으로 바꿉니다. main 메서드의 ``myTv``가 가리키는 바로 그 객체입니다.
 <3> main 메서드의 ``myTv``로 채널을 읽으면 ``Rock``이 출력됩니다. 변수는 바뀌지 않았지만 변수가 가리키는 객체의 상태가 바뀌었기 때문입니다.
 
-image::img/call-by-value/java-mutation.svg[두 변수가 같은 객체를 가리키므로 내부 상태 변경이 호출자 변수로 접근해도 확인되는 상황,width=640]
+image::img/call-by-value/java-mutation.png[두 변수가 같은 객체를 가리키므로 내부 상태 변경이 호출자 변수로 접근해도 확인되는 상황,width=700]
 
 파라미터 재할당은 호출자 변수에 반영되지 않는데 객체 상태 변경은 호출자 변수로 접근해도 확인되니, "객체는 call by reference로 전달된다"는 설명이 그럴듯하게 들립니다.
 그러나 앞에서 설명했듯이, 두 방식을 구분하는 실용적인 기준은 파라미터에 대입한 값이 호출자 변수에 반영되는가입니다.
