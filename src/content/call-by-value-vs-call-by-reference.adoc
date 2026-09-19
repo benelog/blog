@@ -206,6 +206,43 @@ When the method or constructor is invoked (§15.12), the values of the actual ar
 메서드나 생성자를 호출하면(§15.12), 그 본문을 실행하기 전에 실제 인자 표현식의 값이 새로 만들어진 파라미터 변수를 초기화한다. 새로 만들어지는 파라미터 변수는 각각 선언된 타입을 따른다.
 ____
 
+=== 메서드 호출마다 새로 만들어지는 프레임
+
+JLS는 메서드 호출을 실행하는 과정도 단계별로 서술합니다. https://docs.oracle.com/javase/specs/jls/se26/html/jls-15.html#jls-15.12.4.5[15.12.4.5. Create Frame, Synchronize, Transfer Control] 절은 호출할 메서드가 정해지면 activation frame을 새로 만들고 그 안에 인자 값을 담는다고 설명합니다.
+
+[quote, Java Language Specification, "15.12.4.5. Create Frame, Synchronize, Transfer Control"]
+____
+Now a new activation frame is created, containing the target reference (if any) and the argument values (if any), as well as enough space for the local variables and stack for the method to be invoked ... The effect of this is to assign the argument values to corresponding freshly created parameter variables of the method, and to make the target reference available as this, if there is a target reference.
+
+이제 새 activation frame을 만든다. 여기에는 대상 참조(있다면)와 인자 값(있다면), 그리고 호출할 메서드의 지역 변수와 스택에 필요한 공간이 들어간다. ... 그 결과 인자 값은 메서드에 새로 만들어진 각각의 파라미터 변수에 대입되고, 대상 참조가 있다면 this로 쓸 수 있게 된다.
+____
+
+호출한 쪽의 변수가 아니라 새 프레임에 새로 만들어진 파라미터 변수에 인자의 '값'을 대입한다는 서술입니다. 8.4.1절과 같은 결론입니다. 인스턴스 메서드를 호출한 대상 객체의 참조값(target reference)도 같은 방식으로 새 프레임에 담겨 ``this``가 됩니다.
+
+이 프레임을 가상 머신 수준에서 정의한 문서는 JVMS입니다. https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-2.html#jvms-2.6[2.6. Frames] 절은 메서드를 호출할 때마다 새 프레임이 스레드의 JVM stack에 만들어지고, 프레임마다 자기만의 지역 변수 배열이 있다고 설명합니다.
+
+[quote, Java Virtual Machine Specification, 2.6. Frames]
+____
+A new frame is created each time a method is invoked. ... Frames are allocated from the Java Virtual Machine stack (§2.5.2) of the thread creating the frame. Each frame has its own array of local variables (§2.6.1), ...
+
+메서드를 호출할 때마다 새 프레임이 만들어진다. ... 프레임은 그 프레임을 만드는 스레드의 Java Virtual Machine stack(§2.5.2)에 할당된다. 각 프레임은 자기만의 지역 변수 배열(§2.6.1)을 가진다.
+____
+
+파라미터는 이 지역 변수 배열로 전달됩니다. https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-2.html#jvms-2.6.1[2.6.1. Local Variables] 절의 설명입니다.
+
+[quote, Java Virtual Machine Specification, 2.6.1. Local Variables]
+____
+The Java Virtual Machine uses local variables to pass parameters on method invocation. On class method invocation, any parameters are passed in consecutive local variables starting from local variable 0. On instance method invocation, local variable 0 is always used to pass a reference to the object on which the instance method is being invoked (this in the Java programming language). Any parameters are subsequently passed in consecutive local variables starting from local variable 1.
+
+Java Virtual Machine은 메서드를 호출할 때 지역 변수로 파라미터를 전달한다. 클래스 메서드를 호출하면 파라미터는 0번 지역 변수부터 차례로 전달된다. 인스턴스 메서드를 호출하면 0번 지역 변수는 항상 그 인스턴스 메서드가 호출된 객체의 참조(Java 프로그래밍 언어의 this)를 전달하는 데 쓰인다. 파라미터는 그다음 1번 지역 변수부터 차례로 전달된다.
+____
+
+앞의 ``reassign`` 예제를 이 구조에 대입하면 다음 그림과 같습니다. ``reassign``은 static 메서드이므로 파라미터 ``tv``는 ``reassign`` 프레임의 0번 지역 변수입니다. ``main`` 프레임의 1번 지역 변수인 ``myTv``에 담긴 참조값이 이 칸으로 복사됩니다. 두 칸은 서로 다른 프레임에 속한 별개의 저장 공간이므로 ``tv``에 새 객체를 대입해도 ``main`` 프레임의 ``myTv``는 여전히 처음의 객체를 가리킵니다.
+
+image::img/call-by-value/java-stack-frames.png[reassign 메서드의 프레임과 main 메서드의 프레임이 각자의 지역 변수 배열을 가지고 참조값만 복사되는 구조,width=800]
+
+다만 JVMS는 추상 기계를 정의할 뿐입니다. JVMS 2장의 서두는 런타임 데이터 영역의 메모리 배치를 구현자의 재량에 맡긴다고 밝힙니다. 예를 들어 JIT 컴파일러가 만든 기계어 코드는 파라미터를 CPU 레지스터에 둘 수도 있습니다. 그렇더라도 호출한 쪽의 변수와 파라미터가 별개의 저장 공간이라는 의미는 달라지지 않습니다.
+
 == Kotlin
 
 Kotlin도 call by reference를 지원하지 않습니다. 그런데 이 글의 판별 기준인 '파라미터에 새 값을 대입했을 때 호출한 쪽의 변수가 바뀌는가'를 Kotlin에서는 실험할 수 없습니다. https://kotlinlang.org/spec/declarations.html#function-declaration[Kotlin Language Specification]의 Function declaration 절은 각 파라미터가 함수 본문 안에서 값의 이름으로 도입되므로 파라미터는 final이고 함수 안에서 바꿀 수 없다고 규정합니다.
@@ -708,6 +745,9 @@ after By_Reference: Original = 2
 * Java
 ** https://docs.oracle.com/javase/specs/jls/se26/html/jls-8.html#jls-8.4.1[Java Language Specification - 8.4.1. Formal Parameters]
 ** https://docs.oracle.com/javase/specs/jls/se26/html/jls-4.html#jls-4.3.1[Java Language Specification - 4.3.1. Objects]
+** https://docs.oracle.com/javase/specs/jls/se26/html/jls-15.html#jls-15.12.4.5[Java Language Specification - 15.12.4.5. Create Frame, Synchronize, Transfer Control]
+** https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-2.html#jvms-2.6[Java Virtual Machine Specification - 2.6. Frames]
+** https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-2.html#jvms-2.6.1[Java Virtual Machine Specification - 2.6.1. Local Variables]
 ** https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-2.html#jvms-2.7[Java Virtual Machine Specification - 2.7. Representation of Objects]
 ** https://dev.java/learn/classes-objects/calling-methods-constructors/[Dev.java - Calling Methods and Constructors]
 ** Ken Arnold, James Gosling, David Holmes, link:https://www.informit.com/store/java-programming-language-9780321349804[**The Java Programming Language**] 4판, Addison-Wesley, 2006
