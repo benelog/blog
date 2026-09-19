@@ -6,7 +6,7 @@
 - 범위: 글 전체와 `src/content/img/call-by-value/`의 `.drawio` 3개. 중점은 새로 추가한 "메서드 호출마다 새로 만들어지는 프레임" 절(209–244행)과 그림이다.
 - 방법: Codex 적대적 리뷰(`task`, 글 전체)로 의심 지점을 모은 뒤, Claude가 JLS·JVMS SE 26, Ada RM, C# 레퍼런스, Go 사양, rustc 문서, HotSpot 소스를 curl로 받아 대조했다. 글에 인용한 18개 출처의 영문 인용(JLS 4.3.1, 8.4.1, 15.12.4.5, JVMS 2.6, 2.6.1, 2장 서두, Dev.java, MDN, Python 튜토리얼, Go FAQ, C# 레퍼런스, Kotlin 사양, TypeScript 핸드북, Rust Book, N4950 [dcl.ref]·[expr.call], Flanagan, N1570)는 원문과 글자 단위로 대조했다. Java 예제는 Java 25, JavaScript는 Node 24.6, Python은 3.12.3으로 실행했고, `javap -l`로 지역 변수 슬롯을 확인했다. Go 1.27.1과 Rust 1.98.1(도커 `rust:latest`)로 지적 사항을 재현했다. 이전 기록의 판정은 승계하지 않았다. 다만 C·C++·C#·Ada 예제의 실행은 3차 기록의 결과에 기댔다.
 - 결과: **우선 수정할 사항 3건, 표현을 보완할 사항 5건.** 핵심 결론인 "Java는 객체를 전달할 때도 참조값의 복사본을 전달하는 call by value"와 새로 추가한 JLS·JVMS 인용·번역은 타당하다. 오류는 그림의 실행 시점, 정리 표의 C#·Ada 행, Ada 절의 unspecified 경우 누락에 있다.
-- 반영 상태: **8건 모두 본문에 반영함.** 우선 수정 1번과 표현 보완 1·2번은 커밋 `adb199ae352d4b7d2c3e7598d3d81aa26df743e9`에, 나머지 5건은 커밋 `3f9e2d3ca77004d1aafe25ded34f0bb9bef02ab8`에 적용했다. 이 문서의 검증 본문은 작성 당시의 수정 제안을 그대로 둔다.
+- 반영 상태: **8건 모두 본문에 반영함.** 우선 수정 1번과 표현 보완 1·2번은 커밋 `adb199ae352d4b7d2c3e7598d3d81aa26df743e9`에, 나머지 5건은 커밋 `3f9e2d3ca77004d1aafe25ded34f0bb9bef02ab8`에 적용했다. 이후 저자 판단으로 Go 절의 맵·슬라이스 설명 문단과 `append` 예제를 본문에서 삭제했다(커밋 `9a450e9f3a2b705bf402beb141e96f07c8ff4871`). 표현 보완 4번과 확인한 사항 표의 Go 슬라이스 예제 행은 기준 커밋 시점의 기록으로 남겨 둔다. 이 문서의 검증 본문은 작성 당시의 수정 제안을 그대로 둔다.
 - 아래 행 번호는 위 기준 커밋 기준이다.
 
 ## 우선 수정할 사항
@@ -117,7 +117,7 @@ Codex 지적. 실행 확인(Java 25, `javap -c -l -p`). 커밋 `3f9e2d3`에 위 
 
 근거: [Go 사양 - Slice expressions](https://go.dev/ref/spec#Slice_expressions) "For slices, the upper index bound is the slice capacity cap(a) rather than the length.", [Appending and copying slices](https://go.dev/ref/spec#Appending_and_copying_slices).
 
-Codex 지적. 실행 확인(Go 1.27.1, 출력 `[100 2 3] 3 4 4`). 커밋 `3f9e2d3`에 두 제안 모두 반영했다.
+Codex 지적. 실행 확인(Go 1.27.1, 출력 `[100 2 3] 3 4 4`). 커밋 `3f9e2d3`에 두 제안 모두 반영했다. 이후 커밋 `9a450e9`에서 저자 판단으로 해당 문단과 예제를 삭제했다.
 
 ### 5. Rust에서 `Copy`가 아닌 인자는 모두 이동한다고 읽히는 서술 — 반영 완료
 
@@ -152,7 +152,7 @@ Codex 지적. 실행 확인(Rust 1.98.1에서 `let r = &mut a; bump(r); bump(r);
 | Dev.java, MDN, Python 튜토리얼, Go FAQ, C# 레퍼런스, Kotlin 사양, TypeScript 핸드북, Rust Book 인용 | **확인.** 각 원문과 글자 단위로 같다. | 본문 참고 자료의 각 링크 |
 | {cpp} N4950 [dcl.ref] 4항, [expr.call] 6항, C11 N1570 6.5.2.2 4항, Flanagan 11.2 인용 | **확인.** 원문(N4950은 timsong-cpp 미러, N1570은 port70.net HTML 미러)과 같다. | [N4950 dcl.ref](https://timsong-cpp.github.io/cppwp/n4950/dcl.ref), [N4950 expr.call](https://timsong-cpp.github.io/cppwp/n4950/expr.call), [N1570 HTML](https://port70.net/~nsz/c/c11/n1570.html), [Flanagan 11.2](https://docstore.mik.ua/orelly/webprog/jscript/ch11_02.htm) |
 | JavaScript 객체 전달 예제, Python swap·객체 예제의 출력 | **확인.** 실행 확인(Node 24.6, Python 3.12.3). | 로컬 실행 |
-| Go 슬라이스 예제의 출력 `[100 2 3] 3` (612행) | **확인.** 실행 확인(Go 1.27.1). 표현 보완 4번과 별개로 예제 출력은 맞다. | 로컬 실행 |
+| Go 슬라이스 예제의 출력 `[100 2 3] 3` (612행) | **확인.** 실행 확인(Go 1.27.1). 표현 보완 4번과 별개로 예제 출력은 맞다. 이후 커밋 `9a450e9`에서 예제를 삭제했다. | 로컬 실행 |
 | JavaScript의 Object 값과 Java 참조값의 구분 (337–339행), Python의 불변성과 전달 방식 구분 (566행) | **확인.** Codex도 적절하다고 판정. | [ECMAScript ArgumentListEvaluation](https://tc39.es/ecma262/2026/multipage/ecmascript-language-expressions.html#sec-argument-lists-runtime-semantics-argumentlistevaluation), [Python FAQ](https://docs.python.org/3/faq/programming.html#how-do-i-write-a-function-with-output-parameters-call-by-reference) |
 
 ## 한계
