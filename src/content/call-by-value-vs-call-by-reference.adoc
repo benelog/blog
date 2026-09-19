@@ -6,6 +6,7 @@
 :jbake-tags: java, javascript
 :description: Call by value와 call by reference의 정의를 정리하고, Java, Kotlin, JavaScript, C, {cpp}, C#, Python, Go, Rust, Ada가 인자를 어떻게 전달하는지 비교합니다.
 :jbake-last_updated: 2026-09-20
+:jbake-og: {"image": "img/call-by-value/og-call-by-value.png"}
 :toc:
 :idprefix:
 
