@@ -25,6 +25,7 @@ Requires JDK 25 (configured via `.sdkmanrc` as `25-tem`). Use `sdk env` if using
 - **Assets**: `src/assets/` — CSS, JS, fonts, images served as-is.
 - **Config**: `src/jbake.properties` — site metadata, menu items, sidebar config, social links, rendering options.
 - **Output**: `output/` (gitignored).
+- **Fact checks**: `fact-checks/` — 글별 사실 관계 검증 기록(`<slug>-<YYYY-MM-DD>.md`). `/fact-check` 스킬이 작성한다.
 
 ## Content Conventions
 

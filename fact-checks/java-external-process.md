@@ -2,7 +2,7 @@
 
 - 최초 검증일: 2026-09-06 (Asia/Seoul)
 - 추가 검증일: 2026-09-13 (Asia/Seoul). 아래 1~6절은 최초 검증 당시의 기록이며, 현재 원고에 대한 재검증 결과와 패치 상태는 7~9절에 기록했다.
-- 대상: [src/content/java-external-process.adoc](../../src/content/java-external-process.adoc)
+- 대상: [src/content/java-external-process.adoc](../src/content/java-external-process.adoc)
 - 범위: 본문의 JDK API, 라이브러리 동작과 릴리스, Linux/glibc 구현, 예제 실행 결과, 벤치마크 해석, 운영상 결론.
 - 방법: 공식 API 문서, OpenJDK 이슈와 소스, Maven Central 배포물, 라이브러리 소스, Linux 소스를 대조하고 로컬에서 재현했다. 웹으로 읽히지 않은 OpenJDK 이슈는 공개 REST API `/rest/api/2/issue/JDK-번호`로 조회했다.
 - 판정: **확인**은 출처 또는 실행으로 뒷받침됨, **수정**은 오류나 과도한 일반화를 고침, **한계**는 이번 검증으로 확정할 수 없는 내용이다.

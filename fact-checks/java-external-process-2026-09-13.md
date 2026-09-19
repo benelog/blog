@@ -1,6 +1,6 @@
 # Java 외부 프로세스 글 재검증 — 2026-09-13
 
-- 대상: [java-external-process.adoc](../../src/content/java-external-process.adoc)
+- 대상: [java-external-process.adoc](../src/content/java-external-process.adoc)
 - 검토 기준 커밋: `42e16fee393ca22ae6b7558d24f310ac89798e22`
 - 이전 기록: [2026-09-06 검증](java-external-process.md). 반영 과정과 후속 재검토는 같은 문서의 7절과 8절에 있다.
 - 범위: 현재 본문 전체의 논리 전개와 기술적 주장. 이전 기록의 판정을 그대로 승계하지 않고 변경된 설명을 중심으로 공식 문서·배포 소스·실행 결과를 대조했다.
