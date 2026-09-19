@@ -2,7 +2,7 @@
 
 - 대상: [java-external-process.adoc](../src/content/java-external-process.adoc)
 - 검토 기준 커밋: `42e16fee393ca22ae6b7558d24f310ac89798e22`
-- 이전 기록: [2026-09-06 검증](java-external-process.md). 반영 과정과 후속 재검토는 같은 문서의 7절과 8절에 있다.
+- 이전 기록: [2026-09-06 검증](java-external-process-2026-09-06.md). 반영 과정과 후속 재검토는 같은 문서의 7절과 8절에 있다.
 - 범위: 현재 본문 전체의 논리 전개와 기술적 주장. 이전 기록의 판정을 그대로 승계하지 않고 변경된 설명을 중심으로 공식 문서·배포 소스·실행 결과를 대조했다.
 - 결과: **우선 수정할 사항 4건, 표현을 보완할 사항 2건.** 기본 POSIX_SPAWN 유지, 출력 소비와 입력 EOF 처리, 시간제한과 종료 정책을 함께 설계한다는 핵심 결론은 타당하다.
 - 반영 상태: **6건 모두 본문에 반영 완료.** 검증 당일 패치로 만들어 검토를 거쳐 커밋 `fc14993`에 적용했다. 반영 후 재검토에서 나온 보완 2건(INHERIT 리다이렉트의 파이프 대기 조건, 시스템 콜 설명의 아키텍처 한정)도 커밋 `f8859cb`에 적용했다. 패치 파일은 반영 뒤 삭제했다.
@@ -86,7 +86,7 @@ explicitUTF8=true, codepoints=[e9]
 
 또한 “버전 불일치와 VFORK 제거는 모두 이 설계에서 나온 결과”는 인과관계가 너무 압축되어 있다. helper 버전 불일치는 별도 실행 파일의 교체 문제이고, VFORK 제거는 직접 vfork 경로의 안전성 문제이므로 각각 설명하는 편이 명확하다.
 
-근거: 현재 본문의 절 구성, [이전 검증의 jspawnhelper 항목](java-external-process.md#3-jdk-실행-방식과-jspawnhelper), [JDK 25 ProcessImpl_md.c의 helper 실패 진단](https://github.com/openjdk/jdk/blob/jdk-25%2B36/src/java.base/unix/native/libjava/ProcessImpl_md.c).
+근거: 현재 본문의 절 구성, [이전 검증의 jspawnhelper 항목](java-external-process-2026-09-06.md#3-jdk-실행-방식과-jspawnhelper), [JDK 25 ProcessImpl_md.c의 helper 실패 진단](https://github.com/openjdk/jdk/blob/jdk-25%2B36/src/java.base/unix/native/libjava/ProcessImpl_md.c).
 
 ## 표현을 보완할 사항
 
@@ -160,4 +160,4 @@ pumpAlive=true
 
 임시 검증 코드·다운로드 소스·실행 로그는 `/tmp/java-process-review-0913/`에 보관했다. 이 경로의 파일은 영구 보존되는 저장소 산출물이 아니다.
 
-벤치마크의 과거 절대 수치, 원래 서버의 장애 원인, helper 교체 실험, JDK 27 바이너리 실행은 이번에 재현하지 않았다. 벤치마크 코드는 측정 구간과 해석을 검토했으며 이전 검증의 한계가 그대로 적용된다. 검증 시점에는 본문·예제·사이트 설정을 바꾸지 않았으므로 사이트 빌드를 실행하지 않았다. 반영 시점의 빌드와 렌더링 확인 결과는 [2026-09-06 검증 문서의 7절과 8절](java-external-process.md)에 있다.
+벤치마크의 과거 절대 수치, 원래 서버의 장애 원인, helper 교체 실험, JDK 27 바이너리 실행은 이번에 재현하지 않았다. 벤치마크 코드는 측정 구간과 해석을 검토했으며 이전 검증의 한계가 그대로 적용된다. 검증 시점에는 본문·예제·사이트 설정을 바꾸지 않았으므로 사이트 빌드를 실행하지 않았다. 반영 시점의 빌드와 렌더링 확인 결과는 [2026-09-06 검증 문서의 7절과 8절](java-external-process-2026-09-06.md)에 있다.
