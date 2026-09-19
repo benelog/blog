@@ -237,11 +237,11 @@ The Java Virtual Machine uses local variables to pass parameters on method invoc
 Java Virtual Machine은 메서드를 호출할 때 지역 변수로 파라미터를 전달한다. 클래스 메서드를 호출하면 파라미터는 0번 지역 변수부터 차례로 전달된다. 인스턴스 메서드를 호출하면 0번 지역 변수는 항상 그 인스턴스 메서드가 호출된 객체의 참조(Java 프로그래밍 언어의 this)를 전달하는 데 쓰인다. 파라미터는 그다음 1번 지역 변수부터 차례로 전달된다.
 ____
 
-앞의 ``reassign`` 예제를 이 구조에 대입하면 다음 그림과 같습니다. ``reassign``은 static 메서드이므로 파라미터 ``tv``는 ``reassign`` 프레임의 0번 지역 변수입니다. ``main`` 프레임의 1번 지역 변수인 ``myTv``에 담긴 참조값이 이 칸으로 복사됩니다. 두 칸은 서로 다른 프레임에 속한 별개의 저장 공간이므로 ``tv``에 새 객체를 대입해도 ``main`` 프레임의 ``myTv``는 여전히 처음의 객체를 가리킵니다.
+앞의 ``reassign`` 예제를 이 구조에 대입하면 다음 그림과 같습니다. ``reassign``은 static 메서드이므로 파라미터 ``tv``는 ``reassign`` 프레임의 0번 지역 변수입니다. ``main`` 프레임의 1번 지역 변수인 ``myTv``에 담긴 참조값이 이 칸으로 복사됩니다. 바이트코드 수준에서는 ``aload_1`` 명령이 이 참조값을 ``main`` 프레임의 operand stack에 올리고, https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-6.html#jvms-6.5.invokestatic[`invokestatic`] 명령이 그 값을 꺼내 새 프레임의 0번 지역 변수에 넣습니다. 두 칸은 서로 다른 프레임에 속한 별개의 저장 공간이므로 ``tv``에 새 객체를 대입해도 ``main`` 프레임의 ``myTv``는 여전히 처음의 객체를 가리킵니다.
 
 image::img/call-by-value/java-stack-frames.png[reassign 메서드의 프레임과 main 메서드의 프레임이 각자의 지역 변수 배열을 가지고 참조값만 복사되는 구조,width=800]
 
-다만 JVMS는 추상 기계를 정의할 뿐입니다. JVMS 2장의 서두는 런타임 데이터 영역의 메모리 배치를 구현자의 재량에 맡긴다고 밝힙니다. 예를 들어 JIT 컴파일러가 만든 기계어 코드는 파라미터를 CPU 레지스터에 둘 수도 있습니다. 그렇더라도 호출한 쪽의 변수와 파라미터가 별개의 저장 공간이라는 의미는 달라지지 않습니다.
+다만 JVMS는 추상 기계를 정의할 뿐입니다. JVMS 2장의 서두는 런타임 데이터 영역의 메모리 배치를 구현자의 재량에 맡긴다고 밝힙니다. 예를 들어 JIT 컴파일러가 만든 기계어 코드는 파라미터를 CPU 레지스터에 둘 수도 있습니다. 그렇더라도 호출한 쪽의 변수와 파라미터가 별개의 변수라는 언어의 의미는 달라지지 않습니다.
 
 == Kotlin
 
@@ -749,6 +749,7 @@ after By_Reference: Original = 2
 ** https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-2.html#jvms-2.6[Java Virtual Machine Specification - 2.6. Frames]
 ** https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-2.html#jvms-2.6.1[Java Virtual Machine Specification - 2.6.1. Local Variables]
 ** https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-2.html#jvms-2.7[Java Virtual Machine Specification - 2.7. Representation of Objects]
+** https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-6.html#jvms-6.5.invokestatic[Java Virtual Machine Specification - 6.5. invokestatic]
 ** https://dev.java/learn/classes-objects/calling-methods-constructors/[Dev.java - Calling Methods and Constructors]
 ** Ken Arnold, James Gosling, David Holmes, link:https://www.informit.com/store/java-programming-language-9780321349804[**The Java Programming Language**] 4판, Addison-Wesley, 2006
 ** Kathy Sierra, Bert Bates, link:https://www.oreilly.com/library/view/head-first-java/0596009208/[**Head First Java**] 2판, O'Reilly, 2005, 3장과 4장

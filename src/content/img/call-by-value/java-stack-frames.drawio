@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net">
   <diagram id="java-stack-frames" name="Java stack frames">
-    <mxGraphModel dx="1200" dy="700" grid="1" gridSize="10" page="1" pageWidth="900" pageHeight="540">
+    <mxGraphModel dx="1200" dy="700" grid="1" gridSize="10" page="1" pageWidth="1000" pageHeight="540">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -10,7 +10,7 @@
           <mxGeometry x="20" y="20" width="440" height="460" as="geometry" />
         </mxCell>
         <mxCell id="heap" value="Heap" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;fillColor=#fafafa;strokeColor=#b3b3b3;dashed=1;verticalAlign=top;align=left;fontStyle=1;spacingLeft=10;spacingTop=6;" vertex="1" parent="1">
-          <mxGeometry x="540" y="20" width="320" height="460" as="geometry" />
+          <mxGeometry x="640" y="20" width="320" height="460" as="geometry" />
         </mxCell>
 
         <!-- reassign 프레임 -->
@@ -49,14 +49,14 @@
 
         <!-- 객체 -->
         <mxCell id="rock" value="Tv 객체&lt;br&gt;channel = &quot;Rock&quot;" style="rounded=1;arcSize=20;whiteSpace=wrap;html=1;fontSize=13;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
-          <mxGeometry x="600" y="110" width="200" height="60" as="geometry" />
+          <mxGeometry x="700" y="110" width="200" height="60" as="geometry" />
         </mxCell>
         <mxCell id="classic" value="Tv 객체&lt;br&gt;channel = &quot;Classic&quot;" style="rounded=1;arcSize=20;whiteSpace=wrap;html=1;fontSize=13;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
-          <mxGeometry x="600" y="390" width="200" height="60" as="geometry" />
+          <mxGeometry x="700" y="390" width="200" height="60" as="geometry" />
         </mxCell>
 
         <!-- 간선 -->
-        <mxCell id="e_copy" value="① 참조값 복사" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=12;fontColor=#6c8ebf;strokeColor=#6c8ebf;dashed=1;strokeWidth=1.5;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;labelBackgroundColor=#fafafa;" edge="1" parent="1" source="m1" target="t0">
+        <mxCell id="e_copy" value="① 참조값 복사&lt;br&gt;(operand stack 경유)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=12;fontColor=#6c8ebf;strokeColor=#6c8ebf;dashed=1;strokeWidth=1.5;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;labelBackgroundColor=#fafafa;" edge="1" parent="1" source="m1" target="t0">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="340" y="408" />
@@ -67,16 +67,16 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="e_old" value="재할당 전" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=12;fontColor=#999999;strokeColor=#b3b3b3;dashed=1;exitX=1;exitY=0.8;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;labelBackgroundColor=#fafafa;" edge="1" parent="1" source="t0" target="classic">
-          <mxGeometry relative="1" as="geometry">
+          <mxGeometry x="0.25" relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="500" y="152" />
-              <mxPoint x="500" y="405" />
+              <mxPoint x="620" y="152" />
+              <mxPoint x="620" y="405" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="e_new" value="② tv = new Tv()" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=12;strokeColor=#d79b00;fontColor=#b46504;strokeWidth=1.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="t0" target="rock">
-          <mxGeometry x="0.1" relative="1" as="geometry">
-            <mxPoint as="offset" x="0" y="-14" />
+        <mxCell id="e_new" value="② tv = new Tv();&lt;br&gt;tv.setChannel(&quot;Rock&quot;)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=12;strokeColor=#d79b00;fontColor=#b46504;strokeWidth=1.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="t0" target="rock">
+          <mxGeometry x="0.3" relative="1" as="geometry">
+            <mxPoint as="offset" x="0" y="-26" />
           </mxGeometry>
         </mxCell>
         <mxCell id="e_mytv" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#d79b00;strokeWidth=1.5;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.6667;entryDx=0;entryDy=0;" edge="1" parent="1" source="m1" target="classic">
@@ -85,7 +85,7 @@
 
         <!-- 설명 -->
         <mxCell id="note" value="static 메서드는 지역 변수 0번부터 파라미터를 채웁니다(JVMS §2.6.1). 두 프레임의 칸은 서로 다른 변수입니다." style="text;html=1;fontSize=12;fontColor=#555555;align=left;verticalAlign=middle;whiteSpace=wrap;" vertex="1" parent="1">
-          <mxGeometry x="20" y="490" width="840" height="30" as="geometry" />
+          <mxGeometry x="20" y="490" width="940" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
