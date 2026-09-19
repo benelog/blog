@@ -212,6 +212,7 @@ ____
 === 메서드 호출마다 새로 만들어지는 프레임
 
 JLS는 메서드 호출을 실행하는 과정도 단계별로 서술합니다. https://docs.oracle.com/javase/specs/jls/se26/html/jls-15.html#jls-15.12.4.5[15.12.4.5. Create Frame, Synchronize, Transfer Control] 절은 호출할 메서드가 정해지면 activation frame을 새로 만들고 그 안에 인자 값을 담는다고 설명합니다.
+Activation frame은 메서드 호출의 파라미터, 지역 변수, 반환 주소 같은 실행 상태를 담고 호출이 끝나면 사라지는 메모리 영역입니다.
 
 [quote, Java Language Specification, "15.12.4.5. Create Frame, Synchronize, Transfer Control"]
 ____
