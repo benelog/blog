@@ -21,7 +21,11 @@
 
 **Call by reference**는 변수 자체를 전달하는 방식입니다. 파라미터는 호출한 쪽 변수의 별칭(alias)이 되므로, 함수 안에서 파라미터에 새 값을 대입하면 호출한 쪽의 변수도 함께 바뀝니다.
 
-이 정의는 프로그래밍 언어론의 표준적인 설명을 따릅니다. Christopher Strachey는 1967년 강의를 정리한 https://www.cs.cmu.edu/~crary/819-f09/Strachey67.pdf[Fundamental Concepts in Programming Languages] 3.4.2절에서 파라미터에 표현식의 R-value를 넘기는 방식을 call by value, L-value를 넘기는 방식을 call by reference라고 불렀습니다. 컴파일러 교과서로 널리 쓰이는 **Compilers: Principles, Techniques, and Tools** 2판 1.6.6절도 call by value는 인자를 평가하거나 복사한 값을 파라미터의 저장 위치에 넣는 방식, call by reference는 인자의 주소를 파라미터의 값으로 넘겨 파라미터의 변경이 인자의 변경으로 나타나는 방식이라고 설명합니다.
+이 정의는 프로그래밍 언어론의 표준적인 설명을 따릅니다.
+
+Christopher Strachey는 1967년 강의를 정리한 https://www.cs.cmu.edu/~crary/819-f09/Strachey67.pdf[Fundamental Concepts in Programming Languages] 3.4.2절에서 파라미터에 표현식의 R-value를 넘기는 방식을 call by value, L-value를 넘기는 방식을 call by reference라고 불렀습니다. L-value는 대입문의 왼쪽(Left)에 놓인 표현식이 뜻하는 저장 위치이고, R-value는 오른쪽(Right)에 놓인 표현식이 뜻하는 그 위치에 담긴 값입니다. 이 강의록은 L-value와 R-value, first-class 객체 같은 용어의 출처로 지금도 인용되는 프로그래밍 언어론의 고전입니다.
+
+컴파일러 교과서로 널리 쓰이는 **Compilers: Principles, Techniques, and Tools** 2판 1.6.6절도 call by value는 인자를 평가하거나 복사한 값을 파라미터의 저장 위치에 넣는 방식, call by reference는 인자의 주소를 파라미터의 값으로 넘겨 파라미터의 변경이 인자의 변경으로 나타나는 방식이라고 설명합니다. 이 책은 표지 그림 때문에 Dragon Book으로 불리며 1977년의 전신 **Principles of Compiler Design**부터 대학 컴파일러 강의의 기본 교재로 쓰여 온 표준 교과서입니다.
 
 이 글처럼 call by value와 call by reference만 비교하고, 값을 다시 대입할 수 있는 변수를 인자로 넘기고 파라미터에도 대입할 수 있다고 가정하면, 두 방식을 구분하는 실용적인 기준은 한 문장으로 요약할 수 있습니다. *함수 안에서 파라미터에 새 값을 대입했을 때 호출한 쪽의 변수가 바뀌는가?* 바뀌면 두 방식 중 call by reference이고, 바뀌지 않으면 call by value입니다. 다만 call by copy-restore나 call by name 등 다른 평가 전략까지 포함하면 이 질문만으로 모든 인자 전달 방식을 분류할 수는 없습니다. 파라미터가 가리키는 객체의 내부 상태를 바꾸는 일은 이 기준과 다른 문제입니다. 뒤에서 다루겠지만 바로 여기서 오해가 생깁니다.
 
@@ -195,7 +199,7 @@ The reference values (often just references) are pointers to these objects, and 
 참조값(흔히 그냥 참조라고 부른다)은 이 객체들을 가리키는 포인터이고, 여기에 어떤 객체도 가리키지 않는 특별한 null 참조가 있다.
 ____
 
-다만 이는 언어 수준의 의미를 설명하는 표현이지, 참조값이 원시 메모리 주소와 같은 형식이라고 보장하는 문장은 아닙니다. https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-2.html#jvms-2.7[Java Virtual Machine Specification 2.7]은 객체의 내부 구조를 특정하지 않으며, 일부 구현에서는 참조가 객체 데이터가 아니라 핸들을 가리킬 수도 있다고 설명합니다. 여기서 핸들은 참조와 객체 데이터 사이에 놓인 작은 중간 구조입니다. 참조는 핸들을 가리키고, 핸들 안의 포인터가 다시 객체 데이터와 메서드 테이블을 가리킵니다. 참조값이 객체가 놓인 메모리 주소 그 자체가 아닐 수도 있다는 뜻입니다.
+다만 이는 언어 수준의 의미를 설명하는 표현이지, 참조값이 원시 메모리 주소와 같은 형식이라고 보장하는 문장은 아닙니다. https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-2.html#jvms-2.7[JVMS(Java Virtual Machine Specification) 2.7]은 객체의 내부 구조를 특정하지 않으며, 일부 구현에서는 참조가 객체 데이터가 아니라 핸들을 가리킬 수도 있다고 설명합니다. 여기서 핸들은 참조와 객체 데이터 사이에 놓인 작은 중간 구조입니다. 참조는 핸들을 가리키고, 핸들 안의 포인터가 다시 객체 데이터와 메서드 테이블을 가리킵니다. 참조값이 객체가 놓인 메모리 주소 그 자체가 아닐 수도 있다는 뜻입니다.
 
 이 문장은 https://web.archive.org/web/20001213164500/http://java.sun.com/docs/books/vmspec/html/Overview.doc.html[JVMS 초판(1997)]에서 "Sun의 현재 구현"을 설명하던 것입니다. 2판에서 "Sun의 일부 구현"으로, Oracle 인수 뒤의 판에서 "Oracle의 일부 구현"으로 바뀌었을 뿐 내용은 같습니다. 초판 당시 Sun의 JVM은 JDK 1.0·1.1의 Classic VM이었고, https://www.oracle.com/java/technologies/whitepaper.html[The Java HotSpot Performance Engine Architecture]의 'Handleless Objects' 절은 이 Classic VM이 간접 핸들을 썼다고 설명합니다. 현재 Oracle JDK와 OpenJDK가 공통으로 쓰는 HotSpot은 핸들 없이 객체를 직접 가리키는 포인터를 씁니다. 같은 절은 HotSpot에서 Java 코드가 핸들을 쓰지 않고 객체 참조를 직접 포인터로 구현한다고 설명합니다.
 
@@ -241,11 +245,18 @@ The Java Virtual Machine uses local variables to pass parameters on method invoc
 Java Virtual Machine은 메서드를 호출할 때 지역 변수로 파라미터를 전달한다. 클래스 메서드를 호출하면 파라미터는 0번 지역 변수부터 차례로 전달된다. 인스턴스 메서드를 호출하면 0번 지역 변수는 항상 그 인스턴스 메서드가 호출된 객체의 참조(Java 프로그래밍 언어의 this)를 전달하는 데 쓰인다. 파라미터는 그다음 1번 지역 변수부터 차례로 전달된다.
 ____
 
-앞의 ``reassign`` 예제를 이 구조에 대입하면 다음 그림과 같습니다. ``reassign``은 static 메서드이므로 파라미터 ``tv``는 ``reassign`` 프레임의 0번 지역 변수입니다. javac가 ``main`` 프레임의 1번 지역 변수에 배정한 ``myTv``에 담긴 참조값이 이 칸으로 복사됩니다. 파라미터가 0번부터 들어가는 것은 JVMS가 정하지만, 파라미터가 아닌 지역 변수를 몇 번 칸에 둘지는 컴파일러가 정합니다. 바이트코드 수준에서는 ``aload_1`` 명령이 이 참조값을 ``main`` 프레임의 operand stack에 올리고, https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-6.html#jvms-6.5.invokestatic[`invokestatic`] 명령이 그 값을 꺼내 새 프레임의 0번 지역 변수에 넣습니다. 두 칸은 서로 다른 프레임에 속한 별개의 저장 공간이므로 ``tv``에 새 객체를 대입해도 ``main`` 프레임의 ``myTv``는 여전히 처음의 객체를 가리킵니다.
+앞의 ``reassign`` 예제에서 ``myTv``의 참조값이 파라미터 ``tv``로 복사되는 과정을 이 구조에 대입해 따라가 보겠습니다. 그러려면 먼저 다음 개념을 알아야 합니다.
+
+* Operand stack: 프레임마다 하나씩 있는 후입선출 스택으로, JVM 명령이 피연산자를 꺼내고 결과를 올리는 작업 공간입니다. 메서드에 넘길 인자를 준비하는 데도 쓰입니다.
+* 바이트코드: javac가 Java 소스를 컴파일해 class 파일에 담는 JVM 명령어입니다. 이 예제의 호출 과정에는 두 명령이 등장합니다.
+** https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-6.html#jvms-6.5.aload_n[`aload_1`]: 현재 프레임의 1번 지역 변수에 담긴 참조값을 operand stack에 올립니다.
+** https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-6.html#jvms-6.5.invokestatic[`invokestatic`]: static 메서드를 호출합니다. 인자 값을 operand stack에서 꺼내고, 새 프레임을 만들어 그 값을 새 프레임의 0번 지역 변수부터 차례로 넣습니다.
+
+이 개념으로 ``reassign`` 호출을 그리면 다음 그림과 같습니다. ``reassign``은 static 메서드이므로 파라미터 ``tv``는 ``reassign`` 프레임의 0번 지역 변수입니다. javac가 ``main`` 프레임의 1번 지역 변수에 배정한 ``myTv``에 담긴 참조값이 이 칸으로 복사됩니다. 파라미터가 0번부터 들어가는 것은 JVMS가 정하지만, 파라미터가 아닌 지역 변수를 몇 번 칸에 둘지는 컴파일러가 정합니다. 바이트코드 수준에서는 ``aload_1`` 명령이 이 참조값을 ``main`` 프레임의 operand stack에 올리고, ``invokestatic`` 명령이 그 값을 꺼내 새 프레임의 0번 지역 변수에 넣습니다. 두 칸은 서로 다른 프레임에 속한 별개의 저장 공간이므로 ``tv``에 새 객체를 대입해도 ``main`` 프레임의 ``myTv``는 여전히 처음의 객체를 가리킵니다.
 
 image::img/call-by-value/java-stack-frames.png[reassign 메서드의 프레임과 main 메서드의 프레임이 각자의 지역 변수 배열을 가지고 참조값만 복사되는 구조,width=800]
 
-다만 JVMS는 추상 기계를 정의할 뿐입니다. JVMS 2장의 서두는 런타임 데이터 영역의 메모리 배치를 구현자의 재량에 맡긴다고 밝힙니다. 예를 들어 JIT 컴파일러가 만든 기계어 코드는 파라미터를 CPU 레지스터에 둘 수도 있습니다. 그렇더라도 호출한 쪽의 변수와 파라미터가 별개의 변수라는 언어의 의미는 달라지지 않습니다.
+다만 JVMS는 추상 기계를 정의할 뿐입니다. 특정 구현의 메모리 구조가 아니라 명령의 동작 규칙을 정한 모델이라는 뜻입니다. JVMS 2장의 서두는 런타임 데이터 영역의 메모리 배치를 구현자의 재량에 맡긴다고 밝힙니다. 예를 들어 JIT 컴파일러가 만든 기계어 코드는 파라미터를 CPU 레지스터에 둘 수도 있습니다. 그렇더라도 호출한 쪽의 변수와 파라미터가 별개의 변수라는 언어의 의미는 달라지지 않습니다.
 
 == Kotlin
 
@@ -282,7 +293,7 @@ fun changeState(tv: Tv) {
 <1> 컴파일 오류가 납니다. 오류 메시지는 "'val' cannot be reassigned"입니다.
 <2> 파라미터가 가리키는 객체의 속성을 바꾸므로 호출한 쪽 변수로 접근해도 바뀌어 있습니다. 컴파일 오류가 나는 ``reassign`` 함수를 지우고 실행하면 ``Rock``이 출력됩니다.
 
-재할당이 막혀 있을 뿐 나머지는 Java와 같습니다. JVM에서 실행할 때 전달되는 것은 Java와 같은 참조값의 복사본입니다. 파라미터가 final이라는 규칙은 언어 사양이므로 Kotlin/JS나 Kotlin/Native로 컴파일해도 달라지지 않습니다.
+재할당이 막혀 있을 뿐 나머지는 Java와 같습니다. JVM에서 실행할 때 전달되는 것은 Java와 같은 참조값의 복사본입니다. 파라미터가 final이라는 규칙은 언어 사양이므로 Kotlin/JS나 Kotlin/Native 등 JVM이 아닌 플랫폼으로 컴파일해도 달라지지 않습니다.
 
 == JavaScript
 
@@ -401,7 +412,7 @@ swap(&a, &b); // <2>
 
 == {cpp}
 
-진짜 call by reference가 어떤 것인지는 {cpp}의 참조 파라미터와 비교하면 분명해집니다. {cpp}은 C의 포인터에 더해 참조 타입을 제공합니다.
+{cpp}는 진정한 call by reference 방식인 참조 파라미터를 제공합니다.
 
 [source,cpp]
 .{cpp} 참조 파라미터로 구현한 swap
@@ -422,7 +433,7 @@ swap(a, b); // <3>
 
 === 포인터 파라미터와 참조 파라미터의 차이
 
-{cpp}에는 C에서 물려받은 포인터 파라미터도 있어서 둘을 구분해야 합니다. 포인터 파라미터는 {cpp}에서도 call by value입니다. ``void swap(int* x, int* y)``처럼 포인터를 받으면 앞의 C 예제와 똑같이 포인터 값의 복사본이 파라미터에 대입됩니다. 함수 안에서 ``x``에 다른 주소를 대입해도 호출한 쪽 변수에는 반영되지 않습니다.
+{cpp}에는 C에서 물려받은 포인터 파라미터(예: int*)도 있어서 둘을 구분해야 합니다. 포인터 파라미터는 {cpp}에서도 call by value입니다. ``void swap(int* x, int* y)``처럼 포인터를 받으면 앞의 C 예제와 똑같이 포인터 값의 복사본이 파라미터에 대입됩니다. 함수 안에서 ``x``에 다른 주소를 대입해도 호출한 쪽 변수에는 반영되지 않습니다.
 
 반면 `int&` 참조 파라미터에는 재할당할 문법 자체가 없습니다. ``x = y;``는 참조를 다른 변수에 다시 묶는 문장이 아니라, 참조가 가리키는 객체에 값을 대입하는 문장입니다. 앞에서 정리한 구분 기준을 두 경우에 적용하면 결과가 다릅니다. 포인터 파라미터(`int*`)에 대입하면 호출한 쪽 변수는 그대로지만, 참조 파라미터(`int&`)에 대입하면 호출한 쪽 변수가 바뀝니다.
 
@@ -516,7 +527,7 @@ class Tv
 
 == Python
 
-Python도 Java와 같은 구조입니다. 공식 튜토리얼 https://docs.python.org/3/tutorial/controlflow.html#defining-functions[4.8 Defining Functions]는 인자가 호출된 함수의 지역 심벌 테이블에 도입되므로 값이 항상 객체 참조인 call by value로 전달된다고 설명합니다.
+Python도 Java와 동일하게 call by value만 존재합니다. 공식 튜토리얼 https://docs.python.org/3/tutorial/controlflow.html#defining-functions[4.8 Defining Functions]는 인자가 호출된 함수의 지역 심벌 테이블에 도입되므로 값이 항상 객체 참조인 call by value로 전달된다고 설명합니다.
 
 [quote, The Python Tutorial, 4.8 Defining Functions]
 ____
@@ -565,9 +576,7 @@ main()
 <2> 파라미터 ``tv``를 새 객체에 다시 묶으므로 호출한 쪽의 ``my_tv``는 그대로이고, ``Classic``이 출력됩니다.
 <3> ``tv``가 가리키는 객체의 속성을 바꾸므로 호출한 쪽의 ``my_tv``로 접근해도 바뀌어 있고, ``Rock``이 출력됩니다.
 
-Java의 `Tv` 예제, JavaScript의 ``reassign``과 `changeState` 예제와 같은 구분입니다.
-
-정수나 문자열을 넘기면 호출한 쪽 변수가 그대로인데 리스트나 딕셔너리를 넘기면 바뀌어 있어서, 타입에 따라 전달 규칙이 다르다고 오해하기 쉽습니다. 그러나 전달 규칙은 같습니다. 정수와 문자열은 불변 객체라 내부 상태를 바꿀 방법이 없고, 리스트와 딕셔너리는 변경 가능한 객체라 상태를 바꿀 수 있을 뿐입니다. 위 예제에서 ``x, y = y, x``가 호출한 쪽의 ``a``를 바꾸지 못한 것도 int가 불변이어서가 아니라 지역 이름을 다시 할당했기 때문입니다. 파라미터 ``x``에 리스트를 넘겨도 ``x = [1]``처럼 다시 할당하면 호출한 쪽은 그대로입니다.
+Java의 `Tv` 예제, JavaScript의 ``reassign``과 `changeState` 예제와 동일한 결과입니다.
 
 == Go
 
@@ -580,7 +589,7 @@ As in all languages in the C family, everything in Go is passed by value. That i
 C 계열의 모든 언어처럼 Go에서도 모든 것이 값으로 전달된다. 즉 함수는 넘긴 것의 복사본을 항상 받으며, 대입문으로 파라미터에 값을 대입한 것과 같다.
 ____
 
-FAQ의 'C 계열의 모든 언어'라는 표현은 Go의 규칙을 강조하려는 것입니다. 이 글에서 살펴본 {cpp}과 C#은 C 계열이지만 참조 파라미터를 따로 지원합니다.
+'C 계열의 모든 언어'를 글자 그대로 읽으면 맞지 않습니다. 이 글에서 살펴본 {cpp}과 C#은 C 계열이지만 참조 파라미터를 문법으로 지원합니다. 다만 두 언어도 기본 전달 방식은 값 전달이고 참조 전달은 수정자를 붙여야 하는 예외이므로, 이 문장은 'C 계열 언어의 기본은 값 전달이고 Go에는 그 기본만 있다'는 뜻으로 읽는 것이 알맞습니다. Go는 C처럼 호출자 변수를 바꾸려면 포인터를 명시적으로 넘겨야 합니다.
 
 [source,go]
 .Go 포인터 파라미터로 구현한 swap
@@ -608,9 +617,14 @@ Passing a variable to a function will move or copy, just as assignment does.
 변수를 함수에 넘기면 대입과 마찬가지로 이동하거나 복사된다.
 ____
 
-``String``처럼 ``Copy``가 아닌 타입의 값은 소유권이 파라미터로 이동하고, ``i32``처럼 ``Copy``인 타입의 값은 복사됩니다. 다만 ``&mut T`` 타입의 변수를 ``&mut T`` 파라미터에 넘기면 컴파일러가 암묵적으로 재대여(reborrow)하므로, ``&mut T``가 ``Copy``가 아니어도 호출 뒤에 그 변수를 다시 쓸 수 있습니다.
+이 설명에서 '이동'을 이해하려면 Rust의 소유권(ownership)을 알아야 합니다. https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#ownership-rules[Rust Book의 Ownership Rules 절]은 소유권을 세 규칙으로 정리합니다. 모든 값에는 소유자(owner)인 변수가 있고, 소유자는 한 번에 하나뿐이며, 소유자가 스코프를 벗어나면 값이 해제됩니다. ``let s2 = s1;``처럼 대입하면 소유권이 ``s2``로 넘어가는데 이를 이동(move)이라 부르고, 이동한 뒤에 ``s1``을 쓰면 컴파일 오류가 납니다.
 
-``Copy``는 값을 다른 변수에 대입해도 원래 변수를 계속 쓸 수 있는 타입에 붙는 트레이트입니다. https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#stack-only-data-copy[Rust Book의 Stack-Only Data: Copy 절]은 ``Copy``를 구현한 타입의 변수는 이동하지 않고 그대로 복사되어 다른 변수에 대입한 뒤에도 유효하다고 설명합니다. 정수, 실수, ``bool``, ``char``, 그리고 ``Copy``인 타입만 담은 튜플이 여기에 속합니다. 반면 ``String``이나 ``Vec``처럼 힙 메모리를 할당하거나 자원을 소유하는 타입은 ``Copy``가 될 수 없고, 값이 스코프를 벗어날 때 정리 작업을 하는 ``Drop``을 구현한 타입에 ``Copy``를 붙이면 컴파일 오류가 납니다. 메모리를 그대로 복제해도 안전한 타입만 ``Copy``가 되는 셈입니다. 그래서 ``let t = s;``에서 ``s``가 ``i32``이면 이후에도 ``s``를 쓸 수 있지만, ``String``이면 소유권이 ``t``로 이동해 ``s``를 더 쓸 수 없습니다.
+'복사'가 일어나는 타입은 ``Copy`` 트레이트가 정합니다.
+https://doc.rust-lang.org/book/ch10-02-traits.html[트레이트]는 여러 타입이 공유하는 동작을 선언하는 문법으로, 다른 언어의 인터페이스에 가깝습니다. 메서드 없이 컴파일러에게 타입의 성질만 알려 주는 트레이트도 있는데, ``Copy``가 그런 트레이트입니다.
+
+``Copy``는 값을 다른 변수에 대입해도 원래 변수를 계속 쓸 수 있는 타입에 붙는 트레이트입니다. https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#stack-only-data-copy[Rust Book의 Stack-Only Data: Copy 절]은 ``Copy``를 구현한 타입의 변수는 이동하지 않고 그대로 복사되어 다른 변수에 대입한 뒤에도 유효하다고 설명합니다. 정수, 실수, ``bool``, ``char``, 그리고 ``Copy``인 타입만 담은 튜플이 여기에 속합니다. 반면 ``String``이나 ``Vec``처럼 힙 메모리를 할당하거나 자원을 소유하는 타입은 ``Copy``가 될 수 없고, 값이 스코프를 벗어날 때 정리 작업을 하는 ``Drop``을 구현한 타입에 ``Copy``를 붙이면 컴파일 오류가 납니다. 메모리를 그대로 복제해도 안전한 타입만 ``Copy``가 되는 셈입니다. 그래서 ``let t = s;``에서 ``s``가 ``i32``이면 이후에도 ``s``를 쓸 수 있지만, ``String``이면 앞에서 본 것처럼 이동합니다.
+
+``String``처럼 ``Copy``가 아닌 타입의 값은 소유권이 파라미터로 이동하고, ``i32``처럼 ``Copy``인 타입의 값은 복사됩니다. 다만 ``&mut T`` 타입의 변수를 ``&mut T`` 파라미터에 넘기면 컴파일러가 암묵적으로 재대여(reborrow)하므로, ``&mut T``가 ``Copy``가 아니어도 호출 뒤에 그 변수를 다시 쓸 수 있습니다.
 
 이 글의 관점에서 이동과 복사는 모두 파라미터가 인자 값으로 초기화되는 같은 방식이고, 호출자 변수의 별칭이 생기지 않는다는 점도 같습니다. 다른 점은 호출 뒤에 호출자 변수를 계속 쓸 수 있느냐뿐입니다.
 
@@ -757,8 +771,10 @@ after By_Reference: Original = 2
 ** https://go.dev/ref/spec#Calls[The Go Programming Language Specification - Calls]
 ** https://go.dev/doc/faq#pass_by_value[Go FAQ - When are function parameters passed by value?]
 * Rust
+** https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#ownership-rules[The Rust Programming Language - Ownership Rules]
 ** https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#ownership-and-functions[The Rust Programming Language - Ownership and Functions]
 ** https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#stack-only-data-copy[The Rust Programming Language - Stack-Only Data: Copy]
+** https://doc.rust-lang.org/book/ch10-02-traits.html[The Rust Programming Language - Traits: Defining Shared Behavior]
 ** https://doc.rust-lang.org/std/mem/fn.swap.html[Rust Standard Library - std::mem::swap]
 ** https://doc.rust-lang.org/reference/expressions/method-call-expr.html[The Rust Reference - Method-call expressions]
 * Ada
