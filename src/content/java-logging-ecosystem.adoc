@@ -4,24 +4,21 @@
 :jbake-type: post
 :jbake-status: draft
 :jbake-tags: java, logging, spring
-:description: JCL, SLF4J 같은 로깅 파사드와 Log4j, Logback 같은 구현체의 역할을 구분하고, 2026년 9월 기준 각 라이브러리의 상태와 선택 기준을 정리합니다. JCL의 LogFactory 탐색, SLF4J 1.x의 StaticLoggerBinder, SLF4J 2.0의 ServiceLoader, Commons Logging 1.3과 spring-jcl 제거까지 구현체를 찾는 방식의 변천도 살펴봅니다.
+:description: JCL, SLF4J 같은 로깅 파사드와 Log4j, Logback 같은 구현체의 역할을 구분하고, 각 라이브러리의 선택 기준을 정리합니다. JCL의 LogFactory 탐색, SLF4J 1.x의 StaticLoggerBinder, SLF4J 2.0의 ServiceLoader, Commons Logging 1.3과 spring-jcl 제거까지 구현체를 찾는 방식의 변천도 살펴봅니다.
 :jbake-og: {"image": "img/java-logging-ecosystem/facade-and-implementation.png"}
 :idprefix:
 :toc:
 :toclevels: 3
 
-"저희는 Log4j 대신 SLF4J를 써요."라는 말을 가끔 듣습니다.
-이 문장은 범주가 다른 두 라이브러리를 같은 자리에 놓고 있습니다.
-SLF4J는 로거를 선택할 수 있게 하는 파사드이고, Log4j는 로그를 실제로 기록하는 구현체입니다.
-두 라이브러리는 대체 관계가 아니라 함께 쓰는 관계입니다.
+Java 로깅 라이브러리 생태계는 꽤나 복잡해서 라이브러리 간의 관계를 제대로 이해하지 못 하고 사용하는 경우도 많습니다.
+SLF4J, Apache Commons Logging, Logback, Log4j 등 많이 쓰이는 라이브러리만도 해도 여러 가지이고, 대부분의 실무에서는 적어도 2개는 조합해서 쓰고 있기 때문입니다.
 
-이 글은 Java 로깅 라이브러리를 파사드와 구현체로 나누어 역할을 정리하고, 2026년 9월 기준으로 각 라이브러리의 상태와 선택 기준을 살펴봅니다.
-이어서 파사드가 구현체를 찾는 방식이 어떻게 바뀌어 왔는지를 JCL, SLF4J 1.x, SLF4J 2.0, Commons Logging 1.3의 순서로 따라갑니다.
+이 글은 Java 로깅 라이브러리를 파사드와 구현체로 나누어 역할을 설명하고, 라이브러리의 선택 기준을 정리합니다.
+이어서 파사드가 구현체를 찾는 방식이 어떻게 바뀌어 왔는지를 JCL, SLF4J 1.x, SLF4J 2.0, Commons Logging 1.3의 순서로 분석해봅니다.
 
-== 파사드와 구현체의 역할 구분
+== 파사드와 구현체의 역할
 
 로깅 파사드(facade)는 애플리케이션 코드가 호출하는 인터페이스만 제공합니다.
-어떤 구현체가 로그를 기록할지는 실행 시점의 클래스패스에 따라 정해집니다.
 대표적인 파사드는 두 가지입니다.
 
 * https://commons.apache.org/proper/commons-logging/[Apache Commons Logging]: 예전 이름이 Jakarta Commons Logging이어서 약자로 JCL이라고 부릅니다.
