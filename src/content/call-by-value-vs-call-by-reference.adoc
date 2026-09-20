@@ -130,13 +130,13 @@ public class ChangeStateTest {
         System.out.println(myTv.getChannel()); // <3>
     }
 
-    static void changeState(Tv tv) {
-        tv.setChannel("Rock"); // <2>
+    static void changeState(Tv targetTv) {
+        targetTv.setChannel("Rock"); // <2>
     }
 }
 ----
-<1> 앞의 예제와 같이 ``myTv``에 담긴 참조값이 복사되어 changeState 메서드의 파라미터 ``tv``에 대입됩니다. 두 변수는 같은 객체를 가리킵니다.
-<2> 파라미터 ``tv``를 재할당하지 않고, 파라미터가 가리키는 객체의 채널을 ``Rock``으로 바꿉니다. main 메서드의 ``myTv``가 가리키는 바로 그 객체입니다.
+<1> 앞의 예제와 같이 ``myTv``에 담긴 참조값이 복사되어 changeState 메서드의 파라미터 ``targetTv``에 대입됩니다. 두 변수는 같은 객체를 가리킵니다.
+<2> 파라미터 ``targetTv``를 재할당하지 않고, 파라미터가 가리키는 객체의 채널을 ``Rock``으로 바꿉니다. main 메서드의 ``myTv``가 가리키는 바로 그 객체입니다.
 <3> main 메서드의 ``myTv``로 채널을 읽으면 ``Rock``이 출력됩니다. 변수는 바뀌지 않았지만 변수가 가리키는 객체의 상태가 바뀌었기 때문입니다.
 
 image::img/call-by-value/java-mutation.png[두 변수가 같은 객체를 가리키므로 내부 상태 변경이 호출자 변수로 접근해도 확인되는 상황,width=700]
@@ -286,8 +286,8 @@ fun reassign(targetTv: Tv) {
     targetTv = Tv("Rock") // <1>
 }
 
-fun changeState(tv: Tv) {
-    tv.channel = "Rock" // <2>
+fun changeState(targetTv: Tv) {
+    targetTv.channel = "Rock" // <2>
 }
 ----
 <1> 컴파일 오류가 납니다. 오류 메시지는 "'val' cannot be reassigned"입니다.
@@ -331,8 +331,8 @@ function reassign(targetTv) {
   targetTv = { channel: "Rock" }; // <1>
 }
 
-function changeState(tv) {
-  tv.channel = "Rock"; // <2>
+function changeState(targetTv) {
+  targetTv.channel = "Rock"; // <2>
 }
 ----
 <1> 파라미터 ``targetTv``에 새 객체를 대입해도 호출한 쪽의 ``myTv``는 바뀌지 않습니다.
@@ -566,15 +566,15 @@ def reassign(targetTv):
     targetTv = Tv("Rock")  # <2>
 
 
-def changeState(tv):
-    tv.channel = "Rock"  # <3>
+def changeState(targetTv):
+    targetTv.channel = "Rock"  # <3>
 
 
 main()
 ----
 <1> 지역 이름 ``x``와 ``y``를 서로 다른 객체에 다시 묶을 뿐이라 호출한 쪽의 ``a``는 1로 남습니다.
 <2> 파라미터 ``targetTv``를 새 객체에 다시 묶으므로 호출한 쪽의 ``my_tv``는 그대로이고, ``Classic``이 출력됩니다.
-<3> ``tv``가 가리키는 객체의 속성을 바꾸므로 호출한 쪽의 ``my_tv``로 접근해도 바뀌어 있고, ``Rock``이 출력됩니다.
+<3> ``targetTv``가 가리키는 객체의 속성을 바꾸므로 호출한 쪽의 ``my_tv``로 접근해도 바뀌어 있고, ``Rock``이 출력됩니다.
 
 Java의 `Tv` 예제, JavaScript의 ``reassign``과 `changeState` 예제와 동일한 결과입니다.
 

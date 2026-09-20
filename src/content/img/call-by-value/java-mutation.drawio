@@ -4,14 +4,14 @@
       <root>
         <mxCell id="0"/>
         <mxCell id="1" parent="0"/>
-<mxCell id="v1" value='changeState(myTv) 안에서 tv.setChannel("Rock") 실행 후' style="text;html=1;fontSize=15;fontStyle=1;align=left;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="20" y="10" width="600" height="30" as="geometry"/></mxCell>
+<mxCell id="v1" value='changeState(myTv) 안에서 targetTv.setChannel("Rock") 실행 후' style="text;html=1;fontSize=15;fontStyle=1;align=left;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="20" y="10" width="600" height="30" as="geometry"/></mxCell>
 <mxCell id="v2" value="main 메서드의 지역 변수" style="text;html=1;fontSize=12;fontColor=#666666;align=left;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="60" y="50" width="240" height="20" as="geometry"/></mxCell>
 <mxCell id="v3" value="myTv" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fontSize=14;fontFamily=Courier New;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="60" y="74" width="180" height="44" as="geometry"/></mxCell>
 <mxCell id="v4" value="changeState 메서드의 파라미터" style="text;html=1;fontSize=12;fontColor=#666666;align=left;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="60" y="170" width="260" height="20" as="geometry"/></mxCell>
-<mxCell id="v5" value="tv" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fontSize=14;fontFamily=Courier New;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="60" y="194" width="180" height="44" as="geometry"/></mxCell>
+<mxCell id="v5" value="targetTv" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fontSize=14;fontFamily=Courier New;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="60" y="194" width="180" height="44" as="geometry"/></mxCell>
 <mxCell id="v6" value='같은 Tv 객체&lt;br&gt;channel = "Rock"' style="rounded=1;arcSize=20;whiteSpace=wrap;html=1;fontSize=13;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1"><mxGeometry x="460" y="121" width="220" height="70" as="geometry"/></mxCell>
 <mxCell id="e7" value="" style="html=1;fontSize=12;strokeColor=#d79b00;fontColor=#b46504;strokeWidth=1.5;labelBackgroundColor=#ffffff;endArrow=classic;exitX=1;exitY=0.5;entryX=0;entryY=0.3;" edge="1" parent="1" source="v3" target="v6"><mxGeometry x="0" relative="1" as="geometry"><mxPoint as="offset" x="0" y="-12"/></mxGeometry></mxCell>
-<mxCell id="e8" value='tv.setChannel("Rock")' style="html=1;fontSize=12;strokeColor=#d79b00;fontColor=#b46504;strokeWidth=1.5;labelBackgroundColor=#ffffff;endArrow=classic;exitX=1;exitY=0.5;entryX=0;entryY=0.7;" edge="1" parent="1" source="v5" target="v6"><mxGeometry x="0" relative="1" as="geometry"><mxPoint as="offset" x="0" y="28"/></mxGeometry></mxCell>
+<mxCell id="e8" value='targetTv.setChannel("Rock")' style="html=1;fontSize=12;strokeColor=#d79b00;fontColor=#b46504;strokeWidth=1.5;labelBackgroundColor=#ffffff;endArrow=classic;exitX=1;exitY=0.5;entryX=0;entryY=0.7;" edge="1" parent="1" source="v5" target="v6"><mxGeometry x="0" relative="1" as="geometry"><mxPoint as="offset" x="0" y="28"/></mxGeometry></mxCell>
 <mxCell id="v9" value="두 변수가 같은 객체를 가리키므로, main 메서드의 myTv로 접근해도 바뀌어 있습니다." style="text;html=1;fontSize=13;fontColor=#333333;align=left;verticalAlign=middle;whiteSpace=wrap;" vertex="1" parent="1"><mxGeometry x="60" y="258" width="640" height="24" as="geometry"/></mxCell>
       </root>
     </mxGraphModel>
