@@ -23,7 +23,7 @@
         <mxCell id="t0i" value="0" style="rounded=0;whiteSpace=wrap;html=1;fontSize=12;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#555555;" vertex="1" parent="1">
           <mxGeometry x="60" y="120" width="40" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="t0" value="tv" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;fontFamily=Courier New;fillColor=#ffffff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+        <mxCell id="t0" value="targetTv" style="rounded=0;whiteSpace=wrap;html=1;fontSize=14;fontFamily=Courier New;fillColor=#ffffff;strokeColor=#6c8ebf;" vertex="1" parent="1">
           <mxGeometry x="100" y="120" width="180" height="40" as="geometry" />
         </mxCell>
 
@@ -74,7 +74,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="e_new" value="② tv = new Tv();&lt;br&gt;tv.setChannel(&quot;Rock&quot;)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=12;strokeColor=#d79b00;fontColor=#b46504;strokeWidth=1.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="t0" target="rock">
+        <mxCell id="e_new" value="② targetTv = new Tv();&lt;br&gt;targetTv.setChannel(&quot;Rock&quot;)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=12;strokeColor=#d79b00;fontColor=#b46504;strokeWidth=1.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="t0" target="rock">
           <mxGeometry x="0.3" relative="1" as="geometry">
             <mxPoint as="offset" x="0" y="-26" />
           </mxGeometry>

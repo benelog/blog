@@ -103,14 +103,14 @@ public class ReassignTest {
         System.out.println(myTv.getChannel()); // Classic
     }
 
-    static void reassign(Tv tv) {
-        tv = new Tv(); // <2>
-        tv.setChannel("Rock");
+    static void reassign(Tv targetTv) {
+        targetTv = new Tv(); // <2>
+        targetTv.setChannel("Rock");
     }
 }
 ----
-<1> main 메서드의 ``myTv``에 담긴 참조값이 복사되어 reassign 메서드의 파라미터 ``tv``에 대입됩니다. 두 변수는 같은 객체를 가리키지만 서로 다른 변수입니다.
-<2> 파라미터 ``tv``에 새 객체를 대입합니다. 파라미터 ``tv``만 새 객체를 가리키게 되고, main 메서드의 ``myTv``는 원래 객체를 그대로 가리킵니다. 그래서 출력은 ``Classic``입니다.
+<1> main 메서드의 ``myTv``에 담긴 참조값이 복사되어 reassign 메서드의 파라미터 ``targetTv``에 대입됩니다. 두 변수는 같은 객체를 가리키지만 서로 다른 변수입니다.
+<2> 파라미터 ``targetTv``에 새 객체를 대입합니다. 파라미터 ``targetTv``만 새 객체를 가리키게 되고, main 메서드의 ``myTv``는 원래 객체를 그대로 가리킵니다. 그래서 출력은 ``Classic``입니다.
 
 image::img/call-by-value/java-reassign.png[참조값이 복사된 뒤 파라미터만 새 객체를 가리키게 되는 과정,width=700]
 
@@ -145,7 +145,7 @@ image::img/call-by-value/java-mutation.png[두 변수가 같은 객체를 가리
 그러나 앞에서 설명했듯이, 두 방식을 구분하는 실용적인 기준은 파라미터에 대입한 값이 호출자 변수에 반영되는가입니다.
 객체 상태 변경이 호출자 변수로 접근해도 확인되는 것은 두 변수가 같은 객체를 가리키고 있기 때문일 뿐, 전달 방식은 여전히 참조값의 복사, 즉 call by value입니다.
 
-**Head First Java**에서는 객체 참조를 TV 리모컨에 비유해서 설명합니다. 객체를 전달하면 TV(객체)가 복사되는 것이 아니라 그 TV를 조작할 수 있는 리모컨(참조값)이 복사됩니다. 복사된 리모컨으로 채널을 바꾸면(객체 상태 변경) 원래 리모컨을 가진 사람에게도 바뀐 채널이 보입니다. 복사된 리모컨이 다른 새로운 TV에 연결된 이후에는(재할당, `tv = new Tv()`) 이전의 TV에 영향을 미치지 못하고 원래 리모컨은 여전히 기존의 TV와 연결되어 있습니다.
+**Head First Java**에서는 객체 참조를 TV 리모컨에 비유해서 설명합니다. 객체를 전달하면 TV(객체)가 복사되는 것이 아니라 그 TV를 조작할 수 있는 리모컨(참조값)이 복사됩니다. 복사된 리모컨으로 채널을 바꾸면(객체 상태 변경) 원래 리모컨을 가진 사람에게도 바뀐 채널이 보입니다. 복사된 리모컨이 다른 새로운 TV에 연결된 이후에는(재할당, `targetTv = new Tv()`) 이전의 TV에 영향을 미치지 못하고 원래 리모컨은 여전히 기존의 TV와 연결되어 있습니다.
 
 === Java의 reference와 용어의 혼란
 
@@ -245,14 +245,14 @@ The Java Virtual Machine uses local variables to pass parameters on method invoc
 Java Virtual Machine은 메서드를 호출할 때 지역 변수로 파라미터를 전달한다. 클래스 메서드를 호출하면 파라미터는 0번 지역 변수부터 차례로 전달된다. 인스턴스 메서드를 호출하면 0번 지역 변수는 항상 그 인스턴스 메서드가 호출된 객체의 참조(Java 프로그래밍 언어의 this)를 전달하는 데 쓰인다. 파라미터는 그다음 1번 지역 변수부터 차례로 전달된다.
 ____
 
-앞의 ``reassign`` 예제에서 ``myTv``의 참조값이 파라미터 ``tv``로 복사되는 과정을 이 구조에 대입해 따라가 보겠습니다. 그러려면 먼저 다음 개념을 알아야 합니다.
+앞의 ``reassign`` 예제에서 ``myTv``의 참조값이 파라미터 ``targetTv``로 복사되는 과정을 이 구조에 대입해 따라가 보겠습니다. 그러려면 먼저 다음 개념을 알아야 합니다.
 
 * Operand stack: 프레임마다 하나씩 있는 후입선출 스택으로, JVM 명령이 피연산자를 꺼내고 결과를 올리는 작업 공간입니다. 메서드에 넘길 인자를 준비하는 데도 쓰입니다.
 * 바이트코드: javac가 Java 소스를 컴파일해 class 파일에 담는 JVM 명령어입니다. 이 예제의 호출 과정에는 두 명령이 등장합니다.
 ** https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-6.html#jvms-6.5.aload_n[`aload_1`]: 현재 프레임의 1번 지역 변수에 담긴 참조값을 operand stack에 올립니다.
 ** https://docs.oracle.com/en/java/javase/26/docs/specs/jvms/jvms-6.html#jvms-6.5.invokestatic[`invokestatic`]: static 메서드를 호출합니다. 인자 값을 operand stack에서 꺼내고, 새 프레임을 만들어 그 값을 새 프레임의 0번 지역 변수부터 차례로 넣습니다.
 
-이 개념으로 ``reassign`` 호출을 그리면 다음 그림과 같습니다. ``reassign``은 static 메서드이므로 파라미터 ``tv``는 ``reassign`` 프레임의 0번 지역 변수입니다. javac가 ``main`` 프레임의 1번 지역 변수에 배정한 ``myTv``에 담긴 참조값이 이 칸으로 복사됩니다. 파라미터가 0번부터 들어가는 것은 JVMS가 정하지만, 파라미터가 아닌 지역 변수를 몇 번 칸에 둘지는 컴파일러가 정합니다. 바이트코드 수준에서는 ``aload_1`` 명령이 이 참조값을 ``main`` 프레임의 operand stack에 올리고, ``invokestatic`` 명령이 그 값을 꺼내 새 프레임의 0번 지역 변수에 넣습니다. 두 칸은 서로 다른 프레임에 속한 별개의 저장 공간이므로 ``tv``에 새 객체를 대입해도 ``main`` 프레임의 ``myTv``는 여전히 처음의 객체를 가리킵니다.
+이 개념으로 ``reassign`` 호출을 그리면 다음 그림과 같습니다. ``reassign``은 static 메서드이므로 파라미터 ``targetTv``는 ``reassign`` 프레임의 0번 지역 변수입니다. javac가 ``main`` 프레임의 1번 지역 변수에 배정한 ``myTv``에 담긴 참조값이 이 칸으로 복사됩니다. 파라미터가 0번부터 들어가는 것은 JVMS가 정하지만, 파라미터가 아닌 지역 변수를 몇 번 칸에 둘지는 컴파일러가 정합니다. 바이트코드 수준에서는 ``aload_1`` 명령이 이 참조값을 ``main`` 프레임의 operand stack에 올리고, ``invokestatic`` 명령이 그 값을 꺼내 새 프레임의 0번 지역 변수에 넣습니다. 두 칸은 서로 다른 프레임에 속한 별개의 저장 공간이므로 ``targetTv``에 새 객체를 대입해도 ``main`` 프레임의 ``myTv``는 여전히 처음의 객체를 가리킵니다.
 
 image::img/call-by-value/java-stack-frames.png[reassign 메서드의 프레임과 main 메서드의 프레임이 각자의 지역 변수 배열을 가지고 참조값만 복사되는 구조,width=800]
 
@@ -282,8 +282,8 @@ fun main() {
     println(myTv.channel) // Rock
 }
 
-fun reassign(tv: Tv) {
-    tv = Tv("Rock") // <1>
+fun reassign(targetTv: Tv) {
+    targetTv = Tv("Rock") // <1>
 }
 
 fun changeState(tv: Tv) {
@@ -327,15 +327,15 @@ console.log(myTv.channel); // Classic
 changeState(myTv);
 console.log(myTv.channel); // Rock
 
-function reassign(tv) {
-  tv = { channel: "Rock" }; // <1>
+function reassign(targetTv) {
+  targetTv = { channel: "Rock" }; // <1>
 }
 
 function changeState(tv) {
   tv.channel = "Rock"; // <2>
 }
 ----
-<1> 파라미터 ``tv``에 새 객체를 대입해도 호출한 쪽의 ``myTv``는 바뀌지 않습니다.
+<1> 파라미터 ``targetTv``에 새 객체를 대입해도 호출한 쪽의 ``myTv``는 바뀌지 않습니다.
 <2> 파라미터가 가리키는 객체의 프로퍼티를 바꾸면 호출한 쪽의 ``myTv``로 접근해도 바뀌어 있습니다.
 
 앞의 두 그림에서 `Tv` 객체를 객체 리터럴로 바꾸면 JavaScript의 동작을 설명하는 그림이 됩니다.
@@ -562,8 +562,8 @@ def main():
     print(my_tv.channel)  # Rock
 
 
-def reassign(tv):
-    tv = Tv("Rock")  # <2>
+def reassign(targetTv):
+    targetTv = Tv("Rock")  # <2>
 
 
 def changeState(tv):
@@ -573,7 +573,7 @@ def changeState(tv):
 main()
 ----
 <1> 지역 이름 ``x``와 ``y``를 서로 다른 객체에 다시 묶을 뿐이라 호출한 쪽의 ``a``는 1로 남습니다.
-<2> 파라미터 ``tv``를 새 객체에 다시 묶으므로 호출한 쪽의 ``my_tv``는 그대로이고, ``Classic``이 출력됩니다.
+<2> 파라미터 ``targetTv``를 새 객체에 다시 묶으므로 호출한 쪽의 ``my_tv``는 그대로이고, ``Classic``이 출력됩니다.
 <3> ``tv``가 가리키는 객체의 속성을 바꾸므로 호출한 쪽의 ``my_tv``로 접근해도 바뀌어 있고, ``Rock``이 출력됩니다.
 
 Java의 `Tv` 예제, JavaScript의 ``reassign``과 `changeState` 예제와 동일한 결과입니다.
