@@ -509,10 +509,10 @@ myTv.Channel = "Classic";
 Replace(ref myTv); // <1>
 Console.WriteLine(myTv.Channel); // Rock
 
-void Replace(ref Tv tv)
+void Replace(ref Tv targetTv)
 {
-    tv = new Tv(); // <2>
-    tv.Channel = "Rock";
+    targetTv = new Tv(); // <2>
+    targetTv.Channel = "Rock";
 }
 
 class Tv
@@ -520,7 +520,7 @@ class Tv
     public string Channel { get; set; } = "";
 }
 ----
-<1> ``Replace(Tv tv)``처럼 `ref` 없이 선언하고 ``Replace(myTv)``로 호출하면 Java의 ``reassign(myTv)``와 같아서 ``Classic``이 출력됩니다. 선언에 `ref`가 있는 상태에서 호출 지점의 `ref`만 빼면 컴파일 오류입니다.
+<1> ``Replace(Tv targetTv)``처럼 `ref` 없이 선언하고 ``Replace(myTv)``로 호출하면 Java의 ``reassign(myTv)``와 같아서 ``Classic``이 출력됩니다. 선언에 `ref`가 있는 상태에서 호출 지점의 `ref`만 빼면 컴파일 오류입니다.
 <2> `ref` 파라미터에 새 객체를 대입하면 호출한 쪽의 ``myTv``가 새 객체를 가리키게 됩니다. .NET 8로 실행하면 ``Rock``이 출력됩니다.
 
 '참조 타입을 값으로 전달'하는 것과 '변수를 ref로 참조 전달'하는 것이 서로 다른 동작이라는 점을 C#은 문법으로 구분합니다.
