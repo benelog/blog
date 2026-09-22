@@ -10,46 +10,50 @@
 :toc:
 :toclevels: 3
 
-Java 로깅 라이브러리 생태계는 꽤나 복잡해서 라이브러리 간의 관계를 제대로 이해하지 못 하고 사용하는 경우도 많습니다.
-SLF4J, Apache Commons Logging, Logback, Log4j 등 많이 쓰이는 라이브러리만도 해도 여러 가지이고, 대부분의 실무에서는 적어도 2개는 조합해서 쓰고 있기 때문입니다.
+Java 로깅 라이브러리는 종류가 많고 서로 얽혀 있어서, 라이브러리 간의 관계를 제대로 이해하지 못하고 쓰는 경우가 많습니다.
+많이 쓰이는 라이브러리만 해도 SLF4J, Apache Commons Logging, Logback, Log4j 등 여러 가지이고, 실무 프로젝트는 대부분 SLF4J와 Logback처럼 적어도 2개를 조합해서 쓰기 때문입니다.
 
 이 글은 Java 로깅 라이브러리를 파사드와 구현체로 나누어 역할을 설명하고, 라이브러리의 선택 기준을 정리합니다.
 이어서 파사드가 구현체를 찾는 방식이 어떻게 바뀌어 왔는지를 JCL, SLF4J 1.x, SLF4J 2.0, Commons Logging 1.3의 순서로 분석해봅니다.
 
 == 파사드와 구현체의 역할
 
-로깅 파사드(facade)는 애플리케이션 코드가 호출하는 인터페이스만 제공합니다.
+로깅 파사드(facade)는 애플리케이션 코드가 호출하는 인터페이스만 제공하고, 실제 기록은 구현체에 맡깁니다.
 대표적인 파사드는 두 가지입니다.
 
 * https://commons.apache.org/proper/commons-logging/[Apache Commons Logging]: 예전 이름이 Jakarta Commons Logging이어서 약자로 JCL이라고 부릅니다.
 * https://www.slf4j.org/[SLF4J]: Simple Logging Facade for Java의 약자입니다.
 
 구현체는 로그를 어디에 어떤 형식으로 기록할지 결정하고 실제로 기록합니다.
-JCL이나 SLF4J가 정의한 인터페이스에 맞춘 어댑터 클래스가 구현체 안에 들어 있거나, 별도 모듈로 제공됩니다.
+JCL이나 SLF4J가 정의한 인터페이스에 맞춘 어댑터 클래스는 Logback처럼 구현체 안에 들어 있기도 하고, ``log4j-slf4j2-impl``처럼 별도 모듈로 제공되기도 합니다.
 
 * https://logging.apache.org/log4j/2.x/[Log4j 2]: ``log4j-core``가 구현체입니다.
 * https://logback.qos.ch/[Logback]: SLF4J의 창시자가 만든 구현체로, SLF4J 인터페이스를 직접 구현합니다.
 * java.util.logging(이하 JUL): JDK에 포함된 구현체입니다.
 * https://reload4j.qos.ch/[reload4j]: 2015년에 지원이 끝난 Log4j 1.x의 보안 패치 포크입니다.
 
-경계가 겹치는 경우도 두 가지 있습니다.
-Log4j 2는 API 모듈(``log4j-api``)과 구현 모듈(``log4j-core``)을 분리했으므로 ``log4j-api``는 파사드로도 쓰입니다.
-``log4j-to-slf4j`` 모듈을 추가하면 Log4j API 호출을 SLF4J로 보낼 수 있습니다.
-JDK 9의 https://openjdk.org/jeps/264[JEP 264]로 추가된 ``System.Logger``와 ``System.LoggerFinder``도 파사드입니다.
+파사드와 구현체의 경계가 겹치는 경우도 두 가지 있습니다.
+
+첫째, Log4j 2는 API 모듈(``log4j-api``)과 구현 모듈(``log4j-core``)을 분리했으므로 ``log4j-api``는 파사드로도 쓰입니다.
+예를 들어 ``log4j-core`` 대신 ``log4j-to-slf4j`` 모듈을 추가하면 Log4j API 호출을 SLF4J로 보낼 수 있습니다.
+
+둘째, JDK 9의 https://openjdk.org/jeps/264[JEP 264]로 추가된 ``System.Logger``와 ``System.LoggerFinder``도 파사드입니다.
 ``System.getLogger(name)``으로 로거를 얻고, 구현체는 ``ServiceLoader``로 찾은 ``LoggerFinder``가 정합니다.
 ``LoggerFinder``가 없으면 JUL로 보내고, ``java.logging`` 모듈조차 없으면 INFO 이상만 ``System.err``에 찍는 단순 로거를 씁니다.
 SLF4J의 ``slf4j-jdk-platform-logging``과 Log4j 2의 ``log4j-jpl``이 이 ``LoggerFinder``를 구현하므로, 애플리케이션 코드가 ``System.Logger``를 써도 SLF4J나 Log4j API로 보낼 수 있습니다.
 다만 JEP 264는 JDK 내부의 로그를 애플리케이션이 고른 프레임워크로 보내는 것이 목적이며, 범용 로깅 인터페이스를 정의하는 것은 목표가 아니라고 밝혔습니다.
-그래서 API가 작습니다.
+그래서 API가 제공하는 기능이 적습니다.
 파라미터 치환은 ``MessageFormat`` 방식의 ``{0}``이고, MDC나 marker에 해당하는 기능이 없습니다.
 JDK 외의 의존성을 두고 싶지 않은 라이브러리에는 선택지가 되지만, 애플리케이션 코드에서 SLF4J 대신 쓸 이유는 적다고 생각합니다.
 
 == 조합과 연결 모듈
 
-파사드와 구현체는 역할이 다르므로 아래 4가지 조합이 모두 가능합니다.
+파사드와 구현체가 분리되어 있으므로 JCL과 SLF4J 중 어느 파사드든 Log4j 2와 Logback 중 어느 구현체와도 조합할 수 있습니다.
 아래 그림은 파사드에서 구현체로 호출이 전달되는 경로와 그 사이의 연결 모듈을 정리한 것입니다.
 
 image::img/java-logging-ecosystem/facade-and-implementation.png[로깅 파사드(JCL, SLF4J, Log4j API)에서 구현체(JUL, Logback, Log4j Core)로 이어지는 연결 모듈,width=800]
+
+두 파사드와 두 구현체를 조합한 4가지 경우의 연결 모듈은 아래와 같습니다.
 
 [cols="1,2,3", options="header"]
 |===
@@ -156,7 +160,8 @@ JUL은 구현체이면서 API이기도 하므로 출발점으로도 넣었습니
 |===
 
 연결 모듈을 고를 때는 순환을 피해야 합니다.
-SLF4J 문서는 아래 조합이 무한 위임을 일으킨다고 경고합니다.
+A에서 B로 보내는 모듈과 B에서 A로 보내는 모듈을 함께 넣으면 호출이 두 파사드 사이를 끝없이 오갑니다.
+SLF4J 문서는 아래 조합이 이런 무한 위임을 일으킨다고 경고합니다.
 
 * ``jcl-over-slf4j`` + ``slf4j-jcl``
 * ``log4j-over-slf4j`` + ``slf4j-reload4j``
@@ -166,8 +171,8 @@ SLF4J 문서는 아래 조합이 무한 위임을 일으킨다고 경고합니�
 표에서 양방향 모듈이 있는 쌍은 모두 이 조건에 해당합니다.
 
 ``jul-to-slf4j``는 비용이 큽니다.
-SLF4J 문서에 따르면 레벨 때문에 무시되는 로그 문장도 60배 정도 느려지고, 실제로 기록되는 문장도 20% 정도 느려집니다.
-Logback을 쓴다면 ``LevelChangePropagator``로 JUL 로거의 레벨을 동기화해 이 비용을 없앨 수 있습니다.
+SLF4J 문서에 따르면 레벨이 꺼져 있어 기록되지 않는 로그 호출도 60배 정도 느려지고, 실제로 기록되는 호출도 20% 정도 느려집니다.
+Logback을 쓴다면 ``LevelChangePropagator``가 Logback의 레벨 설정을 JUL 로거에 전파하므로, 꺼진 레벨의 로그 호출에 드는 비용을 없앨 수 있습니다.
 
 == 2026년 9월 기준 각 라이브러리의 상태
 
@@ -183,12 +188,12 @@ Logback을 쓴다면 ``LevelChangePropagator``로 JUL 로거의 레벨을 동기
 |Logback
 |1.6.3
 |2026-08-14
-|1.5.x 이후 SLF4J 2.0.x가 필요합니다. 1.6.x는 JDK 11 이상. 1.5.x는 1.6.x로 바로 교체할 수 있는 이전 계열입니다.
+|1.5.x 이후 SLF4J 2.0.x가 필요합니다. 1.6.x는 JDK 11 이상. 1.5.x를 쓰던 프로젝트는 1.6.x로 바로 교체할 수 있습니다.
 
 |Log4j 2
 |2.26.1
 |2026-06-29
-|2.25.x 계열도 같은 수정을 담은 2.25.5(2026-07-01)가 나왔습니다.
+|2.25.x 계열로는 2.26.1과 같은 수정을 담은 2.25.5(2026-07-01)가 나왔습니다.
 
 |Log4j 3
 |3.0.0-beta3
@@ -208,7 +213,7 @@ Logback을 쓴다면 ``LevelChangePropagator``로 JUL 로거의 레벨을 동기
 
 Log4j 2에서 2021년 12월에 공개된 https://logging.apache.org/security.html[CVE-2021-44228](Log4Shell)은 ``log4j-core``의 JNDI lookup 문제였습니다.
 ``log4j-api``만 쓰는 경우는 영향이 없었습니다.
-파사드와 구현체를 나누어 두면 이런 사고 때 영향 범위를 가늠하기도 쉽습니다.
+파사드와 구현체를 나누어 두면 이런 사고가 났을 때 의존성 목록에 ``log4j-core``가 있는지만 확인해도 영향 여부를 가늠할 수 있습니다.
 
 == 파사드 선택: SLF4J와 JCL
 
@@ -220,11 +225,11 @@ Log4j 2에서 2021년 12월에 공개된 https://logging.apache.org/security.htm
 JCL의 ``Log`` 인터페이스에는 이 기능이 없어서 ``if (log.isDebugEnabled())``로 감싸야 합니다.
 SLF4J 2.0에서는 ``logger.atDebug().setMessage("msg {}").addArgument(value).log()`` 같은 fluent API도 추가되었습니다.
 
-둘째, SLF4J 2.0부터는 구현체를 찾는 방식이 Java 표준 방식인 ``ServiceLoader``입니다.
-JCL도 1.3.0부터 개선되었지만, 이 변천은 뒤에서 따로 다룹니다.
+둘째, SLF4J 2.0부터는 Java 표준 API인 ``ServiceLoader``로 구현체를 찾습니다.
+JCL도 1.3.0부터 탐색 방식이 나아졌는데, 두 파사드의 탐색 방식이 바뀐 과정은 뒤에서 따로 다룹니다.
 
 JCL은 Spring Framework처럼 오래된 라이브러리의 내부 로깅에 남아 있습니다.
-Spring Boot 문서는 내부 로깅에 Commons Logging을 쓰되 구현체는 열어 둔다고 설명합니다.
+Spring Boot 문서는 내부 로깅에 Commons Logging을 쓰되 구현체는 정해 두지 않는다고 설명합니다.
 Spring Boot 4.1.1의 ``spring-boot-starter-logging``은 아래 세 의존성으로 구성됩니다.
 
 [source,groovy]
@@ -248,7 +253,7 @@ Log4j 2로 바꾸려면 이 스타터를 제외하고 ``spring-boot-starter-log4
 == 구현체 선택: Logback과 Log4j 2
 
 Log4j 1.x의 개발이 느리던 시기에 Logback이 대안으로 자리를 잡았습니다.
-그 뒤 Log4j 2.x가 Logback의 장점을 흡수하며 계속 발전했습니다.
+그 뒤 Log4j 2.x가 Logback의 장점을 받아들이며 계속 발전했습니다.
 저는 현재 두 구현체 중 어느 한쪽이 확실히 우세하다고 보지 않습니다.
 Spring Boot의 기본값이라는 이유로 Logback을 고르는 프로젝트가 많고, 그 선택도 합리적입니다.
 
@@ -260,8 +265,13 @@ Logback은 ``BlockingQueue``와 작업 스레드로 동작하는 ``AsyncAppender
 
 두 구현체를 비교한 수치는 대부분 오래되었습니다.
 Log4j 2의 성능 페이지도 지금은 Logback과 비교한 수치를 싣지 않고, 비동기 로거의 장단점과 최적화 지침만 설명합니다.
-그 페이지는 비동기 로거의 단점도 함께 적었습니다.
-로그 발생 속도가 appender의 처리 속도를 계속 넘으면 결국 appender 속도가 병목이 되고, 로깅 중 예외를 애플리케이션에 알리기 어려우며, vCPU가 하나뿐인 환경에서는 스레드가 늘어난 만큼 오히려 느려질 수 있습니다.
+그 페이지는 비동기 로거의 단점도 아래와 같이 함께 적었습니다.
+
+* 로그 발생 속도가 appender의 처리 속도를 계속 넘으면 결국 appender 속도가 병목이 됩니다.
+* 로깅 중 발생한 예외를 애플리케이션에 알리기 어렵습니다.
+* vCPU가 하나뿐인 환경에서는 스레드가 늘어난 만큼 오히려 느려질 수 있습니다.
+
+
 성능이 선택 기준이라면 실제 로그 패턴과 appender 구성으로 직접 측정하는 편이 낫습니다.
 
 === PatternLayout의 위치 정보 옵션
@@ -277,14 +287,16 @@ Log4j 2의 성능 페이지도 지금은 Logback과 비교한 수치를 싣지 �
 Logback 문서는 네 옵션마다 "not particularly fast. Thus, its use should be avoided unless execution speed is not an issue"라고 적었습니다.
 Log4j 2 문서도 "This is an expensive operation and should be avoided in performance-sensitive setups"라고 경고합니다.
 비동기 로거에서는 이 비용이 더 두드러집니다.
-위치 정보를 캡처할지를 비동기 경계를 넘기 전에 결정해야 하므로, Log4j 2의 비동기 로거는 ``includeLocation``이 기본으로 꺼져 있고 Logback의 ``AsyncAppender``도 ``includeCallerData``가 기본으로 꺼져 있습니다.
+로그 이벤트가 작업 스레드로 넘어간 뒤에는 호출한 스레드의 스택을 볼 수 없으므로, 위치 정보는 이벤트를 넘기기 전에 호출한 스레드에서 미리 캡처해야 합니다.
+그래서 Log4j 2의 비동기 로거는 ``includeLocation``이 기본으로 꺼져 있고 Logback의 ``AsyncAppender``도 ``includeCallerData``가 기본으로 꺼져 있습니다.
 운영 환경에서는 로거 이름(``%c`` 또는 ``%logger``)으로 위치를 짐작하는 정도로 두는 편이 좋습니다.
 로거 이름은 로거를 만들 때 정해지므로 추가 비용이 없습니다.
 
 == 파사드가 구현체를 찾는 방식의 변천
 
 파사드는 실행 시점에 구현체를 찾아야 합니다.
-이 부분은 오랫동안 Java의 인터페이스와 구현체 관계처럼 단순하지 않았습니다.
+구현 클래스를 ``new``로 만들어 인터페이스 타입 변수에 대입하는 일반적인 Java 코드와 달리, 파사드는 클래스패스를 탐색해 구현체를 골라야 합니다.
+이 탐색 방식은 오랫동안 표준이 없었습니다.
 JCL, SLF4J 1.x, SLF4J 2.0, 그리고 최근의 Commons Logging 1.3 순서로 어떻게 바뀌었는지 살펴봅니다.
 
 === JCL의 LogFactory 탐색
@@ -348,8 +360,8 @@ SLF4J 1.7.36의 ``LoggerFactory``는 클래스로더의 ``getResources("org/slf4
 경고를 내더라도 그중 하나로 연결은 되는데, SLF4J 문서는 어느 것이 선택될지는 JVM이 정하며 실질적으로 무작위로 보아야 한다고 적었습니다.
 
 이 방식은 두 가지 면에서 불편합니다.
-서로 다른 구현이 같은 이름의 클래스로 제공되므로 스택 트레이스나 IDE에서 혼란스럽습니다.
-그리고 두 구현체가 클래스패스에 함께 있을 여지를 처음부터 없애 버립니다.
+첫째, 서로 다른 구현이 같은 이름의 클래스로 제공되므로 스택 트레이스나 IDE에서 ``StaticLoggerBinder``를 보고 어느 jar의 클래스인지 바로 알 수 없습니다.
+둘째, 두 구현체가 클래스패스에 함께 있을 여지를 처음부터 없애 버립니다.
 
 로깅 구현체를 두 개씩 쓰지는 않으니 괜찮다고 할 수도 있습니다.
 그러나 테스트 의존성이 문제가 됩니다.
@@ -369,7 +381,7 @@ Assert.state(factory instanceof LoggerContext,
 				factory.getClass(), getLocation(factory)));
 ----
 
-https://github.com/portingle/slf4jtesting[portingle/slf4jtesting]은 이런 폐해를 아는 사람이 만든 라이브러리입니다.
+https://github.com/portingle/slf4jtesting[portingle/slf4jtesting]은 이 문제를 피하도록 설계된 라이브러리입니다.
 정적 바인딩을 쓰지 않고 ``ILoggerFactory`` 인스턴스를 생성자로 주입받아 테스트마다 로거를 따로 구성합니다.
 README는 static과 singleton이 테스트 가능한 코드를 방해한다고 밝힙니다.
 
@@ -383,7 +395,7 @@ ILoggerFactory factory = new LogbackLoggerFactory("logback.xml");
 ----
 
 이 방식은 클래스패스 탐색이 없으므로 어떤 구현체가 쓰이는지 코드에 드러납니다.
-다만 라이브러리는 사용자가 어떤 구현체를 쓸지 모르므로 파사드와 탐색이 필요합니다.
+다만 Spring Framework 같은 라이브러리는 그 라이브러리를 쓰는 애플리케이션이 어떤 구현체를 고를지 모르므로 파사드와 탐색이 필요합니다.
 SLF4J의 정적 접근은 그 요구에서 나온 설계이고, 문제는 탐색 방식이 Java 표준을 쓰지 않았다는 점입니다.
 
 === SLF4J 2.0의 ServiceLoader
