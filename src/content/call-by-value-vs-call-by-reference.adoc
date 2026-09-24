@@ -5,7 +5,7 @@
 :jbake-status: published
 :jbake-tags: java, javascript
 :description: Call by value와 call by reference의 정의를 정리하고, Java, Kotlin, JavaScript, C, {cpp}, C#, Python, Go, Rust, Ada가 인자를 어떻게 전달하는지 비교합니다.
-:jbake-last_updated: 2026-09-23
+:jbake-last_updated: 2026-09-24
 :jbake-og: {"image": "img/call-by-value/og-call-by-value.png"}
 :toc:
 :idprefix:
@@ -23,13 +23,38 @@
 
 이 정의는 프로그래밍 언어론의 표준적인 설명을 따릅니다.
 
-Christopher Strachey는 1967년 강의를 정리한 https://www.cs.cmu.edu/~crary/819-f09/Strachey67.pdf[Fundamental Concepts in Programming Languages] 3.4.2절에서 파라미터에 표현식의 R-value를 넘기는 방식을 call by value, L-value를 넘기는 방식을 call by reference라고 불렀습니다. L-value는 대입문의 왼쪽(Left)에 놓인 표현식이 뜻하는 저장 위치이고, R-value는 오른쪽(Right)에 놓인 표현식이 뜻하는 그 위치에 담긴 값입니다. 이 강의록은 L-value와 R-value, first-class 객체 같은 용어의 출처로 지금도 인용되는 프로그래밍 언어론의 고전입니다.
+**Compilers: Principles, Techniques, and Tools** 2판은 1.6.6절에서 두 방식을 다음과 같이 설명합니다.
 
-**Compilers: Principles, Techniques, and Tools** 2판 1.6.6절도 call by value는 인자를 평가하거나 복사한 값을 파라미터의 저장 위치에 넣는 방식, call by reference는 인자의 주소를 파라미터의 값으로 넘겨 파라미터의 변경이 인자의 변경으로 나타나는 방식이라고 설명합니다. 이 책은 표지 그림 때문에 Dragon Book으로 불리며 1977년의 전신 **Principles of Compiler Design**부터 대학 컴파일러 강의의 기본 교재로 쓰여 온 표준 교과서입니다.
+[quote, "Alfred V. Aho, Monica S. Lam, Ravi Sethi, Jeffrey D. Ullman", "Compilers: Principles, Techniques, and Tools 2판 1.6.6절"]
+____
+In call-by-value, the actual parameter is evaluated (if it is an expression) or copied (if it is a variable). The value is placed in the location belonging to the corresponding formal parameter of the called procedure. This method is used in C and Java, and is a common option in C++, as well as in most other languages. ...
+
+In call-by-reference, the address of the actual parameter is passed to the callee as the value of the corresponding formal parameter. Uses of the formal parameter in the code of the callee are implemented by following this pointer to the location indicated by the caller. Changes to the formal parameter thus appear as changes to the actual parameter.
+
+Call by value에서는 실제 파라미터가 표현식이면 평가하고, 변수이면 복사한다. 그 값은 호출된 프로시저에서 대응하는 형식 파라미터의 저장 위치에 놓인다. 이 방식은 C와 Java에서 쓰이며, {cpp}와 대부분의 다른 언어에서도 흔히 쓰는 선택지다. ...
+
+Call by reference에서는 실제 파라미터의 주소가 대응하는 형식 파라미터의 값으로 호출된 쪽에 전달된다. 호출된 쪽의 코드에서 형식 파라미터를 쓰는 부분은 이 포인터를 따라 호출한 쪽이 가리킨 위치에 접근하도록 구현된다. 따라서 형식 파라미터의 변경은 실제 파라미터의 변경으로 나타난다.
+____
+
+인용문의 실제 파라미터(actual parameter)는 이 글의 인자에, 형식 파라미터(formal parameter)는 이 글의 파라미터에 해당합니다. 이 책은 1977년의 전신 **Principles of Compiler Design**부터 대학 컴파일러 강의의 기본 교재로 쓰여 온 표준 교과서입니다. 표지 그림 때문에 Dragon Book으로도 불립니다.
+
+.Compilers: Principles, Techniques, and Tools 2판 표지 (이미지 출처: https://openlibrary.org/isbn/9780321486813[Open Library])
+image::img/call-by-value/dragon-book-2nd.jpg["Compilers: Principles, Techniques, and Tools 2판 표지",width=200]
+
+이 구분은 Christopher Strachey의 1967년 강의로 거슬러 올라갑니다. Strachey는 강의를 정리한 https://www.cs.cmu.edu/~crary/819-f09/Strachey67.pdf[Fundamental Concepts in Programming Languages] 3.4.2절에서 파라미터에 표현식의 R-value를 넘기는 방식을 call by value, L-value를 넘기는 방식을 call by reference라고 불렀습니다.
+
+[quote, Christopher Strachey, Fundamental Concepts in Programming Languages 3.4.2절]
+____
+When the function is used (or called or applied) we write f[ε] where ε can be an expression. If we are using a referentially transparent language all we require to know about the expression ε in order to evaluate f[ε] is its value. There are, however, two sorts of value, so we have to decide whether to supply the R-value or the L-value of ε to the function f. Either is possible, so that it becomes a part of the definition of the function to specify for each of its bound variables (also called its formal parameters) whether it requires an R-value or an L-value. These alternatives will also be known as calling a parameter by value (R-value) or reference (L-value).
+
+함수를 사용할(호출하거나 적용할) 때는 f[ε]라고 쓰며, ε는 표현식일 수 있다. 참조 투명한 언어라면 f[ε]를 평가하는 데 표현식 ε에 대해 알아야 할 것은 그 값뿐이다. 그러나 값에는 두 종류가 있으므로 함수 f에 ε의 R-value를 넘길지 L-value를 넘길지 정해야 한다. 어느 쪽도 가능하므로, 함수의 각 속박 변수(형식 파라미터라고도 한다)가 R-value를 요구하는지 L-value를 요구하는지 정하는 일이 함수 정의의 일부가 된다. 이 두 가지를 파라미터를 값(R-value)으로 호출하는 방식과 참조(L-value)로 호출하는 방식이라고도 부른다.
+____
+
+L-value는 대입문의 왼쪽(Left)에 놓인 표현식이 뜻하는 저장 위치이고, R-value는 오른쪽(Right)에 놓인 표현식이 뜻하는 그 위치에 담긴 값입니다. 이 강의록은 L-value와 R-value, first-class 객체 같은 용어의 출처로 지금도 인용되는 프로그래밍 언어론의 고전입니다.
 
 두 방식을 구분하는 실용적인 기준은 한 문장으로 요약할 수 있습니다. *함수 안에서 파라미터에 새 값을 대입했을 때 호출한 쪽의 변수가 바뀌는가?* 바뀌면 call by reference이고, 바뀌지 않으면 call by value입니다. 이 기준은 이 글처럼 두 방식만 비교하고, 다시 대입할 수 있는 변수를 인자로 넘기며, 파라미터에도 대입할 수 있다고 가정할 때 성립합니다. Call by copy-restore나 call by name 등 다른 평가 전략까지 포함하면 이 질문만으로 모든 인자 전달 방식을 분류할 수는 없습니다.
 
-또한 이 기준은 파라미터 변수 자체에 대입하는 경우만 봅니다. 파라미터가 가리키는 객체의 내부 상태를 바꾸는 것은 별개의 문제이고, 뒤에서 볼 오해는 이 둘을 섞는 데서 생깁니다.
+또한 이 기준에서 말하는 대입은 ``targetTv = new Tv()``처럼 파라미터 변수 자체에 다른 값을 넣는 것입니다. 파라미터가 객체를 가리킨다면 다른 객체를 가리키게 바꾸는 셈입니다. ``targetTv.setChannel("Rock")``처럼 파라미터가 가리키는 객체의 내부 상태를 바꾸는 것은 별개의 문제입니다. 뒤에서 볼 오해는 이 둘을 혼동하는 것에서 생깁니다.
 
 === Pass by ~와 call by ~ 용어
 
@@ -160,6 +185,9 @@ Some people will say incorrectly that objects are passed "by reference." ... The
 어떤 사람들은 객체가 '참조로(by reference)' 전달된다고 잘못 말한다. ... Java 프로그래밍 언어는 객체를 참조로 전달하지 않는다. 객체의 참조를 값으로 전달한다.
 ____
 
+.The Java Programming Language 4판 표지 (이미지 출처: https://openlibrary.org/isbn/9780321349804[Open Library])
+image::img/call-by-value/java-programming-language-4th.jpg["The Java Programming Language 4판 표지",width=200]
+
 최신 공식 Java 학습 자료인 https://dev.java/learn/classes-objects/calling-methods-constructors/[Dev.java]에서도 같은 내용을 설명합니다.
 
 [quote, Dev.java, Calling Methods and Constructors]
@@ -169,7 +197,22 @@ Reference data type parameters, such as objects, are also passed into methods by
 객체 같은 참조 데이터 타입 파라미터도 메서드에 값으로 전달된다. ... 메서드가 반환될 때 전달된 참조는 여전히 이전과 같은 객체를 참조한다.
 ____
 
-이런 혼란은 'reference'라는 용어에서 비롯된 것으로 보입니다. Java에서 객체를 가리키는 값을 'reference'라고 부르는데, 이 단어가 'call by reference'의 reference와 겹치면서 오해가 생긴 것으로 보입니다. 더 정확하게 표현하면 *Java는 객체를 가리키는 참조값을 call by value로 전달합니다.*
+앞에서 인용한 Dragon Book도 같은 절에서 Java는 call by value만 쓴다고 밝힙니다. 그런데 이어지는 call by reference 항목에서는 Java가 기본 타입이 아닌 값에는 call by reference를 쓰는 것처럼 동작한다고 적었습니다.
+
+[quote, "Alfred V. Aho, Monica S. Lam, Ravi Sethi, Jeffrey D. Ullman", "Compilers: Principles, Techniques, and Tools 2판 1.6.6절"]
+____
+Even though Java uses call-by-value exclusively, whenever we pass the name of an object to a called procedure, the value received by that procedure is in effect a pointer to the object. Thus, the called procedure is able to affect the value of the object itself. ...
+
+As we noted when discussing call-by-value, languages such as Java solve the problem of passing arrays, strings, or other objects by copying only a reference to those objects. The effect is that Java behaves as if it used call-by-reference for anything other than a basic type such as an integer or real.
+
+Java는 call by value만 쓰지만, 호출되는 프로시저에 객체의 이름을 넘기면 그 프로시저가 받는 값은 사실상 그 객체를 가리키는 포인터다. 따라서 호출된 프로시저는 객체 자체의 값에 영향을 줄 수 있다. ...
+
+Call by value를 다루면서 언급했듯이, Java 같은 언어는 배열, 문자열, 그 밖의 객체를 넘기는 문제를 그 객체에 대한 참조만 복사하는 방식으로 해결한다. 그 결과 Java는 정수나 실수 같은 기본 타입이 아닌 모든 것에 call by reference를 쓰는 것처럼 동작한다.
+____
+
+'call by reference를 쓰는 것처럼 동작한다(behaves as if)'는 호출된 메서드에서 바꾼 객체 상태가 호출한 쪽에서도 보인다는 효과를 가리킵니다. 이 책이 앞에서 밝혔듯이 실제 전달 방식은 call by reference가 아니라는 전제를 깐 표현입니다. 표준 교과서도 효과를 설명할 때 'call by reference'라는 말을 빌려 쓸 만큼 두 개념은 섞이기 쉽습니다.
+
+이런 혼란은 'reference'라는 용어에서 비롯된 것으로 보입니다. Java에서 객체를 가리키는 값을 'reference'라고 부르는데, 이 단어가 'call by reference'의 reference와 겹치면서 오해가 생긴 것입니다. 더 정확하게 표현하면 *Java는 객체를 가리키는 참조값을 call by value로 전달합니다.*
 
 Java의 reference는 객체를 식별하고 접근하는 값입니다. 포인터처럼 이해할 수 있습니다.
 다음의 Java 객체 접근 동작은
@@ -735,8 +778,8 @@ after By_Reference: Original = 2
 == 참고 자료
 
 * 용어
-** Christopher Strachey, link:https://www.cs.cmu.edu/~crary/819-f09/Strachey67.pdf[**Fundamental Concepts in Programming Languages**], Higher-Order and Symbolic Computation 13권, 2000, 3.4.2 Parameter calling modes
 ** Alfred V. Aho, Monica S. Lam, Ravi Sethi, Jeffrey D. Ullman, link:https://www.pearson.com/en-us/subject-catalog/p/compilers-principles-techniques-and-tools/P200000003472/9780133002140[**Compilers: Principles, Techniques, and Tools**] 2판, Addison-Wesley, 2007, 1.6.6 Parameter Passing Mechanisms
+** Christopher Strachey, link:https://www.cs.cmu.edu/~crary/819-f09/Strachey67.pdf[**Fundamental Concepts in Programming Languages**], Higher-Order and Symbolic Computation 13권, 2000, 3.4.2 Parameter calling modes
 ** https://www.masswerk.at/algol60/report.htm[Revised Report on the Algorithmic Language Algol 60 - 4.7.3 Semantics]
 ** https://csg.csail.mit.edu/pubs/memos/Memo-112/memo112-1a.pdf[CLU 설계 문서 - Call by sharing]
 * Java
