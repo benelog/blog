@@ -51,6 +51,18 @@ New posts go in `src/content/` as `.adoc` files with this header format:
 
 Post images go in `src/content/img/<topic-slug>/`.
 
+### 파일명을 바꿀 때의 redirect
+
+글의 파일명이 곧 주소(`/<slug>.html`)이므로, 이미 게시된 글의 파일명을 바꾸면 `src/assets/_redirects`에 옛 주소를 새 주소로 넘기는 301 규칙을 추가한다.
+Netlify는 확장자 없는 주소(`/<slug>`)로도 페이지를 열어 주므로, 규칙은 `.html` 주소와 확장자 없는 주소 두 줄을 한 쌍으로 넣는다.
+
+```
+/old-slug.html /new-slug.html 301
+/old-slug /new-slug.html 301
+```
+
+배포 후 `curl -sI https://blog.benelog.net/old-slug`로 두 주소 모두 301과 새 `location`이 오는지 확인한다.
+
 ## Template Structure
 
 Key layout chain: `header.ftl` → `menu.ftl` → page-specific template → `commons/sidebar.ftl` → `footer.ftl`
