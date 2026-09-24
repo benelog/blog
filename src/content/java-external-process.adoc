@@ -4,7 +4,7 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: java, jdk, linux
-:jbake-last_updated: 2026-09-13
+:jbake-last_updated: 2026-09-25
 :description: JDK 25와 Linux 6.x에서 외부 프로세스를 실행할 때 필요한 출력 처리, 시간제한, 종료 정책을 예제로 정리합니다. zt-exec과 Apache Commons Exec의 API와 기본값을 비교하고, 기본 실행 방식인 posix_spawn의 동작, 큰 힙에서의 실행 지연과 실행 방식 설정의 변경 이력을 다룹니다.
 :idprefix:
 :toc:
@@ -383,15 +383,181 @@ timed out: sleep 60
 * 출력이 아주 크면 ``StringBuilder``에 다 담지 말고 줄 단위나 고정 크기 버퍼로 처리합니다.
 * 출력 인코딩이 부모 JVM의 ``native.encoding``과 다른 명령에는 ``inputReader(Charset)``으로 인코딩을 지정합니다.
 
-``destroyForcibly()``는 직접 만든 프로세스만 끝냅니다.
-후손 프로세스가 남는 경우로는 ``sh -c``로 여러 명령을 이어서 실행하거나, 실행한 명령이 다시 자식 프로세스를 만드는 경우가 대표적입니다.
-셸만 끝나고 손자 프로세스가 남아서 물려받은 출력 파이프를 계속 열고 있으면, 진행 중인 읽기가 후손의 파이프 닫기를 기다리면서 ``join()``도 지연될 수 있습니다. JDK 25의 ``Process`` 구현은 직접 자식이 종료하면 파이프에 남은 출력을 회수하고 스트림을 닫지만, 이미 진행 중인 읽기와 이 종료 처리의 순서에 따라 대기 여부가 달라집니다.
-JDK 9의 ``ProcessHandle.descendants()``로 후손을 조회해 하나씩 종료할 수 있지만 그 결과는 스냅샷이므로, 조회와 종료 사이에 생기거나 부모 종료 뒤 재부모화된 프로세스까지 확실하게 정리하지는 못합니다.
+``destroyForcibly()``는 직접 만든 프로세스만 끝냅니다. 실행한 명령이 다시 자식 프로세스를 만들었다면 그 후손은 남을 수 있습니다. 이런 경우와 정리 방법은 다음 절에서 다룹니다.
+
+=== 후손 프로세스의 정리
+
+``destroy()``와 ``destroyForcibly()``는 직접 자식에게만 시그널을 보냅니다.
+자식이 먼저 끝나면 그 자식이 만든 후손 프로세스는 부모를 잃고, PID 1이나 가장 가까운 subreaper 프로세스의 자식으로 재부모화되어 계속 실행됩니다.
+subreaper는 ``prctl(PR_SET_CHILD_SUBREAPER)``로 지정한 프로세스로, 부모를 잃은 후손을 PID 1 대신 넘겨받습니다. 데스크톱 세션의 ``systemd --user``가 그 예입니다.
+
+==== 후손 프로세스가 남는 사례
+
+후손 프로세스가 남는 상황은 크게 네 가지입니다.
+
+* **셸을 거쳐 실행한 명령**: ``sh -c "a | b"``나 ``run.sh`` 같은 스크립트를 실행하다가 시간 초과로 종료하는 경우입니다. 스크립트를 실행하는 비대화형 셸은 자신이 받은 SIGTERM을 자식에게 전달하지 않으므로 셸만 끝납니다.
+* **래퍼나 런처를 거쳐 실행되는 프로그램**: ``npm run``은 셸과 node를 거쳐 명령을 실행합니다. headless Chrome은 renderer와 GPU 프로세스를 따로 띄우고, LibreOffice의 ``soffice``는 실제 작업을 하는 ``soffice.bin``을 실행합니다. ``git``도 fetch나 clone 중에 ``ssh``나 ``git-remote-https``를 자식으로 실행합니다.
+* **스스로 데몬이 되는 프로그램**: Gradle daemon, Kotlin 컴파일 데몬, ``adb start-server``, ``ssh``의 ControlPersist 연결은 호출한 쪽이 끝나도 남아 있도록 만들어졌습니다. 이런 프로그램은 ``setsid()``로 원래 세션과 그룹을 벗어나기도 합니다.
+* **백그라운드 작업을 기다리지 않는 스크립트**: ``server &`` 뒤에 ``wait``가 없으면 스크립트가 정상 종료해도 ``server``는 남습니다. 이 후손이 물려받은 출력 파이프를 열어 두면 ``waitFor()``는 반환되어도 출력을 읽는 쪽은 EOF를 받지 못합니다.
+
+첫 번째 경우를 재현해 보겠습니다. 아래 코드는 셸로 ``sleep 60``을 실행하고 0.3초 뒤에 ``destroy()``를 호출한 다음, 종료 전에 조회해 둔 후손 중 살아 있는 프로세스와 그 부모 PID를 출력합니다.
+
+[source,java]
+.DescendantLeakDemo.java
+----
+public static void main(String[] args) throws Exception {
+    run("sh", "-c", "sleep 60");
+    run("sh", "-c", "sleep 60; echo done");
+    run("sh", "-c", "sleep 60 | cat");
+    run("bash", "-c", "sleep 60");
+}
+
+static void run(String... command) throws Exception {
+    Process process = new ProcessBuilder(command).start();
+    Thread.sleep(300);
+    List<ProcessHandle> descendants = process.descendants().toList();
+    process.destroy();
+    process.waitFor(1, TimeUnit.SECONDS);
+    Thread.sleep(100);
+
+    List<String> left = descendants.stream()
+            .filter(ProcessHandle::isAlive)
+            .map(p -> name(p) + "(ppid=" + p.parent().map(ProcessHandle::pid).orElse(-1L) + ")")
+            .toList();
+    System.out.println(String.join(" ", command) + " -> shell alive=" + process.isAlive()
+            + ", children=" + descendants.size() + ", left=" + left);
+    descendants.forEach(ProcessHandle::destroyForcibly);
+}
+----
+
+[source,text]
+.DescendantLeakDemo.java의 실행 결과
+----
+sh -c sleep 60 -> shell alive=false, children=1, left=[sleep(ppid=1693)]
+sh -c sleep 60; echo done -> shell alive=false, children=1, left=[sleep(ppid=1693)]
+sh -c sleep 60 | cat -> shell alive=false, children=2, left=[sleep(ppid=1693), cat(ppid=1693)]
+bash -c sleep 60 -> shell alive=false, children=0, left=[]
+----
+
+``sh -c``로 실행한 세 경우 모두 셸은 끝났지만 ``sleep``과 ``cat``은 남았습니다. 남은 프로세스의 부모인 PID 1693은 이 환경의 ``systemd --user``입니다.
+명령이 하나뿐인 ``sh -c "sleep 60"``에서도 후손이 남은 점을 주의해야 합니다. Ubuntu 24.04의 ``/bin/sh``인 dash 0.5.12는 ``-c``로 받은 마지막 명령도 자식 프로세스로 실행했습니다. 반면 ``bash -c``는 셸 프로세스를 ``sleep``으로 바꿔 실행했으므로(``children=0``) 남은 후손이 없습니다.
+셸의 종류와 버전에 따라 이 동작이 다르므로, 셸을 거친 명령은 후손이 남는다고 가정하고 정리 방법을 준비하는 편이 안전합니다.
+
+남은 후손이 곧 끝나는 명령이라면 문제는 그 후손이 실행되는 동안만 이어집니다. 그래도 그동안 시간 초과로 실패 처리한 작업이 뒤에서 계속 파일을 쓰거나 외부 API를 호출할 수 있습니다.
+더 큰 문제는 스스로 끝나지 않는 후손입니다. 시간 초과가 났다는 것 자체가 명령이 제시간에 끝나지 않았다는 뜻이므로, 남은 후손도 곧 끝난다고 기대하기 어렵습니다. 서버나 데몬처럼 원래 끝나지 않는 후손은 실행할 때마다 쌓여 메모리와 프로세스 수 한도를 차지합니다. 포트나 파일 잠금을 계속 잡고 있으면 다음 실행이 ``Address already in use`` 같은 오류로 실패합니다.
+
+남은 후손이 물려받은 출력 파이프를 계속 열고 있으면, 진행 중인 읽기가 후손의 파이프 닫기를 기다리면서 ``join()``도 지연될 수 있습니다. JDK 25의 ``Process`` 구현은 직접 자식이 종료하면 파이프에 남은 출력을 회수하고 스트림을 닫지만, 이미 진행 중인 읽기와 이 종료 처리의 순서에 따라 대기 여부가 달라집니다.
+위 예제처럼 JDK 9의 ``ProcessHandle.descendants()``로 후손을 조회해 하나씩 종료할 수도 있습니다. 하지만 그 결과는 스냅샷이므로, 조회와 종료 사이에 생기거나 부모 종료 뒤 재부모화된 프로세스까지 확실하게 정리하지는 못합니다.
 후손까지 한 번에 끝내려면 OS 수준의 프로세스 그룹이나 cgroup으로 관리해야 합니다.
-후손이 같은 프로세스 그룹에 남는 명령은 ``setsid``로 새 세션과 그룹을 만들어 실행하고 시간 초과 때 그 그룹 전체에 시그널을 보내 정리할 수 있습니다.
-다만 후손이 ``setsid()``나 ``setpgid()``로 새 세션이나 다른 그룹으로 이동하면 원래 그룹에 보내는 시그널을 받지 않습니다.
-이런 후손까지 관리하려면 ``systemd-run``이나 컨테이너처럼 cgroup 단위로 정리하는 방법을 고려해야 합니다. 이때도 대상 작업을 해당 cgroup 안에서 시작하고, 그 밖으로 이동할 권한과 종료 정책을 함께 관리해야 합니다.
-JDK API에는 프로세스 그룹을 만들거나 그룹에 시그널을 보내는 기능이 없으므로, 프로세스 그룹 방식은 ``setsid``와 ``kill`` 명령을 함께 실행하는 식으로 구성해야 합니다.
+
+==== 프로세스 그룹 단위의 종료
+
+후손이 같은 프로세스 그룹에 남는 명령은 ``setsid``로 새 세션과 그룹을 만들어 실행하고, 시간 초과 때 그 그룹 전체에 시그널을 보내 정리할 수 있습니다.
+JDK API에는 프로세스 그룹을 만들거나 그룹에 시그널을 보내는 기능이 없으므로, ``setsid``와 ``kill`` 명령을 함께 실행하는 식으로 구성합니다.
+
+[source,java]
+.ProcessGroupKillDemo.java
+----
+public static void main(String[] args) throws Exception {
+    run("sleep 60 | cat");
+    run("setsid sleep 60 & sleep 60");
+}
+
+static void run(String script) throws Exception {
+    Process process = new ProcessBuilder("setsid", "sh", "-c", script).start();
+    if (!process.waitFor(1, TimeUnit.SECONDS)) {
+        List<ProcessHandle> descendants = process.descendants().toList();
+        killGroup(process);
+        Thread.sleep(100);
+
+        List<String> left = descendants.stream()
+                .filter(ProcessHandle::isAlive)
+                .map(p -> p.info().commandLine().orElse("?"))
+                .toList();
+        System.out.println("[" + script + "] pgid=" + process.pid()
+                + ", shell alive=" + process.isAlive() + ", left=" + left);
+        descendants.forEach(ProcessHandle::destroyForcibly);
+    }
+}
+
+// setsid로 그룹 리더가 된 자식의 PID가 곧 프로세스 그룹 ID
+static void killGroup(Process process) throws Exception {
+    long pgid = process.pid();
+    new ProcessBuilder("kill", "-TERM", "--", "-" + pgid).start().waitFor();
+    if (!process.waitFor(5, TimeUnit.SECONDS)) {
+        new ProcessBuilder("kill", "-KILL", "--", "-" + pgid).start().waitFor();
+        process.waitFor();
+    }
+}
+----
+
+util-linux의 ``setsid`` 명령은 호출한 프로세스가 이미 그룹 리더일 때만 ``fork()``하고, 그렇지 않으면 자기 프로세스에서 ``setsid()``를 호출한 뒤 명령을 실행합니다. JVM이 만든 자식은 그룹 리더가 아니므로 PID가 바뀌지 않고, ``process.pid()``를 새 그룹의 ID로 쓸 수 있습니다.
+``kill``에 PID 대신 음수를 넘기면 그 절댓값을 ID로 쓰는 그룹 전체에 시그널이 갑니다. ``--``는 ``-289019`` 같은 인자가 옵션으로 해석되지 않게 막습니다.
+SIGTERM 뒤 5초의 유예 시간 안에 셸이 끝나지 않으면 SIGKILL을 보냅니다. 셸이 끝나도 SIGTERM을 무시한 후손이 남을 수 있으므로, 이런 명령을 다룬다면 유예 시간 뒤에 그룹 전체에 SIGKILL을 한 번 더 보냅니다.
+
+[source,text]
+.ProcessGroupKillDemo.java의 실행 결과
+----
+[sleep 60 | cat] pgid=289019, shell alive=false, left=[]
+[setsid sleep 60 & sleep 60] pgid=289027, shell alive=false, left=[/usr/bin/sleep 60]
+----
+
+첫 번째 명령의 ``sleep``과 ``cat``은 셸과 같은 그룹에 있으므로 함께 끝났습니다.
+두 번째 명령에서 ``setsid``로 실행한 ``sleep``은 새 세션과 그룹으로 이동해서 그룹에 보낸 시그널을 받지 않았습니다. 후손이 ``setsid()``나 ``setpgid()``로 새 세션이나 다른 그룹으로 이동하면 이 방법으로는 정리하지 못합니다. 앞에서 본 데몬형 프로그램이 이런 경우에 해당합니다.
+
+==== cgroup 단위의 종료
+
+cgroup(control group)은 Linux 커널이 프로세스를 계층 구조의 그룹으로 묶어 CPU, 메모리, I/O, 프로세스 수 같은 자원을 제한하고 측정하는 기능입니다. Docker 컨테이너의 메모리 제한도 cgroup으로 동작합니다.
+``fork()``로 만든 자식은 부모의 cgroup에 속한 채로 시작하므로 손자와 그 아래 후손도 모두 같은 cgroup에 들어갑니다.
+``setsid()``는 세션과 프로세스 그룹만 바꾸고 cgroup은 바꾸지 않습니다. cgroup v2에서 프로세스를 다른 cgroup으로 옮기려면 원래 cgroup과 옮길 cgroup의 공통 조상에 있는 ``cgroup.procs`` 파일에 쓸 권한이 필요합니다. 그래서 권한이 없는 후손은 cgroup을 벗어나지 못합니다.
+현재 프로세스가 속한 cgroup은 ``/proc/self/cgroup``에서, 전체 트리는 ``systemd-cgls`` 명령으로 확인할 수 있습니다.
+
+systemd는 서비스마다 cgroup을 따로 만들고, 서비스를 멈출 때 그 cgroup에 남은 프로세스를 모두 종료합니다(``KillMode=control-group``이 기본값).
+``systemd-run --scope``를 쓰면 한 번 실행할 명령에도 같은 방식을 적용할 수 있습니다. 아래 코드는 앞에서 프로세스 그룹을 벗어난 명령을 임시 scope 단위로 실행하고, 시간 초과 때 그 단위를 멈춥니다.
+
+[source,java]
+.SystemdScopeDemo.java
+----
+String unit = "job-" + UUID.randomUUID() + ".scope";
+Process process = new ProcessBuilder(
+        "systemd-run", "--user", "--scope", "--quiet", "--unit=" + unit,
+        "sh", "-c", "setsid sleep 60 & sleep 60")
+        .start();
+
+if (!process.waitFor(1, TimeUnit.SECONDS)) {
+    System.out.println("cgroup: " + Files.readString(Path.of("/proc/" + process.pid() + "/cgroup")).trim());
+    List<ProcessHandle> descendants = process.descendants().toList();
+    new ProcessBuilder("systemctl", "--user", "stop", unit).start().waitFor();
+    process.waitFor();
+
+    List<String> left = descendants.stream()
+            .filter(ProcessHandle::isAlive)
+            .map(p -> p.info().commandLine().orElse("?"))
+            .toList();
+    System.out.println("descendants=" + descendants.size() + ", left=" + left);
+}
+----
+
+[source,text]
+.SystemdScopeDemo.java의 실행 결과
+----
+cgroup: 0::/user.slice/user-1000.slice/user@1000.service/app.slice/job-a3be6e7e-b1e5-4d64-af85-bc60b86e4efc.scope
+descendants=2, left=[]
+----
+
+``--scope``로 실행하면 ``systemd-run``은 자기 프로세스를 새 scope의 cgroup으로 옮긴 뒤 명령을 실행합니다. 명령은 여전히 JVM의 직접 자식이므로 앞의 예제들처럼 ``Process``로 출력을 읽고 종료를 기다릴 수 있습니다.
+실행 결과의 cgroup 경로가 ``job-...scope``로 끝나는 것으로 명령이 전용 cgroup에서 실행됐음을 확인할 수 있습니다. ``systemctl stop``을 호출하자 ``setsid``로 그룹을 벗어난 ``sleep``까지 두 후손이 모두 끝났습니다.
+``systemctl stop``은 SIGTERM을 먼저 보내고, 유예 시간(``TimeoutStopSec``) 안에 끝나지 않은 프로세스에 SIGKILL을 보냅니다. 유예 시간은 ``systemd-run``에 ``-p TimeoutStopSec=5s``처럼 지정할 수 있습니다.
+
+이 방법에는 전제 조건이 있습니다.
+
+* ``--user``를 쓰려면 사용자의 systemd 인스턴스가 실행 중이어야 합니다. 로그인 세션이 없는 서버의 서비스 계정이라면 ``loginctl enable-linger``로 사용자 인스턴스를 유지하거나, 권한이 있는 system 인스턴스를 써야 합니다.
+* 대부분의 컨테이너 안에는 systemd가 없으므로 이 방법을 쓸 수 없습니다. 이때는 작업마다 별도 컨테이너를 실행해 컨테이너 단위로 정리하는 방법을 고려할 수 있습니다.
+* systemd 없이 cgroup v2를 직접 다룰 권한을 위임받았다면, 작업용 cgroup을 만들고 그 안에서 명령을 시작한 뒤 ``cgroup.kill`` 파일에 ``1``을 써서 하위 cgroup까지 모든 프로세스에 SIGKILL을 보낼 수 있습니다. 이 파일은 Linux 5.14부터 지원합니다.
+
+어느 방법이든 대상 작업을 처음부터 해당 cgroup 안에서 시작하고, 그 밖으로 이동할 권한과 종료 정책을 함께 관리해야 합니다.
+
+정리하면 실행하는 명령을 직접 통제하고 그 명령이 데몬이 되지 않는다면 프로세스 그룹 방식으로 충분합니다. 임의의 스크립트나 외부에서 받은 명령을 실행한다면 cgroup 단위로 정리하는 편이 확실합니다.
 다음 절의 라이브러리들도 출력 처리와 시간제한 코드를 줄여 주지만, 이런 조건까지 모두 해결해 주지는 않습니다.
 
 == zt-exec과 Apache Commons Exec의 활용
@@ -854,6 +1020,11 @@ Linux의 JDK 25에서는 기본값인 ``POSIX_SPAWN``을 유지하는 편이 무
 ** https://openjdk.org/jeps/486[JEP 486: Permanently Disable the Security Manager]
 * Linux 매뉴얼과 커널
 ** https://man7.org/linux/man-pages/man7/pipe.7.html[pipe(7)]: 파이프 용량
+** https://man7.org/linux/man-pages/man1/setsid.1.html[setsid(1)]: 그룹 리더가 아닐 때 fork 없이 실행하는 동작
+** https://man7.org/linux/man-pages/man2/setsid.2.html[setsid(2)], https://man7.org/linux/man-pages/man2/kill.2.html[kill(2)]: 새 세션 생성과 음수 PID로 그룹에 시그널 보내기
+** https://man7.org/linux/man-pages/man2/PR_SET_CHILD_SUBREAPER.2const.html[PR_SET_CHILD_SUBREAPER(2const)]: subreaper의 재부모화
+** https://docs.kernel.org/admin-guide/cgroup-v2.html[Control Group v2]: 프로세스 이동 권한과 ``cgroup.kill``
+** https://www.freedesktop.org/software/systemd/man/latest/systemd-run.html[systemd-run(1)], https://www.freedesktop.org/software/systemd/man/latest/systemd.kill.html[systemd.kill(5)]: scope 단위 실행과 ``KillMode``
 ** https://man7.org/linux/man-pages/man2/vfork.2.html[vfork(2)]
 ** https://man7.org/linux/man-pages/man3/posix_spawn.3.html[posix_spawn(3)]: glibc 2.24 이후의 구현
 ** https://www.kernel.org/doc/html/latest/mm/overcommit-accounting.html[Overcommit Accounting]
