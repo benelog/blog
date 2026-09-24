@@ -383,22 +383,21 @@ timed out: sleep 60
 * 출력이 아주 크면 ``StringBuilder``에 다 담지 말고 줄 단위나 고정 크기 버퍼로 처리합니다.
 * 출력 인코딩이 부모 JVM의 ``native.encoding``과 다른 명령에는 ``inputReader(Charset)``으로 인코딩을 지정합니다.
 
-``destroyForcibly()``는 직접 만든 프로세스만 끝냅니다. 실행한 명령이 다시 자식 프로세스를 만들었다면 그 후손은 남을 수 있습니다. 이런 경우와 정리 방법은 다음 절에서 다룹니다.
-
 === 후손 프로세스의 정리
 
-``destroy()``와 ``destroyForcibly()``는 직접 자식에게만 시그널을 보냅니다.
-자식이 먼저 끝나면 그 자식이 만든 후손 프로세스는 부모를 잃고, PID 1이나 가장 가까운 subreaper 프로세스의 자식으로 재부모화되어 계속 실행됩니다.
-subreaper는 ``prctl(PR_SET_CHILD_SUBREAPER)``로 지정한 프로세스로, 부모를 잃은 후손을 PID 1 대신 넘겨받습니다. 데스크톱 세션의 ``systemd --user``가 그 예입니다.
+``destroy()``와 ``destroyForcibly()``는 직접 만든 자식에게만 시그널을 보냅니다.
+실행한 명령이 다시 자식 프로세스를 만들었다면 그 후손은 남을 수 있습니다.
+자식이 먼저 끝나면 그 자식이 만든 후손 프로세스는 PID 1이나 가장 가까운 subreaper 프로세스의 자식으로 바뀌어 계속 실행됩니다.
+subreaper는 ``prctl(PR_SET_CHILD_SUBREAPER)``로 지정한 프로세스로, 부모를 잃은 후손을 PID 1 대신 넘겨받습니다. systemd는 대부분의 Linux 배포판에서 부팅 때 PID 1로 가장 먼저 실행되어 다른 서비스를 시작하고 관리하는 프로그램이며, 로그인한 사용자마다 ``systemd --user``라는 별도 인스턴스도 실행합니다. 데스크톱 세션의 ``systemd --user``가 subreaper의 예입니다.
 
 ==== 후손 프로세스가 남는 사례
 
 후손 프로세스가 남는 상황은 크게 네 가지입니다.
 
 * **셸을 거쳐 실행한 명령**: ``sh -c "a | b"``나 ``run.sh`` 같은 스크립트를 실행하다가 시간 초과로 종료하는 경우입니다. 스크립트를 실행하는 비대화형 셸은 자신이 받은 SIGTERM을 자식에게 전달하지 않으므로 셸만 끝납니다.
-* **래퍼나 런처를 거쳐 실행되는 프로그램**: ``npm run``은 셸과 node를 거쳐 명령을 실행합니다. headless Chrome은 renderer와 GPU 프로세스를 따로 띄우고, LibreOffice의 ``soffice``는 실제 작업을 하는 ``soffice.bin``을 실행합니다. ``git``도 fetch나 clone 중에 ``ssh``나 ``git-remote-https``를 자식으로 실행합니다.
+* **래퍼나 런처를 거쳐 실행되는 프로그램**: ``npm run``은 Node.js로 실행되는 npm이 ``sh -c``로 스크립트를 실행하므로, npm 프로세스를 끝내도 셸이 실행한 명령이 남을 수 있습니다. LibreOffice의 ``soffice``는 ``oosplash``를 거쳐 실제 작업을 하는 ``soffice.bin``을 실행하며, ``oosplash``를 SIGKILL로 끝내면 ``soffice.bin``은 종료되지 않고 남습니다. ``git``도 fetch나 clone 중에 ``ssh``나 ``git-remote-https``를 자식으로 실행합니다.
 * **스스로 데몬이 되는 프로그램**: Gradle daemon, Kotlin 컴파일 데몬, ``adb start-server``, ``ssh``의 ControlPersist 연결은 호출한 쪽이 끝나도 남아 있도록 만들어졌습니다. 이런 프로그램은 ``setsid()``로 원래 세션과 그룹을 벗어나기도 합니다.
-* **백그라운드 작업을 기다리지 않는 스크립트**: ``server &`` 뒤에 ``wait``가 없으면 스크립트가 정상 종료해도 ``server``는 남습니다. 이 후손이 물려받은 출력 파이프를 열어 두면 ``waitFor()``는 반환되어도 출력을 읽는 쪽은 EOF를 받지 못합니다.
+* **백그라운드 작업을 기다리지 않는 스크립트**: ``server &`` 뒤에 ``wait``가 없으면 스크립트가 정상 종료해도 ``server``는 계속 실행됩니다. 이 후손이 물려받은 출력 파이프를 열어 두면 ``waitFor()``는 반환되어도 출력을 읽는 쪽은 EOF를 받지 못합니다.
 
 첫 번째 경우를 재현해 보겠습니다. 아래 코드는 셸로 ``sleep 60``을 실행하고 0.3초 뒤에 ``destroy()``를 호출한 다음, 종료 전에 조회해 둔 후손 중 살아 있는 프로세스와 그 부모 PID를 출력합니다.
 
@@ -440,7 +439,7 @@ bash -c sleep 60 -> shell alive=false, children=0, left=[]
 ----
 
 ``sh -c``로 실행한 세 경우 모두 셸은 끝났지만 ``sleep``과 ``cat``은 남았습니다. 남은 프로세스의 부모인 PID 1693은 이 환경의 ``systemd --user``입니다.
-명령이 하나뿐인 ``sh -c "sleep 60"``에서도 후손이 남은 점을 주의해야 합니다. Ubuntu 24.04의 ``/bin/sh``인 dash 0.5.12는 ``-c``로 받은 마지막 명령도 자식 프로세스로 실행했습니다. 반면 ``bash -c``는 셸 프로세스를 ``sleep``으로 바꿔 실행했으므로(``children=0``) 남은 후손이 없습니다.
+명령이 한 줄뿐인 ``sh -c "sleep 60"``에서도 후손이 남은 점을 주의해야 합니다. Ubuntu 24.04의 ``/bin/sh``인 dash 0.5.12는 ``-c``로 받은 마지막 명령도 자식 프로세스로 실행했습니다. 반면 ``bash -c``는 셸 프로세스를 ``sleep``으로 바꿔 실행했으므로(``children=0``) 남은 후손이 없습니다.
 셸의 종류와 버전에 따라 이 동작이 다르므로, 셸을 거친 명령은 후손이 남는다고 가정하고 정리 방법을 준비하는 편이 안전합니다.
 
 남은 후손이 곧 끝나는 명령이라면 문제는 그 후손이 실행되는 동안만 이어집니다. 그래도 그동안 시간 초과로 실패 처리한 작업이 뒤에서 계속 파일을 쓰거나 외부 API를 호출할 수 있습니다.
@@ -452,7 +451,7 @@ bash -c sleep 60 -> shell alive=false, children=0, left=[]
 
 ==== 프로세스 그룹 단위의 종료
 
-후손이 같은 프로세스 그룹에 남는 명령은 ``setsid``로 새 세션과 그룹을 만들어 실행하고, 시간 초과 때 그 그룹 전체에 시그널을 보내 정리할 수 있습니다.
+후손이 같은 프로세스 그룹에 남는 명령은 ``setsid``로 새 세션과 그룹을 만들어 실행하고, 작업이 끝나면 그 그룹 전체에 시그널을 보내 정리할 수 있습니다.
 JDK API에는 프로세스 그룹을 만들거나 그룹에 시그널을 보내는 기능이 없으므로, ``setsid``와 ``kill`` 명령을 함께 실행하는 식으로 구성합니다.
 
 [source,java]
@@ -460,50 +459,76 @@ JDK API에는 프로세스 그룹을 만들거나 그룹에 시그널을 보내�
 ----
 public static void main(String[] args) throws Exception {
     run("sleep 60 | cat");
+    run("(trap '' TERM; sleep 60) & sleep 60");
     run("setsid sleep 60 & sleep 60");
 }
 
 static void run(String script) throws Exception {
     Process process = new ProcessBuilder("setsid", "sh", "-c", script).start();
-    if (!process.waitFor(1, TimeUnit.SECONDS)) {
-        List<ProcessHandle> descendants = process.descendants().toList();
-        killGroup(process);
-        Thread.sleep(100);
+    List<ProcessHandle> descendants = List.of();
+    try {
+        if (!process.waitFor(1, TimeUnit.SECONDS)) {
+            descendants = process.descendants().toList(); // 결과 확인용 스냅샷
+        }
+    } finally {
+        killGroup(process.pid()); // setsid로 그룹 리더가 된 자식의 PID가 곧 프로세스 그룹 ID
+        process.waitFor();
+    }
 
-        List<String> left = descendants.stream()
-                .filter(ProcessHandle::isAlive)
-                .map(p -> p.info().commandLine().orElse("?"))
-                .toList();
-        System.out.println("[" + script + "] pgid=" + process.pid()
-                + ", shell alive=" + process.isAlive() + ", left=" + left);
-        descendants.forEach(ProcessHandle::destroyForcibly);
+    List<String> left = descendants.stream()
+            .filter(ProcessHandle::isAlive)
+            .map(p -> p.info().commandLine().orElse("?"))
+            .toList();
+    System.out.println("[" + script + "] pgid=" + process.pid() + ", left=" + left);
+    descendants.forEach(ProcessHandle::destroyForcibly);
+}
+
+static void killGroup(long pgid) throws Exception {
+    signalGroup("TERM", pgid);
+    if (!awaitGroupExit(pgid, 5)) {
+        signalGroup("KILL", pgid);
+        awaitGroupExit(pgid, 5);
     }
 }
 
-// setsid로 그룹 리더가 된 자식의 PID가 곧 프로세스 그룹 ID
-static void killGroup(Process process) throws Exception {
-    long pgid = process.pid();
-    new ProcessBuilder("kill", "-TERM", "--", "-" + pgid).start().waitFor();
-    if (!process.waitFor(5, TimeUnit.SECONDS)) {
-        new ProcessBuilder("kill", "-KILL", "--", "-" + pgid).start().waitFor();
-        process.waitFor();
+static boolean awaitGroupExit(long pgid, long seconds) throws Exception {
+    long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(seconds);
+    while (signalGroup("0", pgid)) {
+        if (System.nanoTime() > deadline) {
+            return false;
+        }
+        Thread.sleep(100);
     }
+    return true;
+}
+
+// kill의 종료 코드 0은 그룹에 시그널을 받은 프로세스가 하나 이상 있다는 뜻
+static boolean signalGroup(String signal, long pgid) throws Exception {
+    Process kill = new ProcessBuilder("kill", "-" + signal, "--", "-" + pgid)
+            .redirectErrorStream(true)
+            .redirectOutput(Redirect.DISCARD)
+            .start();
+    return kill.waitFor() == 0;
 }
 ----
 
 util-linux의 ``setsid`` 명령은 호출한 프로세스가 이미 그룹 리더일 때만 ``fork()``하고, 그렇지 않으면 자기 프로세스에서 ``setsid()``를 호출한 뒤 명령을 실행합니다. JVM이 만든 자식은 그룹 리더가 아니므로 PID가 바뀌지 않고, ``process.pid()``를 새 그룹의 ID로 쓸 수 있습니다.
-``kill``에 PID 대신 음수를 넘기면 그 절댓값을 ID로 쓰는 그룹 전체에 시그널이 갑니다. ``--``는 ``-289019`` 같은 인자가 옵션으로 해석되지 않게 막습니다.
-SIGTERM 뒤 5초의 유예 시간 안에 셸이 끝나지 않으면 SIGKILL을 보냅니다. 셸이 끝나도 SIGTERM을 무시한 후손이 남을 수 있으므로, 이런 명령을 다룬다면 유예 시간 뒤에 그룹 전체에 SIGKILL을 한 번 더 보냅니다.
+``kill``의 PID 인자에 음수를 넘기면 그 절댓값을 ID로 쓰는 프로세스 그룹 전체에 시그널이 갑니다. 단, ``-1``은 그룹이 아니라 권한이 있는 모든 프로세스를 뜻합니다. kill은 ``-9``나 ``-KILL``처럼 ``-``로 시작하는 인자를 시그널로 받으므로, ``--``를 앞에 두어 ``-295952``를 PID로 읽게 합니다. 시그널 번호 0은 실제로 시그널을 보내지 않고 대상의 존재와 권한만 확인하므로, ``kill -0``이 성공하면 그룹에 프로세스가 남아 있다는 뜻입니다.
+
+``waitFor()``는 직접 자식인 셸만 기다리므로, 셸이 끝났다고 그룹 전체가 끝났다고 볼 수 없습니다. 그래서 ``killGroup()``은 SIGTERM을 보낸 뒤 ``kill -0``으로 그룹에 남은 프로세스가 있는지 확인하면서 최대 5초를 기다리고, 그 뒤에도 남아 있으면 그룹 전체에 SIGKILL을 보냅니다.
+정리는 시간 초과 때만이 아니라 ``finally``에서 항상 합니다. 직접 자식이 정상 종료해도 백그라운드로 띄운 후손은 남을 수 있기 때문입니다. 예를 들어 ``sleep 60 &``만 실행하는 스크립트는 셸이 바로 끝나서 ``waitFor()``가 ``true``를 돌려주지만, ``finally``의 ``killGroup()``이 남은 ``sleep``을 정리합니다.
 
 [source,text]
 .ProcessGroupKillDemo.java의 실행 결과
 ----
-[sleep 60 | cat] pgid=289019, shell alive=false, left=[]
-[setsid sleep 60 & sleep 60] pgid=289027, shell alive=false, left=[/usr/bin/sleep 60]
+[sleep 60 | cat] pgid=295952, left=[]
+[(trap '' TERM; sleep 60) & sleep 60] pgid=295959, left=[]
+[setsid sleep 60 & sleep 60] pgid=296018, left=[/usr/bin/sleep 60]
 ----
 
-첫 번째 명령의 ``sleep``과 ``cat``은 셸과 같은 그룹에 있으므로 함께 끝났습니다.
-두 번째 명령에서 ``setsid``로 실행한 ``sleep``은 새 세션과 그룹으로 이동해서 그룹에 보낸 시그널을 받지 않았습니다. 후손이 ``setsid()``나 ``setpgid()``로 새 세션이나 다른 그룹으로 이동하면 이 방법으로는 정리하지 못합니다. 앞에서 본 데몬형 프로그램이 이런 경우에 해당합니다.
+첫 번째 명령의 ``sleep``과 ``cat``은 셸과 같은 그룹에 있으므로 SIGTERM으로 함께 끝났습니다.
+두 번째 명령의 셸은 SIGTERM으로 바로 끝났지만, SIGTERM을 무시하도록 실행한 ``sleep``은 5초 유예 뒤 SIGKILL로 끝났습니다. 셸의 종료만 보고 SIGKILL을 생략했다면 이 ``sleep``은 남았을 것입니다.
+세 번째 명령에서 ``setsid``로 실행한 ``sleep``은 새 세션과 그룹으로 이동해서 그룹에 보낸 시그널을 받지 않았습니다. 후손이 ``setsid()``나 ``setpgid()``로 새 세션이나 다른 그룹으로 이동하면 이 방법으로는 정리하지 못합니다. 앞에서 본 데몬형 프로그램이 이런 경우에 해당합니다.
 
 ==== cgroup 단위의 종료
 
@@ -513,7 +538,7 @@ cgroup(control group)은 Linux 커널이 프로세스를 계층 구조의 그룹
 현재 프로세스가 속한 cgroup은 ``/proc/self/cgroup``에서, 전체 트리는 ``systemd-cgls`` 명령으로 확인할 수 있습니다.
 
 systemd는 서비스마다 cgroup을 따로 만들고, 서비스를 멈출 때 그 cgroup에 남은 프로세스를 모두 종료합니다(``KillMode=control-group``이 기본값).
-``systemd-run --scope``를 쓰면 한 번 실행할 명령에도 같은 방식을 적용할 수 있습니다. 아래 코드는 앞에서 프로세스 그룹을 벗어난 명령을 임시 scope 단위로 실행하고, 시간 초과 때 그 단위를 멈춥니다.
+``systemd-run --scope``를 쓰면 한 번 실행할 명령에도 같은 방식을 적용할 수 있습니다. 아래 코드는 앞에서 프로세스 그룹을 벗어난 명령을 임시 scope 단위로 실행하고, 작업이 끝나면 그 단위를 멈춥니다.
 
 [source,java]
 .SystemdScopeDemo.java
@@ -522,32 +547,48 @@ String unit = "job-" + UUID.randomUUID() + ".scope";
 Process process = new ProcessBuilder(
         "systemd-run", "--user", "--scope", "--quiet", "--unit=" + unit,
         "sh", "-c", "setsid sleep 60 & sleep 60")
+        .redirectError(Redirect.INHERIT)
         .start();
-
-if (!process.waitFor(1, TimeUnit.SECONDS)) {
-    System.out.println("cgroup: " + Files.readString(Path.of("/proc/" + process.pid() + "/cgroup")).trim());
-    List<ProcessHandle> descendants = process.descendants().toList();
-    new ProcessBuilder("systemctl", "--user", "stop", unit).start().waitFor();
-    process.waitFor();
-
-    List<String> left = descendants.stream()
-            .filter(ProcessHandle::isAlive)
-            .map(p -> p.info().commandLine().orElse("?"))
-            .toList();
-    System.out.println("descendants=" + descendants.size() + ", left=" + left);
+List<ProcessHandle> descendants = List.of();
+try {
+    if (process.waitFor(1, TimeUnit.SECONDS)) {
+        System.out.println("exit=" + process.exitValue()); // systemd-run의 실패도 여기서 드러남
+    } else {
+        System.out.println("cgroup: " + Files.readString(Path.of("/proc/" + process.pid() + "/cgroup")).trim());
+        descendants = process.descendants().toList(); // 결과 확인용 스냅샷
+    }
+} finally {
+    int stopExit = new ProcessBuilder("systemctl", "--user", "stop", unit)
+            .redirectError(Redirect.INHERIT)
+            .start()
+            .waitFor();
+    System.out.println("systemctl stop exit=" + stopExit);
+    if (!process.waitFor(10, TimeUnit.SECONDS)) {
+        process.destroyForcibly().waitFor();
+    }
 }
+
+List<String> left = descendants.stream()
+        .filter(ProcessHandle::isAlive)
+        .map(p -> p.info().commandLine().orElse("?"))
+        .toList();
+System.out.println("descendants=" + descendants.size() + ", left=" + left);
 ----
 
 [source,text]
 .SystemdScopeDemo.java의 실행 결과
 ----
-cgroup: 0::/user.slice/user-1000.slice/user@1000.service/app.slice/job-a3be6e7e-b1e5-4d64-af85-bc60b86e4efc.scope
+cgroup: 0::/user.slice/user-1000.slice/user@1000.service/app.slice/job-0fbacb17-d0c0-47de-a65d-db30d90ecfb1.scope
+systemctl stop exit=0
 descendants=2, left=[]
 ----
 
-``--scope``로 실행하면 ``systemd-run``은 자기 프로세스를 새 scope의 cgroup으로 옮긴 뒤 명령을 실행합니다. 명령은 여전히 JVM의 직접 자식이므로 앞의 예제들처럼 ``Process``로 출력을 읽고 종료를 기다릴 수 있습니다.
+``--scope``로 실행하면 ``systemd-run``은 scope 단위의 시작을 기다린 뒤 자기 프로세스를 명령으로 바꿔 실행하므로 PID가 바뀌지 않습니다. 명령은 여전히 JVM의 직접 자식이므로 앞의 예제들처럼 ``Process``로 출력을 읽고 종료를 기다릴 수 있습니다.
 실행 결과의 cgroup 경로가 ``job-...scope``로 끝나는 것으로 명령이 전용 cgroup에서 실행됐음을 확인할 수 있습니다. ``systemctl stop``을 호출하자 ``setsid``로 그룹을 벗어난 ``sleep``까지 두 후손이 모두 끝났습니다.
 ``systemctl stop``은 SIGTERM을 먼저 보내고, 유예 시간(``TimeoutStopSec``) 안에 끝나지 않은 프로세스에 SIGKILL을 보냅니다. 유예 시간은 ``systemd-run``에 ``-p TimeoutStopSec=5s``처럼 지정할 수 있습니다.
+
+scope는 특정 프로세스가 아니라 그 안에 프로세스가 하나라도 남아 있는 동안 유지됩니다. 셸이 먼저 끝나도 백그라운드로 띄운 후손이 있으면 scope는 활성 상태로 남으므로, 앞의 프로세스 그룹 예제처럼 ``finally``에서 항상 단위를 멈춥니다.
+``systemd-run``이 사용자 버스에 접속하지 못하는 등의 이유로 실패하면 오류를 표준 오류에 출력하고 0이 아닌 종료 코드로 끝나므로, 예제는 표준 오류를 부모로 넘기고 종료 코드를 출력합니다. ``systemctl stop``도 종료 코드를 확인하고, 정리가 실패했을 때 무한정 기다리지 않도록 ``waitFor()``에 제한 시간을 둡니다. 명령이 먼저 끝나 scope가 이미 사라졌다면 ``systemctl stop``은 단위가 없다는 뜻의 종료 코드 5를 돌려주므로, 실제 코드에서는 이 경우를 정상으로 처리합니다.
 
 이 방법에는 전제 조건이 있습니다.
 
@@ -1021,7 +1062,7 @@ Linux의 JDK 25에서는 기본값인 ``POSIX_SPAWN``을 유지하는 편이 무
 * Linux 매뉴얼과 커널
 ** https://man7.org/linux/man-pages/man7/pipe.7.html[pipe(7)]: 파이프 용량
 ** https://man7.org/linux/man-pages/man1/setsid.1.html[setsid(1)]: 그룹 리더가 아닐 때 fork 없이 실행하는 동작
-** https://man7.org/linux/man-pages/man2/setsid.2.html[setsid(2)], https://man7.org/linux/man-pages/man2/kill.2.html[kill(2)]: 새 세션 생성과 음수 PID로 그룹에 시그널 보내기
+** https://man7.org/linux/man-pages/man2/setsid.2.html[setsid(2)], https://manpages.ubuntu.com/manpages/noble/man1/kill.1.html[kill(1) (procps-ng)], https://man7.org/linux/man-pages/man2/kill.2.html[kill(2)]: 새 세션 생성, 음수 PID로 그룹에 시그널 보내기, 시그널 0의 존재 확인
 ** https://man7.org/linux/man-pages/man2/PR_SET_CHILD_SUBREAPER.2const.html[PR_SET_CHILD_SUBREAPER(2const)]: subreaper의 재부모화
 ** https://docs.kernel.org/admin-guide/cgroup-v2.html[Control Group v2]: 프로세스 이동 권한과 ``cgroup.kill``
 ** https://www.freedesktop.org/software/systemd/man/latest/systemd-run.html[systemd-run(1)], https://www.freedesktop.org/software/systemd/man/latest/systemd.kill.html[systemd.kill(5)]: scope 단위 실행과 ``KillMode``

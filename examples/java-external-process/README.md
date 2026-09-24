@@ -11,8 +11,8 @@
 | `StdinEofDemo.java` | 표준 입력의 쓰기 끝을 열어 두면 `cat`이 EOF를 받지 못하는 현상과, 스트림 닫기·`/dev/null` 입력·입력 후 닫기로 끝내는 예 |
 | `PlainJdkRunner.java` | JDK API만으로 표준 출력과 표준 오류를 동시에 읽고 시간제한과 강제 종료까지 처리하는 예 |
 | `DescendantLeakDemo.java` | 셸로 실행한 명령에 `destroy()`를 호출하면 셸만 끝나고 후손 프로세스가 남는 현상 재현 |
-| `ProcessGroupKillDemo.java` | `setsid`로 새 프로세스 그룹을 만들어 실행하고 `kill -- -PGID`로 후손까지 정리하는 예와, `setsid`로 그룹을 벗어난 후손이 남는 한계 |
-| `SystemdScopeDemo.java` | `systemd-run --user --scope`로 전용 cgroup에서 실행하고 `systemctl --user stop`으로 그룹을 벗어난 후손까지 정리하는 예 (systemd 사용자 인스턴스 필요) |
+| `ProcessGroupKillDemo.java` | `setsid`로 새 프로세스 그룹을 만들어 실행하고 `finally`에서 `kill -- -PGID`로 후손까지 정리하는 예. SIGTERM을 무시하는 후손은 유예 시간 뒤 SIGKILL로 정리하고, `setsid`로 그룹을 벗어난 후손이 남는 한계도 보여줌 |
+| `SystemdScopeDemo.java` | `systemd-run --user --scope`로 전용 cgroup에서 실행하고 `finally`에서 `systemctl --user stop`으로 그룹을 벗어난 후손까지 정리하는 예 (systemd 사용자 인스턴스 필요) |
 | `ZtExecRunner.java` | zt-exec 1.13.0으로 출력 수집, 시간제한, 종료 코드 검사를 처리하는 예 |
 | `CommonsExecRunner.java` | Apache Commons Exec 1.6.0의 builder API로 같은 일을 처리하는 예 |
 | `CommandLineQuotingDemo.java` | Commons Exec의 `CommandLine`이 공백을 포함한 인자에 붙이는 따옴표가 `Runtime.exec(String[])`에서 인자의 일부로 전달되는 현상 재현 |
