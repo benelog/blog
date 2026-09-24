@@ -179,7 +179,7 @@ DB2의 DOUBLE 타입은 IEEE 754 binary64를 따르므로 자바의 ``double``�
 
 ``double``형 연산의 오차를 피하는 대안으로 ``BigDecimal``을 쓰는 방법과 금액을 최소 단위의 정수로 다루는 방법을 소개합니다.
 
-=== BigDecimal
+=== BigDecimal로 계산하기
 
 자바에서 십진 소수를 정확하게 다루는 기본 수단은 ``java.math.BigDecimal``입니다.
 https://dzone.com/articles/never-use-float-and-double-for-monetary-calculatio[Never Use Float and Double for Monetary Calculations]에서도 금액 계산에 부동소수점 자료형 대신 ``BigDecimal``을 쓰라고 권고합니다.
@@ -219,7 +219,7 @@ $1 ==> 0.3333333333
 Joshua Bloch도 'Effective Java' 3판의 아이템 60 '정확한 답이 필요하다면 float와 double은 피하라'(Avoid float and double if exact answers are required)에서 같은 권고를 합니다.
 이 항목은 ``BigDecimal``과 함께 ``int``, ``long``도 대안으로 제시하는데, 둘 중 무엇을 고를지는 뒤의 선택 기준 절에서 정리합니다.
 
-=== 정수형 최소 단위 계산
+=== 정수로 계산하기
 
 금액을 원(₩)이나 센트 같은 최소 단위의 정수로 다루는 방법도 널리 쓰입니다.
 특히 1원 이하의 가치가 적은 한국에서는 업무 규칙과 어긋나지 않는다면 실용적인 방법입니다.
@@ -269,7 +269,7 @@ public static long calculate(long amount, BigDecimal percent, RoundingMode round
 이 버전에서 ``calculate(16_777_217L, new BigDecimal("100"), RoundingMode.HALF_UP)``은 16,777,217을 그대로 돌려줍니다.
 정수형 최소 단위 방식을 쓰더라도 오차를 없애려면 모든 중간값을 정수나 ``BigDecimal``로 유지해야 합니다.
 
-== BigDecimal과 정수형 최소 단위의 선택 기준
+== BigDecimal과 정수 계산의 선택 기준
 
 계산 정밀도가 중요한 모듈이라면 적어도 메서드 파라미터와 리턴 타입에는 ``double``과 ``float``를 쓰지 않는 것이 좋습니다.
 대신 쓸 타입으로는 앞에서 본 ``BigDecimal``과 정수형 최소 단위(``long``) 두 가지가 있습니다.
@@ -278,7 +278,7 @@ public static long calculate(long amount, BigDecimal percent, RoundingMode round
 
 앞에서 언급한 'Effective Java' 아이템 60도 같은 기준으로 선택을 정리해 두었습니다.
 소수점 추적을 시스템에 맡기고 반올림 방식까지 고르고 싶다면, 기본 타입보다 쓰기 불편하고 느리다는 비용을 감수하고 ``BigDecimal``을 쓰라는 것이 이 항목의 결론입니다.
-반대로 성능이 중요하고 소수점을 직접 추적할 수 있다면 ``int``나 ``long``을 쓰라는 대안도 함께 제시하는데, 앞 절에서 본 정수형 최소 단위 계산과 같은 방법입니다.
+반대로 성능이 중요하고 소수점을 직접 추적할 수 있다면 ``int``나 ``long``을 쓰라는 대안도 함께 제시하는데, 앞 절에서 본 정수로 계산하는 방법과 같습니다.
 값이 십진수로 아홉 자리를 넘지 않으면 ``int``, 열여덟 자리를 넘지 않으면 ``long``, 그보다 크면 ``BigDecimal``을 쓰라는 자릿수 기준도 덧붙입니다.
 
 Chronicle Software의 Peter Lawrey는 https://blog.vanillajava.blog/2014/07/if-bigdecimal-is-answer-it-must-have.html[If BigDecimal is the answer, it must have been a strange question]에서 ``BigDecimal``의 단점을 이렇게 꼽습니다.
@@ -304,7 +304,7 @@ Lawrey의 결론은 "``double``의 반올림을 다루는 법을 모르거나 �
 지금까지의 내용을 정리하면 다음과 같습니다.
 
 [cols="1,1,2,2", options="header"]
-.BigDecimal과 정수형 최소 단위 비교
+.BigDecimal과 정수 계산 비교
 |===
 ^|자료형 ^|저장 방식 ^|강점 ^|감수할 점
 
