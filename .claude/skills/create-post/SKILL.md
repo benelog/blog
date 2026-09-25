@@ -33,13 +33,13 @@ description: 이 블로그의 글 형식·문체·AsciiDoc 규칙을 정리한 �
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: tag1, tag2
+:description: 포스트의 한줄 요약
 :idprefix:
 ```
 
 ### 선택 필드
 
 ```adoc
-:description: 포스트의 한줄 요약 (최근 글에는 거의 항상 포함)
 :jbake-last_updated: 2026-03-28
 :jbake-og: {"image": "img/topic/thumbnail.jpg"}
 :toc:
@@ -52,7 +52,7 @@ description: 이 블로그의 글 형식·문체·AsciiDoc 규칙을 정리한 �
 ### 필드별 참고사항
 
 - **태그**: 3~5개, 영문 소문자 위주 (`claude-code`, `java`, `git`, `linux`, `test`, `책`)
-- **description**: 100~200자, 최근 글(2023년 이후)에는 거의 필수로 포함
+- **description**: 100~200자. 검색 결과와 SNS 공유 미리보기에 쓰이므로 새 글에는 반드시 넣는다. 옛 글에는 없는 경우가 있다
 - **jbake-last_updated**: 내용을 수정했을 때만 추가. 원래 작성일은 변경하지 않음
 - **jbake-og**: SNS 공유 시 표시할 이미지가 있을 때 사용
 - **toc**: 섹션이 3개 이상인 기술 글에는 포함 권장

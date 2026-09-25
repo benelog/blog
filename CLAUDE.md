@@ -45,9 +45,10 @@ New posts go in `src/content/` as `.adoc` files with this header format:
 :jbake-status: published
 :jbake-tags: tag1, tag2
 :description: Brief description
-:jbake-last_updated: 2026-02-18
 :idprefix:
 ```
+
+`:jbake-last_updated:`처럼 게시 후 수정할 때만 넣는 필드와 필드별 규칙은 `create-post` 스킬에 있다.
 
 Post images go in `src/content/img/<topic-slug>/`.
 
