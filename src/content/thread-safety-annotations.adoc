@@ -28,11 +28,16 @@
 
 == Javadoc으로 표시하는 스레드 안전성
 
-Javadoc이 메서드의 ``synchronized``를 표시하지 않는 이유와 그럼에도 클래스 수준의 규약이 왜 필요한지, 문서화를 한다면 어떤 분류가 적절할지, 그리고 실제 라이브러리 문서의 사례를 차례로 살펴봅니다.
+이 절에서는 다음 네 가지를 차례로 살펴봅니다.
+
+* Javadoc이 메서드의 ``synchronized``를 표시하지 않는 이유
+* 그럼에도 클래스 수준의 규약이 필요한 이유
+* 문서화할 때 적절한 분류
+* 실제 라이브러리 문서의 사례
 
 === Javadoc이 synchronized를 감추는 이유
 
-클래스의 인스턴스 메서드에 `synchronized` 키워드가 붙으면 그 인스턴스 자체가 lock이 됩니다. 즉 여러 스레드가 한 인스턴스의 `synchronized` 메서드를 동시에 호출해도 한 스레드만 진입할 수 있고, 다른 스레드는 먼저 들어간 스레드가 메서드를 마칠 때까지 기다립니다. `static synchronized` 메서드는 해당 클래스의 `Class` 객체를 lock으로 사용합니다. 따라서 ``synchronized``는 스레드 안전성을 판단하는 단서가 되고, Javadoc에 공개되면 도움이 될 만한 정보입니다.
+클래스의 인스턴스 메서드에 `synchronized` 키워드가 붙으면 그 인스턴스 자체가 lock이 됩니다. 즉 여러 스레드가 한 인스턴스의 `synchronized` 메서드를 동시에 호출해도 한 스레드만 진입할 수 있습니다. 다른 스레드는 먼저 들어간 스레드가 메서드를 마칠 때까지 기다립니다. `static synchronized` 메서드는 해당 클래스의 `Class` 객체를 lock으로 사용합니다. 따라서 ``synchronized``는 스레드 안전성을 판단하는 단서가 되고, Javadoc에 공개되면 도움이 될 만한 정보입니다.
 그러나 Javadoc은 메서드 선언의 `synchronized` 키워드를 출력하지 않습니다. 동기화 여부는 구현 세부 사항이라서 API 문서에 노출할 계약이 아니라고 보기 때문입니다. Effective Java 3판의 아이템 82도 같은 근거를 들어 이 정책을 옹호합니다.
 
 메서드 선언부의 ``synchronized``는 메서드 본문 전체를 `synchronized(this)` 블록으로 감싼 것과 같습니다. 즉 아래 코드는
@@ -57,12 +62,12 @@ void run() {
 }
 ----
 
-구현을 개선하면서 동기화 구간을 메서드의 일부로 좁힐 수도 있고, `this` 대신 별도의 lock 객체를 쓸 수도 있습니다. 이런 세부 구현은 외부 인터페이스보다 자주 바뀝니다. lock으로 보호되는 모든 구간을 메서드 선언부에 표시하기도 어렵습니다. 내부적으로 ``java.util.concurrent.locks.Lock``이나 CAS(Compare And Swap) 연산으로 동기화한 클래스도 있으니, `synchronized` 키워드의 유무는 스레드 안전성을 판단하는 유일한 기준이 되지 못합니다.
+구현을 개선하면서 동기화 구간을 메서드의 일부로 좁힐 수도 있고, `this` 대신 별도의 lock 객체를 쓸 수도 있습니다. 이런 세부 구현은 외부 인터페이스보다 자주 바뀝니다. lock으로 보호되는 모든 구간을 메서드 선언부에 표시하기도 어렵습니다. 내부적으로 ``java.util.concurrent.locks.Lock``이나 CAS(Compare And Swap) 연산으로 동기화한 클래스도 있습니다. 따라서 `synchronized` 키워드의 유무는 스레드 안전성을 판단하는 유일한 기준이 되지 못합니다.
 
 === 클래스 수준 스레드 안전성 표기의 필요성
 
 멀티스레드 환경에서는 메서드 하나씩 호출할 때는 안전하더라도 여러 메서드 호출을 조합하면 안전하지 않을 수 있습니다.
-예를 들어 ``HashMap``은 생성이 끝난 뒤 안전하게 공개되고(예: `final` 필드나 `volatile` 변수로 전달) 더 이상 변경되지 않는다면 여러 스레드가 ``get()``을 호출해도 문제가 없습니다. 그러나 한 스레드가 ``put()``으로 구조를 바꾸는 동안 다른 스레드가 ``get()``을 호출하면 결과를 보장할 수 없습니다. 메서드 대부분이 ``synchronized``인 ``Hashtable``이나 ``Collections.synchronizedMap()``으로 감싼 ``Map``도, ``containsKey()``로 확인한 뒤 ``put()``하는 것처럼 호출 두 개를 조합하면서 외부에서 lock을 잡지 않으면 경쟁 조건이 생깁니다.
+예를 들어 ``HashMap``은 생성이 끝난 뒤 안전하게 공개되고(예: `final` 필드나 `volatile` 변수로 전달) 더 이상 변경되지 않는다면 여러 스레드가 ``get()``을 호출해도 문제가 없습니다. 그러나 한 스레드가 ``put()``으로 구조를 바꾸는 동안 다른 스레드가 ``get()``을 호출하면 결과를 보장할 수 없습니다. 메서드 대부분이 ``synchronized``인 ``Hashtable``이나 ``Collections.synchronizedMap()``으로 감싼 ``Map``도 마찬가지입니다. ``containsKey()``로 확인한 뒤 ``put()``하는 것처럼 호출 두 개를 조합할 때 외부에서 lock을 잡지 않으면 경쟁 조건이 생깁니다.
 
 그러므로 문서화할 대상은 메서드의 동기화 여부가 아니라 클래스가 어떤 조건에서 안전한지입니다. Javadoc에 이를 표시할 규약이 없으니 개발자가 클래스 설명에 직접 적어야 합니다. 다음 절에서 볼 Effective Java의 분류가 그 기준이 됩니다.
 
@@ -102,7 +107,11 @@ https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/text/SimpleDat
 
 image::img/thread-safety-annotations/SimpleDateFormat-doc.png[SimpleDateFormat의 JDK 25 Javadoc,width=800]
 
-``DateTimeFormatter``와 ``LocalDate``의 문서에는 'Implementation Requirements' 항목에 'This class is immutable and thread-safe.'라고 적혀 있습니다. JDK 8에서 추가된 `java.time` 패키지의 불변 클래스들은 대부분 Javadoc의 `@implSpec` 태그로 같은 문장을 같은 자리에 적습니다. 표준 라이브러리 안에서도 새로 만든 API일수록 스레드 안전성을 일관된 형식으로 표시하는 추세입니다.
+https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/time/format/DateTimeFormatter.html[DateTimeFormatter의 JDK 25 Javadoc]은 클래스 설명 끝의 'Implementation Requirements' 항목에 'This class is immutable and thread-safe.'라고 적어 두었습니다.
+
+image::img/thread-safety-annotations/DateTimeFormatter-doc.png[DateTimeFormatter의 JDK 25 Javadoc,width=800]
+
+``LocalDate``를 비롯해 JDK 8에서 추가된 `java.time` 패키지의 불변 클래스들은 대부분 Javadoc의 `@implSpec` 태그로 같은 문장을 같은 자리에 적습니다. 표준 라이브러리 안에서도 새로 만든 API일수록 스레드 안전성을 일관된 형식으로 표시하는 추세입니다.
 
 ==== org.springframework.batch.item.file.FlatFileItemWriter
 
@@ -191,7 +200,7 @@ public class BasicHttpClientConnectionManager implements HttpClientConnectionMan
 
 === JCIP 애너테이션
 
-HttpClient처럼 프로젝트마다 애너테이션을 정의해도 되지만, 널리 쓰이는 오픈소스의 애너테이션을 쓰면 사용자가 새로 익힐 필요가 없고 SpotBugs 같은 정적 분석 도구나 IDE의 지원을 받기도 쉽습니다. HttpClient 4.x가 가져다 쓴 JCIP 애너테이션이 그런 공통 애너테이션의 출발점입니다.
+HttpClient처럼 프로젝트마다 애너테이션을 정의해도 됩니다. 그러나 널리 쓰이는 오픈소스의 애너테이션을 쓰면 사용자가 새로 익힐 필요가 없습니다. SpotBugs 같은 정적 분석 도구나 IDE의 지원을 받기도 쉽습니다. HttpClient 4.x가 가져다 쓴 JCIP 애너테이션이 그런 공통 애너테이션의 출발점입니다.
 
 https://jcip.net/annotations/doc/net/jcip/annotations/package-summary.html[JCIP 애너테이션]은 'Java Concurrency in Practice' 책의 부록 A에서 제안한, 스레드 안전성을 표시하는 애너테이션으로 아래 네 가지가 있습니다.
 
@@ -252,7 +261,7 @@ JCIP 책과 함께 배포된 원본 라이브러리는 Maven Central의 ``net.jc
 원본 JCIP 라이브러리는 라이선스 문제로, JSR-305는 표준화 중단으로 새 프로젝트에 권하기 어렵습니다.
 대신 다음 절에서 볼 정적 분석 도구의 검사 범위를 고려해 아래 두 라이브러리 중 하나를 권합니다.
 
-* 컴파일 시점 검증이 우선이라면 ``error_prone_annotations``가 적합합니다. Error Prone과 함께 쓰면 ``@Immutable``과 ``@GuardedBy``를 컴파일 시점에 검사할 수 있습니다. 이 라이브러리는 Guava의 전이 의존성으로 컴파일 클래스패스에 들어오기도 하지만, 코드에서 직접 쓴다면 전이 의존성에 기대지 말고 명시적으로 의존성을 선언하는 편이 안전합니다. Error Prone은 ``@ThreadSafe``를 검사하지 않고 이 라이브러리에는 ``@NotThreadSafe``가 없으므로, 표시가 없는 클래스를 스레드 안전하지 않다고 간주하는 관례도 필요합니다.
+* 컴파일 시점 검증이 우선이라면 ``error_prone_annotations``가 적합합니다. Error Prone과 함께 쓰면 ``@Immutable``과 ``@GuardedBy``를 컴파일 시점에 검사할 수 있습니다. 이 라이브러리는 Guava의 전이 의존성으로 컴파일 클래스패스에 들어오기도 합니다. 그래도 코드에서 직접 쓴다면 전이 의존성에 기대지 말고 명시적으로 의존성을 선언하는 편이 안전합니다. Error Prone은 ``@ThreadSafe``를 검사하지 않고, 이 라이브러리에는 ``@NotThreadSafe``가 없습니다. 그래서 표시가 없는 클래스를 스레드 안전하지 않다고 간주하는 관례도 필요합니다.
 * 공개 API에 ``@NotThreadSafe``를 포함한 JCIP 애너테이션 네 가지를 모두 표현하는 것이 우선이라면 ``com.github.stephenc.jcip:jcip-annotations``가 적합합니다. IntelliJ와 SpotBugs를 사용하는 프로젝트라면 기존 도구와 빌드 설정을 크게 바꾸지 않고 적용할 수 있습니다.
 
 == 정적 분석 도구의 검사 범위
@@ -286,7 +295,9 @@ JCIP 책과 함께 배포된 원본 라이브러리는 Maven Central의 ``net.jc
 
 2026년 9월 시점의 JDT Core Options 전체 목록과 Eclipse JDT 소스 {eclipse-jdt-source-short}에서는 스레드 안전성 애너테이션을 다루는 컴파일러 검사를 찾지 못했습니다. Eclipse 사용자는 https://spotbugs.readthedocs.io/en/stable/eclipse.html[SpotBugs Eclipse 플러그인]으로 보완할 수 있습니다.
 
-같은 시점에 SonarQube의 Java 분석기인 SonarJava 소스 {sonar-java-source-short}에서 내장 규칙 구현을 `ThreadSafe`, `GuardedBy`, ``javax.annotation.concurrent``로 검색해 보니 스레드 안전성 애너테이션을 참조하는 구현은 S3077뿐이었습니다. 애너테이션의 약속을 직접 검증하는 규칙은 찾지 못했습니다. 참조 타입 필드의 ``volatile``을 막는 link:{sonar-java-source-base}/java-checks/src/main/java/org/sonar/java/checks/VolatileNonPrimitiveFieldCheck.java[S3077 구현]은 필드 타입에 JSR-305 패키지의 ``@Immutable``이나 ``@ThreadSafe``가 붙어 있으면 예외로 넘기지만 ``@GuardedBy``는 다루지 않습니다. SonarQube는 https://docs.sonarsource.com/sonarqube-server/analyzing-source-code/importing-external-issues/external-analyzer-reports[SpotBugs 보고서를 외부 이슈로 가져올 수 있고], link:{sonar-java-source-base}/external-reports/src/main/resources/org/sonar/l10n/java/rules/spotbugs/spotbugs-rules.json[외부 규칙 목록]에는 뒤에서 볼 세 버그 패턴이 모두 들어 있습니다. 따라서 SonarQube에서 이 결과를 보려면 SpotBugs를 빌드에서 돌려 XML 보고서를 만들고 `sonar.java.spotbugs.reportPaths`로 넘겨야 합니다.
+같은 시점에 SonarQube의 Java 분석기인 SonarJava 소스 {sonar-java-source-short}의 내장 규칙 구현을 `ThreadSafe`, `GuardedBy`, ``javax.annotation.concurrent``로 검색해 봤습니다. 스레드 안전성 애너테이션을 참조하는 구현은 S3077뿐이었습니다. 애너테이션의 약속을 직접 검증하는 규칙은 찾지 못했습니다. 참조 타입 필드의 ``volatile``을 막는 link:{sonar-java-source-base}/java-checks/src/main/java/org/sonar/java/checks/VolatileNonPrimitiveFieldCheck.java[S3077 구현]은 필드 타입에 JSR-305 패키지의 ``@Immutable``이나 ``@ThreadSafe``가 붙어 있으면 예외로 넘깁니다. ``@GuardedBy``는 다루지 않습니다.
+
+SonarQube는 https://docs.sonarsource.com/sonarqube-server/analyzing-source-code/importing-external-issues/external-analyzer-reports[SpotBugs 보고서를 외부 이슈로 가져올 수 있습니다]. link:{sonar-java-source-base}/external-reports/src/main/resources/org/sonar/l10n/java/rules/spotbugs/spotbugs-rules.json[외부 규칙 목록]에는 뒤에서 볼 세 버그 패턴이 모두 들어 있습니다. 따라서 SonarQube에서 이 결과를 보려면 SpotBugs를 빌드에서 돌려 XML 보고서를 만들고 `sonar.java.spotbugs.reportPaths`로 넘겨야 합니다.
 
 SpotBugs와 Error Prone 예제는 link:{static-analysis-repo}[examples/thread-safety-static-analysis]에 있습니다.
 
@@ -381,9 +392,15 @@ M B JCIP: Memo.content should be final since net.benelog.Memo is marked as Immut
 
 예제는 경고가 있어도 보고서를 끝까지 출력하려고 ``ignoreFailures``를 ``true``로 두었습니다. 실제 CI에서 위반 때문에 빌드를 실패시키려면 이 설정을 ``false``로 바꾸거나 생략해야 합니다.
 
-``@GuardedBy``는 https://spotbugs.readthedocs.io/en/latest/bugDescriptions.html#is-field-not-guarded-against-concurrent-access-is-field-not-guarded[IS_FIELD_NOT_GUARDED] 버그 패턴이 다룹니다. 그런데 이 패턴은 애너테이션을 보고 위반을 찾는 것이 아닙니다. https://spotbugs.readthedocs.io/en/latest/bugDescriptions.html#is-inconsistent-synchronization-is2-inconsistent-sync[IS2_INCONSISTENT_SYNC] 탐지기는 필드 접근 중 lock을 잡은 비율로 동기화 누락을 추정합니다. 필드에 ``@GuardedBy("this")``가 붙어 있으면 이 탐지기는 버그 패턴 이름을 IS_FIELD_NOT_GUARDED로 바꾸고, lock을 잡은 접근이 없는 필드도 후보에 남기며, 경고 우선순위를 올립니다. 인식하는 값도 ``"this"``뿐입니다. 이 탐지기는 lock을 잡은 접근이 절반에 못 미치는 필드는 오탐으로 간주해 우선순위를 낮춥니다.
+``@GuardedBy``는 https://spotbugs.readthedocs.io/en/latest/bugDescriptions.html#is-field-not-guarded-against-concurrent-access-is-field-not-guarded[IS_FIELD_NOT_GUARDED] 버그 패턴이 다룹니다. 그런데 이 패턴은 애너테이션을 보고 위반을 찾는 것이 아닙니다. https://spotbugs.readthedocs.io/en/latest/bugDescriptions.html#is-inconsistent-synchronization-is2-inconsistent-sync[IS2_INCONSISTENT_SYNC] 탐지기는 필드 접근 중 lock을 잡은 비율로 동기화 누락을 추정합니다. 필드에 ``@GuardedBy("this")``가 붙어 있으면 이 탐지기는 세 가지를 다르게 처리합니다.
 
-그래서 같은 프로젝트의 link:{static-analysis-repo}/spotbugs/src/main/java/net/benelog/Counter.java[Counter]는 `@GuardedBy("this")` 필드를 lock 없이 수정하는데도 기본 설정에서는 보고되지 않습니다. ``increment()``의 읽기와 쓰기는 lock 없이 이루어지고 `synchronized` 메서드 ``get()``의 읽기만 lock을 잡으므로, 세 번의 접근 중 lock을 잡은 접근은 33%입니다. 예제 저장소에서 ``./gradlew :spotbugs:spotbugsMain -PreportLow``로 낮은 우선순위까지 보고하게 하면 그제야 나타납니다.
+* 버그 패턴 이름을 IS_FIELD_NOT_GUARDED로 바꿉니다.
+* lock을 잡은 접근이 없는 필드도 후보에 남깁니다.
+* 경고 우선순위를 올립니다.
+
+인식하는 값도 ``"this"``뿐입니다. 이 탐지기는 lock을 잡은 접근이 절반에 못 미치는 필드는 오탐으로 간주해 우선순위를 낮춥니다.
+
+그래서 같은 프로젝트의 link:{static-analysis-repo}/spotbugs/src/main/java/net/benelog/Counter.java[Counter]는 `@GuardedBy("this")` 필드를 lock 없이 수정하는데도 기본 설정에서는 보고되지 않습니다. ``increment()``의 읽기와 쓰기는 lock 없이 이루어지고, `synchronized` 메서드 ``get()``의 읽기만 lock을 잡습니다. 세 번의 접근 중 lock을 잡은 접근은 33%입니다. 예제 저장소에서 ``./gradlew :spotbugs:spotbugsMain -PreportLow``로 낮은 우선순위까지 보고하게 하면 그제야 나타납니다.
 
 [source]
 ----
@@ -446,7 +463,13 @@ Google의 https://errorprone.info/[Error Prone]은 ``javac``에 플러그인으�
 
 Error Prone의 https://errorprone.info/bugpattern/GuardedBy[GuardedBy 검사]는 ``@GuardedBy(lock)``이 붙은 필드나 메서드를 지정한 lock을 잡지 않고 접근하면 컴파일 오류를 냅니다. 접근 비율에 따라 보고 여부가 달라지는 SpotBugs와 달리, 분석 범위 안의 접근마다 lock을 잡았는지 판정합니다. 다만 생성자와 초기화 블록 안의 접근, `ReadWriteLock`으로 보호하는 필드는 검사하지 않습니다.
 
-다만 이 검사가 인식하는 애너테이션은 `com.google.errorprone.annotations.concurrent.GuardedBy`, `javax.annotation.concurrent.GuardedBy`, Android용 `androidx.annotation.GuardedBy` 등이고, 원본 JCIP의 ``net.jcip.annotations.GuardedBy``는 목록에 없습니다. `@Immutable` 검사는 ``com.google.errorprone.annotations.Immutable``만 검사 대상으로 하고 ``javax.annotation.concurrent.Immutable``은 제외한다고 문서에 명시되어 있습니다. 다음 절에서 확인합니다.
+이 검사가 인식하는 애너테이션에는 다음이 있습니다.
+
+* `com.google.errorprone.annotations.concurrent.GuardedBy`
+* `javax.annotation.concurrent.GuardedBy`
+* Android용 `androidx.annotation.GuardedBy`
+
+원본 JCIP의 ``net.jcip.annotations.GuardedBy``는 목록에 없습니다. `@Immutable` 검사는 ``com.google.errorprone.annotations.Immutable``만 검사 대상으로 하고 ``javax.annotation.concurrent.Immutable``은 제외한다고 문서에 명시되어 있습니다. 다음 절에서 확인합니다.
 
 Gradle에서는 https://github.com/tbroyer/gradle-errorprone-plugin[net.ltgt.errorprone 플러그인]으로 Error Prone을 ``javac``에 붙입니다. 세 가지 패키지의 애너테이션을 비교하기 위해 라이브러리도 셋 다 넣었습니다.
 
@@ -518,7 +541,7 @@ JsrCounter.java:15: error: [GuardedBy] This access should be guarded by 'this', 
 
 ==== @Immutable 검사
 
-https://errorprone.info/bugpattern/Immutable[Immutable 검사]는 ``com.google.errorprone.annotations.Immutable``이 붙은 클래스가 깊은 불변인지 검사합니다. SpotBugs의 JCIP 검사는 필드가 ``final``인지만 보지만, Error Prone은 참조 필드의 타입이 불변인지도 봅니다. Error Prone 문서가 설명하는 보수적인 불변성의 정의에는 생성자에서 ``this``가 밖으로 새지 않아야 한다는 조건도 있지만, 2.50.0의 ``ImmutableChecker``는 일반적인 생성자 본문의 `this` 탈출까지 분석하지는 않습니다. 아래 클래스에는 ``final``이 아닌 필드와 ``final``이지만 타입이 가변인 필드가 하나씩 있습니다.
+https://errorprone.info/bugpattern/Immutable[Immutable 검사]는 ``com.google.errorprone.annotations.Immutable``이 붙은 클래스가 깊은 불변인지 검사합니다. SpotBugs의 JCIP 검사는 필드가 ``final``인지만 보지만, Error Prone은 참조 필드의 타입이 불변인지도 봅니다. Error Prone 문서가 설명하는 보수적인 불변성의 정의에는 생성자에서 ``this``가 밖으로 새지 않아야 한다는 조건도 있습니다. 그러나 2.50.0의 ``ImmutableChecker``는 일반적인 생성자 본문의 `this` 탈출까지 분석하지는 않습니다. 아래 클래스에는 ``final``이 아닌 필드와 ``final``이지만 타입이 가변인 필드가 하나씩 있습니다.
 
 [source,java]
 .link:{static-analysis-repo}/errorprone/src/main/java/net/benelog/ErrorProneMemo.java[ErrorProneMemo.java]
@@ -612,7 +635,7 @@ public class ErrorProneRegistry {
 }
 ----
 
-이 검사기가 무엇을 보는지 확인하려고 예제 저장소에 link:{static-analysis-repo}/threadsafe-check[threadsafe-check] 서브프로젝트를 만들었습니다. ``ThreadSafeChecker``를 상속한 클래스를 ``META-INF/services``에 등록해서 Error Prone의 플러그인 검사로 불러오는 실험용 코드입니다. Error Prone은 컴파일러의 애너테이션 프로세서 경로(processor path)에서 ``com.google.errorprone.bugpatterns.BugChecker``를 서비스 인터페이스로 삼아 ServiceLoader로 검사기를 찾기 때문에, 그 이름의 파일에 검사기 클래스 이름을 적어 두면 됩니다.
+이 검사기가 무엇을 보는지 확인하려고 예제 저장소에 link:{static-analysis-repo}/threadsafe-check[threadsafe-check] 서브프로젝트를 만들었습니다. ``ThreadSafeChecker``를 상속한 클래스를 ``META-INF/services``에 등록해서 Error Prone의 플러그인 검사로 불러오는 실험용 코드입니다. Error Prone은 컴파일러의 애너테이션 프로세서 경로(processor path)에서 ``com.google.errorprone.bugpatterns.BugChecker``를 서비스 인터페이스로 삼아 ServiceLoader로 검사기를 찾습니다. 그래서 그 이름의 파일에 검사기 클래스 이름을 적어 두면 됩니다.
 
 [source]
 .link:{static-analysis-repo}/threadsafe-check/src/main/resources/META-INF/services/com.google.errorprone.bugpatterns.BugChecker[META-INF/services/com.google.errorprone.bugpatterns.BugChecker]
@@ -620,7 +643,7 @@ public class ErrorProneRegistry {
 com.google.errorprone.bugpatterns.threadsafety.ThreadSafeCheck
 ----
 
-등록한 클래스는 ``ThreadSafeChecker``를 상속하고 ``@BugPattern``으로 검사 이름을 붙인 래퍼입니다. ``ThreadSafeChecker``의 생성자가 패키지 전용이라 같은 패키지 이름을 썼고, ServiceLoader가 요구하는 public 기본 생성자도 형식적으로 두었습니다. 이렇게 2.50.0의 내부 구조에 기댄 코드라서 실제 프로젝트에는 권하지 않습니다.
+등록한 클래스는 ``ThreadSafeChecker``를 상속하고 ``@BugPattern``으로 검사 이름을 붙인 래퍼입니다. ``ThreadSafeChecker``의 생성자가 패키지 전용이라 같은 패키지 이름을 썼습니다. ServiceLoader가 요구하는 public 기본 생성자도 형식적으로 두었습니다. 이렇게 2.50.0의 내부 구조에 기댄 코드라서 실제 프로젝트에는 권하지 않습니다.
 
 [source,java]
 .link:{static-analysis-repo}/threadsafe-check/src/main/java/com/google/errorprone/bugpatterns/threadsafety/ThreadSafeCheck.java[ThreadSafeCheck.java]
@@ -675,7 +698,12 @@ ErrorProneRegistry.java:17: error: [ThreadSafe] @ThreadSafe class has non-thread
     (see https://errorprone.info/bugpattern/ThreadSafe)
 ----
 
-이 검사를 통과하려면 인스턴스 필드는 ``final``이면서 선언 타입이 Error Prone이 스레드 안전하다고 아는 타입이거나, ``@GuardedBy``가 붙어 있어야 합니다(`static` 필드는 검사하지 않고, `@LazyInit` 필드는 `final` 조건에서 제외합니다). ``count``는 ``final``도 ``@GuardedBy``도 없어서, ``entries``는 선언 타입 ``Map``이 스레드 안전 타입이 아니라서 걸립니다. 실제 객체가 ``ConcurrentHashMap``이어도 선언 타입이 ``Map``이면 걸립니다. 선언 타입까지 ``ConcurrentHashMap``인 ``safeEntries``는 통과합니다. 앞에서 본 ErrorProneCounter는 ``count``에 ``@GuardedBy("this")``가 있어서 이 검사는 통과하고 `@GuardedBy` 검사에만 걸립니다.
+이 검사를 통과하려면 인스턴스 필드가 다음 둘 중 하나여야 합니다.
+
+* ``final``이면서 선언 타입이 Error Prone이 스레드 안전하다고 아는 타입
+* ``@GuardedBy``가 붙은 필드
+
+`static` 필드는 검사하지 않고, `@LazyInit` 필드는 `final` 조건에서 제외합니다. ``count``는 ``final``도 ``@GuardedBy``도 없어서 걸립니다. ``entries``는 선언 타입 ``Map``이 스레드 안전 타입이 아니라서 걸립니다. 실제 객체가 ``ConcurrentHashMap``이어도 선언 타입이 ``Map``이면 걸립니다. 선언 타입까지 ``ConcurrentHashMap``인 ``safeEntries``는 통과합니다. 앞에서 본 ErrorProneCounter는 ``count``에 ``@GuardedBy("this")``가 있어서 이 검사는 통과하고 `@GuardedBy` 검사에만 걸립니다.
 
 정리하면 2026년 9월 시점의 Error Prone은 ``@Immutable``과 ``@GuardedBy``는 검사하지만, ``@ThreadSafe``는 위처럼 검사기를 직접 플러그인으로 등록하지 않는 한 문서 역할만 합니다.
 
@@ -685,21 +713,46 @@ IntelliJ IDEA 2026.2는 https://www.jetbrains.com/help/inspectopedia/Java-Concur
 
 image::img/thread-safety-annotations/intellij-concurrency-inspections.png[IntelliJ IDEA 2026.2의 Concurrency annotation issues 인스펙션 목록,width=800]
 
-https://www.jetbrains.com/help/inspectopedia/FieldAccessNotGuarded.html[Unguarded field access or method call] 인스펙션은 `net.jcip.annotations`, `javax.annotation.concurrent`, `org.apache.http.annotation`, `com.android.annotations.concurrency`, `androidx.annotation`, `com.google.errorprone.annotations.concurrent` 패키지의 ``@GuardedBy``를 모두 인식합니다. SpotBugs도 원본 JCIP 패키지를 읽지만 ``@GuardedBy("this")``만 다루고 접근 비율로 짐작해 경고하는 데 그칩니다. IntelliJ는 이에 비해 원본 JCIP의 guard 표현을 직접 검사합니다.
+https://www.jetbrains.com/help/inspectopedia/FieldAccessNotGuarded.html[Unguarded field access or method call] 인스펙션은 다음 패키지의 ``@GuardedBy``를 모두 인식합니다.
 
-https://www.jetbrains.com/help/inspectopedia/NonFinalFieldInImmutable.html[Non-final field in @Immutable class] 인스펙션은 `@Immutable` 클래스에 ``final``이 아닌 필드가 있으면 경고합니다. 필드 타입이 가변인지는 보지 않으므로 검사 깊이는 Error Prone이 아니라 SpotBugs에 가깝습니다. 다만 SpotBugs와 달리 `transient`나 `volatile` 필드도 경고합니다. 원본 JCIP와 JSR-305 패키지에 더해 Error Prone의 ``com.google.errorprone.annotations.Immutable``, AutoValue의 ``@AutoValue``, Javadoc의 `@Immutable` 태그도 인식합니다.
+* `net.jcip.annotations`
+* `javax.annotation.concurrent`
+* `org.apache.http.annotation`
+* `com.android.annotations.concurrency`
+* `androidx.annotation`
+* `com.google.errorprone.annotations.concurrent`
 
-``@ThreadSafe``는 'Threading issues' 그룹의 https://www.jetbrains.com/help/inspectopedia/AccessToStaticFieldLockedOnInstance.html[Access to static field locked on instance] 인스펙션이 힌트로만 읽습니다. 이 인스펙션은 인스턴스 lock을 잡고 상수가 아닌 `static` 필드에 접근하면 경고합니다. 접근한 필드가 ``final``이면 link:{intellij-source-base}/java/java-impl-inspections/src/com/siyeh/ig/threading/AccessToStaticFieldLockedOnInstanceInspection.java[그 선언 타입의 애너테이션을 확인]하고, 등록된 스레드 안전 애너테이션이 있으면 경고를 생략합니다. 따라서 애너테이션이 붙은 클래스 자체의 규약을 검증하지는 않습니다. link:{intellij-source-base}/java/java-psi-api/src/com/intellij/codeInsight/ConcurrencyAnnotationsManager.java[기본 목록]에는 원본 JCIP, JSR-305, `org.apache.http.annotation`, `com.android.annotations.concurrency` 패키지의 ``@ThreadSafe``와 `androidx.annotation`, `android.support.annotation` 패키지의 ``@AnyThread``가 들어 있습니다. Error Prone의 ``@ThreadSafe``는 기본 목록에 없습니다.
+SpotBugs도 원본 JCIP 패키지를 읽지만 ``@GuardedBy("this")``만 다루고 접근 비율로 짐작해 경고하는 데 그칩니다. IntelliJ는 이에 비해 원본 JCIP의 guard 표현을 직접 검사합니다.
 
-주의할 점은 IntelliJ IDEA 2026.2의 link:{intellij-source-base}/java/java-backend/resources/META-INF/Inspections.xml[인스펙션 등록 정보]에서 'Concurrency annotation issues' 그룹이 모두 `enabledByDefault="false"`, ``level="WARNING"``으로 선언되어 있다는 것입니다. Settings의 Editor | Inspections | Java | Concurrency annotation issues에서 직접 켜야 합니다. 켜도 편집기 안의 경고라서 Error Prone처럼 `javac` 컴파일을 막지는 못합니다. CI에서 강제하려면 Qodana 같은 별도 실행 환경이 필요합니다. https://www.jetbrains.com/help/qodana/about-qodana.html[Qodana]는 JetBrains가 만든 코드 품질 분석 플랫폼으로, IntelliJ IDEA와 같은 인스펙션을 Docker 이미지나 명령행 도구로 CI에서 실행합니다. 따라서 https://www.jetbrains.com/help/qodana/inspection-profiles.html[Qodana 프로필]에서 검사를 켜고 https://www.jetbrains.com/help/qodana/quality-gate.html[실패 조건]을 설정하면 됩니다.
+https://www.jetbrains.com/help/inspectopedia/NonFinalFieldInImmutable.html[Non-final field in @Immutable class] 인스펙션은 `@Immutable` 클래스에 ``final``이 아닌 필드가 있으면 경고합니다. 필드 타입이 가변인지는 보지 않으므로 검사 깊이는 Error Prone이 아니라 SpotBugs에 가깝습니다. 다만 SpotBugs와 달리 `transient`나 `volatile` 필드도 경고합니다. 이 인스펙션이 인식하는 표시는 다음과 같습니다.
 
-세 도구를 정리하면 애너테이션만 보고 결정적으로 검사하는 범위는 좁습니다. SpotBugs는 `@Immutable` 클래스의 `final` 규칙만 직접 검사하고, ``@GuardedBy``는 lock을 잡은 접근 비율로 짐작하며, ``@ThreadSafe``와 ``@NotThreadSafe``는 그 짐작의 근거로만 읽습니다. Error Prone은 ``@GuardedBy``의 lock 누락과 ``@Immutable``의 깊은 불변성을 컴파일 오류로 잡지만, 원본 JCIP 패키지는 인식하지 않고 ``@ThreadSafe`` 검사는 따로 등록해야 켜집니다. IntelliJ IDEA는 원본 JCIP를 포함한 여러 패키지의 ``@GuardedBy``를 직접 검사하고 ``@Immutable``은 SpotBugs와 비슷한 깊이로 보지만, 인스펙션이 기본으로 꺼져 있고 `javac` 컴파일에는 연동되지 않으므로 강제하려면 Qodana나 명령행 검사 같은 별도 실행 환경이 필요합니다. 앞에서 ``error_prone_annotations``와 ``jcip-annotations`` 중 하나를 권한 이유가 여기에 있습니다. 컴파일을 막는 검사가 필요하면 Error Prone이 인식하는 애너테이션을, 네 가지 애너테이션을 모두 표기하면서 IDE와 SpotBugs의 검사를 받으려면 ``net.jcip.annotations`` 패키지(Apache 라이선스 재구현)를 써야 합니다.
+* 원본 JCIP와 JSR-305 패키지의 `@Immutable`
+* Error Prone의 `com.google.errorprone.annotations.Immutable`
+* AutoValue의 `@AutoValue`
+* Javadoc의 `@Immutable` 태그
+
+``@ThreadSafe``는 'Threading issues' 그룹의 https://www.jetbrains.com/help/inspectopedia/AccessToStaticFieldLockedOnInstance.html[Access to static field locked on instance] 인스펙션이 힌트로만 읽습니다. 이 인스펙션은 인스턴스 lock을 잡고 상수가 아닌 `static` 필드에 접근하면 경고합니다. 접근한 필드가 ``final``이면 link:{intellij-source-base}/java/java-impl-inspections/src/com/siyeh/ig/threading/AccessToStaticFieldLockedOnInstanceInspection.java[그 선언 타입의 애너테이션을 확인]하고, 등록된 스레드 안전 애너테이션이 있으면 경고를 생략합니다. 따라서 애너테이션이 붙은 클래스 자체의 규약을 검증하지는 않습니다. link:{intellij-source-base}/java/java-psi-api/src/com/intellij/codeInsight/ConcurrencyAnnotationsManager.java[기본 목록]에는 다음 애너테이션이 들어 있습니다.
+
+* 원본 JCIP, JSR-305, `org.apache.http.annotation`, `com.android.annotations.concurrency` 패키지의 `@ThreadSafe`
+* `androidx.annotation`, `android.support.annotation` 패키지의 `@AnyThread`
+
+Error Prone의 ``@ThreadSafe``는 기본 목록에 없습니다.
+
+다만 IntelliJ IDEA 2026.2의 link:{intellij-source-base}/java/java-backend/resources/META-INF/Inspections.xml[인스펙션 등록 정보]를 보면 'Concurrency annotation issues' 그룹은 모두 `enabledByDefault="false"`, ``level="WARNING"``으로 선언되어 있습니다. Settings의 Editor | Inspections | Java | Concurrency annotation issues에서 직접 켜야 합니다. 켜도 편집기 안의 경고라서 Error Prone처럼 `javac` 컴파일을 막지는 못합니다. CI에서 강제하려면 Qodana 같은 별도 실행 환경이 필요합니다. https://www.jetbrains.com/help/qodana/about-qodana.html[Qodana]는 JetBrains가 만든 코드 품질 분석 플랫폼으로, IntelliJ IDEA와 같은 인스펙션을 Docker 이미지나 명령행 도구로 CI에서 실행합니다. 따라서 https://www.jetbrains.com/help/qodana/inspection-profiles.html[Qodana 프로필]에서 검사를 켜고 https://www.jetbrains.com/help/qodana/quality-gate.html[실패 조건]을 설정하면 됩니다.
+
+세 도구를 정리하면 애너테이션만 보고 결정적으로 검사하는 범위는 좁습니다.
+
+* SpotBugs는 `@Immutable` 클래스의 `final` 규칙만 직접 검사합니다. ``@GuardedBy``는 lock을 잡은 접근 비율로 짐작하며, ``@ThreadSafe``와 ``@NotThreadSafe``는 그 짐작의 근거로만 읽습니다.
+* Error Prone은 ``@GuardedBy``의 lock 누락과 ``@Immutable``의 깊은 불변성을 컴파일 오류로 잡습니다. 다만 원본 JCIP 패키지는 인식하지 않고, ``@ThreadSafe`` 검사는 따로 등록해야 켜집니다.
+* IntelliJ IDEA는 원본 JCIP를 포함한 여러 패키지의 ``@GuardedBy``를 직접 검사하고, ``@Immutable``은 SpotBugs와 비슷한 깊이로 봅니다. 그러나 인스펙션이 기본으로 꺼져 있고 `javac` 컴파일에는 연동되지 않습니다. 강제하려면 Qodana나 명령행 검사 같은 별도 실행 환경이 필요합니다.
+
+앞에서 ``error_prone_annotations``와 ``jcip-annotations`` 중 하나를 권한 이유가 여기에 있습니다. 컴파일을 막는 검사가 필요하면 Error Prone이 인식하는 애너테이션을 써야 합니다. 네 가지 애너테이션을 모두 표기하면서 IDE와 SpotBugs의 검사를 받으려면 ``net.jcip.annotations`` 패키지(Apache 라이선스 재구현)를 써야 합니다.
 
 == ArchUnit으로 검증하는 프로젝트별 규칙
 
 앞의 정적 분석 도구들은 애너테이션이 붙은 클래스 자체가 선언대로 구현되었는지를 일부 검사합니다. 그런데 비즈니스 애플리케이션을 개발하는 프로젝트에서 더 자주 생기는 사고는 다른 형태입니다. 여러 스레드가 공유하는 객체가, 스레드 안전하지 않다고 표시된 클래스를 동기화 없이 필드로 두는 경우입니다.
 
-예를 들어 Spring의 ``@RestController``나 `@Service` 빈은 별도의 scope를 지정하지 않으면 singleton이라서 여러 요청 스레드가 필드를 공유합니다. request scope 같은 다른 scope를 쓸 수도 있지만 프로젝트의 정책으로 컨트롤러가 이런 타입을 필드로 보유하는 것 자체를 금지해서 이 문제를 예방하기도 합니다.
+예를 들어 Spring의 ``@RestController``나 `@Service` 빈은 별도의 scope를 지정하지 않으면 singleton이라서 여러 요청 스레드가 필드를 공유합니다. request scope 같은 다른 scope를 쓸 수도 있습니다. 그러나 프로젝트의 정책으로 컨트롤러가 이런 타입을 필드로 보유하는 것 자체를 금지해서 이 문제를 예방하기도 합니다.
 이런 규칙은 프로젝트에서 추구하는 구조에 따라 달라지므로 범용 정적 분석 도구에는 없습니다. https://www.archunit.org/[ArchUnit]을 쓰면 이 규칙을 JUnit 테스트로 작성해서 빌드마다 검사할 수 있습니다.
 
 === 예제 코드
@@ -759,7 +812,7 @@ public class ReportController {
 
 ArchUnit 테스트는 규칙 두 개로 구성했습니다.
 
-첫 번째 규칙은 ``@RestController``가 붙은 클래스의 필드 타입에 ``@NotThreadSafe``가 붙어 있으면 외부 동기화 여부와 빈 scope를 따로 분석하지 않고 실패합니다. ArchUnit은 바이트코드에서 애너테이션을 읽으므로 원본 JCIP 애너테이션 같은 RUNTIME retention이든 JSR-305 애너테이션이나 HttpClient ``@Contract`` 같은 CLASS retention이든 모두 검사할 수 있습니다. 다만 예제 규칙은 ``net.jcip.annotations.NotThreadSafe``만 보므로, 다른 패키지의 애너테이션이나 ``@Contract``의 `threading` 값을 검사하려면 조건을 추가해야 합니다. 분석 대상 패키지 밖에 있는 라이브러리 클래스도 기본 설정에서는 클래스패스에서 읽어 오므로, 라이브러리가 붙인 ``@NotThreadSafe``도 같은 규칙으로 검사할 수 있습니다.
+첫 번째 규칙은 ``@RestController``가 붙은 클래스의 필드 타입에 ``@NotThreadSafe``가 붙어 있으면 외부 동기화 여부와 빈 scope를 따로 분석하지 않고 실패합니다. ArchUnit은 바이트코드에서 애너테이션을 읽습니다. 그래서 원본 JCIP 애너테이션 같은 RUNTIME retention이든, JSR-305 애너테이션이나 HttpClient ``@Contract`` 같은 CLASS retention이든 모두 검사할 수 있습니다. 다만 예제 규칙은 ``net.jcip.annotations.NotThreadSafe``만 보므로, 다른 패키지의 애너테이션이나 ``@Contract``의 `threading` 값을 검사하려면 조건을 추가해야 합니다. 분석 대상 패키지 밖에 있는 라이브러리 클래스도 기본 설정에서는 클래스패스에서 읽어 오므로, 라이브러리가 붙인 ``@NotThreadSafe``도 같은 규칙으로 검사할 수 있습니다.
 
 두 번째 규칙은 ``SimpleDateFormat``처럼 스레드 안전성 애너테이션이 없는 JDK 클래스를 위한 것으로, `Format`, `Calendar`, ``StringBuilder``를 목록으로 지정했습니다.
 
@@ -834,7 +887,13 @@ public String report(@PathVariable long id) {
 
 ``ReportController``를 이렇게 바꾸고 테스트를 다시 실행하면 두 규칙을 모두 통과합니다. ``ReportFormatter``는 호출마다 새로 만들어져 다른 요청 스레드와 공유되지 않습니다. 그러나 규칙을 통과했다고 해서 컨트롤러 전체의 스레드 안전성이 증명되지는 않습니다. 다른 공유 상태나 메서드 호출 순서의 경쟁 조건은 별도로 검토해야 합니다.
 
-이 방식에는 한계도 있습니다. ArchUnit은 이 규칙에서 필드의 raw 선언 타입만 보므로, ``List``로 선언한 필드에 ``ArrayList``를 넣는 경우나 제네릭 타입 인자로 들어간 스레드 안전하지 않은 타입은 잡지 못합니다. 상위 타입에만 애너테이션이 있고 실제 선언 타입에는 없는 경우도 별도로 계층을 탐색하지 않으면 놓칩니다. 필드 접근을 외부 lock으로 보호하는지나 컨트롤러에 별도 scope가 붙었는지도 이 규칙은 판단하지 않습니다. 애너테이션이 없는 JDK 타입은 두 번째 규칙처럼 목록을 직접 관리해야 합니다. 규칙은 ``@RestController``가 붙은 클래스에 직접 선언된 필드만 보므로, 애너테이션이 없는 상위 클래스에서 상속한 필드도 놓칩니다.
+이 방식에는 한계도 있습니다.
+
+* ArchUnit은 이 규칙에서 필드의 raw 선언 타입만 봅니다. ``List``로 선언한 필드에 ``ArrayList``를 넣는 경우나 제네릭 타입 인자로 들어간 스레드 안전하지 않은 타입은 잡지 못합니다.
+* 상위 타입에만 애너테이션이 있고 실제 선언 타입에는 없는 경우도 별도로 계층을 탐색하지 않으면 놓칩니다.
+* 필드 접근을 외부 lock으로 보호하는지나 컨트롤러에 별도 scope가 붙었는지도 이 규칙은 판단하지 않습니다.
+* 애너테이션이 없는 JDK 타입은 두 번째 규칙처럼 목록을 직접 관리해야 합니다.
+* 규칙은 ``@RestController``가 붙은 클래스에 직접 선언된 필드만 봅니다. 그래서 애너테이션이 없는 상위 클래스에서 상속한 필드도 놓칩니다.
 
 == 정리
 
