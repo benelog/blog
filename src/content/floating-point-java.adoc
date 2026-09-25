@@ -4,7 +4,7 @@
 :jbake-type: post
 :jbake-status: published
 :jbake-tags: java, code-review
-:description: IEEE 754 표현이 0.1 같은 십진 소수를 정확히 담지 못하는 이유와, 자바에서 그 오차를 피하는 BigDecimal과 정수형 최소 단위 두 대안, 그 위에 얹는 Java Money 같은 도메인 특화 라이브러리를 정리합니다.
+:description: 자바의 double에 0.1을 저장할 때 IEEE 754 가수 52비트에서 반올림 오차가 생기는 원리를 설명하고, 그 오차가 장애로 이어진 NEIS 성적 오류와 패트리어트 미사일 사례를 살펴봅니다. 오차를 피하는 BigDecimal과 정수형 최소 단위의 선택 기준, Java Money 같은 도메인 특화 라이브러리도 정리합니다.
 :jbake-og: {"image": "img/floating-point-java/ieee754-double.png"}
 :jbake-last_updated: 2026-09-25
 :toc:
