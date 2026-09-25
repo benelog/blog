@@ -31,7 +31,7 @@ public class Boxing {
 }
 ----
 
-JDK에 포함된 ``javap``으로 `javap -c Boxing.class` 를 실행하면 다음 바이트코드가 나옵니다.
+JDK에 포함된 `javap -c Boxing.class` 를 실행하면 다음 바이트코드가 나옵니다.
 
 [source]
 ----
@@ -53,11 +53,11 @@ JDK에 포함된 ``javap``으로 `javap -c Boxing.class` 를 실행하면 다음
         ...
 ----
 
-박싱과 언박싱만을 위한 바이트코드 명령은 따로 없습니다. JDK의 ``javac``은 `int` 가 ``Integer``로 바뀔 때 ``Integer.valueOf()``를, ``Integer``가 `int` 로 바뀔 때 ``intValue()``를 호출하는 바이트코드로 컴파일합니다. 이 방식은 JDK 5에서 auto boxing이 도입된 이후 JDK 25까지 같습니다.
+박싱과 언박싱만을 위한 바이트코드 명령은 따로 없습니다. JDK의 ``javac``은 `int` 가 ``Integer``로 바뀔 때 ``Integer.valueOf()``를, ``Integer``가 `int` 로 바뀔 때 ``intValue()``를 호출하는 바이트코드로 컴파일합니다.
 
-`a == b` 처럼 한쪽이 `int` 이고 다른 쪽이 ``Integer``이면 ``Integer``쪽이 언박싱되어 값 비교(`if_icmpne`)가 됩니다. 반면 양쪽이 모두 ``Integer``이면 언박싱 없이 참조 비교(`if_acmpne`)가 되므로, 다음 절에서 다루는 캐시 범위에 따라 결과가 달라집니다.
+`a == b` 처럼 한쪽이 `int` 이고 다른 쪽이 ``Integer``이면 ``Integer`` 쪽이 언박싱되어 값 비교(`if_icmpne`)가 됩니다. 반면 양쪽이 모두 ``Integer``이면 언박싱 없이 참조 비교(`if_acmpne`)가 되므로, 다음 절에서 다루는 캐시 범위에 따라 결과가 달라집니다.
 
-바이트코드를 다시 Java 코드로 되돌려 보면 변환 결과가 더 뚜렷하게 보입니다. 다만 요즘 역컴파일러는 ``valueOf()``와 ``intValue()`` 호출을 auto boxing 문법으로 도로 접어서 원본과 거의 같은 코드를 보여 줍니다. https://www.benf.org/other/cfr/[CFR]에서는 `--sugarboxing false` 옵션으로 이 접기를 끌 수 있습니다.
+역컴파일하면 변환 결과를 Java 코드로 읽을 수 있습니다. 다만 요즘 역컴파일러는 ``valueOf()``와 ``intValue()`` 호출을 auto boxing 문법으로 복원해서 원본과 거의 같은 코드를 보여 줍니다. https://www.benf.org/other/cfr/[CFR]에서는 `--sugarboxing false` 옵션으로 이 복원을 끄고 메서드 호출을 그대로 보여 주게 할 수 있습니다.
 
 [source,java]
 .java -jar cfr-0.152.jar --sugarboxing false Boxing.class
@@ -75,7 +75,7 @@ public class Boxing {
 
 `Integer.valueOf((int)1)` 의 `(int)` 처럼 원본에 없던 캐스팅과 `(... ? 1 : 0) != 0` 같은 표현은 역컴파일러가 붙인 것입니다. 바이트코드에는 boolean 연산이 따로 없고 분기 명령만 있어서 이런 모양이 됩니다. 눈여겨볼 곳은 대입문 두 줄입니다. `Integer n2` 에는 ``Integer.valueOf()``의 반환값이, `int n3` 에는 ``intValue()``의 반환값이 들어갑니다.
 
-`--sugarboxing` 옵션을 그대로 두면 아래처럼 원본 소스와 같은 코드가 나옵니다. 역컴파일 결과만 보고 박싱 비용을 판단할 수 없다는 뜻이기도 합니다.
+`--sugarboxing` 옵션을 지정하지 않으면 아래처럼 원본 소스와 같은 코드가 나옵니다. 그래서 역컴파일 결과만으로는 박싱 비용을 판단할 수 없습니다.
 
 [source,java]
 .java -jar cfr-0.152.jar Boxing.class
@@ -93,7 +93,7 @@ public class Boxing {
 
 == Integer.valueOf()의 캐시와 참조 비교
 
-``new Integer(int)``로 생성자를 호출하면 매번 새 객체를 만들지만, ``Integer.valueOf()``는 캐시된 인스턴스를 재사용할 수 있습니다. JDK 25의 `java.lang.Integer` 소스를 보면 -128부터 127까지를 `IntegerCache` 에 담아 둡니다.
+``new Integer(int)`` 생성자는 매번 새 객체를 만들지만, ``Integer.valueOf()``는 캐시된 인스턴스를 재사용할 수 있습니다. JDK 25의 `java.lang.Integer` 는 -128부터 127까지의 인스턴스를 `IntegerCache` 에 담아 둡니다.
 
 [source,java]
 .java/lang/Integer.java (JDK 25)
@@ -122,16 +122,16 @@ public class Boxing {
     }
 ----
 
-캐시의 기본 상한은 127이고, VM이 보관하는 내부 프로퍼티로 더 늘릴 수 있습니다. CDS(Class Data Sharing) 아카이브를 사용할 수 있으면 아카이브된 배열을 가져옵니다. 아카이브가 없거나 요청된 캐시 크기보다 작으면 캐시 전체 또는 부족한 부분을 실행 시점에 만듭니다.
+캐시의 기본 상한은 127이고, VM이 별도로 보관하는 saved property로 더 늘릴 수 있습니다. CDS(Class Data Sharing) 아카이브를 사용할 수 있으면 아카이브된 배열을 가져옵니다. 아카이브가 없거나 요청된 캐시 크기보다 작으면 캐시 전체 또는 부족한 부분을 실행 시점에 만듭니다.
 
-JLS는 `IntegerCache` 라는 구현 자체를 요구하지 않습니다. https://docs.oracle.com/javase/specs/jls/se25/html/jls-5.html#jls-5.1.7[JLS 5.1.7]은 박싱 대상이 상수식일 때 아래 조건에서 두 박싱 결과가 반드시 같은 참조여야 한다고 규정하고, JDK는 이 요구를 캐시로 충족합니다. 한편 https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Integer.html#valueOf(int)[``Integer.valueOf(int)``의 API 계약]은 상수식 여부와 관계없이 -128부터 127까지를 항상 캐시한다고 보장합니다.
+JLS는 `IntegerCache` 라는 구현 자체를 요구하지 않습니다. https://docs.oracle.com/javase/specs/jls/se25/html/jls-5.html#jls-5.1.7[JLS 5.1.7]은 박싱 대상이 상수식일 때 아래 조건에서 두 박싱 결과가 반드시 같은 참조여야 한다고 규정합니다. JDK는 이 요구를 캐시로 충족합니다. 한편 https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Integer.html#valueOf(int)[``Integer.valueOf(int)``의 API 계약]은 상수식 여부와 관계없이 -128부터 127까지를 항상 캐시한다고 보장합니다.
 
 [quote, 'JLS 5.1.7. Boxing Conversion']
 ____
 If the value `p` being boxed is the result of evaluating a constant expression of type `boolean`, `byte`, `char`, `short`, `int`, or `long`, and the result is `true`, `false`, a character in the range `'\u0000'` to `'\u007f'` inclusive, or an integer in the range `-128` to `127` inclusive, then let `a` and `b` be the results of any two boxing conversions of `p`. It is always the case that `a == b`.
 ____
 
-그래서 아래 코드의 결과는 값의 크기에 따라 달라집니다.
+캐시 범위 때문에 아래 코드의 결과는 값의 크기에 따라 달라집니다.
 
 [source,java]
 .Identity.java
@@ -156,15 +156,13 @@ c == d : false
 c.equals(d) : true
 ----
 
-기본 설정으로 실행한 위 예제에서는 128이 캐시 범위 밖이라 서로 다른 ``Integer``가 반환되므로 `c == d` 가 `false` 가 됩니다. 박싱된 타입끼리는 `==` 대신 ``equals()``로 비교해야 하는 이유입니다.
+기본 설정에서 128은 캐시 범위 밖이므로 박싱할 때마다 새 ``Integer``가 만들어집니다. 그래서 `c == d` 는 `false` 입니다. 박싱된 타입끼리는 `==` 대신 ``equals()``로 비교해야 하는 이유입니다.
 
 캐시 범위는 타입마다 다릅니다. JDK 25 기준으로 ``Long``, ``Short``, ``Byte``는 -128~127을, ``Character``는 `'\u0000'` 부터 `'\u007f'` 까지를 캐시합니다. ``Boolean``은 ``Boolean.TRUE``와 ``Boolean.FALSE``를 재사용합니다.
 
 === -XX:AutoBoxCacheMax로 캐시 범위 조정
 
-``Integer``만은 공개 VM 옵션인 `-XX:AutoBoxCacheMax=<size>` 로 캐시의 상한을 늘릴 수 있습니다. 앞의 예제를 같은 클래스 파일로 다시 실행하면 결과가 바뀝니다.
-
-OpenJDK 구현에서는 `-Djava.lang.Integer.IntegerCache.high=<size>` 로 지정해도 같은 효과가 나지만, 이 값은 ``System.getProperty()``로 조회하는 공개 시스템 프로퍼티가 아니라 VM이 별도로 보관하는 private saved property입니다. 따라서 이 이름에 의존하기보다는 공개 옵션인 `-XX:AutoBoxCacheMax` 를 쓰는 편이 안전합니다.
+``Integer``는 공개 VM 옵션인 `-XX:AutoBoxCacheMax=<size>` 로 캐시의 상한을 늘릴 수 있습니다. 앞의 예제를 같은 클래스 파일로 다시 실행하면 결과가 바뀝니다.
 
 [source,shell]
 ----
@@ -179,11 +177,13 @@ c == d : true
 c.equals(d) : true
 ----
 
-같은 코드의 `==` 비교 결과가 실행 옵션에 따라 달라진다는 점은, 박싱된 타입을 `==` 로 비교하면 안 되는 이유를 한 번 더 보여 줍니다. 이 옵션은 ``Integer``에만 적용되고 ``Long``이나 ``Short``에는 영향을 주지 않습니다.
+같은 코드라도 실행 옵션에 따라 `==` 의 결과가 달라지므로, 박싱된 타입은 `==` 로 비교하면 안 됩니다. 이 옵션은 ``Integer``에만 적용되고 ``Long``이나 ``Short``에는 영향을 주지 않습니다.
+
+OpenJDK 구현에서는 `-Djava.lang.Integer.IntegerCache.high=<size>` 로 지정해도 같은 효과가 나지만, 이 값은 ``System.getProperty()``로 조회하는 공개 시스템 프로퍼티가 아니라 VM이 별도로 보관하는 saved property입니다. 따라서 이 이름에 의존하기보다는 공개 옵션인 `-XX:AutoBoxCacheMax` 를 쓰는 편이 안전합니다.
 
 == JDK 9부터 deprecated된 wrapper 생성자
 
-``new Integer(int)``에 `@Deprecated` 가 붙은 것은 JDK 9부터입니다. 그전까지는 컴파일러가 이 코드에 아무 경고도 하지 않아서, https://findbugs.sourceforge.net/[FindBugs] 같은 정적 분석기를 따로 붙여야 알 수 있는 문제였습니다. Eclipse에 FindBugs 플러그인을 설치하면 Problems 뷰에 아래와 같은 경고가 떴습니다.
+``new Integer(int)``에는 JDK 9부터 `@Deprecated` 가 붙었습니다. 그전에는 ``javac``이 이 코드를 경고하지 않아서 https://findbugs.sourceforge.net/[FindBugs] 같은 정적 분석기를 따로 붙여야 찾을 수 있었습니다. Eclipse에 FindBugs 플러그인을 설치하면 Problems 뷰에 아래와 같은 경고가 떴습니다.
 
 [source]
 ----
@@ -191,7 +191,7 @@ M P Bx: Method study.Test.testInteger() invokes inefficient new Integer(int) con
         use Integer.valueOf(int) instead
 ----
 
-지금은 ``javac``이 직접 경고합니다.
+지금은 ``javac``이 알려 줍니다. `-Xlint:deprecation` 옵션을 붙이면 위치까지 경고합니다.
 
 [source,shell]
 ----
@@ -205,7 +205,7 @@ OldStyle.java:4: warning: [deprecation] Double(double) in Double has been deprec
 2 warnings
 ----
 
-JDK 25의 소스에는 `@Deprecated(since="9")` 가 붙어 있습니다. `forRemoval` 은 지정되어 있지 않아서 아직 제거 예정으로 표시된 상태는 아니지만, 새 코드에서 쓸 이유는 없습니다.
+JDK 25의 소스에는 `@Deprecated(since="9")` 가 붙어 있습니다. `forRemoval` 이 없으므로 제거 예정 API는 아니지만, 새 코드에서 쓸 이유는 없습니다.
 
 [source,java]
 .java/lang/Integer.java (JDK 25)
@@ -233,7 +233,7 @@ ____
 
 다만 인용문의 '약 3.5배'라는 수치와 캐시 범위 밖에서는 성능이 같다는 설명은 Java API의 보장이 아닙니다. 실제 차이는 확장된 캐시 범위와 JIT 최적화, 실행 환경에 따라 달라질 수 있습니다.
 
-IDE에 내장된 검사로도 잡힙니다. Eclipse는 Java > Compiler > Errors/Warnings의 'Deprecated and restricted API' 아래 'Deprecated API' 항목이 기본값 Warning이라 별도 플러그인 없이 deprecation 경고를 표시합니다. IntelliJ IDEA에는 deprecation 경고와 별개로 'Number constructor call with primitive argument'(`CachedNumberConstructorCall`) 인스펙션이 Java > Numeric issues 그룹에 있습니다. `Long`, `Integer`, `Short`, `Byte` 생성자에 primitive 값을 넘기는 코드를 찾아 ``valueOf()``로 바꾸도록 안내합니다.
+IDE의 내장 검사로도 찾을 수 있습니다. Eclipse는 Java > Compiler > Errors/Warnings의 'Deprecated and restricted API' 아래 'Deprecated API' 항목의 기본값이 Warning이라 별도 플러그인 없이 deprecation 경고를 표시합니다. IntelliJ IDEA에는 deprecation 경고와 별개로 'Number constructor call with primitive argument'(`CachedNumberConstructorCall`) 인스펙션이 Java > Numeric issues 그룹에 있습니다. `Long`, `Integer`, `Short`, `Byte` 생성자에 primitive 값을 넘기는 코드를 찾아 ``valueOf()``로 바꾸도록 안내합니다.
 
 == 박싱된 타입을 반복문에 쓸 때의 비용
 
@@ -250,7 +250,7 @@ static long boxed() {
 }
 ----
 
-`sum += i` 한 줄이 언박싱과 박싱을 모두 거치는 코드로 컴파일됩니다. 역컴파일하면 그 한 줄이 어떻게 부풀어 오르는지 드러납니다.
+`sum += i` 한 줄이 언박싱과 박싱을 모두 거치는 코드로 컴파일됩니다. 역컴파일하면 이 한 줄이 ``longValue()``와 ``Long.valueOf()`` 호출로 바뀐 것을 볼 수 있습니다.
 
 [source,java]
 .java -jar cfr-0.152.jar --sugarboxing false SumTest.class
@@ -292,7 +292,9 @@ static long boxed() {
         29: goto          7
 ----
 
-반복할 때마다 ``longValue()``로 값을 꺼내 더한 뒤 ``Long.valueOf()``로 다시 박싱합니다. 누적값이 127을 넘은 뒤에는 ``Long.valueOf()``가 캐시되지 않은 ``Long`` 인스턴스를 반환합니다. 다만 실제 객체 할당은 JIT 최적화로 제거될 수도 있습니다. 누적 변수의 타입만 `long` 으로 바꾸면 박싱이 사라집니다. 두 방식을 한 번씩 재는 프로그램을 JDK 25에서 세 번 실행해 보면 이 환경에서는 차이가 크게 벌어집니다.
+반복할 때마다 ``longValue()``로 값을 꺼내 더한 뒤 ``Long.valueOf()``로 다시 박싱합니다. 누적값이 127을 넘은 뒤에는 ``Long.valueOf()``가 새 ``Long`` 인스턴스를 반환합니다. 다만 실제 객체 할당은 JIT 최적화로 제거될 수도 있습니다.
+
+누적 변수의 타입만 `long` 으로 바꾸면 박싱이 사라집니다. 두 방식을 한 번씩 재는 프로그램을 JDK 25에서 세 번 실행해 보면 약 10배 차이가 납니다.
 
 [source]
 ----
@@ -301,11 +303,11 @@ Long: 4987 ms, long: 516 ms
 Long: 4919 ms, long: 513 ms
 ----
 
-JMH 같은 벤치마크 도구를 쓰지 않고 `System.nanoTime()` 으로 각 실행에서 한 번씩 잰 값이라 절대 수치를 그대로 믿을 수는 없습니다. 그래도 이 측정에서는 자릿수가 달라질 만큼 벌어졌습니다.
+JMH 같은 벤치마크 도구를 쓰지 않고 `System.nanoTime()` 으로 각 실행에서 한 번씩 잰 값이라 절대 수치를 그대로 믿을 수는 없습니다.
 
-== 캐시가 없는 Double과 Float
+== 캐시가 없는 Double와 Float
 
-정수 계열과 달리 ``Double``과 ``Float``에는 캐시가 없습니다. JLS 5.1.7이 `float` 과 `double` 에 대해서는 참조 동일성을 요구하지 않기 때문입니다. JDK 25의 ``Double.valueOf()``는 아직도 생성자를 그대로 호출합니다.
+정수 계열과 달리 ``Double``와 ``Float``에는 캐시가 없습니다. JLS 5.1.7도 `float` 와 `double` 에는 참조 동일성을 요구하지 않습니다. JDK 25의 ``Double.valueOf()``는 아직도 생성자를 그대로 호출합니다.
 
 [source,java]
 .java/lang/Double.java (JDK 25)
@@ -370,14 +372,14 @@ Note: OldStyle.java uses or overrides a deprecated API.
 Note: Recompile with -Xlint:deprecation for details.
 ----
 
-JLS 5.1.7의 변화도 짚어 둘 만합니다. Java SE 8까지는 참조 동일성을 '리터럴'에 대해서만 보장했습니다.
+JLS 5.1.7의 보장 범위도 Java SE 9에서 바뀌었습니다. Java SE 8까지는 참조 동일성을 '리터럴'에 대해서만 보장했습니다.
 
 [quote, 'JLS SE8 5.1.7']
 ____
 If the value `p` being boxed is an integer literal of type `int` between `-128` and `127` inclusive, or the boolean literal `true` or `false`, or a character literal between `'\u0000'` and `'\u007f'` inclusive, then let `a` and `b` be the results of any two boxing conversions of `p`. It is always the case that `a == b`.
 ____
 
-Java SE 9부터 이 조건이 상수식의 평가 결과로 넓어졌습니다. `Integer x = 100 + 27;` 처럼 리터럴이 아닌 상수식도 보장 대상이 된 것입니다. 실제 JDK 구현은 그 전에도 ``valueOf()``를 거쳐 같은 인스턴스를 돌려주고 있었으니, 명세가 구현을 따라간 셈입니다.
+Java SE 9부터 이 조건이 상수식의 평가 결과로 넓어졌습니다. `Integer x = 100 + 27;` 처럼 리터럴이 아닌 상수식도 보장 대상이 된 것입니다. 실제 JDK 구현은 그 전에도 ``valueOf()``를 거쳐 같은 인스턴스를 돌려주고 있었으니, 명세가 구현에 맞춰 보장 범위를 넓혔습니다.
 
 == 정리
 
