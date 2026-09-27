@@ -6,7 +6,7 @@
 :jbake-tags: java, code-review
 :description: 자바의 double에 0.1을 저장할 때 IEEE 754 가수 52비트에서 반올림 오차가 생기는 원리를 설명하고, 그 오차가 장애로 이어진 NEIS 성적 오류와 패트리어트 미사일 사례를 살펴봅니다. 오차를 피하는 BigDecimal과 정수형 최소 단위의 선택 기준, Java Money 같은 도메인 특화 라이브러리도 정리합니다.
 :jbake-og: {"image": "img/floating-point-java/ieee754-double.png"}
-:jbake-last_updated: 2026-09-25
+:jbake-last_updated: 2026-09-27
 :toc:
 :sectnums:
 :idprefix:
@@ -24,14 +24,14 @@ jshell은 JDK 9부터 포함된 대화형 실행 도구입니다.
 [source,java]
 .소수 더하기 연산
 ----
-jshell> System.out.println(0.1 + 0.2);
-0.30000000000000004
+jshell> 0.1 + 0.2
+$1 ==> 0.30000000000000004
 
-jshell> System.out.println(0.1 + 0.2 == 0.3);
-false
+jshell> 0.1 + 0.2 == 0.3
+$2 ==> false
 
-jshell> System.out.println(1.03 - 0.42);
-0.6100000000000001
+jshell> 1.03 - 0.42
+$3 ==> 0.6100000000000001
 ----
 
 0.1을 열 번 더해도 1.0이 되지 않습니다.
@@ -40,9 +40,12 @@ jshell> System.out.println(1.03 - 0.42);
 .0.1 열 번 더하기
 ----
 jshell> double sum = 0;
+sum ==> 0.0
+
 jshell> for (int i = 0; i < 10; i++) { sum += 0.1; }
-jshell> System.out.println(sum);
-0.9999999999999999
+
+jshell> sum
+sum ==> 0.9999999999999999
 ----
 
 `double` 리터럴 0.1에 실제로 저장된 값은 `BigDecimal` 생성자로 확인할 수 있습니다.
@@ -50,8 +53,8 @@ jshell> System.out.println(sum);
 [source,java]
 .double 리터럴 0.1의 실제 값
 ----
-jshell> System.out.println(new BigDecimal(0.1));
-0.1000000000000000055511151231257827021181583404541015625
+jshell> new BigDecimal(0.1)
+$1 ==> 0.1000000000000000055511151231257827021181583404541015625
 ----
 
 jshell 명령행에서 0.1로 입력했지만 저장된 값은 0.1보다 약 5.55 × 10^-18^만큼 큰 수입니다.
@@ -97,7 +100,7 @@ IEEE 754는 실수를 2진수 과학적 표기법으로 바꾼 다음 비트로 
 `double` (binary64)은 이렇게 정규화한 값을 64비트에 담으면서 다음 규칙을 따릅니다.
 
 * 부호(s)는 맨 앞 1비트에 저장합니다. 0이면 양수, 1이면 음수입니다.
-* 지수(e)는 실제 지수에 1023을 더한 값을 11비트에 저장합니다. 이렇게 하면 -1022~1023의 지수를 1~2046의 부호 없는 정수로 저장할 수 있고, 값을 읽을 때는 거꾸로 1023을 뺍니다.
+* 지수(e)는 실제 지수에 1023을 더한 값을 11비트에 저장합니다. 이렇게 하면 -1022~1023의 지수를 1~2046의 부호 없는 정수로 저장할 수 있고, 값을 읽을 때는 거꾸로 1023을 뺍니다. 11비트로 나타낼 수 있는 0~2047 중 양 끝의 두 값은 용도가 따로 있어서, 0은 0과 0에 아주 가까운 수를, 2047은 무한대와 NaN을 나타냅니다.
 * 가수(f)는 1.가수에서 소수점 아래 부분만 52비트에 저장합니다. 정규화된 수는 정수부가 항상 1이므로 그 1은 생략합니다.
 * 소수점 아래가 52비트를 넘으면 가장 가까운 값으로 반올림합니다.
 
@@ -116,6 +119,20 @@ image::img/floating-point-java/ieee754-double.png[IEEE 754 double의 비트 구�
 52비트 뒤에 이어지는 비트가 1로 시작하므로 올림이 일어나, 가수의 마지막 네 비트 1001이 1010이 됩니다.
 그 결과 0.1이 아니라 0.1보다 아주 조금 큰 수가 저장됩니다.
 앞에서 ``new BigDecimal(0.1)``로 확인한 0.1000000000000000055511151231257827021181583404541015625가 바로 이 반올림된 값입니다.
+
+저장된 비트는 jshell에서 16진수로 확인할 수 있습니다.
+
+[source,java]
+.0.1을 저장한 64비트
+----
+jshell> Long.toHexString(Double.doubleToLongBits(0.1))
+$1 ==> "3fb999999999999a"
+----
+
+16진수 한 자리는 4비트입니다.
+맨 앞의 세 자리 3fb는 부호 1비트와 지수 11비트를 합친 12비트로, 부호 비트는 0이고 지수부는 0x3fb, 십진수로 1019입니다.
+나머지 열세 자리가 가수 52비트입니다.
+9(1001)가 열두 번 반복되다가 마지막 자리만 a(1010)로 올림되어 있습니다.
 
 모든 소수에서 오차가 생기는 것은 아닙니다.
 0.5(1/2), 0.25(1/4), 0.75(3/4)처럼 분모가 2의 거듭제곱인 소수는 유한한 2진 소수가 되므로 정확하게 저장됩니다.
@@ -144,6 +161,24 @@ image::img/floating-point-java/ieee754-double.png[IEEE 754 double의 비트 구�
 이 때문에 총점이 같아야 할 학생이 동점자로 판별되지 않거나 동점자 사이의 석차가 뒤집혔습니다.
 (https://use.go.kr/news/user/bbs/BD_selectBbs.do?q_bbsSn=1005&q_bbsDocNo=13244[울산광역시교육청 안내문]).
 교육과학기술부는 이 계산 오차를 보정하지 않은 것이 버그의 원인이라고 설명했습니다(https://www.khan.co.kr/article/201107222144165[경향신문 기사]).
+
+같은 수를 더해도 더하는 순서에 따라 합이 달라지는 것을 jshell로 확인할 수 있습니다.
+아래는 나이스의 실제 계산식이 아니라 원리를 보여 주는 예입니다.
+
+[source,java]
+.더하는 순서에 따라 달라지는 합
+----
+jshell> 0.1 + 0.2 + 0.3
+$1 ==> 0.6000000000000001
+
+jshell> 0.3 + 0.2 + 0.1
+$2 ==> 0.6
+
+jshell> (0.1 + 0.2 + 0.3) == (0.3 + 0.2 + 0.1)
+$3 ==> false
+----
+
+같은 세 수를 더했으므로 두 합은 같아야 하지만, ``double``로 계산하면 서로 다른 값이 되어 동점으로 판별되지 않습니다.
 
 교육과학기술부 집계로는 전국 823개 고교에서 2만 9,007명의 석차가 바뀌었고, 그중 350개교 2,416명은 석차 등급까지 바뀌었습니다(https://www.jejunews.com/news/articleView.html?idxno=957280[제주일보 기사]).
 학교들은 오류 정정 프로그램으로 성적을 다시 계산하고 성적표를 재발송해야 했습니다(경향신문 기사).
@@ -222,6 +257,16 @@ Joshua Bloch도 'Effective Java' 3판의 아이템 60 '정확한 답이 필요�
 === 정수로 계산하기
 
 금액을 원(₩)이나 센트 같은 최소 단위의 정수로 다루는 방법도 널리 쓰입니다.
+결제 서비스인 Stripe의 API가 그런 예입니다.
+https://docs.stripe.com/api/charges/object[Charge 객체]의 `amount` 속성은 integer 타입이고, 설명은 다음과 같습니다.
+
+[quote, Stripe API Reference, The Charge object]
+____
+A positive integer representing how much to charge in the smallest currency unit (e.g., 100 cents to charge $1.00 or 100 to charge ¥100, a zero-decimal currency).
+
+청구할 금액을 최소 통화 단위로 나타낸 양의 정수(예: $1.00를 청구하려면 100센트, 소수 단위가 없는 통화인 엔화로 ¥100을 청구하려면 100).
+____
+
 특히 1원 이하의 가치가 적은 한국에서는 업무 규칙과 어긋나지 않는다면 실용적인 방법입니다.
 같은 이유로 기존 시스템의 데이터베이스도 원화 금액을 정수 타입 칼럼으로 정의한 경우가 많습니다.
 그래서 애플리케이션에서 ``BigDecimal``로 계산하더라도 저장하기 직전에 정수로 바꾸는 과정이 한 번은 들어갑니다.
@@ -266,7 +311,13 @@ public static long calculate(long amount, BigDecimal percent, RoundingMode round
 }
 ----
 
-이 버전에서 ``calculate(16_777_217L, new BigDecimal("100"), RoundingMode.HALF_UP)``은 16,777,217을 그대로 돌려줍니다.
+[source,java]
+.고친 calculate 메서드의 실행 결과
+----
+jshell> calculate(16_777_217L, new BigDecimal("100"), RoundingMode.HALF_UP)
+$1 ==> 16777217
+----
+
 정수형 최소 단위 방식을 쓰더라도 오차를 없애려면 모든 중간값을 정수나 ``BigDecimal``로 유지해야 합니다.
 
 == BigDecimal과 정수 계산의 선택 기준
@@ -287,6 +338,26 @@ Chronicle Software의 Peter Lawrey는 https://blog.vanillajava.blog/2014/07/if-b
 * ``double``보다 메모리를 많이 사용한다. 객체를 계속 생성하므로 가비지가 많이 만들어진다.
 * 대부분의 연산에서 훨씬 느리다.
 
+이 글에는 속도 차이를 잰 JMH 벤치마크도 실려 있습니다.
+두 값의 평균을 구해 소수점 아래 6자리로 반올림하는 계산을 원소 1,024개짜리 배열에 반복한 결과입니다.
+
+[cols="2,1,1", options="header"]
+.Lawrey의 JMH 벤치마크 결과
+|===
+|벤치마크 |처리량(ops/s) |오차
+
+|`doubleMidPrice`
+|123,208.083
+|±2,109.738
+
+|`bigDecimalMidPrice`
+|23,638.568
+|±590.094
+|===
+
+``double``로 구현한 쪽의 처리량이 ``BigDecimal``의 약 5.2배입니다.
+2014년에 측정한 값이므로 지금의 JVM에서는 수치가 다를 수 있습니다.
+
 Lawrey의 결론은 "``double``의 반올림을 다루는 법을 모르거나 프로젝트 표준이 ``BigDecimal``을 강제한다면 ``BigDecimal``을 쓰되, 선택할 수 있다면 ``BigDecimal``이 당연히 옳다고 가정하지는 말라"는 것입니다.
 금융 애플리케이션의 성능 개선을 맡으면 언젠가는 ``BigDecimal``을 걷어 내게 된다는 자신의 경험도 근거로 듭니다.
 ``BigDecimal``이 처음부터 가장 큰 지연 원인은 아니지만, 다른 병목을 고쳐 나가다 보면 결국 가장 느린 부분으로 올라온다는 것입니다.
@@ -294,6 +365,10 @@ Lawrey의 결론은 "``double``의 반올림을 다루는 법을 모르거나 �
 
 정수형 최소 단위 계산은 시스템 자원을 적게 쓴다는 장점이 있습니다.
 `long` 타입의 값은 객체를 만들지 않고, 연산도 CPU의 정수 연산으로 끝납니다.
+메모리 크기는 https://github.com/openjdk/jol[JOL(Java Object Layout)]로 잴 수 있습니다.
+JDK 25 HotSpot 64비트 기본 설정에서 ``new BigDecimal("1.03")`` 객체는 40바이트입니다.
+값이 `long` 범위를 넘으면 내부에 ``BigInteger``와 `int` 배열이 추가되어, 22자리 수인 ``new BigDecimal("12345678901234567890.12")``는 모두 112바이트를 씁니다.
+`long` 값은 8바이트입니다.
 
 대신 `long` 방식은 중간에 나눗셈이 있거나 ``double``이나 ``float``가 섞인 연산이 있으면 개발자가 정확성을 더 많이 의식해야 합니다.
 반올림 규칙을 정해야 하는 것은 ``BigDecimal``도 마찬가지이지만, ``long`` 방식에서는 그 규칙을 빠뜨렸을 때 생기는 오류를 알아차리기가 더 어렵습니다.
@@ -314,7 +389,7 @@ a|
 * 자릿수 제한 없이 십진수를 정확하게 표현
 * 최소 단위를 따로 정하지 않아도 됨
 a|
-* 메모리 사용량 증가
+* 메모리 사용량 증가(객체 하나에 40바이트 이상)
 * 연산 속도 저하
 * 기본 연산자 대신 메서드 체인 호출로 연산해야 하는 번거로움
 
@@ -369,15 +444,15 @@ implementation 'org.javamoney:moneta:1.4.5'
 ----
 MonetaryAmount price = Money.of(new BigDecimal("1.03"), "USD");
 MonetaryAmount result = price.subtract(Money.of(new BigDecimal("0.42"), "USD"));
-System.out.println(result);
+System.out.println(result); // USD 0.61
 ----
 
-통화가 다른 금액끼리 연산하면 예외가 발생합니다.
+통화가 다른 금액끼리 연산하면 ``javax.money.MonetaryException``이 발생합니다.
 서로 다른 통화의 금액을 섞어 계산하는 실수를 API가 실행 시점에 예외로 막아 줍니다.
 
 [source,java]
 ----
-price.add(Money.of(100, "KRW"));
+price.add(Money.of(100, "KRW")); // MonetaryException: Currency mismatch: USD/KRW
 ----
 
 Java Money는 앞의 두 방법을 대체하지 않고 그 위에 얹혀 있습니다.
@@ -413,6 +488,8 @@ Java Money를 선택할지는 통화를 여러 개 다루는지에 달렸다고 
 * https://www.geeksforgeeks.org/bigdecimal-class-java/[BigDecimal Class in Java - GeeksforGeeks]
 * https://blog.vanillajava.blog/2014/07/if-bigdecimal-is-answer-it-must-have.html[If BigDecimal is the answer, it must have been a strange question - Peter Lawrey]
 * https://techblog.woowahan.com/2560/[Spock으로 테스트코드를 짜보자 - 우아한형제들 기술 블로그]
+* https://docs.stripe.com/api/charges/object[The Charge object - Stripe API Reference]
+* https://github.com/openjdk/jol[JOL (Java Object Layout)]
 
 [discrete]
 === 장애 사례
