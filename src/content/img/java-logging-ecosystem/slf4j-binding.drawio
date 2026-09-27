@@ -39,8 +39,8 @@
         <mxCell id="lf2" value="slf4j-api 2.0.x&lt;br&gt;LoggerFactory" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
           <mxGeometry x="785" y="80" width="220" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="sl" value="ServiceLoader.load(SLF4JServiceProvider.class)&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;META-INF/services/org.slf4j.spi.SLF4JServiceProvider&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
-          <mxGeometry x="740" y="200" width="310" height="60" as="geometry" />
+        <mxCell id="sl" value="ServiceLoader.load(SLF4JServiceProvider.class, classLoader)&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;META-INF/services/org.slf4j.spi.SLF4JServiceProvider&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="695" y="200" width="400" height="60" as="geometry" />
         </mxCell>
         <mxCell id="q1" value="logback-classic 1.5+&lt;br&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;LogbackServiceProvider&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
           <mxGeometry x="650" y="340" width="145" height="60" as="geometry" />

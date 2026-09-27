@@ -14,7 +14,7 @@ Java 로깅 라이브러리는 종류가 많고 서로 얽혀 있어서, 라이�
 많이 쓰이는 라이브러리만 해도 SLF4J, Apache Commons Logging, Logback, Log4j 등 여러 가지이고, 실무 프로젝트는 대부분 SLF4J와 Logback처럼 적어도 2개를 조합해서 쓰기 때문입니다.
 
 이 글은 Java 로깅 라이브러리를 파사드와 구현체로 나누어 역할을 설명하고, 라이브러리의 선택 기준을 정리합니다.
-이어서 파사드가 구현체를 찾는 방식이 어떻게 바뀌어 왔는지를 JCL, SLF4J 1.x, SLF4J 2.0, Commons Logging 1.3의 순서로 분석해봅니다.
+이어서 파사드가 구현체를 찾는 방식이 어떻게 바뀌어 왔는지를 JCL, SLF4J 1.x, SLF4J 2.0, Commons Logging 1.3의 순서로 분석해 봅니다.
 Spring Framework가 5.0에서 ``spring-jcl`` 모듈을 만들었다가 7.0에서 없앤 과정도 함께 다룹니다.
 
 == 파사드와 구현체의 역할
@@ -31,7 +31,6 @@ JCL이나 SLF4J가 정의한 인터페이스에 맞춘 어댑터 클래스는 Lo
 * https://logging.apache.org/log4j/2.x/[Log4j 2]: ``log4j-core``가 구현체입니다.
 * https://logback.qos.ch/[Logback]: SLF4J의 창시자가 만든 구현체로, SLF4J 인터페이스를 직접 구현합니다.
 * java.util.logging(이하 JUL): JDK에 포함된 구현체입니다.
-* https://reload4j.qos.ch/[reload4j]: 2015년에 지원이 끝난 Log4j 1.x의 보안 패치 포크입니다.
 
 파사드와 구현체의 경계가 겹치는 경우도 두 가지 있습니다.
 
@@ -117,7 +116,7 @@ JUL은 구현체이면서 API이기도 하므로 출발점으로도 넣었습니
 |SLF4J
 |JCL
 |``slf4j-jcl``
-|SLF4J 호출을 JCL로 보냅니다. 요즘은 쓸 이유가 거의 없습니다.
+|SLF4J 호출을 JCL로 보냅니다. SLF4J 1.8.0-alpha0에서 제거되어 1.7 계열까지만 제공됩니다.
 
 |Log4j API
 |SLF4J
@@ -132,7 +131,7 @@ JUL은 구현체이면서 API이기도 하므로 출발점으로도 넣었습니
 |Log4j 1.x API
 |SLF4J
 |``log4j-over-slf4j``
-|Log4j 1.x의 ``Logger``, ``Category`` 같은 클래스를 같은 이름으로 다시 구현합니다. appender나 ``PropertyConfigurator``를 직접 참조하는 코드는 깨집니다.
+|Log4j 1.x의 ``Logger``, ``Category`` 같은 클래스를 같은 이름으로 다시 구현합니다. appender나 filter처럼 이 모듈에 없는 클래스를 참조하는 코드는 깨지고, ``PropertyConfigurator`` 호출은 아무 일도 하지 않습니다.
 
 |Log4j 1.x API
 |Log4j API
@@ -152,7 +151,7 @@ JUL은 구현체이면서 API이기도 하므로 출발점으로도 넣었습니
 |System.Logger
 |SLF4J
 |``slf4j-jdk-platform-logging``
-|``LoggerFinder`` 구현입니다. SLF4J 2.0.0-alpha5부터 제공합니다.
+|``LoggerFinder`` 구현입니다. SLF4J 2.0.0-alpha4에서 추가되었고, ``META-INF/services`` 등록 파일의 오류는 2.0.0-alpha5에서 고쳐졌습니다.
 
 |System.Logger
 |Log4j API
@@ -166,13 +165,14 @@ SLF4J 문서는 아래 조합이 이런 무한 위임을 일으킨다고 경고�
 
 * ``jcl-over-slf4j`` + ``slf4j-jcl``
 * ``log4j-over-slf4j`` + ``slf4j-reload4j``
-* ``jul-to-slf4j`` + ``slf4j-jdk14``
+* ``jul-to-slf4j`` + ``slf4j-jdk14``: ``SLF4JBridgeHandler``를 설치했을 때
 
 같은 이유로 ``log4j-to-slf4j``와 ``log4j-slf4j2-impl``, ``log4j-to-jul``과 ``log4j-jul``도 함께 쓰면 안 됩니다.
 표에서 양방향 모듈이 있는 쌍은 모두 이 조건에 해당합니다.
 
 ``jul-to-slf4j``는 비용이 큽니다.
-SLF4J 문서에 따르면 레벨이 꺼져 있어 기록되지 않는 로그 호출도 60배 정도 느려지고, 실제로 기록되는 호출도 20% 정도 느려집니다.
+JUL은 SLF4J 쪽의 레벨 설정을 모르므로 로그 레코드를 일단 만들어서 넘깁니다.
+SLF4J 문서에 따르면 이렇게 넘어왔다가 레벨이 꺼져 있어 기록되지 않는 로그 호출도 60배 정도 느려지고, 실제로 기록되는 호출도 20% 정도 느려집니다.
 Logback을 쓴다면 ``LevelChangePropagator``가 Logback의 레벨 설정을 JUL 로거에 전파하므로, 꺼진 레벨의 로그 호출에 드는 비용을 없앨 수 있습니다.
 
 == 2026년 9월 기준 각 라이브러리의 상태
@@ -182,14 +182,14 @@ Logback을 쓴다면 ``LevelChangePropagator``가 Logback의 레벨 설정을 JU
 |라이브러리 |최신 버전 |릴리스 날짜 |비고
 
 |SLF4J
-|2.0.19
-|2026-09-04
+|2.0.20
+|2026-09-22
 |2.0.0은 2022-08-20에 나왔습니다. Java 8 이상. 2.1.0은 2024년 초의 alpha1에 머물러 있습니다.
 
 |Logback
-|1.6.3
-|2026-08-14
-|1.5.x 이후 SLF4J 2.0.x가 필요합니다. 1.6.x는 JDK 11 이상. 1.5.x를 쓰던 프로젝트는 1.6.x로 바로 교체할 수 있습니다.
+|1.6.4
+|2026-09-24
+|1.3.x부터 SLF4J 2.0.x가 필요합니다. 1.6.x는 JDK 11 이상. 1.5.x를 쓰던 프로젝트는 1.6.x로 바로 교체할 수 있는데, 설정 파일에 Janino 조건문을 쓴 경우는 예외여서 설정 파일을 고쳐야 합니다.
 
 |Log4j 2
 |2.26.1
@@ -214,7 +214,7 @@ Logback을 쓴다면 ``LevelChangePropagator``가 Logback의 레벨 설정을 JU
 
 Log4j 2에서 2021년 12월에 공개된 https://logging.apache.org/security.html[CVE-2021-44228](Log4Shell)은 ``log4j-core``의 JNDI lookup 문제였습니다.
 ``log4j-api``만 쓰는 경우는 영향이 없었습니다.
-파사드와 구현체를 나누어 두면 이런 사고가 났을 때 의존성 목록에 ``log4j-core``가 있는지만 확인해도 영향 여부를 가늠할 수 있습니다.
+파사드와 구현체를 나누어 두면 이런 사고가 났을 때 의존성 목록에 ``log4j-core``가 있는지만 확인해도 영향을 받는지 가늠할 수 있습니다.
 
 == 파사드 선택: SLF4J와 JCL
 
@@ -272,7 +272,6 @@ Log4j 2의 성능 페이지도 지금은 Logback과 비교한 수치를 싣지 �
 * 로깅 중 발생한 예외를 애플리케이션에 알리기 어렵습니다.
 * vCPU가 하나뿐인 환경에서는 스레드가 늘어난 만큼 오히려 느려질 수 있습니다.
 
-
 성능이 선택 기준이라면 실제 로그 패턴과 appender 구성으로 직접 측정하는 편이 낫습니다.
 
 === PatternLayout의 위치 정보 옵션
@@ -306,18 +305,21 @@ JCL, SLF4J 1.x, SLF4J 2.0, 그리고 최근의 Commons Logging 1.3 순서로 어
 JCL의 ``LogFactory``는 아래 순서로 구현체를 찾습니다.
 
 . 시스템 프로퍼티 ``org.apache.commons.logging.LogFactory``
+. 클래스패스의 ``META-INF/services/org.apache.commons.logging.LogFactory`` 파일
 . 클래스패스의 ``commons-logging.properties`` 파일
-. 자동 탐지
+. 기본 구현인 ``LogFactoryImpl``의 자동 탐지
 
 자동 탐지는 스레드 컨텍스트 클래스로더(TCCL)를 기준으로 클래스를 찾고, 찾은 ``LogFactory``를 클래스로더별로 캐시합니다.
-애플리케이션 서버처럼 클래스로더가 여러 겹인 환경에서는 이 방식이 자주 문제를 일으켰습니다.
-JCL의 기술 문서는 컨텍스트 클래스로더가 설정되지 않았거나, 컨테이너가 로깅 클래스를 정의한 클래스로더와 부모도 자식도 아닌 클래스로더를 컨텍스트로 지정하면 탐지가 실패한다고 설명합니다.
-클래스로더 언로드 시 ``LogFactory.release()``를 호출하지 않으면 메모리 누수가 생기는 문제도 같은 문서가 다룹니다.
+애플리케이션 서버처럼 클래스로더 여러 개가 부모와 자식 관계로 이어진 환경에서는 이 방식이 자주 문제를 일으켰습니다.
+JCL의 기술 문서는 컨텍스트 클래스로더를 쓰는 코드가 어려움을 겪는 경우를 두 가지로 설명합니다.
+컨텍스트 클래스로더가 설정되지 않은 경우와, 컨테이너가 로깅 클래스를 정의한 클래스로더의 부모도 자식도 아닌 클래스로더를 컨텍스트로 지정한 경우입니다.
+클래스로더를 언로드할 때 ``LogFactory.release()``를 호출하지 않으면 메모리 누수가 생길 수 있다는 점은 JCL의 사용자 가이드가 다룹니다.
 
 더 큰 제약은 확장 방식입니다.
 JCL 1.2까지 자동 탐지 대상은 Log4j 1.x와 JUL 같은 정해진 구현체뿐이었습니다.
-다른 구현체를 쓰려면 ``Log`` 인터페이스를 구현한 클래스를 만들고 설정 파일이나 시스템 프로퍼티로 지정해야 했습니다.
-설정 없이 연결하고 클래스로더 탐색도 피하려면 ``org.apache.commons.logging`` 패키지의 클래스를 같은 이름으로 다시 구현해 ``commons-logging.jar``를 통째로 대체하는 방법뿐이었습니다.
+다른 구현체를 쓰려면 ``Log`` 인터페이스를 구현한 클래스를 설정 파일이나 시스템 프로퍼티로 지정하거나, ``LogFactory``를 구현한 클래스를 ``META-INF/services``에 등록해야 했습니다.
+Log4j 2의 ``log4j-jcl``이 뒤의 방법을 썼습니다.
+클래스로더 탐색까지 피하려면 ``org.apache.commons.logging`` 패키지의 클래스를 같은 이름으로 다시 구현해 ``commons-logging.jar``를 통째로 대체해야 했습니다.
 SLF4J의 ``jcl-over-slf4j``가 그렇게 만들어졌고, Spring Framework 5.0부터 6.2까지 있던 ``spring-jcl`` 모듈도 같은 방법을 썼습니다.
 ``spring-jcl``은 <<spring-jcl,뒤에서>> 따로 다룹니다.
 
@@ -330,13 +332,14 @@ SLF4J 1.7.36의 ``LoggerFactory``는 클래스로더의 ``getResources("org/slf4
 
 이 방식은 두 가지 면에서 불편합니다.
 첫째, 서로 다른 구현이 같은 이름의 클래스로 제공되므로 스택 트레이스나 IDE에서 ``StaticLoggerBinder``를 보고 어느 jar의 클래스인지 바로 알 수 없습니다.
-둘째, 두 구현체가 클래스패스에 함께 있을 여지를 처음부터 없애 버립니다.
+둘째, 두 구현체가 클래스패스에 함께 있으면 어느 쪽이 선택될지 정할 방법이 없습니다.
 
 로깅 구현체를 두 개씩 쓰지는 않으니 괜찮다고 할 수도 있습니다.
 그러나 테스트 의존성이 문제가 됩니다.
 로그 출력을 검증하는 https://github.com/Mahoney/slf4j-test[lidalia의 slf4j-test]는 ``StaticLoggerBinder``를 제공하는 SLF4J 구현체입니다.
-이 라이브러리를 테스트 의존성에 추가하는 순간 Logback과 충돌합니다.
-Spring Boot의 테스트라면 ``LogbackLoggingSystem``이 ``LoggerFactory.getILoggerFactory()``가 Logback의 ``LoggerContext``가 아니라는 이유로 예외를 던져서 ``ApplicationContext``가 올라가지도 않습니다.
+이 라이브러리를 테스트 의존성에 추가하면 Logback과 함께 클래스패스에 놓여 둘 중 하나가 선택됩니다.
+Spring Boot의 테스트에서 이 라이브러리가 선택되면 ``LoggerFactory.getILoggerFactory()``가 돌려주는 객체는 Logback의 ``LoggerContext``가 아닙니다.
+``LogbackLoggingSystem``은 이때 예외를 던지므로 ``ApplicationContext``가 올라가지 않습니다.
 Spring Boot 4.1.1에서도 이 검사는 아래와 같이 남아 있습니다.
 
 [source,java]
@@ -371,9 +374,9 @@ SLF4J의 정적 접근은 그 요구에서 나온 설계이고, 문제는 탐색
 
 ==== ServiceLoader의 동작 방식
 
-``java.util.ServiceLoader``는 JDK 6부터 있던 표준 API로, 인터페이스의 구현 클래스를 실행 시점에 찾아서 인스턴스를 만들어 줍니다.
+``java.util.ServiceLoader``는 JDK 6부터 있던 표준 API로, 인터페이스의 구현 클래스를 실행 시점에 찾아서 인스턴스를 만듭니다.
 호출하는 코드는 인터페이스만 알면 되고, 어떤 구현 클래스를 쓸지는 ``ServiceLoader``가 jar 안의 텍스트 파일에서 읽습니다.
-구성 요소는 세 가지입니다.
+provider를 클래스패스에 둘 때의 구성 요소는 세 가지입니다.
 
 * 서비스(service): 호출하는 쪽과 구현하는 쪽이 함께 쓰는 인터페이스나 추상 클래스입니다.
 * provider: 서비스를 구현한 클래스입니다. ``ServiceLoader``가 인스턴스를 만들 수 있도록 파라미터 없는 public 생성자가 있어야 합니다.
@@ -459,7 +462,7 @@ provider와 등록 파일을 클래스패스에서 빼고 실행하면 순회할
 
 ==== SLF4J의 provider 등록과 탐색
 
-SLF4J는 1.8.0-beta0(2017-10-20)에서 ``org.slf4j.impl`` 패키지를 없애고 ``ServiceLoader``로 구현체를 찾는 방식을 시도했습니다.
+SLF4J는 2017년 4월의 1.8.0 알파 버전부터 ``ServiceLoader``로 구현체를 찾기 시작했고, 1.8.0-beta0(2017-10-20)에서 ``org.slf4j.impl`` 패키지를 없앴습니다.
 이 계열은 2.0.0-alpha0(2019-06-13)으로 이름을 바꾸어 fluent API를 더했고, 2.0.0 정식 버전은 2022-08-20에 나왔습니다.
 구현체는 ``SLF4JServiceProvider`` 인터페이스를 구현하고 ``META-INF/services``에 등록합니다.
 SLF4J는 이를 "binding" 대신 "provider"라고 부릅니다.
@@ -474,14 +477,15 @@ ch.qos.logback.classic.spi.LogbackServiceProvider
 ----
 
 두 jar는 모듈로도 같은 관계를 선언합니다.
-``slf4j-api``의 ``module-info``에는 ``uses org.slf4j.spi.SLF4JServiceProvider``가, ``logback-classic``의 ``module-info``에는 같은 서비스에 대한 ``provides ... with`` 선언이 있습니다.
+``slf4j-api``의 ``module-info``에는 ``uses org.slf4j.spi.SLF4JServiceProvider``가, ``logback-classic``의 ``module-info``에는 같은 서비스의 ``provides ... with`` 선언이 있습니다.
 SLF4J 1.x에서는 구현체마다 ``StaticLoggerBinder``라는 같은 이름의 클래스를 만들어야 했지만, 이제는 ``LogbackServiceProvider``처럼 구현체마다 고유한 이름의 클래스를 둡니다.
 
-SLF4J 2.0.19의 ``LoggerFactory``는 ``ServiceLoader.load(SLF4JServiceProvider.class)``로 provider 목록을 얻습니다.
+SLF4J 2.0.19의 ``LoggerFactory``는 ``ServiceLoader.load()``에 ``SLF4JServiceProvider.class``와 ``LoggerFactory``를 로딩한 클래스로더를 넘겨 provider 목록을 얻습니다.
+2.0.3까지는 스레드 컨텍스트 클래스로더를 썼는데, 의도한 동작이 아니었다며 2.0.4에서 바꾸었습니다.
 provider가 둘 이상이면 각각을 "Found provider"로 출력한 뒤 목록의 첫 번째를 씁니다.
 2.0.9부터는 시스템 프로퍼티 ``slf4j.provider``로 provider 클래스를 지정해 탐색을 건너뛸 수도 있습니다.
-1.7용 ``StaticLoggerBinder``가 클래스패스에 있으면 목록으로 출력만 하고 무시합니다.
 provider가 하나도 없으면 "No SLF4J providers were found" 경고를 내고 아무것도 기록하지 않는 NOP 구현으로 동작합니다.
+이때 1.7용 ``StaticLoggerBinder``가 클래스패스에 있으면 그 위치를 출력만 하고 무시합니다.
 두 방식의 차이를 그림으로 비교하면 아래와 같습니다.
 
 image::img/java-logging-ecosystem/slf4j-binding.png[SLF4J 1.x의 StaticLoggerBinder 탐색과 SLF4J 2.0의 ServiceLoader 탐색 비교,width=800]
@@ -489,15 +493,17 @@ image::img/java-logging-ecosystem/slf4j-binding.png[SLF4J 1.x의 StaticLoggerBin
 테스트 라이브러리도 이 방식에 맞춰 갱신되었습니다.
 lidalia의 slf4j-test는 SLF4J 1.7까지만 지원하고 멈췄고, 포크인 https://github.com/valfirst/slf4j-test[valfirst/slf4j-test]가 ``SLF4JServiceProvider``를 구현해 SLF4J 2.0.x를 지원합니다.
 다만 provider가 여러 개일 때 첫 번째를 쓰는 동작과 Spring Boot의 ``LoggerContext`` 검사는 그대로이므로, 테스트에서 구현체를 바꿔치기하려면 여전히 Logback을 그 실행 구성에서 제외해야 합니다.
-``ServiceLoader``로 바뀌었다고 해서 구현체 두 개가 공존할 수 있게 된 것은 아닙니다.
-바뀐 것은 정해진 이름의 클래스 대신 표준 등록 파일로 구현체를 선언하게 되었다는 점입니다.
+``ServiceLoader``로 바뀌었다고 해서 구현체 두 개를 함께 쓸 수 있게 된 것은 아닙니다.
+바뀐 것은 구현체를 선언하는 방법입니다.
+정해진 이름의 클래스 대신 표준 등록 파일을 씁니다.
 
 === Commons Logging 1.3의 Log4j API, SLF4J 지원
 
 JCL 쪽에도 변화가 있었습니다.
 Apache Commons Logging 1.3.0(2023-11-26)은 Log4j API와 SLF4J를 직접 찾는 ``Log4jApiLogFactory``와 ``Slf4jLogFactory``를 추가했습니다.
 이 변경은 Log4j 메인테이너인 Piotr P. Karwasz가 기여했습니다.
-1.4.0의 ``LogFactory``는 아래 순서로 팩토리를 고릅니다.
+``META-INF/services``에 등록된 ``LogFactory``를 찾는 단계도 1.3.0부터는 ``ServiceLoader``를 씁니다.
+시스템 프로퍼티, ``META-INF/services``, ``commons-logging.properties`` 중 어디에도 팩토리가 지정되지 않았으면 1.4.0의 ``LogFactory``는 아래 순서로 팩토리를 고릅니다.
 
 . ``log4j-to-slf4j``의 ``SLF4JProvider`` 클래스가 있으면 ``Slf4jLogFactory``
 . ``log4j-api``가 있으면 ``Log4jApiLogFactory``
@@ -526,7 +532,7 @@ Spring Framework는 내부 로깅에 JCL의 ``Log`` 인터페이스를 씁니다
 |5.0
 |2017-09-28
 |``spring-jcl``
-|``LogFactory``가 Log4j 2 API, SLF4J, JUL 순서로 클래스 존재 여부를 확인합니다. 제외 설정과 연결 모듈이 필요 없어졌습니다.
+|``LogFactory``가 Log4j 2 API, SLF4J, JUL 순서로 클래스가 있는지 확인합니다. 제외 설정과 연결 모듈이 필요 없어졌습니다.
 
 |5.1
 |2018-09-21
@@ -595,7 +601,7 @@ Juergen Hoeller는 2016년 7월에 https://github.com/spring-projects/spring-fra
 
 * SLF4J로 옮기는 것은 2017년 시점에서 그만한 가치가 없고, API만 보면 Log4j 2가 더 낫습니다.
 * Log4j 2 API로 옮기는 것도 SLF4J를 쓰는 사람이 많아서 적절하지 않습니다.
-* 어느 쪽으로 옮기든 하위 호환성이 깨집니다. Spring의 클래스는 ``protected`` 로거 필드를 하위 클래스에 노출하고 있고, 이미 컴파일된 확장 라이브러리의 바이너리에는 이 필드의 타입인 JCL의 ``Log``를 가리키는 참조가 들어 있습니다.
+* 어느 쪽으로 옮기든 하위 호환성이 깨집니다. Spring의 클래스는 ``protected`` 로거 필드를 하위 클래스에 노출하고, 이미 컴파일된 확장 라이브러리의 바이너리에는 이 필드의 타입인 JCL의 ``Log``를 가리키는 참조가 들어 있습니다.
 
 그래서 JCL API는 그대로 두고 구현체를 찾는 부분만 Spring이 직접 만드는 방법을 골랐습니다.
 
@@ -686,7 +692,9 @@ Java 모듈 시스템(JPMS)은 한 패키지를 두 모듈에서 읽는 것을 �
 Error:java: module maven.artifact reads package org.apache.commons.logging from both commons.logging and spring.jcl
 ----
 
-Hoeller는 ``spring-jcl``이 ``commons-logging``을 대체하는 jar이고 함께 쓰라고 만든 것이 아니므로 ``jcl-over-slf4j``보다 상황이 나쁘지는 않다고 답했습니다.
+Hoeller는 그 이슈에서 이것이 의도한 설계라고 답했습니다.
+``spring-jcl``은 ``jcl-over-slf4j``처럼 ``commons-logging``을 대체하는 jar이므로 모듈 경로에는 둘 중 하나만 두어야 한다는 것입니다.
+#32459에서도 ``jcl-over-slf4j``나 ``log4j-jcl``을 쓸 때보다 상황이 나쁘지는 않다고 답했습니다.
 클래스패스에서는 5.1의 ``LogFactoryService`` 덕분에 어느 쪽 ``LogFactory``가 로딩되어도 ``spring-jcl``의 탐색으로 연결됩니다.
 그러나 모듈 경로에서는 Apache HttpClient 4.5처럼 ``commons-logging``에 의존하는 라이브러리를 함께 쓰면 여전히 제외 설정이 필요했습니다.
 Spring이 진짜 ``commons-logging``에 의존하면 이 문제가 없어집니다.
@@ -705,14 +713,14 @@ API는 바꾸지 않고 그 API를 제공하는 jar만 바꾸는 방법이 이 �
 구현이 바뀌면서 생긴 회귀도 하나 있습니다.
 ``spring-jcl``의 SLF4J 어댑터는 메시지 객체를 문자열로 바꾸기 전에 로그 레벨을 확인했는데, Commons Logging의 SLF4J 어댑터는 레벨과 무관하게 ``String.valueOf(message)``를 호출합니다.
 그래서 ``LogAccessor.debug(CharSequence)``에 ``LogMessage.format(...)``을 넘기는 코드는 DEBUG 레벨이 꺼져 있어도 메시지를 만들게 되었습니다.
-이 문제는 2026년 9월에 https://github.com/spring-projects/spring-framework/issues/37266[#37266]으로 보고되었고, ``LogAccessor``에 레벨 확인을 넣는 수정이 7.0.10에 예정되어 있습니다.
+이 문제는 2026년 9월에 https://github.com/spring-projects/spring-framework/issues/37266[#37266]으로 보고되었고, ``LogAccessor``에 레벨 확인을 넣는 수정이 보고된 날 커밋되어 7.0.10에 들어갈 예정입니다.
 
 2017년에 Spring이 직접 만들었던 대체 모듈의 역할을 8년 뒤에는 JCL 본체가 맡게 되었습니다.
 
 == 정리
 
-* SLF4J와 JCL은 파사드, Log4j 2 Core와 Logback은 구현체입니다. "Log4j 대신 SLF4J"는 성립하지 않는 비교입니다.
-* 애플리케이션 코드는 SLF4J를 쓰고, 구현체는 Logback이나 Log4j 2 Core 중 하나만 클래스패스에 둡니다. 다른 파사드로 들어오는 호출은 ``jcl-over-slf4j``, ``log4j-to-slf4j``, ``jul-to-slf4j``로 모읍니다. Spring Boot의 기본 스타터가 이 구성입니다.
+* SLF4J와 JCL은 파사드, Log4j 2 Core와 Logback은 구현체입니다. SLF4J와 비교할 대상은 Log4j API이고, Log4j Core는 Logback과 비교해야 합니다.
+* 애플리케이션 코드는 SLF4J를 쓰고, 구현체는 Logback이나 Log4j 2 Core 중 하나만 클래스패스에 둡니다. Logback을 쓴다면 다른 파사드로 들어오는 호출은 ``log4j-to-slf4j``, ``jul-to-slf4j``로 모으고, JCL 호출은 Commons Logging 1.3 이상이 SLF4J로 연결합니다. Spring Boot의 기본 스타터가 이 구성입니다.
 * 두 구현체의 성능 비교 수치는 오래되었습니다. 성능이 기준이라면 실제 구성으로 직접 측정합니다.
 * ``%C``, ``%F``, ``%L``, ``%M`` 같은 위치 정보 옵션은 운영 환경의 패턴에서 뺍니다.
 * 구현체 탐색은 JCL의 클래스로더 탐색, SLF4J 1.x의 정해진 클래스 이름을 거쳐 SLF4J 2.0과 Commons Logging 1.3에서 표준에 가까운 방식으로 바뀌었습니다. 너무 오래 걸렸지만, 늦은 개선이라도 안 하는 것보다는 낫다고 생각합니다.
@@ -724,7 +732,7 @@ API는 바꾸지 않고 그 API를 제공하는 jar만 바꾸는 방법이 이 �
 ** https://www.slf4j.org/faq.html#changesInVersion200[SLF4J FAQ: What has changed in SLF4J version 2.0.0?]
 ** https://www.slf4j.org/codes.html[SLF4J warning or error messages and their meanings]: multiple_bindings, noProviders, ignoredBindings
 ** https://www.slf4j.org/legacy.html[Bridging legacy APIs]: jcl-over-slf4j, log4j-over-slf4j, jul-to-slf4j와 순환 의존 경고
-** https://www.slf4j.org/news.html[SLF4J News]: 1.8.0-beta0, 2.0.0-alpha0, 2.0.0, 2.0.19의 릴리스 기록
+** https://www.slf4j.org/news.html[SLF4J News]: 1.8.0-beta0, 2.0.0-alpha0, 2.0.0, 2.0.20의 릴리스 기록
 ** https://github.com/qos-ch/slf4j/blob/v_1.7.36/slf4j-api/src/main/java/org/slf4j/LoggerFactory.java[SLF4J 1.7.36 LoggerFactory.java]: ``StaticLoggerBinder`` 탐색
 ** https://github.com/qos-ch/slf4j/blob/master/slf4j-api/src/main/java/org/slf4j/LoggerFactory.java[SLF4J 2.0.x LoggerFactory.java]: ``ServiceLoader`` 탐색과 다중 provider 처리
 * Logback
@@ -741,7 +749,7 @@ API는 바꾸지 않고 그 API를 제공하는 jar만 바꾸는 방법이 이 �
 ** https://logging.apache.org/log4j/1.x/[Log4j 1.x End of Life]
 ** https://logging.apache.org/security.html[Apache Logging Security]: CVE-2021-44228
 * Apache Commons Logging
-** https://commons.apache.org/proper/commons-logging/guide.html[Commons Logging User Guide]: 설정과 자동 탐지 순서
+** https://commons.apache.org/proper/commons-logging/guide.html[Commons Logging User Guide]: 설정과 자동 탐지 순서, ``LogFactory.release()``와 메모리 누수
 ** https://commons.apache.org/proper/commons-logging/tech.html[Commons Logging Tech Guide]: 클래스로더 문제
 ** https://commons.apache.org/proper/commons-logging/changes.html[Commons Logging Changes]: 1.3.0의 Log4j API, SLF4J 지원 추가
 ** https://github.com/apache/commons-logging/blob/master/src/main/java/org/apache/commons/logging/LogFactory.java[Commons Logging LogFactory.java]: ``newStandardFactory()``의 선택 순서
