@@ -35,7 +35,7 @@ JCL이나 SLF4J가 정의한 인터페이스에 맞춘 어댑터 클래스는 Lo
 
 * https://logging.apache.org/log4j/2.x/[Log4j 2]: ``log4j-core``가 구현체입니다.
 * https://logback.qos.ch/[Logback]: SLF4J의 창시자가 만든 구현체로, SLF4J 인터페이스를 직접 구현합니다.
-* java.util.logging(이하 JUL): JDK에 포함된 구현체입니다.
+* java.util.logging(이하 JUL): JDK에 포함된 구현체입니다. 파일 기록과 크기 기준 로테이션은 지원하지만 날짜 기준 로테이션은 없습니다. 자세한 내용은 <<jul-filehandler,뒤에서>> 다룹니다.
 
 파사드와 구현체의 경계가 겹치는 경우도 있습니다.
 Log4j 2는 API 모듈(``log4j-api``)과 구현 모듈(``log4j-core``)을 분리했으므로 ``log4j-api``는 파사드로도 쓰입니다.
@@ -301,6 +301,46 @@ Log4j 2 문서도 "This is an expensive operation and should be avoided in perfo
 그래서 Log4j 2의 비동기 로거는 ``includeLocation``이 기본으로 꺼져 있고 Logback의 ``AsyncAppender``도 ``includeCallerData``가 기본으로 꺼져 있습니다.
 운영 환경에서는 로거 이름(``%c`` 또는 ``%logger``)으로 위치를 짐작하는 정도로 두는 편이 좋습니다.
 로거 이름은 로거를 만들 때 정해지므로 추가 비용이 없습니다.
+
+[[jul-filehandler]]
+=== JUL의 FileHandler와 크기 기준 로테이션
+
+의존성을 추가하지 않고 JUL만으로 파일에 로그를 남길 수도 있습니다.
+JUL의 ``FileHandler``는 파일 기록과 크기 기준 로테이션을 지원합니다.
+아래는 파일 하나가 1000바이트를 넘으면 다음 파일로 넘기고, 파일을 3개까지 유지하는 설정입니다.
+
+[source,properties]
+.logging.properties
+----
+handlers = java.util.logging.FileHandler
+.level = INFO
+
+java.util.logging.FileHandler.pattern = logs/app.%g.log
+java.util.logging.FileHandler.limit = 1000
+java.util.logging.FileHandler.count = 3
+java.util.logging.FileHandler.append = true
+java.util.logging.FileHandler.formatter = java.util.logging.SimpleFormatter
+java.util.logging.SimpleFormatter.format = %1$tF %1$tT %4$s %3$s - %5$s%n
+----
+
+설정 파일의 위치는 시스템 프로퍼티 ``java.util.logging.config.file``로 지정합니다.
+``pattern``의 ``%g``는 로테이션할 때 붙는 세대 번호입니다.
+``formatter``를 지정하지 않으면 ``XMLFormatter``가 쓰여서 로그가 XML로 기록됩니다.
+
+이 설정으로 INFO 로그를 100건 남기면 ``logs`` 디렉터리에 파일이 3개 생깁니다.
+``app.0.log``가 지금 쓰는 파일이고 번호가 클수록 오래된 파일입니다.
+``limit``을 넘으면 ``app.0.log``의 내용이 ``app.1.log``로 밀리고, ``count``를 넘는 가장 오래된 파일은 지워집니다.
+JDK 25에서 실행했을 때 ``app.2.log``는 48번째 메시지부터 시작했고, 그 앞의 로그는 남지 않았습니다.
+
+Logback, Log4j 2와 비교하면 아래 기능이 없습니다.
+
+* 날짜 기준 로테이션: 크기 기준만 있고, 일별이나 시간별로 파일을 나눌 수 없습니다.
+* 파일 이름의 날짜: 파일 이름에는 세대 번호만 넣을 수 있습니다.
+* 압축과 보관 기간: 지난 파일을 압축하거나, 일정 기간이 지난 파일을 지우는 정책을 설정할 수 없습니다.
+* 디렉터리 생성: ``logs`` 디렉터리가 없으면 ``NoSuchFileException``이 나면서 ``FileHandler``가 등록되지 않습니다.
+
+이런 기능이 필요하면 ``jul-to-slf4j``나 ``log4j-jul``로 JUL 호출을 Logback이나 Log4j 2로 보내고 그쪽의 로테이션 정책을 씁니다.
+Tomcat은 JUL을 확장한 ``org.apache.juli.FileHandler``를 따로 두고, 보관 기간을 정하는 ``maxDays`` 속성을 제공합니다.
 
 == 파사드가 구현체를 찾는 방식의 변천
 
@@ -781,6 +821,8 @@ API는 바꾸지 않고 그 API를 제공하는 jar만 바꾸는 방법이 이 �
 ** https://openjdk.org/jeps/264[JEP 264: Platform Logging API and Service]
 ** https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/util/ServiceLoader.html[ServiceLoader Javadoc (JDK 25)]: 등록 파일 형식, 지연 로딩, provider 순서, 모듈 선언
 ** https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/System.LoggerFinder.html[System.LoggerFinder Javadoc (JDK 25)]: ``ServiceLoader`` 탐색과 기본 동작
+** https://docs.oracle.com/en/java/javase/25/docs/api/java.logging/java/util/logging/FileHandler.html[FileHandler Javadoc (JDK 25)]: ``pattern``, ``limit``, ``count``와 기본 포매터
+** https://tomcat.apache.org/tomcat-11.0-doc/logging.html[Apache Tomcat 11 Logging]: ``org.apache.juli.FileHandler``와 ``maxDays``
 * 테스트용 SLF4J 구현체
 ** https://github.com/Mahoney/slf4j-test[lidalia slf4j-test]: SLF4J 1.7까지
 ** https://github.com/valfirst/slf4j-test[valfirst/slf4j-test]: SLF4J 2.0.x 지원 포크
