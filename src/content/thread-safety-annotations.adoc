@@ -325,8 +325,8 @@ package net.benelog;
 import net.jcip.annotations.Immutable;
 
 /**
- * {@code @Immutable}로 선언했지만 final이 아닌 필드가 있어서
- * SpotBugs가 JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS로 보고한다.
+ * Declared {@code @Immutable} but has a non-final field, so
+ * SpotBugs reports JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS.
  */
 @Immutable
 public class Memo {
@@ -370,7 +370,7 @@ spotbugs {
 	toolVersion.set("4.10.4")
 	ignoreFailures.set(true)
 	if (project.hasProperty("reportLow")) {
-		// 낮은 우선순위 경고까지 보고한다. 기본값은 medium 이상만 보고한다.
+		// Report low-priority warnings too. The default reports medium and above only.
 		reportLevel.set(com.github.spotbugs.snom.Confidence.LOW)
 	}
 }
@@ -422,8 +422,8 @@ import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * Counter와 같은 위반이지만 synchronized 메서드가 더 많아서
- * lock을 잡은 접근 비율이 높다. SpotBugs가 IS_FIELD_NOT_GUARDED로 보고한다.
+ * Same violation as Counter, but more synchronized methods raise
+ * the proportion of locked accesses. SpotBugs reports IS_FIELD_NOT_GUARDED.
  */
 @ThreadSafe
 public class LockedCounter {
@@ -514,7 +514,7 @@ import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * JSR-305 패키지. Error Prone이 @GuardedBy 위반을 컴파일 오류로 보고한다.
+ * JSR-305 package. Error Prone reports the @GuardedBy violation as a compile error.
  */
 @ThreadSafe
 public class JsrCounter {
@@ -557,8 +557,8 @@ import java.util.List;
 import com.google.errorprone.annotations.Immutable;
 
 /**
- * Error Prone 자체 패키지의 @Immutable. final이 아닌 필드와
- * final이지만 가변 타입인 필드를 모두 컴파일 오류로 보고한다.
+ * Error Prone's own @Immutable. Both the non-final field and
+ * the final field of a mutable type are reported as compile errors.
  */
 @Immutable
 public class ErrorProneMemo {
@@ -617,9 +617,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.google.errorprone.annotations.ThreadSafe;
 
 /**
- * Error Prone 자체 패키지의 @ThreadSafe. 기본 설정의 Error Prone 2.50.0은 검사하지 않는다.
- * -PthreadSafeCheck로 ThreadSafeChecker를 등록하면 lock 없이 바뀌는 필드와
- * 스레드 안전하지 않은 타입의 final 필드를 컴파일 오류로 보고한다.
+ * Error Prone's own @ThreadSafe. Error Prone 2.50.0 does not check it by default.
+ * Registering ThreadSafeChecker with -PthreadSafeCheck reports fields modified without a lock
+ * and final fields of non-thread-safe types as compile errors.
  */
 @ThreadSafe
 public class ErrorProneRegistry {
@@ -660,7 +660,7 @@ package com.google.errorprone.bugpatterns.threadsafety;
 		severity = ERROR)
 public class ThreadSafeCheck extends ThreadSafeChecker {
 
-	/** ServiceLoader가 요구하는 public 기본 생성자. Error Prone은 @Inject 생성자를 쓴다. */
+	/** Public no-argument constructor required by ServiceLoader. Error Prone uses the @Inject constructor. */
 	public ThreadSafeCheck() {
 		super(null, null);
 	}
@@ -681,7 +681,7 @@ public class ThreadSafeCheck extends ThreadSafeChecker {
 dependencies {
 	errorprone("com.google.errorprone:error_prone_core:2.50.0")
 	if (project.hasProperty("threadSafeCheck")) {
-		// 기본 검사 목록에 없는 ThreadSafeChecker를 플러그인으로 등록한다.
+		// Register ThreadSafeChecker, which is not in the default check list, as a plugin.
 		errorprone(project(":threadsafe-check"))
 	}
 }
@@ -847,19 +847,19 @@ class ThreadSafetyArchTest {
 	static final ArchRule controllers_should_not_hold_not_thread_safe_types =
 			fields().that().areDeclaredInClassesThat().areAnnotatedWith(RestController.class)
 					.should().notHaveRawType(annotatedWith(NotThreadSafe.class))
-					.because("controller는 기본 scope가 singleton이라 모든 요청 스레드가 필드를 공유한다");
+					.because("controllers are singletons by default, so all request threads share their fields");
 
 	private static final DescribedPredicate<JavaClass> KNOWN_NOT_THREAD_SAFE_JDK_TYPES =
 			assignableTo(Format.class)
 					.or(assignableTo(Calendar.class))
 					.or(assignableTo(StringBuilder.class))
-					.as("JDK의 스레드 안전하지 않은 타입(Format, Calendar, StringBuilder)");
+					.as("JDK types that are not thread-safe (Format, Calendar, StringBuilder)");
 
 	@ArchTest
 	static final ArchRule controllers_should_not_hold_known_not_thread_safe_jdk_types =
 			fields().that().areDeclaredInClassesThat().areAnnotatedWith(RestController.class)
 					.should().notHaveRawType(KNOWN_NOT_THREAD_SAFE_JDK_TYPES)
-					.because("JDK 클래스에는 스레드 안전성 애너테이션이 없으므로 목록으로 막는다");
+					.because("JDK classes carry no thread safety annotations, so a list blocks them");
 }
 ----
 
@@ -867,11 +867,11 @@ ArchUnit 1.5.0, Spring Web 7.0.9, JUnit 6.1.3, JDK 25에서 ``./gradlew test``�
 
 [source]
 ----
-Architecture Violation [Priority: MEDIUM] - Rule 'fields that are declared in classes that are annotated with @RestController should not have raw type annotated with @NotThreadSafe, because controller는 기본 scope가 singleton이라 모든 요청 스레드가 필드를 공유한다' was violated (1 times):
+Architecture Violation [Priority: MEDIUM] - Rule 'fields that are declared in classes that are annotated with @RestController should not have raw type annotated with @NotThreadSafe, because controllers are singletons by default, so all request threads share their fields' was violated (1 times):
 Field <net.benelog.web.ReportController.formatter> has raw type annotated with @NotThreadSafe in (ReportController.java:0)
 
-Architecture Violation [Priority: MEDIUM] - Rule 'fields that are declared in classes that are annotated with @RestController should not have raw type JDK의 스레드 안전하지 않은 타입(Format, Calendar, StringBuilder), because JDK 클래스에는 스레드 안전성 애너테이션이 없으므로 목록으로 막는다' was violated (1 times):
-Field <net.benelog.web.ReportController.dateFormat> has raw type JDK의 스레드 안전하지 않은 타입(Format, Calendar, StringBuilder) in (ReportController.java:0)
+Architecture Violation [Priority: MEDIUM] - Rule 'fields that are declared in classes that are annotated with @RestController should not have raw type JDK types that are not thread-safe (Format, Calendar, StringBuilder), because JDK classes carry no thread safety annotations, so a list blocks them' was violated (1 times):
+Field <net.benelog.web.ReportController.dateFormat> has raw type JDK types that are not thread-safe (Format, Calendar, StringBuilder) in (ReportController.java:0)
 ----
 
 같은 프로젝트에서 ``Clock``과 ``DateTimeFormatter``만 필드로 가진 link:{source-link-base}/src/main/java/net/benelog/web/HealthController.java[HealthController]는 두 규칙을 통과했습니다.

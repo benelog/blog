@@ -4,7 +4,7 @@ import com.google.errorprone.annotations.ThreadSafe;
 import com.google.errorprone.annotations.concurrent.GuardedBy;
 
 /**
- * Error Prone 자체 패키지. @GuardedBy 위반을 컴파일 오류로 보고한다.
+ * Error Prone's own package. Error Prone reports the @GuardedBy violation as a compile error.
  */
 @ThreadSafe
 public class ErrorProneCounter {

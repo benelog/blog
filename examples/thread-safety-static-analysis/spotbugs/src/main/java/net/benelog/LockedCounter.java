@@ -4,8 +4,8 @@ import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * Counter와 같은 위반이지만 synchronized 메서드가 더 많아서
- * lock을 잡은 접근 비율이 높다. SpotBugs가 IS_FIELD_NOT_GUARDED로 보고한다.
+ * Same violation as Counter, but more synchronized methods raise
+ * the proportion of locked accesses. SpotBugs reports IS_FIELD_NOT_GUARDED.
  */
 @ThreadSafe
 public class LockedCounter {

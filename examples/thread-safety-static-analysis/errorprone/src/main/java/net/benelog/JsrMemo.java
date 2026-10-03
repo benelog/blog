@@ -5,7 +5,7 @@ import java.util.List;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * JSR-305 패키지의 @Immutable. Error Prone이 인식하지 않아 오류 없이 컴파일된다.
+ * JSR-305 @Immutable. Error Prone does not recognize it, so this compiles without errors.
  */
 @Immutable
 public class JsrMemo {

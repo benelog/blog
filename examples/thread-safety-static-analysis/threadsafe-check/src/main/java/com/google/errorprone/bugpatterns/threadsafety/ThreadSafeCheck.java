@@ -7,8 +7,8 @@ import javax.inject.Inject;
 import com.google.errorprone.BugPattern;
 
 /**
- * Error Prone에 들어 있지만 기본 검사 목록에는 등록되지 않은 ThreadSafeChecker를
- * 플러그인 검사로 등록하기 위한 래퍼.
+ * Wrapper that registers ThreadSafeChecker, which ships with Error Prone but is not
+ * in its default check list, as a plugin check.
  */
 @BugPattern(
 		name = "ThreadSafe",
@@ -16,7 +16,7 @@ import com.google.errorprone.BugPattern;
 		severity = ERROR)
 public class ThreadSafeCheck extends ThreadSafeChecker {
 
-	/** ServiceLoader가 요구하는 public 기본 생성자. Error Prone은 @Inject 생성자를 쓴다. */
+	/** Public no-argument constructor required by ServiceLoader. Error Prone uses the @Inject constructor. */
 	public ThreadSafeCheck() {
 		super(null, null);
 	}

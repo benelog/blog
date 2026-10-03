@@ -7,9 +7,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.google.errorprone.annotations.ThreadSafe;
 
 /**
- * Error Prone 자체 패키지의 @ThreadSafe. 기본 설정의 Error Prone 2.50.0은 검사하지 않는다.
- * -PthreadSafeCheck로 ThreadSafeChecker를 등록하면 lock 없이 바뀌는 필드와
- * 스레드 안전하지 않은 타입의 final 필드를 컴파일 오류로 보고한다.
+ * Error Prone's own @ThreadSafe. Error Prone 2.50.0 does not check it by default.
+ * Registering ThreadSafeChecker with -PthreadSafeCheck reports fields modified without a lock
+ * and final fields of non-thread-safe types as compile errors.
  */
 @ThreadSafe
 public class ErrorProneRegistry {

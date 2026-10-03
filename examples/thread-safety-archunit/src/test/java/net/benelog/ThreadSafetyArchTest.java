@@ -22,17 +22,17 @@ class ThreadSafetyArchTest {
 	static final ArchRule controllers_should_not_hold_not_thread_safe_types =
 			fields().that().areDeclaredInClassesThat().areAnnotatedWith(RestController.class)
 					.should().notHaveRawType(annotatedWith(NotThreadSafe.class))
-					.because("controller는 기본 scope가 singleton이라 모든 요청 스레드가 필드를 공유한다");
+					.because("controllers are singletons by default, so all request threads share their fields");
 
 	private static final DescribedPredicate<JavaClass> KNOWN_NOT_THREAD_SAFE_JDK_TYPES =
 			assignableTo(Format.class)
 					.or(assignableTo(Calendar.class))
 					.or(assignableTo(StringBuilder.class))
-					.as("JDK의 스레드 안전하지 않은 타입(Format, Calendar, StringBuilder)");
+					.as("JDK types that are not thread-safe (Format, Calendar, StringBuilder)");
 
 	@ArchTest
 	static final ArchRule controllers_should_not_hold_known_not_thread_safe_jdk_types =
 			fields().that().areDeclaredInClassesThat().areAnnotatedWith(RestController.class)
 					.should().notHaveRawType(KNOWN_NOT_THREAD_SAFE_JDK_TYPES)
-					.because("JDK 클래스에는 스레드 안전성 애너테이션이 없으므로 목록으로 막는다");
+					.because("JDK classes carry no thread safety annotations, so a list blocks them");
 }

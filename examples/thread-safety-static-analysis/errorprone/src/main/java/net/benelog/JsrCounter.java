@@ -4,7 +4,7 @@ import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * JSR-305 패키지. Error Prone이 @GuardedBy 위반을 컴파일 오류로 보고한다.
+ * JSR-305 package. Error Prone reports the @GuardedBy violation as a compile error.
  */
 @ThreadSafe
 public class JsrCounter {

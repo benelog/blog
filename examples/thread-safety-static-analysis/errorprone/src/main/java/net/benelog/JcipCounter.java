@@ -4,7 +4,7 @@ import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * 원본 JCIP 패키지. Error Prone은 이 @GuardedBy를 인식하지 않아서 오류 없이 컴파일된다.
+ * Original JCIP package. Error Prone does not recognize this @GuardedBy, so this compiles without errors.
  */
 @ThreadSafe
 public class JcipCounter {

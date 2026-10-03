@@ -3,8 +3,8 @@ package net.benelog;
 import net.jcip.annotations.Immutable;
 
 /**
- * {@code @Immutable}로 선언했지만 final이 아닌 필드가 있어서
- * SpotBugs가 JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS로 보고한다.
+ * Declared {@code @Immutable} but has a non-final field, so
+ * SpotBugs reports JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS.
  */
 @Immutable
 public class Memo {
